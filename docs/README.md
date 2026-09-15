@@ -20,6 +20,7 @@ board status is in [support tiers](boards/support-tiers.md#current-boards).
 | Integrate an application | [Native applications](design/native-applications.md), [containers](design/containers.md), [bus](design/bus.md) |
 | Build, verify or publish artifacts | [Check harness](design/build-harness.md), [release directory](design/release-artifacts.md), [key delivery](design/key-delivery.md) |
 | Port or qualify a board | [Board contract](boards/contract.md), [porting](boards/porting.md), [qualification](boards/qualification.md), [support tiers](boards/support-tiers.md) |
+| Cut or understand a release | [Releasing](user/releasing.md), [release lock](design/release-lock.md), [version index](design/mica-index.md) |
 | Find work status or a decision | [Tasks](task/index.md), [plans](plan/index.md), [decisions](decisions/README.md), [changelog](changelog.md) |
 
 ## Naming
@@ -133,6 +134,7 @@ work in progress lives in `plan/` and `task/`.
   - `release-notes.md` — how releases are identified and where release facts come from
   - `api.md` — the programmatic surface and its machine-readable contract
   - `support.md` — support tiers, lifecycle ownership, and what a support case needs
+  - `releasing.md` — for maintainers: how a release is cut in each repository, what it carries, and what decides a rebuild
 - `website/` — micaos.dev content briefs, one per page
   - `contract.md` — the website content contract: page set, tone, claims policy
   - `product.md` — page brief: what Mica OS is, in one honest screen
