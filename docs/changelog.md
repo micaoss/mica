@@ -2956,3 +2956,24 @@ flashing (`user/install`), updates and rollback (`user/update-rollback`), and tr
 (`user/troubleshooting`). They sit between the download table and the verification block,
 which is the order the work happens in — obtain, write, update, diagnose. Both locales
 resolve to their own documentation.
+
+## 2026-09-15 07:15 [progress]
+
+Two changes to the download section, on the user's call.
+
+**A board's guides are configuration.** They were three hard-coded links — install, update,
+troubleshooting — on every board, which is wrong: `cx3576` has a bench session and a
+dossier, `virt-arm64` is the QEMU reference, and a board with none of those should not
+pretend to. `website/boards.json` now carries each board's guide list in order; an entry
+names a published documentation slug (`doc`, resolved per locale) or an external target
+(`url`, for the board dossiers and bench sessions this site does not publish). The wording
+comes from `download.guides` in the dictionaries, selected by `id`, so the configuration
+stays language-free and an unknown id is skipped rather than rendered blank.
+
+**The board index reads the catalogue.** Each card now says the newest version published for
+that board, or that nothing is published yet. And a board that appears in the catalogue but
+has no page here — an image published upstream before the site knew about the board — is
+named in a line under the cards instead of being silently dropped.
+
+The board list itself stays where it was, in the dictionaries: it carries hardware and
+support status, which the catalogue does not, and it is what generates the routes.

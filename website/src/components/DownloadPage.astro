@@ -1,6 +1,7 @@
 ---
 import type { LocaleCode } from '@/shared/i18n'
 import SiteHeader from '@/components/SiteHeader.astro'
+import { BoardIndex } from '@/features/download/components/board-index'
 import { SiteFooter } from '@/features/landing/components/site-footer'
 import { boardDownloadHref, docsHref, docsPageHref, homeHref } from '@/features/landing/links'
 import BaseLayout from '@/layouts/BaseLayout.astro'
@@ -13,6 +14,12 @@ interface Props {
 
 const { locale } = Astro.props
 const copy = copyFor(locale)
+const boards = copy.boards.rows.map(row => ({
+  board: row.board,
+  hardware: row.hw,
+  status: row.status,
+  href: boardDownloadHref(locale, row.board),
+}))
 const quickstart = docsPageHref(locale, 'user/quickstart')
 const identify = docsPageHref(locale, 'user/download')
 ---
@@ -41,27 +48,7 @@ const identify = docsPageHref(locale, 'user/download')
       >
         {copy.download.boardsHeading}
       </span>
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
-        {
-          copy.boards.rows.map(row => (
-            <a
-              href={boardDownloadHref(locale, row.board)}
-              class="group block text-foreground no-underline hover:no-underline"
-            >
-              <Card className="h-full gap-0 p-6 transition-colors group-hover:border-ring">
-                <CardContent className="p-0">
-                  <h2 class="m-0 font-mono text-lg leading-6 font-semibold">{row.board}</h2>
-                  <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">{row.hw}</p>
-                  <p class="mt-1 mb-0 text-[13px] leading-6 text-muted-foreground">{row.status}</p>
-                  <span class="mt-4 inline-block text-[15px] text-brand-strong">
-                    {copy.download.boardHref}
-                  </span>
-                </CardContent>
-              </Card>
-            </a>
-          ))
-        }
-      </div>
+      <BoardIndex client:load copy={copy} boards={boards} />
     </section>
 
     <section class="border-t border-border py-14">

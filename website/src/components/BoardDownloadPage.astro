@@ -3,7 +3,8 @@ import type { LocaleCode } from '@/shared/i18n'
 import SiteHeader from '@/components/SiteHeader.astro'
 import { DownloadExplorer } from '@/features/download/components/download-explorer'
 import { SiteFooter } from '@/features/landing/components/site-footer'
-import { docsHref, docsPageHref, downloadHref, homeHref } from '@/features/landing/links'
+import { boardGuides } from '@/features/download/boards'
+import { docsHref, downloadHref, homeHref } from '@/features/landing/links'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { copyFor, localePathsFromUrl } from '@/shared/i18n'
@@ -18,11 +19,7 @@ interface Props {
 const { locale, board, hardware, status } = Astro.props
 const copy = copyFor(locale)
 
-const guides = [
-  { ...copy.download.boardDocs.install, href: docsPageHref(locale, 'user/install') },
-  { ...copy.download.boardDocs.update, href: docsPageHref(locale, 'user/update-rollback') },
-  { ...copy.download.boardDocs.trouble, href: docsPageHref(locale, 'user/troubleshooting') },
-]
+const guides = boardGuides(copy, locale, board)
 ---
 
 <BaseLayout
@@ -61,7 +58,7 @@ const guides = [
 
     <section class="border-t border-border py-14">
       <h2 class="m-0 text-[clamp(22px,3vw,28px)] leading-[1.2] font-semibold tracking-tight">
-        {copy.download.boardDocs.heading}
+        {copy.download.guides.heading}
       </h2>
       <div class="mt-8 grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
         {
@@ -71,7 +68,6 @@ const guides = [
                 <CardContent className="p-0">
                   <h3 class="m-0 text-lg leading-6 font-semibold tracking-tight">{guide.title}</h3>
                   <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">{guide.body}</p>
-                  <span class="mt-4 inline-block text-[15px] text-brand-strong">{guide.cta}</span>
                 </CardContent>
               </Card>
             </a>

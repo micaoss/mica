@@ -89,19 +89,40 @@ the filters and the history control; it is not a release and must not be present
 
 ## Adding a board
 
-A board is two lines of copy and a deploy:
-
 1. Add a row to `boards.rows` in `src/shared/i18n/zh.ts` — `board`, `hw`, `status`.
 2. Add the same `board` to `src/shared/i18n/en.ts`, with the English `hw` and `status`.
-3. Deploy.
+3. Add its entry to `boards.json` with the guides its page should link to.
+4. Deploy.
 
-That row is the whole source: the landing page's board table, the card on `/download/`, and
-the `/download/<board>/` pages of both locales, which `getStaticPaths()` generates from it.
-Nothing else needs changing — whether a board has anything to download comes from
-`/api/catalog` at runtime, and a board with nothing published says so.
+Steps 1–2 are the whole source of the landing page's board table, the card on `/download/`,
+and the `/download/<board>/` pages of both locales, which `getStaticPaths()` generates.
+Whether a board has anything to download comes from `/api/catalog` at runtime; a board with
+nothing published says so on its card.
 
-The `board` identifier has to match between the locales, because each generates its own
-routes; `src/shared/i18n/boards.test.ts` fails the build when they drift.
+The `board` identifier has to match across both dictionaries and `boards.json`, because each
+locale generates its own routes; `src/shared/i18n/boards.test.ts` and
+`src/features/download/boards.test.tsx` fail the build when they drift.
+
+### Per-board guides
+
+`boards.json` decides which documents a board's page links to, and in what order:
+
+```json
+{
+  "board": "cx3576",
+  "guides": [
+    { "id": "install", "doc": "user/install" },
+    { "id": "bench", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/cx3576-bench.md" }
+  ]
+}
+```
+
+`doc` is a published slug under `/docs/`, resolved per locale; `url` is an external target,
+for records this site does not publish — board dossiers and bench sessions live in the
+repository, not here. `id` selects the wording from `download.guides` in the dictionaries
+(`quickstart`, `install`, `firstRun`, `update`, `recovery`, `trouble`, `dossier`, `bench`);
+an id with no wording is skipped rather than rendered blank. Adding a kind of guide means
+adding its wording to both dictionaries.
 
 ## Layout
 
