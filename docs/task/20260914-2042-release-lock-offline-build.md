@@ -600,3 +600,32 @@ Moving the repositories to the release lock format
   - Next: the `cx3576` scope; K1 and K2 after the first scoped releases; the
     user still decides `s905x5m` as a release target and a compressed image
     kind.
+- 2026-09-15: `mica-build` scoped release `cx3576/20260915-1515` is published
+  and verified anonymously.
+  - Target `9fe2d1841716905184b3bc429db53e8211ed392b`; release run
+    34987139279 green (plan 15s, `cx3576-dev` 10m06s and `cx3576-minimal`
+    8m53s on `ubuntu-24.04-arm`, publish 2m28s).
+  - `SHA256SUMS` sha256
+    `01c261093177a07c576aa8dcbdac4943149770a693886f51467d9c7e665b828e`;
+    `mica-build.lock` sha256
+    `3666175948a8c4b9b5ecb3b3fc928698dc8c5393adec8a8f7aa8cabfc2689eb8`;
+    `tools/locks.py` and `mica`'s reference checker accept the lock.
+  - Inputs: `mica-boards.cx3576` `20260915-1128`, `mica-build-env`
+    `20260915-0138`, `mica-core` `20260915-1135`, `mica-podman`
+    `20260915-1057`, `mica-system-base` `20260915-1102`.
+  - Products at generation 2, profile `dev`: `cx3576-dev` (deployment
+    `bc2d86fa...`, kernel `6f8f9898...`, rootfs `8432f50d...`) and
+    `cx3576-minimal` (deployment `1acc66f4...`, kernel `c6bec0b9...`, rootfs
+    `3cd901ca...`).
+  - Bundles `image.cx3576-dev.20260915-1515`, `update.cx3576-dev.20260915-1515`,
+    `image.cx3576-minimal.20260915-1515` and
+    `update.cx3576-minimal.20260915-1515`; assets
+    `mica-cx3576-dev-20260915-1515.img` (1362100224 bytes) and `.micaupd`
+    (84986579), `mica-cx3576-minimal-20260915-1515.img` (1362100224) and
+    `.micaupd` (48609999); `full` archives only.
+  - Both release-target boards are now released. `virt-arm64` and `s905x5m`
+    are `BOARD_RELEASE_TARGET=0` in `mica-boards` (`s905x5m` pending a user
+    decision). Every product is `PROFILE=dev` today; there is no prod product
+    yet (pending a user decision).
+  - Next in `mica-build`: K1 and K2 of
+    `docs/decisions/2026-09-15-stable-component-ids.md`.

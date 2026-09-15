@@ -36,7 +36,7 @@ the new format.
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
 | 3 | `mica-podman` (done: `20260915-0245`), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
-| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (in progress: first scoped release `x64/20260915-1458`; further scopes pending) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
+| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (both release-target boards released: `x64/20260915-1458` and `cx3576/20260915-1515`; K1 and K2 of the stable identities next) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
 the new format before `mica-build` switches.
@@ -311,3 +311,11 @@ owner, dispatched by the coordinator.
   `20260915-1135`, podman `20260915-1057` and Base `20260915-1102`, with disk
   images and `full` update archives. Next: the `cx3576` scope; K1 and K2 after
   the first scoped releases.
+- 2026-09-15: `mica-build` `cx3576/20260915-1515` at `9fe2d18` (`SHA256SUMS`
+  sha256 `01c261093177a07c576aa8dcbdac4943149770a693886f51467d9c7e665b828e`)
+  is published and verified anonymously, so both release-target boards
+  (`x64`, `cx3576`) are released. `virt-arm64` and `s905x5m` are
+  `BOARD_RELEASE_TARGET=0` in `mica-boards` (`s905x5m` pending a user
+  decision), and every product is `PROFILE=dev` (a prod product pending a
+  user decision). Next in `mica-build`: K1 and K2 of
+  `docs/decisions/2026-09-15-stable-component-ids.md`.

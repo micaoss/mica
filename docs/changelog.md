@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 15:32 [progress]
+
+`mica-build` `cx3576/20260915-1515` at `9fe2d18` is published and verified
+anonymously (trust hash
+`01c261093177a07c576aa8dcbdac4943149770a693886f51467d9c7e665b828e`):
+`cx3576-dev` and `cx3576-minimal` at generation 2 on boards
+`cx3576/20260915-1128` and the same build-env, core, podman and Base releases
+as `x64/20260915-1458`, each with a disk image and a `full` update archive.
+Both release-target boards are released; `virt-arm64` and `s905x5m` are not
+release targets (`s905x5m` pending a user decision), and every product is
+`PROFILE=dev` until the user decides on a prod product. Next in `mica-build`:
+the kernel `buildId` and deterministic signing (K1, K2).
+
 ## 2026-09-15 15:17 [progress]
 
 The first `mica-build` scoped release, `x64/20260915-1458` at `9fe2d18`, is
