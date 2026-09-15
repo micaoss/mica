@@ -66,7 +66,7 @@ is an object with `available`; the present shape is:
 | `board` | `model`, `source` (`devicetree` or `dmi`) | `/sys/firmware/devicetree/base/model`, else DMI product name and board vendor |
 | `kernel` | `release`, `version` | `/proc/sys/kernel/osrelease`, `/proc/sys/kernel/version` (what `uname -r` / `uname -v` print) |
 | `release` | `name`, `id`, `version`, `versionId`, `prettyName`, `buildId`, `imageId`, `imageVersion` (each only when the file carries it) | `/etc/os-release` |
-| `system` | `version`, `package`, `gitStamp`, `commitDate`, `fileEpoch` | the manifest row of `mica-system`, else of `micad`; `/usr/share/mica/release-identity.env`; the manifest file's mtime |
+| `system` | `version`, `package`, `fileEpoch` | the manifest row of `mica-system`, else of `micad`; the manifest file's mtime |
 | `daemon` | `name`, `version`, `commit` (null when the build supplied none) | what `micad --version` prints, from the same embedded values |
 | `packages` | `count`, `micaCount`, `malformedRows`, `truncated`, `entries[]` of `name`, `version`, `architecture`, `mica` | `/usr/share/mica/manifest.tsv` |
 | `deployment` | `id`, `version`, `generation`, `kernelId`, `kernelRelease`, `rootfsId`, `confirmed`, `contentVerified`, `secureBoot`, `backend`, `bootVerified` | Authenticated native boot receipt and deployment state |
@@ -81,28 +81,14 @@ An absent public-defaults manifest makes the observation unavailable. Public
 defaults do not contain signature anchors: metadata/content policy comes from the
 authenticated kernel package and boot anchors from its firmware trust domain.
 
-`system.gitStamp` is the `+git<commit>[.dirty]-<rev>` stamp the Mica OS rows of
-the manifest share: `commit`, `dirty`, `revision`, and `consistent` with the
-full `stamps` list beside it. A manifest whose Mica OS rows disagree — a
-half-rebuilt pool — reports `consistent: false` and every stamp it found,
-rather than picking one; `verify`'s `packed-mica-manifest` check refuses such
-an image, and this surface is the same fact read on the device.
-
-The surface reports two times and they are different facts, named apart so
-that neither can be read as the other.
-
-`system.commitDate` is when the commit the image's git stamp names was
-committed — an `available`/`detail` object carrying `date`.
-`rootfs/compose/compose-install.sh` writes it into
-`/usr/share/mica/release-identity.env` as `COMMIT_DATE` at compose time, from
-`git show -s --format=%cI` over the commit *inside the stamp*
-`rootfs/build.sh` has already required the pool to carry — not over `HEAD`,
-which is a second question with a second answer. So the date and the packages
-beside it name one commit, and every reproducible build of that commit reports
-the same instant. A `.dirty` stamp means the packaged tree was not exactly
-that commit; the field's `detail` says so rather than leaving a bare date to
-imply otherwise. A root whose identity states no `COMMIT_DATE` reports
-`available: false` with the reason — never a blank, and never the epoch below.
+There is no `system.gitStamp` and no `system.commitDate` (decided 2026-09-15,
+`docs/decisions/2026-09-15-stable-component-ids.md`, landing with
+`mica-core`'s package-version release): package versions carry no commit
+(`docs/decisions/2026-09-15-package-versions.md`), and the root carries no
+`/usr/share/mica/release-identity.env`, so a release that changes nothing in
+the root keeps its rootfs identity. The release identity of the running
+image is the `deployment` member (`version`, `generation`), read from the
+authenticated boot receipt.
 
 `system.fileEpoch` is the manifest file's mtime: the `SOURCE_DATE_EPOCH` that
 `rootfs/scripts/pack-squashfs.sh` pins every file time in the root to. It is

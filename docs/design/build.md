@@ -36,7 +36,16 @@ private key directories are never added to source control.
 
 Root owns userspace. It must contain empty modules/firmware mountpoints and no
 kernel or loader payload. Kernel-only packaging leaves root bytes unchanged;
-root-only packaging leaves kernel/support/firmware unchanged. A new signed
+root-only packaging leaves kernel/support/firmware unchanged. Neither
+component carries release identity (decided 2026-09-15,
+`docs/decisions/2026-09-15-stable-component-ids.md`, not implemented yet):
+the root has no `/usr/share/mica/release-identity.env` and its
+`mica/rootfs/v2` descriptor no `version`; the kernel `buildId` hashes the
+tool image's pinned inputs rather than a local image identity, and `sbsign`
+runs under a clock pinned to `SOURCE_DATE_EPOCH`, with a release guard that
+refuses a changed kernel identity under an unchanged `buildId`. A release
+that changes only a board or only the release metadata keeps both
+identities. A new signed
 deployment binds the chosen association.
 
 ### 1.1 Root composition

@@ -50,7 +50,8 @@ setting, is never persisted or seeded, and is shown read-only in
 Implemented on `mica-build` branch `released-inputs` at `edafed96`, not
 merged or pushed. The kernel component writes `mica.profile=dev|prod` from
 `products/<name>/product.env` `PROFILE` for both profiles, and
-`release-identity.env` derives its `PROFILE` from the same file.
+`release-identity.env` derives its `PROFILE` from the same file (that file
+leaves the root by `docs/decisions/2026-09-15-stable-component-ids.md`).
 
 - **UEFI boards** (x64, virt-arm64): the token is in the UKI's signed
   `.cmdline`. Boot-counting entries share that UKI, systemd-boot entries

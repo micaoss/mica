@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-15 10:57 [decision]
+
+Stable root and kernel component identities (user, "接受"). `mica-build`
+measured that an empty commit changes the rootfs identity
+(`release-identity.env` with a `+git` version and `COMMIT_DATE`, and the
+`version` field of `mica/rootfs/v1`) and that the kernel identity changes even
+at one commit (a `buildId` over a local tool image identity, and `sbsign`'s
+PKCS#7 signing time). The release identity now lives only in the signed
+deployment: `release-identity.env` leaves the root and `system_info` drops
+`system.commitDate` and `system.gitStamp`; `mica/rootfs/v2` replaces v1
+without `version`; the kernel `buildId` hashes the tool image's pinned inputs;
+`sbsign` runs under a pinned clock, with a release guard against a changed
+kernel identity under an unchanged `buildId`. A board-only or release-only
+change then keeps both identities, so `root`-only and `kernel`-only update
+packages can be published. Order: `mica-core`, then `mica-build`.
+`docs/decisions/2026-09-15-stable-component-ids.md`,
+`docs/design/diagnostics.md`, `docs/design/release-signing.md`,
+`docs/design/build.md`, the update-packages decision.
+
 ## 2026-09-15 10:33 [decision]
 
 Package-version rules clarified: the R5 comparison with the previous release

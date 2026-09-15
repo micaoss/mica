@@ -40,7 +40,9 @@ rule. Names, as `mica-core` implements them (`mica-core:docs/task/20260915-0657-
 of the five-line `/usr/lib/mica/product.conf`; `mica/catalog/v2` carries
 channel heads `{board, product, channel, releaseId, generation}`; the
 `MICAUPD1` layout is unchanged, with an object count from 0 to the
-descriptor's; `mica/kernel/v1` and `mica/rootfs/v1` are unchanged.
+descriptor's; `mica/kernel/v1` is unchanged, and `mica/rootfs/v1` is later
+replaced by `mica/rootfs/v2` without `version`
+(`docs/decisions/2026-09-15-stable-component-ids.md`).
 
 **Trust rotation.** A `kernel` package is refused at build when the
 kernel-embedded verity trust certificate differs from the previous release's;
@@ -68,7 +70,9 @@ rows of `mica-build.lock` (`docs/design/release-lock.md` 1.2.2).
 identity to stay unchanged across releases; packages whose inputs did not
 change keep their version and published bytes across releases, and a release
 never changes a package version
-(`docs/decisions/2026-09-15-package-versions.md`).
+(`docs/decisions/2026-09-15-package-versions.md`); the root and kernel
+components carry no release identity and are signed deterministically
+(`docs/decisions/2026-09-15-stable-component-ids.md`).
 
 ## Order
 
