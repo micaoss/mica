@@ -143,8 +143,10 @@ the ordered partition set in `LAYOUT_PARTITIONS` with a `<NAME>_ROLE` per entry
 (the schema lint enforces each role's keys in both directions), the
 hardware as `BOARD_FEATURES` and lists (`BOARD_FIRMWARE_FILES`,
 `BOARD_HWINIT_CONFS`) where empty is a statement, the authenticated boot
-(`FIRMWARE_FORMAT`, the `FIT_*` facts, the exact `BOARD_CMDLINE_ARGS`) and
-`IMAGE_KINDS`. `manifests/board.pkgs` names the board package; a radio's
+(`FIRMWARE_FORMAT`, the `FIT_*` facts, the exact `BOARD_CMDLINE_ARGS`), and
+declare the flashing formats in `<name>/images.tsv`, at least
+`image disk builtin <runtime image> <suffix>` ([contract.md](contract.md)
+section 3.1). `manifests/board.pkgs` names the board package; a radio's
 transport packages and optional components go beside it. `make check` in
 `mica-boards` holds the directory to the contract
 (`tests/board-contract-test.sh`).

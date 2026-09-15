@@ -21,7 +21,8 @@ is grouped by what reads it:
 
 ```
 mica-boards/boards/<board>/
-  board.env             geometry, architecture, capabilities; BOARD_FEATURES, IMAGE_KINDS
+  board.env             geometry, architecture, capabilities; BOARD_FEATURES
+  images.tsv            the board's flashing formats: image <kind> <packer> <runtime image> <suffix>
   Makefile              names the board; its kernel and firmware targets and its own
   sources.env           the upstream source pins (kernel, U-Boot, rkbin)
   bsp.env               a FIT board's file names for its builds (KERNEL_CONFIG, KERNEL_DTB, UBOOT_DEFCONFIG ...)
@@ -57,15 +58,9 @@ producer is that package's.
 `board.env` declares facts, never logic (`board-env.md`). `BOARD_FEATURES` is
 what the hardware has, from the vocabulary `wifi bluetooth display status-led
 can usb-gadget audio containers`; a product selects from it and the resolver
-refuses a feature the board does not declare. `IMAGE_KINDS` names the image
-kinds the assembly may produce for the board: `disk` (the raw whole-disk
-image, implemented), and the reserved `rockchip-update` and `amlogic-burn`,
-which the assembly refuses until it implements them. A board may declare an
-image kind only when `mica-build` implements a packer for it, and only with
-its board-level pieces (such as a Rockchip loader and `idblock.img`, or an
-Amlogic burn package and its packer tool) delivered in its `uboot` component
-and listed in `outputs.tsv`
-(`docs/decisions/2026-09-15-board-image-kinds.md`).
+refuses a feature the board does not declare. The board's flashing formats
+are declared in `images.tsv`, not in `board.env` (`IMAGE_KINDS` is removed;
+section 3.1, `docs/decisions/2026-09-15-board-image-packers.md`).
 Independent BSP or demo artifacts remain inside the BSP and are not image
 inputs unless a component producer names them.
 
@@ -94,9 +89,10 @@ unscoped release was `20260914-1603`). Each component is the OCI artifact
 | Component | `artifactType` | Content |
 |---|---|---|
 | `kernel` | `application/vnd.mica.board.kernel` | UEFI boards: `kernel/`; FIT boards: `kernel/dev/` and `kernel/prod/` with the DTB |
-| `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the host tools, kept x86-64 (`uboot-package/` on s905x5m), and the board-level pieces of the flashing formats its `IMAGE_KINDS` declares |
+| `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the FIT host tools, kept x86-64 (`uboot-package/` on s905x5m) |
 | `firmware` | `application/vnd.mica.board.firmware` | `firmware.tar` and `component-copyright`, when the board carries firmware |
-| `board` | `application/vnd.mica.board` | `board.env`, `manifests/`, `outputs.tsv`, the trust certificate and `evidence.json` |
+| `board` | `application/vnd.mica.board` | `board.env`, `manifests/`, `outputs.tsv`, `images.tsv`, the trust certificate and `evidence.json` |
+| `packer` | (not fixed yet) | when `images.tsv` names a non-builtin packer: the packer tools and the board-level pieces they need (a Rockchip loader and `idblock.img`, an Amlogic packer binary and its ini), kept x86-64; absent while the board has only `disk` |
 
 Each has one layer per file (`firmware.tar` as one layer) and is annotated
 `mica.board`, `mica.arch`, `mica.component`, `mica.inputs=<sha256>` (the
@@ -131,6 +127,8 @@ immutable for it (`docs/decisions/2026-09-13-ghcr-artifact-registry.md`).
 | `uboot/*` (`uboot-package/` on s905x5m) | `uboot` | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
 | `trust/verity-signer.cert.pem` | `board` | yes | refused when it is not the assembly's |
 | `outputs.tsv` | `board` | yes | the check of the components and the board's packages |
+| `images.tsv` | `board` | yes | the image executor (section 3.1) |
+| `packer/*` | `packer` | when `images.tsv` names a non-builtin packer | the image executor (section 3.1) |
 
 On a `uboot-fit` board each of `kernel/dev/` and `kernel/prod/` is a complete
 kernel directory (`Image`, the dtb, `config`, `System.map`, `kernel.release`,
@@ -160,6 +158,50 @@ The board list and each board's expected outputs are machine-readable
 A consumer reads the board list from `boards/boards.tsv` and a board's
 expected outputs from the `outputs.tsv` of its `board` component; the
 assembly checks each pinned component and the board's packages against it.
+
+### 3.1 Flashing formats: `images.tsv` and the packer interface
+
+`mica-boards` declares a board's flashing formats and supplies their packers;
+`mica-build` only executes them (user, 2026-09-15,
+`docs/decisions/2026-09-15-board-image-packers.md`).
+
+`mica-boards:boards/<board>/images.tsv`, in the `board` component: line 1
+`# mica-boards images v1`, then `image <kind> <packer> <runtime image>
+<suffix>` rows. `<kind>` is for example `disk`, `rockchip-update` or
+`amlogic-burn`; `<packer>` is `builtin` (the assembly's own raw disk image,
+only for `disk`) or a path inside the `packer` component; `<runtime image>`
+is an `image` row of `locks/mica-build-env.lock` (such as
+`mica-build-env:base`); `<suffix>` is the output file's suffix. Rules, held by
+`mica-boards`' board contract test:
+
+- `disk` is present: it is the canonical image every other kind derives from;
+- kinds are unique;
+- every non-builtin packer path exists in the `packer` component and is
+  listed in `outputs.tsv` (`file packer <path>`), with the board-level pieces
+  it needs;
+- the runtime image is named by the build-env lock.
+
+The packer interface, executed by `mica-build`:
+
+- `pack <input dir> <output file>` and `verify <input dir> <output file>`;
+- the input directory, written by `mica-build` after signing: `disk.img` (the
+  signed canonical image), `<partition>.img` per partition, `layout.json`
+  (layout version, sectors, GUIDs), `board/` (the `board` component tree),
+  `product.json` (product, release, profile);
+- `verify` unpacks the output and proves every byte it writes to storage
+  equals `disk.img`, exiting non-zero on any difference;
+- the packer runs in its runtime image with `--network none`, a read-only
+  input and no key material; its output is deterministic, and `mica-build`
+  packs twice and compares at release.
+
+A product selects a subset in `mica-build:products/<product>/product.env`
+`IMAGE_KINDS` (default: every kind of the board's `images.tsv`; `disk` always
+included; an undeclared kind is refused). A failed pack, verify or
+determinism check, or an asset over 2 GiB, fails that product's whole
+release. Each kind is published as the release asset
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and as one layer (title the file
+name, annotation `mica.image-kind`) of the OCI manifest
+`image.<product>.<YYYYMMDD-HHMM>`.
 
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there

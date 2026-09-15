@@ -24,3 +24,4 @@ Kinds:
 | [mica-build releases are scoped and carry image files](2026-09-15-mica-build-scoped-releases.md) | engineering decision | 2027-03-15 |
 | [mica-boards releases per board](2026-09-15-mica-boards-per-board-releases.md) | engineering decision | 2027-03-15 |
 | [Board image kinds: the board delivers the pieces, the assembly packs the image](2026-09-15-board-image-kinds.md) | engineering decision | 2027-03-15 |
+| [Board flashing formats: mica-boards declares and packs, mica-build executes](2026-09-15-board-image-packers.md) | engineering decision | 2027-03-15 |

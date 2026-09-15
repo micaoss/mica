@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner (board-level pieces, `IMAGE_KINDS`); the mica-build owner (packers, publication)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); `disk` implemented in `mica-build`; `rockchip-update` and `amlogic-burn` reserved and refused until implemented
+- **status**: accepted (user, 2026-09-15); superseded the same day by `docs/decisions/2026-09-15-board-image-packers.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; the Rockchip plan's deferral (*Plans*) stands
 
 ## Decision
 

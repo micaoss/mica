@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-15 06:38 [decision]
+
+Flashing formats, replacing the earlier split (user): `mica-boards` declares
+each board's formats in `boards/<board>/images.tsv` (`image <kind> <packer>
+<runtime image> <suffix>`, `disk` mandatory and `builtin`) and supplies the
+packers in a new `packer` board component; `mica-build` only executes them
+through `pack` and `verify` over a signed input directory, sandboxed and
+packed twice. `IMAGE_KINDS` leaves `board.env`; a product selects kinds in
+`product.env`. Any failed pack, verify, determinism check or asset over 2 GiB
+fails the product's release; each kind is a release asset
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and a layer of
+`image.<product>.<YYYYMMDD-HHMM>`. `mica-boards`' first four releases stay
+`disk` only and are not delayed. `docs/decisions/2026-09-15-board-image-packers.md`
+(superseding parts of `2026-09-15-board-image-kinds`),
+`docs/boards/contract.md` 3.1, `board-env.md`, `porting.md`, the release-lock
+spec and checker (`packer` component), the per-board and `mica-build`
+release decisions, the Rockchip plan and task.
+
 ## 2026-09-15 06:20 [decision]
 
 Board image kinds (user): a board-specific whole-disk flashing format is

@@ -49,3 +49,8 @@ Planning the Rockchip update.img artifact for CX3576.
   and `idblock.img` in the `uboot` component and layout v4 in `board.env`;
   `mica-build` implements the `rockchip-update` packer and verification. M0
   bench measurement is still the blocker.
+- 2026-09-15 (user, replacing the previous note's split): M1 and M3/M4 belong
+  to a `mica-boards` packer (the cx3576 `packer` component, `images.tsv`),
+  which `mica-build` executes through `pack` and `verify`
+  (`docs/decisions/2026-09-15-board-image-packers.md`); layout v4 stays in
+  `board.env`. Still deferred; M0 bench measurement is still the blocker.

@@ -26,17 +26,21 @@ rebuilt or republished (user: "比如我只编译x64 就可以只发布x64，不
 **Image files as release assets.** A release also carries the images as
 downloadable GitHub Release assets (user: "需要额外放镜像文件，不然无法下载"):
 
-- per product in the scope: the compressed factory image, the update archive
-  and the whole-disk flashing format of each image kind its board declares
-  (`disk` today; `rockchip-update` and `amlogic-burn` reserved,
-  `docs/decisions/2026-09-15-board-image-kinds.md`);
+- per product in the scope: the update archive and one asset per image kind
+  the product selects from its board's `images.tsv` (`disk` always),
+  `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, packed by the board's packer and
+  verified against the signed `disk.img`
+  (`docs/decisions/2026-09-15-board-image-packers.md`);
 - `mica-build.lock` and `SHA256SUMS`, which lists only the lock.
 
-The OCI artifacts `image.<product>.<release>` and
+The OCI artifacts `image.<product>.<release>` (one manifest, one layer per
+image kind, titled by file name and annotated `mica.image-kind`) and
 `update.<product>.<release>` in `ghcr.io/micaoss/mica-build` are the
 canonical copies, where `<release>` is the `<YYYYMMDD-HHMM>` part of the
 scoped tag (`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`).
-`mica-build.lock` ties each asset to its OCI digest and records the five
+A failed pack, verify or determinism check, or an asset over 2 GiB, fails
+the product's whole release. `mica-build.lock` ties each asset (an `asset`
+row per kind) to its OCI digest and records the five
 input releases (`mica-build-env`, `mica-system-base`, `mica-core`,
 `mica-podman`, and the per-board `mica-boards` release of each board in the
 scope). Its release row is `release mica-build <scope>/<YYYYMMDD-HHMM>

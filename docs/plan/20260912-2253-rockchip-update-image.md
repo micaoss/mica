@@ -252,3 +252,12 @@ run stays marked not run.
   behind the reserved `rockchip-update` image kind, which it refuses until
   implemented. M0, the bench measurement, is still the blocker. No Amlogic
   whole-disk burn plan exists.
+- 2026-09-15 (user, replacing the split noted above): `mica-boards` declares
+  flashing formats and supplies their packers, `mica-build` only executes
+  them (`docs/decisions/2026-09-15-board-image-packers.md`). This plan stays
+  deferred. M1 (loader and `idblock.img`) and M3/M4 (the `rockchip-update`
+  packer and its verification) now belong to a `mica-boards` packer in the
+  cx3576 `packer` component, declared in `images.tsv` and run by
+  `mica-build` through `pack` and `verify` against the signed `disk.img`; the
+  M2 layout v4 facts stay in `board.env`. M0, the bench measurement, is still
+  the blocker.

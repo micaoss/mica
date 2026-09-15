@@ -102,10 +102,9 @@ by it, and no second reading of it exists (`BOARD_RADIOS`,
 `BOARD_HAS_STATUS_LED` and `BOARD_HAS_DISPLAY` are gone; the contract test
 refuses them). `BOARD_HWINIT_CONFS` selects the board's hardware
 initialisation units. There is no family key: a board carries its own
-kernel and loader builds (`mica-boards:boards/README.md`); `IMAGE_KINDS` the image kinds
-the assembly may produce (`disk`; `rockchip-update` and `amlogic-burn` are
-reserved and refused until `mica-build` implements them,
-`docs/decisions/2026-09-15-board-image-kinds.md`); `BOARD_PACKAGE_ENABLEMENT`
+kernel and loader builds (`mica-boards:boards/README.md`); there is no `IMAGE_KINDS`: a board's flashing formats are declared in
+`images.tsv` beside `board.env` (`docs/boards/contract.md` section 3.1,
+`docs/decisions/2026-09-15-board-image-packers.md`); `BOARD_PACKAGE_ENABLEMENT`
 how many units the board package enables, which the package gate holds.
 
 ## The authenticated boot

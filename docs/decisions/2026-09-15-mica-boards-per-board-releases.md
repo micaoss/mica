@@ -15,24 +15,24 @@
   builds and publishes only that board.
 - A board is published as separate component artifacts (2026-09-15, agreed
   by `mica-boards` and `mica-build`): `kernel`, `uboot` (FIT boards),
-  `firmware` and `board`, tagged `<component>.<board>.<YYYYMMDD-HHMM>` with
+  `firmware`, `packer` (boards with a non-builtin image kind) and `board`, tagged `<component>.<board>.<YYYYMMDD-HHMM>` with
   `artifactType` `application/vnd.mica.board[.kernel|.uboot|.firmware]` and
   the annotations `mica.component` and `mica.inputs=<sha256>`; the pool is
   `pool.<board>.<arch>.<YYYYMMDD-HHMM>`, all in `ghcr.io/micaoss/mica-boards`.
   A release reuses an unchanged component by digest: the same manifest bytes
   under the new tag, never a re-pointed tag.
-- Board-specific flashing formats: the `uboot` component carries the
-  board-level pieces, `outputs.tsv` lists them, and `board.env`
-  `IMAGE_KINDS` declares the image kinds the assembly packs
-  (`docs/decisions/2026-09-15-board-image-kinds.md`).
+- Board-specific flashing formats: `boards/<board>/images.tsv` in the `board`
+  component declares them, and the `packer` component carries the packers
+  and their board-level pieces, listed in `outputs.tsv`; `mica-build` executes
+  them (`docs/decisions/2026-09-15-board-image-packers.md`).
 - The `mica-kernel-<board>` packages are retired: the pools hold
   `mica-board-<board>`, the radio packages and s905x5m's component packages,
   and the assembly takes the kernel files from the `kernel` artifact.
 - A release carries exactly `mica-boards.lock` and `SHA256SUMS`; the lock's
   release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`. Each
   component is a row `board <board> <component> <arch> <reference>` (key
-  board and component), two to four per lock (`board` and `kernel` required,
-  `uboot` and `firmware` optional; refused otherwise as `board-components`), and the lock holds only that
+  board and component), two to five per lock (`board` and `kernel` required,
+  `uboot`, `firmware` and `packer` optional; refused otherwise as `board-components`), and the lock holds only that
   board: every `board` row names it with a tag `<component>.<board>.<...>` and
   every pool tag is `pool.<board>.<arch>.<...>` (refused otherwise as
   `scope-content`).

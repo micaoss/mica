@@ -43,8 +43,8 @@ every other repository's release is unscoped:
 board with a reference tag `<component>.<scope>.<release>`, and every `pool`
 tag is `pool.<scope>.<arch>.<release>` (`scope-content`). A `mica-boards` lock
 has a `board` row for the `board` component and one for `kernel`, and one
-for `uboot` and `firmware` where the board publishes them, so two to four
-(`board-components`). The lock's release
+for `uboot`, `firmware` and `packer` where the board publishes them, so two
+to five (`board-components`). The lock's release
 row carries the scoped tag (1.2), OCI tags carry the scope before the release
 (1.3), and a consumer keeps each scope as its own input (section 4).
 
@@ -66,7 +66,7 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 | `image` | `image <source> <name> <platform> <reference>` | source, name, platform | `<source>` is the producing repository or `upstream` (1.2.1); `<platform>` is `index`, `amd64`, `arm64` or `386` |
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
-| `board` | `board <board> <component> <arch> <reference>` | board, component | one component artifact of a board (`mica-boards`); `<component>` is `board`, `kernel`, `uboot` or `firmware` (section 2) |
+| `board` | `board <board> <component> <arch> <reference>` | board, component | one component artifact of a board (`mica-boards`); `<component>` is `board`, `kernel`, `uboot`, `firmware` or `packer` (section 2) |
 | `upstream` | `upstream <name> <arch> <version> <sha256> <url> <roots>` | name, arch | a third-party archive pinned for later stages; `<url>` is https; `<roots>` is the comma-separated, sorted, duplicate-free list of `upstream.pkgs` roots it is pinned for (*fixed here*, as Base publishes today); `mica-system-base` only |
 | `apt` | `apt <uri> <suite> <components> <signed-by>` | at most one | the one apt source; `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
 
@@ -134,7 +134,7 @@ carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
 - `<repository>:pool.<arch>.<release>`, and for `mica-boards`
   `mica-boards:pool.<board>.<arch>.<release>`;
 - `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
-  `firmware`);
+  `firmware`, `packer`);
 - `mica-system-base:rootfs.<release>`;
 - `mica-build:root.<product>.<release>`;
 - `<repository>:source.<release>`.
@@ -198,12 +198,15 @@ package of the repository that publishes them.
     board's `kernel/`, or a FIT board's `kernel/dev/` and `kernel/prod/`
     with the DTB;
   - `uboot` (FIT boards), `application/vnd.mica.board.uboot`: the U-Boot
-    binaries, the control dtb, the config and the host tools, kept x86-64
+    binaries, the control dtb, the config and the FIT host tools, kept x86-64
     (`uboot-package/` on s905x5m);
+  - `packer` (boards with a non-builtin image kind): the packer tools and the
+    board-level pieces they need (`docs/boards/contract.md` section 3.1,
+    `docs/decisions/2026-09-15-board-image-packers.md`);
   - `firmware`, `application/vnd.mica.board.firmware`: `firmware.tar` and
     `component-copyright`;
   - `board`, `application/vnd.mica.board`: `board.env`, `manifests/`,
-    `outputs.tsv`, the trust certificate and `evidence.json`.
+    `outputs.tsv`, `images.tsv`, the trust certificate and `evidence.json`.
 
   Annotations: `mica.board`, `mica.arch`, `mica.component`,
   `mica.inputs=<sha256>` (the component's input key), `mica.verity-cert-sha256`

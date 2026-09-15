@@ -117,7 +117,7 @@ decision every OCI tag names its release instead,
 `build-<commit12>` tags go when the assembly moves. `mica-boards` names its artifacts by
 per-board release: `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
 `<component>.<board>.<YYYYMMDD-HHMM>` per board component (`board`, `kernel`,
-`uboot`, `firmware`; `docs/boards/contract.md` section 3).
+`uboot`, `firmware`, `packer`; `docs/boards/contract.md` section 3).
 `mica-system-base` does the same:
 `pool.<arch>.<YYYYMMDD-HHMM>` and the multi-architecture root
 `ghcr.io/micaoss/mica-system-base:rootfs.<YYYYMMDD-HHMM>`, and a Base
