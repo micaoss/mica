@@ -1,84 +1,99 @@
-import type { Artifact } from './catalog'
+import type { Image } from './catalog'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { en } from '@/shared/i18n/en'
 import { zh } from '@/shared/i18n/zh'
-import { ARTIFACTS, filterArtifacts } from './catalog'
+import { filterImages, historyCount, IMAGES, selectVersions } from './catalog'
 import { DownloadExplorer } from './components/download-explorer'
 
-const SAMPLE: Artifact[] = [
-  {
+function image(partial: Partial<Image>): Image {
+  return {
     board: 'x64',
     profile: 'dev',
     version: '2026.09-1',
     deploymentId: 'dep-aa11',
-    kind: 'image',
+    releasedAt: '2026-09-01',
     bytes: 1_073_741_824,
     digest: 'sha256:aaaa',
-    href: 'https://example.invalid/x64-dev.img',
-  },
-  {
-    board: 'cx3576',
-    profile: 'prod',
-    version: '2026.08-3',
-    deploymentId: 'dep-bb22',
-    kind: 'update',
-    bytes: 52_428_800,
-    digest: 'sha256:bbbb',
-    href: 'https://example.invalid/cx3576-prod.micaupd',
-  },
-]
+    href: 'https://example.invalid/x64.img',
+    ...partial,
+  }
+}
 
-describe('filterArtifacts', () => {
+const NEWEST = image({ version: '2026.09-2', deploymentId: 'dep-new', releasedAt: '2026-09-10' })
+const OLDER = image({ version: '2026.08-1', deploymentId: 'dep-old', releasedAt: '2026-08-01' })
+const OTHER_BOARD = image({ board: 'cx3576', profile: 'prod', deploymentId: 'dep-cx', releasedAt: '2026-09-05' })
+const SAMPLE = [OLDER, NEWEST, OTHER_BOARD]
+
+describe('filterImages', () => {
   it('returns everything when nothing is selected', () => {
-    expect(filterArtifacts(SAMPLE, {})).toHaveLength(2)
+    expect(filterImages(SAMPLE, {})).toHaveLength(3)
   })
 
-  it('narrows by board, profile and kind', () => {
-    expect(filterArtifacts(SAMPLE, { board: 'x64' })).toEqual([SAMPLE[0]])
-    expect(filterArtifacts(SAMPLE, { profile: 'prod' })).toEqual([SAMPLE[1]])
-    expect(filterArtifacts(SAMPLE, { kind: 'update' })).toEqual([SAMPLE[1]])
+  it('narrows by board and profile', () => {
+    expect(filterImages(SAMPLE, { board: 'cx3576' })).toEqual([OTHER_BOARD])
+    expect(filterImages(SAMPLE, { profile: 'prod' })).toEqual([OTHER_BOARD])
   })
 
   it('matches the query against version and deployment id, case-insensitively', () => {
-    expect(filterArtifacts(SAMPLE, { query: '2026.09' })).toEqual([SAMPLE[0]])
-    expect(filterArtifacts(SAMPLE, { query: 'DEP-BB22' })).toEqual([SAMPLE[1]])
-    expect(filterArtifacts(SAMPLE, { query: 'nothing' })).toEqual([])
+    expect(filterImages(SAMPLE, { query: '2026.08' })).toEqual([OLDER])
+    expect(filterImages(SAMPLE, { query: 'DEP-CX' })).toEqual([OTHER_BOARD])
+    expect(filterImages(SAMPLE, { query: 'nothing' })).toEqual([])
+  })
+})
+
+describe('selectVersions', () => {
+  it('opens on the newest image of each board and profile', () => {
+    expect(selectVersions(SAMPLE, false)).toEqual([NEWEST, OTHER_BOARD])
   })
 
-  it('combines criteria', () => {
-    expect(filterArtifacts(SAMPLE, { board: 'x64', kind: 'update' })).toEqual([])
-    expect(filterArtifacts(SAMPLE, { board: 'x64', kind: 'image', query: 'dep-aa' }))
-      .toEqual([SAMPLE[0]])
+  it('keeps every version when history is asked for, newest first', () => {
+    expect(selectVersions(SAMPLE, true)).toEqual([NEWEST, OTHER_BOARD, OLDER])
+  })
+
+  it('counts what history would add', () => {
+    expect(historyCount(SAMPLE)).toBe(1)
+    expect(historyCount([NEWEST])).toBe(0)
   })
 })
 
 describe('the published catalogue', () => {
   // The content contract forbids hand-written release identities: rows arrive
   // from published artifact metadata or not at all.
-  it('is empty until the update server publishes one', () => {
-    expect(ARTIFACTS).toEqual([])
+  it('is empty until a release is published', () => {
+    expect(IMAGES).toEqual([])
   })
 })
 
 describe('downloadExplorer', () => {
-  it('lists the artifacts it is given', () => {
-    render(<DownloadExplorer copy={zh} artifacts={SAMPLE} />)
+  it('opens on the newest image per board and profile', () => {
+    render(<DownloadExplorer copy={zh} images={SAMPLE} />)
 
-    expect(screen.getByText('dep-aa11')).toBeInTheDocument()
-    expect(screen.getByText('dep-bb22')).toBeInTheDocument()
-    expect(screen.queryByText(zh.download.empty)).not.toBeInTheDocument()
+    expect(screen.getByText('dep-new')).toBeInTheDocument()
+    expect(screen.getByText('dep-cx')).toBeInTheDocument()
+    expect(screen.queryByText('dep-old')).not.toBeInTheDocument()
+  })
+
+  it('offers history only when there is history, and shows it when asked', async () => {
+    const { rerender } = render(<DownloadExplorer copy={zh} images={[NEWEST]} />)
+    expect(screen.queryByRole('button', { name: new RegExp(zh.download.history) })).not.toBeInTheDocument()
+
+    rerender(<DownloadExplorer copy={zh} images={SAMPLE} />)
+    const button = screen.getByRole('button', { name: new RegExp(zh.download.history) })
+    button.click()
+
+    expect(await screen.findByText('dep-old')).toBeInTheDocument()
   })
 
   it('explains an empty catalogue instead of showing an empty table', () => {
-    render(<DownloadExplorer copy={zh} artifacts={[]} />)
+    render(<DownloadExplorer copy={zh} images={[]} />)
 
     expect(screen.getByText(zh.download.empty)).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
   it('renders the English dictionary just as well', () => {
-    render(<DownloadExplorer copy={en} artifacts={[]} />)
+    render(<DownloadExplorer copy={en} images={[]} />)
 
     expect(screen.getByText(en.download.empty)).toBeInTheDocument()
   })
@@ -86,12 +101,12 @@ describe('downloadExplorer', () => {
 
 describe('the catalogue endpoint', () => {
   it('renders what /api/catalog answers', async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ artifacts: SAMPLE })))
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ images: SAMPLE })))
     vi.stubGlobal('fetch', fetchMock)
 
     render(<DownloadExplorer copy={zh} />)
 
-    expect(await screen.findByText('dep-aa11')).toBeInTheDocument()
+    expect(await screen.findByText('dep-new')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/api/catalog'), expect.anything())
     vi.unstubAllGlobals()
   })

@@ -1,4 +1,4 @@
-import type { Artifact, ArtifactKind, Profile } from './catalog'
+import type { Image, Profile } from './catalog'
 
 /**
  * Reads a remote catalogue. The content contract forbids hand-written release
@@ -6,22 +6,19 @@ import type { Artifact, ArtifactKind, Profile } from './catalog'
  * than completed with a guess.
  */
 
-const KINDS: ArtifactKind[] = ['image', 'update', 'kernel', 'root', 'firmware']
 const PROFILES: Profile[] = ['dev', 'prod']
 
-function readArtifact(value: unknown): Artifact | null {
+function readImage(value: unknown): Image | null {
   if (typeof value !== 'object' || value === null)
     return null
 
   const entry = value as Record<string, unknown>
-  const strings = ['board', 'version', 'deploymentId', 'digest', 'href'] as const
+  const strings = ['board', 'version', 'deploymentId', 'releasedAt', 'digest', 'href'] as const
   for (const key of strings) {
     if (typeof entry[key] !== 'string' || entry[key] === '')
       return null
   }
   if (typeof entry.bytes !== 'number' || !Number.isFinite(entry.bytes))
-    return null
-  if (!KINDS.includes(entry.kind as ArtifactKind))
     return null
   if (!PROFILES.includes(entry.profile as Profile))
     return null
@@ -31,7 +28,7 @@ function readArtifact(value: unknown): Artifact | null {
     profile: entry.profile as Profile,
     version: entry.version as string,
     deploymentId: entry.deploymentId as string,
-    kind: entry.kind as ArtifactKind,
+    releasedAt: entry.releasedAt as string,
     bytes: entry.bytes,
     digest: entry.digest as string,
     href: entry.href as string,
@@ -44,16 +41,16 @@ export function isSample(payload: unknown): boolean {
     && (payload as { sample?: unknown }).sample === true
 }
 
-/** Accepts `{ artifacts: [...] }` or a bare array; anything else reads as empty. */
-export function parseCatalog(payload: unknown): Artifact[] {
+/** Accepts `{ images: [...] }` or a bare array; anything else reads as empty. */
+export function parseCatalog(payload: unknown): Image[] {
   const list = Array.isArray(payload)
     ? payload
     : typeof payload === 'object' && payload !== null
-      ? (payload as { artifacts?: unknown }).artifacts
+      ? (payload as { images?: unknown }).images
       : undefined
 
   if (!Array.isArray(list))
     return []
 
-  return list.map(readArtifact).filter((entry): entry is Artifact => entry !== null)
+  return list.map(readImage).filter((entry): entry is Image => entry !== null)
 }

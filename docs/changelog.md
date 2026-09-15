@@ -2832,3 +2832,20 @@ explicit switch is the form that does not violate it: the rows never claim to be
 their deployment IDs read `sample-*`, and their digests are obviously placeholder. Turning
 the switch off, or pointing `CATALOG_SOURCE` at real metadata, removes both the rows and the
 banner.
+
+## 2026-09-15 06:15 [progress]
+
+The download page was listing artifacts; it now lists **images**. A row is a bootable image
+for one board and profile — component packages (kernel, root, firmware, `.micaupd`) are not
+downloads, they reach a device through an update, so the artifact-kind facet is gone.
+
+Versions are the other half of the correction. An image has a history, and the page opens on
+the newest version of each board and profile; a control below the table loads the earlier
+ones and says how many there are. Ordering is by `releasedAt`, which is now a required field
+— an entry without a release date is dropped, because there is no honest way to say which of
+two undated images is current.
+
+The table reads board · profile · version · released · deployment · size · download, and the
+payload key is `images`. The sample catalogue behind `CATALOG_DEMO=1` carries seven rows
+over four boards with two versions on three of them, so the history control has something to
+open.

@@ -1,6 +1,7 @@
-import type { Artifact, ArtifactKind, Profile } from '../catalog'
+import type { Image, Profile } from '../catalog'
 import type { Copy } from '@/shared/i18n'
 import { useEffect, useMemo, useState } from 'react'
+import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
 import { Input } from '@/shared/components/ui/input'
 import {
@@ -18,14 +19,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table'
-import { ARTIFACTS, filterArtifacts, formatBytes } from '../catalog'
+import { filterImages, formatBytes, historyCount, IMAGES, selectVersions } from '../catalog'
 import { isSample, parseCatalog } from '../catalog-schema'
 
-const KINDS: ArtifactKind[] = ['image', 'update', 'kernel', 'root', 'firmware']
 const PROFILES: Profile[] = ['dev', 'prod']
 
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
 const ALL = 'all'
+
+declare const __BUILD_ID__: string | undefined
+
+/**
+ * Where the Worker answers the catalogue. The build stamp is the cache key: a
+ * deploy asks for a fresh answer, and within one deploy the edge serves one.
+ */
+const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
 
 interface FacetProps {
   label: string
@@ -61,31 +69,23 @@ function Facet({ label, allLabel, value, options, onChange }: FacetProps) {
   )
 }
 
-declare const __BUILD_ID__: string | undefined
-
-/**
- * Where the Worker answers the catalogue. The build stamp is the cache key: a
- * deploy asks for a fresh answer, and within one deploy the edge serves one.
- */
-const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
-
 export function DownloadExplorer({
   copy,
-  artifacts,
+  images,
 }: {
   copy: Copy
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
-  artifacts?: Artifact[]
+  images?: Image[]
 }) {
-  const [fetched, setFetched] = useState<Artifact[]>(ARTIFACTS)
+  const [fetched, setFetched] = useState<Image[]>(IMAGES)
   const [sample, setSample] = useState(false)
   const [board, setBoard] = useState(ALL)
   const [profile, setProfile] = useState(ALL)
-  const [kind, setKind] = useState(ALL)
   const [query, setQuery] = useState('')
+  const [history, setHistory] = useState(false)
 
   useEffect(() => {
-    if (artifacts)
+    if (images)
       return
     const cancel = new AbortController()
     // A failed or unreadable catalogue leaves the empty state standing: the page
@@ -101,23 +101,24 @@ export function DownloadExplorer({
       .then(setFetched)
       .catch(() => {})
     return () => cancel.abort()
-  }, [artifacts])
+  }, [images])
 
-  const catalogue = artifacts ?? fetched
+  const catalogue = images ?? fetched
 
   const boards = useMemo(
-    () => [...new Set(catalogue.map(artifact => artifact.board))].sort(),
+    () => [...new Set(catalogue.map(image => image.board))].sort(),
     [catalogue],
   )
 
-  const rows = filterArtifacts(catalogue, {
+  const matching = filterImages(catalogue, {
     board: board === ALL ? undefined : board,
     profile: profile === ALL ? undefined : (profile as Profile),
-    kind: kind === ALL ? undefined : (kind as ArtifactKind),
     query,
   })
+  const rows = selectVersions(matching, history)
+  const earlier = historyCount(matching)
 
-  const { filters, kinds, cols } = copy.download
+  const { filters, cols } = copy.download
 
   return (
     <div>
@@ -135,13 +136,6 @@ export function DownloadExplorer({
           value={profile}
           onChange={setProfile}
           options={PROFILES.map(value => ({ value, label: value }))}
-        />
-        <Facet
-          label={filters.kind}
-          allLabel={filters.all}
-          value={kind}
-          onChange={setKind}
-          options={KINDS.map(value => ({ value, label: kinds[value] }))}
         />
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
@@ -174,28 +168,32 @@ export function DownloadExplorer({
                   <Table className="min-w-[720px]">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="px-5">{cols.artifact}</TableHead>
-                        <TableHead>{cols.board}</TableHead>
+                        <TableHead className="px-5">{cols.board}</TableHead>
                         <TableHead>{cols.profile}</TableHead>
                         <TableHead>{cols.version}</TableHead>
+                        <TableHead>{cols.released}</TableHead>
                         <TableHead>{cols.deployment}</TableHead>
-                        <TableHead className="pr-5">{cols.size}</TableHead>
+                        <TableHead>{cols.size}</TableHead>
+                        <TableHead className="pr-5">{cols.download}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {rows.map(artifact => (
-                        <TableRow key={`${artifact.deploymentId}-${artifact.kind}`}>
-                          <TableCell className="px-5 text-[15px]">
-                            <a href={artifact.href}>{kinds[artifact.kind]}</a>
-                          </TableCell>
-                          <TableCell className="font-mono text-[13px]">{artifact.board}</TableCell>
-                          <TableCell className="font-mono text-[13px]">{artifact.profile}</TableCell>
-                          <TableCell className="font-mono text-[13px]">{artifact.version}</TableCell>
+                      {rows.map(image => (
+                        <TableRow key={`${image.deploymentId}-${image.version}`}>
+                          <TableCell className="px-5 font-mono text-[13px]">{image.board}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{image.profile}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{image.version}</TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
-                            {artifact.deploymentId}
+                            {image.releasedAt}
                           </TableCell>
-                          <TableCell className="pr-5 font-mono text-[13px] text-muted-foreground tabular-nums">
-                            {formatBytes(artifact.bytes)}
+                          <TableCell className="font-mono text-[13px] text-muted-foreground">
+                            {image.deploymentId}
+                          </TableCell>
+                          <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
+                            {formatBytes(image.bytes)}
+                          </TableCell>
+                          <TableCell className="pr-5 text-[15px]">
+                            <a href={image.href}>disk.img</a>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -203,6 +201,16 @@ export function DownloadExplorer({
                   </Table>
                 </div>
               </Card>
+
+              {(earlier > 0 || history) && (
+                <Button
+                  variant="secondary"
+                  className="mt-4"
+                  onClick={() => setHistory(!history)}
+                >
+                  {history ? copy.download.historyHide : `${copy.download.history} (${earlier})`}
+                </Button>
+              )}
             </>
           )}
     </div>
