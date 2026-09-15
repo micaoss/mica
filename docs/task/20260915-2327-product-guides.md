@@ -1,0 +1,49 @@
+# 20260915-2327-product-guides Complete the product documentation: overview, build, porting, flashing, updates and releasing
+
+- **status**: in_progress
+- **priority**: P1
+- **owner**: olea2l5k
+- **createdAt**: 2026-09-15 23:27
+
+## Description
+
+The user asked for the product-facing documentation to be completed: a build
+guide, a new-board porting guide, a flashing guide and the guides around them,
+in English, against the chain as it stands on 2026-09-15 (`mica-build-env`
+`20260915-0138`, `mica-system-base` `20260915-1102`, `mica-podman`
+`20260915-1057`, `mica-core` `20260915-1135`, `mica-boards`
+`<board>/20260915-1926`, `mica-build` `x64` and `cx3576` `20260915-2230`,
+index `mica/20260915-2242`).
+
+Scope: `docs/user/overview.md`, `docs/user/build.md`, `docs/user/flashing.md`,
+`docs/user/update-packages.md` and `docs/user/releasing.md` are new;
+`docs/boards/porting.md` is rewritten to the current board contract;
+`docs/user/download.md` and the stale parts of `quickstart.md` and
+`install.md` are corrected. The guides cross-link `docs/design/` and
+`docs/decisions/` instead of restating them, and every page carries its
+truth-status lines and a coverage row.
+
+Command sequences come from `mica-build` and `mica-boards` through the
+coordinator, or are read from those repositories; anything not confirmed is
+marked unverified.
+
+Acceptance: the six guides exist and are current, the catalogue and the
+coverage table list them, and `make docs-verify` passes.
+
+## ActiveForm
+
+Writing the product guides
+
+## Dependencies
+
+- **blocked by**: the authoritative command sequences of `mica-build` and `mica-boards`
+- **blocks**: (none)
+
+## Notes
+
+- 2026-09-15: plan reported to the coordinator: new overview, build, flashing,
+  update-packages and releasing guides; `boards/porting.md` rewritten;
+  `download.md`, `quickstart.md` and `install.md` corrected; catalogue and
+  coverage rows with each page. `docs/architecture.md` and the existing design
+  pages are left to task `20260915-0316-docs-multi-repo-ownership`, which is
+  in progress in this repository.

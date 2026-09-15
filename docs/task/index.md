@@ -77,3 +77,4 @@ Each task is a single line linking to its detail file. All detailed information 
 - [-] [**20260914-0558-mica-build-released-inputs mica-build: adopt the released inputs and the workspace rules**](20260914-0558-mica-build-released-inputs.md) `P1`
 - [-] [**20260914-2042-release-lock-offline-build Move every repository to the release lock format and build the chain offline**](20260914-2042-release-lock-offline-build.md) `P1`
 - [-] [**20260915-0316-docs-multi-repo-ownership Restate the documentation system for seven repositories**](20260915-0316-docs-multi-repo-ownership.md) `P1`
+- [-] [**20260915-2327-product-guides Complete the product documentation: overview, build, porting, flashing, updates and releasing**](20260915-2327-product-guides.md) `P1`

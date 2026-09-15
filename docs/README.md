@@ -12,6 +12,7 @@ board status is in [support tiers](boards/support-tiers.md#current-boards).
 
 | I need to… | Read |
 |---|---|
+| Understand the whole system quickly | [Overview](user/overview.md) |
 | Build and boot a device | [Quickstart](user/quickstart.md), [build guide](design/build.md), [installation](user/install.md) |
 | Understand upgrade and rollback | [Operator guide](user/update-rollback.md), [deployment lifecycle](design/updates.md), [trust](design/release-signing.md) |
 | Understand disk layout and recovery | [Storage](design/storage.md), [immutable root](design/ro-root.md), [reset/recovery](design/recovery.md) |
@@ -115,6 +116,7 @@ work in progress lives in `plan/` and `task/`.
   - `s905x5m.md` — board dossier: BM201 / S905X5M mainline adaptation and qualification boundary
   - `virt-arm64.md` — board dossier: ARM64 UEFI/QEMU image and its evidence boundary
 - `user/` — the customer journey from download to support
+  - `overview.md` — Mica OS in one page: the repositories, the release chain, the products and where the files are
   - `doc-contract.md` — the contract behind this set: audience, page ownership, truth-status taxonomy, evidence rules
   - `quickstart.md` — the shortest honest path to a running Mica OS system
   - `download.md` — release selection and obtaining an image
