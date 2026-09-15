@@ -61,11 +61,20 @@ to invented rows. Set the source with `wrangler secret put CATALOG_SOURCE`, or a
 var in `wrangler.jsonc` if it is not a secret.
 
 ```json
-{ "images": [
-  { "board": "x64", "profile": "dev", "version": "2026.09-2",
-    "deploymentId": "dep-aa11", "releasedAt": "2026-09-12",
-    "bytes": 1073741824, "digest": "sha256:…", "href": "https://…/disk.img" }
-] }
+{
+  "images": [
+    {
+      "board": "x64",
+      "profile": "dev",
+      "version": "2026.09-2",
+      "deploymentId": "dep-aa11",
+      "releasedAt": "2026-09-12",
+      "bytes": 1073741824,
+      "digest": "sha256:…",
+      "href": "https://…/disk.img"
+    }
+  ]
+}
 ```
 
 `profile` is `dev` or `prod`; `releasedAt` is what orders the versions, so an entry without
