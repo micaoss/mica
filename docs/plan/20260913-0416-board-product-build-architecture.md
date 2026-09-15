@@ -757,5 +757,5 @@ the Debian base.
   (`docs/task/20260914-2042-release-lock-offline-build.md`).
 - 2026-09-15: the `mica-core` commit `758ba0f` cited here is pre-reset history
   (its history is squashed into the root `239e423`, user); the current
-  `mica-core` is release `20260915-0728` at `2a4c98d` (root `239e423`)
+  `mica-core` is release `20260915-1135` at `610782c` (root `239e423`)
   (`docs/task/20260914-2042-release-lock-offline-build.md`).

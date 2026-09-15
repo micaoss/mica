@@ -287,3 +287,9 @@ owner, dispatched by the coordinator.
   `x64` cut waits for the new pins. No lock row or decision produces a
   `mica-build:root.<product>.<release>` tag, so the spec's tag list and the
   build and artifact designs name only the image and update bundles.
+- 2026-09-15: `mica-core` `20260915-1135` (`610782c`, `SHA256SUMS` sha256
+  `f61c37c3c32566e7c2e00b9a5d15fe1edf8b2a8a41ef9ed952925f292df8f641`) is its
+  first release under the package-version rules, with `mica/rootfs/v2` and
+  no release identity in `system_info`. All four package repositories now
+  have a release under the rules; `mica-build` pins the four in one round
+  before its first scoped release.

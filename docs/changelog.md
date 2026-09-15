@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-15 11:55 [progress]
+
+`mica-core` `20260915-1135` at `610782c` is its first release under the
+package-version rules (trust hash
+`f61c37c3c32566e7c2e00b9a5d15fe1edf8b2a8a41ef9ed952925f292df8f641`): all 14
+packages `0.1.0-1` with no `Mica-Source-Commit`, pools annotated only
+`mica.source-repo` and `mica.arch`, and `micad (= 0.1.0-1)` pins. It also
+implements `mica/rootfs/v2` without `version`, drops the `release-identity.env`
+reader, `system.gitStamp`, `system.commitDate` and `daemon.commit`, and prints
+the package version from `--version`. All four package repositories now have
+a release under the rules; `mica-build` pins them in one round before its
+first scoped release, and the old-release clean-up starts from that pin. The
+design documents and the package-version and stable-identity decisions mark
+the `mica-core` parts implemented.
+
 ## 2026-09-15 11:43 [progress]
 
 `mica-build` `main` `718a1226` implements scoped releases (`release.sh`

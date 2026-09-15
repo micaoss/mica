@@ -277,7 +277,7 @@ The micad side and the SFTP server are implemented in `mica-core`, first as
 `ae513fb`, `790a067` and `3164bf1`, now rebased as `2753040`, `6547e0f` and
 `84dce9f`, with `3affb58` describing SFTP as a board feature; all of these
 are pre-reset history; `mica-core`'s history now starts at the root `239e423`,
-and its current release is `20260915-0728` at `2a4c98d`:
+and its current release is `20260915-1135` at `610782c`:
 
 - The `access.ssh` reconciler (still named `sshd`, and still the live-state
   key) renders `/run/mica/dropbear.env` as one `DROPBEAR_ARGS` line: one

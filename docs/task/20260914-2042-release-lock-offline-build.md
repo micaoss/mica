@@ -489,3 +489,44 @@ Moving the repositories to the release lock format
   `x64` cut waits for the new pins. No lock row or decision produces a
   `mica-build:root.<product>.<release>` tag, so the spec's tag list and the
   build and artifact designs name only the image and update bundles.
+- 2026-09-15: `mica-core` `20260915-1135` at `610782c` is its first release
+  under the package-version rules, together with `mica/rootfs/v2` and the
+  release-identity removal (`docs/decisions/2026-09-15-package-versions.md`,
+  `docs/decisions/2026-09-15-stable-component-ids.md`).
+  - Target `610782c0d1e0acf8bd5b5ed504e088dd81cb4043` (commits `271f20b`,
+    `610782c`); ci runs 34961492067 and 34962880143 and release run
+    34964131576 green; build env `mica-build-env` `20260915-0138`.
+  - `SHA256SUMS` sha256
+    `f61c37c3c32566e7c2e00b9a5d15fe1edf8b2a8a41ef9ed952925f292df8f641`;
+    `mica-core.lock` sha256
+    `6aa265f662042ca61a9fe40a74137f8e03e48a660deee1d25943d7a988cededf`.
+  - Pools
+    `pool.amd64.20260915-1135@sha256:41cdba0a9f4add7cfc2d5b8e17b793587634691032b7a0484e1c5489df26a0e3`
+    and
+    `pool.arm64.20260915-1135@sha256:b3519eca7dcba449b3f473d328eb92233c7758a9295b03f9c18df51f21c27e19`,
+    annotated only `mica.source-repo` and `mica.arch`, 7 layers per
+    architecture with `mica.inputs`. All 14 packages `0.1.0-1`, no
+    `Mica-Source-Commit`; the dependents pin `micad (= 0.1.0-1)`.
+  - API: `GET /api/v1/system/info` `system` has only `version`, `package` and
+    `fileEpoch`, and `daemon` only `name` and `version`; diagnostic snapshot
+    schema 6, redaction schema 8; `micad` reads no `release-identity.env`;
+    `--version` prints `micad 0.1.0-1` and `mica-apid 0.1.0-1`; `openapi.json`
+    regenerated in `mica-apid` `0.1.0-1`.
+  - Contract files `mica-core:crates/mica-deploy/tests/component-contracts/`
+    at `610782c`: `cases.json`
+    `22551a87e1e5382e0e6499b378c74ef89ae52da6a6a7d9113769a39087479f35`,
+    `deployment.json`
+    `142b536d5db0c108a463638c24fa1a1425b12ab222b351702f4b158c8a5ae697`,
+    `envelope.json`
+    `bd926d242b0e7b321634a9ee225121e4cf110e7b9fcd0f7d6c698373271a86d1`,
+    `firmware.json`
+    `79d2a4ff72df13e0940b5af32fe1816906fd3f1a53f3cc1d816fcc82c3760ad3`.
+    `mica/rootfs/v2` has no `version` (v1 or a `version` field refused);
+    `mica/deployment/v2` and `mica/catalog/v2` unchanged since `20260915-0728`;
+    `mica/kernel/v1` and `mica/update-envelope/v1` unchanged.
+  - `mica-build` pins it in one round with Base `20260915-1102`, podman
+    `20260915-1057` and boards `<board>/20260915-1128` before its first scoped
+    release, including its `--version` and `system/info` adaptations, the
+    four contract fixtures, `mica/rootfs/v2` and the removal of
+    `release-identity.env`; K1 and K2 may follow. The clean-up of the
+    pre-rule releases starts from that pin commit.

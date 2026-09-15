@@ -82,16 +82,17 @@ defaults do not contain signature anchors: metadata/content policy comes from th
 authenticated kernel package and boot anchors from its firmware trust domain.
 
 There is no `system.gitStamp` and no `system.commitDate` (decided 2026-09-15,
-`docs/decisions/2026-09-15-stable-component-ids.md`, landing with
-`mica-core`'s package-version release): package versions carry no commit
+`docs/decisions/2026-09-15-stable-component-ids.md`; implemented in
+`mica-core` since `20260915-1135`): package versions carry no commit
 (`docs/decisions/2026-09-15-package-versions.md`), and the root carries no
 `/usr/share/mica/release-identity.env`, so a release that changes nothing in
 the root keeps its rootfs identity. The release identity of the running
 image is the `deployment` member (`version`, `generation`), read from the
 authenticated boot receipt.
 
-`daemon` has no `commit` either (decided 2026-09-15, landing with the same
-`mica-core` package-version release): `mica-core` removes `MICA_BUILD_COMMIT`
+`daemon` has no `commit` either (decided 2026-09-15; implemented in
+`mica-core` since `20260915-1135`, where `micad --version` prints
+`micad 0.1.0-1`): `mica-core` removes `MICA_BUILD_COMMIT`
 (`docs/decisions/2026-09-15-package-versions.md` R3), so `daemon.version` and
 `micad --version` show the declared package version, such as `0.1.0-1`, and
 no commit is compiled into the binary.
