@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 20:32 [progress]
+
+`mica-boards` `94e1dc4` enables CI reuse of unchanged kernel and U-Boot
+components: its build plan skips a component whose `mica.inputs` equals the
+latest published board release's, fails on an unreadable listing, lock or
+manifest, and forces a full build when the build files outside the inputs
+hash change or when there is no base to compare with. A push touching no
+component input fell from 65.5 to 4.3 runner-minutes (17.4 to 2.7 minutes
+wall); one changed `x64` kernel input takes 26.7. Pool jobs, the version guard
+and package gates still run every time. Steps (1), (2), (3) and (5) of
+`docs/decisions/2026-09-15-board-kernel-builds.md` are done.
+
 ## 2026-09-15 19:50 [progress]
 
 `mica-boards` `<board>/20260915-1926` at `12564a3` are released and verified

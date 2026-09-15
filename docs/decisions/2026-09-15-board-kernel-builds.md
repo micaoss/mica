@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner; the virt-arm64 config trim, the mica-build owner first
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); (1) and (5) implemented and released in `mica-boards` `<board>/20260915-1926` (`12564a3`); (3) done (`virt-arm64` trimmed to 71 modules, with `kernel/config/virt-arm64.required` holding `mica-build`'s 83 symbols); (2) next; (4) not now
+- **status**: accepted (user, 2026-09-15); (1) and (5) implemented and released in `mica-boards` `<board>/20260915-1926` (`12564a3`); (3) done (`virt-arm64` trimmed to 71 modules, with `kernel/config/virt-arm64.required` holding `mica-build`'s 83 symbols); (2) enabled at `mica-boards` `94e1dc4`; (4) not now
 
 ## Decision
 

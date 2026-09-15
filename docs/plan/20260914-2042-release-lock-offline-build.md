@@ -388,3 +388,8 @@ owner, dispatched by the coordinator.
   `s905x5m` 1732 to 944 s, `virt-arm64` 1123 to 330 s). `mica-build` re-pins
   them before its `x64` and `cx3576` dev and prod releases; `1128` is deleted
   after that pin.
+- 2026-09-15: `mica-boards` `94e1dc4` enables CI reuse of unchanged kernel
+  and U-Boot components (step 2 of the kernel build decision), forcing a
+  full build when unhashed build files change: a push that touches no
+  component input now takes 4.3 runner-minutes instead of 65.5. Steps 1, 2, 3
+  and 5 of that decision are done.

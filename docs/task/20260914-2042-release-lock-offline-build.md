@@ -772,3 +772,23 @@ Moving the repositories to the release lock format
     (dev and prod); the coordinator then deletes `<board>/20260915-1128` and
     prunes ghcr. Step (2), CI reuse of unchanged kernel and U-Boot
     components, is next in `mica-boards`.
+- 2026-09-15: step (2) of `docs/decisions/2026-09-15-board-kernel-builds.md`
+  is enabled in `mica-boards` `main` `94e1dc4` (changelog `07e499a`).
+  - The `build.yml` plan does not build a `kernel` or `uboot` component whose
+    `mica.inputs` equals the latest published `<board>/*` release component
+    (`tools/reuse.sh` against `tools/inputs.sh`); a failed listing, lock or
+    manifest read fails the plan.
+  - A non-release run forces a full component build when the files the
+    component jobs run but the inputs hash does not cover change
+    (`build.yml`, `ci.yml`, the root `Makefile`, `tools/locks.sh`,
+    `check-lock.sh`, `from.sh`, `upstream.sh`, `apt-snapshot.sh`,
+    `ci-outputs.sh`, `inputs.sh`, `reuse.sh`), compared against the pull
+    request base or the push's previous head; a force-push, a new branch or
+    a dispatch builds everything. These files are not in the inputs hash.
+  - Measured on CI: before, 65.5 runner-minutes and 17.4 minutes wall per
+    push; after, a push touching no component input or build file 4.3 and
+    2.7 (run 35018734522); a push changing one `x64` kernel input 26.7 and
+    12.1 (pull request #1 from a demo branch, closed unmerged and deleted);
+    a `build.yml` change forces all, 62.4 and 16.6 (run 35016915074). Pool
+    jobs, the version guard and the package gates still run on every push.
+  - Steps (1), (2), (3) and (5) are done; (4), ccache, is not used now.
