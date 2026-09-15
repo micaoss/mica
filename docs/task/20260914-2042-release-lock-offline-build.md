@@ -638,6 +638,7 @@ Moving the repositories to the release lock format
   Release images and products
   (`docs/decisions/2026-09-15-release-images-and-products.md`): `s905x5m`
   stays out of the release targets; `mica-build` publishes disk images as
-  deterministic `.img.zst` (raw image still built and verified; its record
+  deterministic `.img.gz`, never the raw `.img` (corrected the same day from
+  zstd; the raw image is still built and verified, and its record is
   proposed by `mica-build`); `x64-prod` and `cx3576-prod` are added with
   development keys on the development channel.

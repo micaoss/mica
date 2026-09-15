@@ -56,7 +56,7 @@ declare is refused.
 
 **Publishing** (per product, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`):
 one release asset `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` per kind (the
-`disk` image published compressed as `.img.zst`,
+`disk` image published gzip-compressed as `.img.gz`,
 `docs/decisions/2026-09-15-release-images-and-products.md`); one
 OCI manifest `image.<product>.<YYYYMMDD-HHMM>` with one layer per kind
 (title the file name, annotation `mica.image-kind`); `asset` rows per kind in

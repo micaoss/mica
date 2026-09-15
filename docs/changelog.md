@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 17:54 [decision]
+
+User correction to the compressed images: a `mica-build` GitHub Release
+never carries the raw `.img`; it carries `mica-<product>-<release>.img.gz`,
+gzip replacing zstd. The OCI image layer is the same file, so the `asset`
+sha256 still equals the layer digest. The gzip is deterministic (no name or
+timestamp, a fixed level, the compressor from a pinned build-env image, two
+compressions byte-identical) and is decompressed and compared with the raw
+signed image before publishing; the raw image is still built, gated and
+verified, and `mica-build` proposes how its sha256 and size are recorded.
+`mica-build` implements it after K1 and K2.
+`docs/decisions/2026-09-15-release-images-and-products.md`.
+
 ## 2026-09-15 17:53 [decision]
 
 User decisions after the first scoped releases. `mica-boards` kernel builds:
