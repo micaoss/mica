@@ -38,15 +38,19 @@ Root owns userspace. It must contain empty modules/firmware mountpoints and no
 kernel or loader payload. Kernel-only packaging leaves root bytes unchanged;
 root-only packaging leaves kernel/support/firmware unchanged. Neither
 component carries release identity (decided 2026-09-15,
-`docs/decisions/2026-09-15-stable-component-ids.md`; `mica-core` implements
-its part since `20260915-1135`, `mica-build` drops `release-identity.env` and
-writes `mica/rootfs/v2` in its next pin round, and the kernel `buildId` and
-signing changes follow its first scoped releases):
-the root has no `/usr/share/mica/release-identity.env` and its
-`mica/rootfs/v2` descriptor no `version`; the kernel `buildId` hashes the
-tool image's pinned inputs rather than a local image identity, and `sbsign`
-runs under a clock pinned to `SOURCE_DATE_EPOCH`, with a release guard that
-refuses a changed kernel identity under an unchanged `buildId`. A release
+`docs/decisions/2026-09-15-stable-component-ids.md`, implemented in
+`mica-core` `20260915-1135` and `mica-build` `fe3ad07` and `7d18da6`): the
+root has no `/usr/share/mica/release-identity.env` and its `mica/rootfs/v2`
+descriptor no `version`; the kernel `buildId` names its packager by the tools
+image label `mica.boot.inputs`, the sha256 of the image's pinned inputs (base
+image digest, apt snapshot row, EFI target, the `mica-systemd-boot` archive,
+the Dockerfile and copied files; the FIT tools image adds its FIT and regdb
+scripts, the board's U-Boot tool binaries and the regdb source), and
+`build/src/kernel-package.ts` refuses an image without it; `ukify` and
+`sbsign` run under `faketime` frozen at `SOURCE_DATE_EPOCH`, so two signings
+are byte-identical (`tests/boot-signing-test.sh`); and `release.sh collect`
+refuses a kernel that has the previous scoped release's `buildId` but
+another identity. A release
 that changes only a board or only the release metadata keeps both
 identities. A new signed
 deployment binds the chosen association.

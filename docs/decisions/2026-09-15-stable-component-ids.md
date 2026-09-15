@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-core owner (`mica/rootfs/v2`, `system_info`); the mica-build owner (the root content, kernel `buildId`, signing)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "接受"); `mica-core` part (R1 reader and `system_info`, R2 `mica/rootfs/v2`) implemented in its release `20260915-1135` (`610782c`); `mica-build` R1 and R2 land in its next pin round, K1 and K2 may follow its first scoped releases; order: `mica-core` with its package-version release, then `mica-build` after its step 3 and its package-version adaptation
+- **status**: accepted (user, 2026-09-15: "接受"); implemented: R1 and R2 in `mica-core` `20260915-1135` (`610782c`) and `mica-build` `fe3ad07`, K1, K2 and the release guard in `mica-build` `7d18da6`; builds at two commits and after rebuilt tool images give identical root and kernel ids, so `root`-only and `kernel`-only update archives are published from the next scoped releases on
 
 ## Findings
 

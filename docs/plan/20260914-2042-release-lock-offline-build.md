@@ -352,3 +352,10 @@ owner, dispatched by the coordinator.
   the prod products if the exclusion makes the path differ. `x64/20260915-1458`
   and `cx3576/20260915-1515` stay as they are. `mica-build` implements it in
   the prod products round, after K1 and K2.
+- 2026-09-15: `mica-build` `7d18da6` implements K1 and K2 (the kernel
+  `buildId` over the tools image's pinned inputs, signing under a frozen
+  clock, and a release guard). With R1 and R2 already in `mica-core`
+  `20260915-1135` and `mica-build` `fe3ad07`, the stable component identities
+  are implemented: root and kernel ids hold across commits and rebuilt tool
+  images, so the next scoped releases publish `root`-only and `kernel`-only
+  update archives where only the other part changed.

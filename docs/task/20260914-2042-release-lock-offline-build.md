@@ -662,3 +662,34 @@ Moving the repositories to the release lock format
   the prod products if the exclusion makes the path differ. `x64/20260915-1458`
   and `cx3576/20260915-1515` stay as they are. `mica-build` implements it in
   the prod products round, after K1 and K2.
+- 2026-09-15: `mica-build` `main` `7d18da6` implements K1 and K2 of
+  `docs/decisions/2026-09-15-stable-component-ids.md` (ci run 35008433331
+  green, 17 jobs; release-products `x64-minimal` 4m11s, `cx3576-minimal`
+  10m00s).
+  - K1: the kernel `buildId` names its packager by the image label
+    `mica.boot.inputs`, the sha256 of the tools image's pinned inputs (base
+    image digest, apt snapshot row, EFI target, `mica-systemd-boot` archive
+    sha256, Dockerfile and copied files; the FIT tools image adds
+    `Dockerfile.fit`, `fit.sh`, `regdb.sh`, the board's four U-Boot tool
+    binaries and the regdb source row); `build/src/kernel-package.ts`
+    refuses an image without the label.
+  - K2: `ukify` and `sbsign` run under `faketime` frozen at
+    `SOURCE_DATE_EPOCH` (`faketime` from the pinned snapshot);
+    `tests/boot-signing-test.sh` signs twice 2 s apart and requires identical
+    bytes, and `sbverify` validates and refuses a foreign certificate
+    (without `faketime` the output differs in 259 bytes).
+  - Release guard: `release.sh collect` refuses a kernel with the previous
+    scoped release's `buildId` but another identity, reading the
+    authenticated descriptor at the head of the previous `full` archive;
+    `release-test` 21/21.
+  - Acceptance: builds at `3f6f3bd1`, a rebuild after `--no-cache` tools
+    images (local image ids moved) and an empty commit give identical ids:
+    `x64-minimal` rootfs `24810a9b...`, kernel `2056c015...`, `buildId`
+    `b3a0288c...`; `cx3576-minimal` rootfs `3cd901ca...`, kernel
+    `18c388a5...`, `buildId` `f64c4f35...`. The rootfs ids equal those
+    published in `x64/20260915-1458` and `cx3576/20260915-1515` (built at
+    another commit), so R1 and R2 hold; the kernel ids change once against
+    the published ones. `lifecycle-uefi` `x64-dev` passes under secure-boot
+    OVMF.
+  - From the next scoped releases on, `root`-only and `kernel`-only update
+    archives are published whenever only the other component changed.

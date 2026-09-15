@@ -22,7 +22,7 @@ changes nothing in the root keeps its rootfs identity; the release identity
 is only in the signed deployment's `version`, `generation` and `product`
 (decided 2026-09-15, `docs/decisions/2026-09-15-stable-component-ids.md`;
 implemented in `mica-core` since its release `20260915-1135`, which refuses v1
-or a `version` field; `mica-build` writes v2 from its next pin round). `mica/deployment/v2` and `mica/catalog/v2` were decided on
+or a `version` field, and written by `mica-build` since `fe3ad07`). `mica/deployment/v2` and `mica/catalog/v2` were decided on
 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and implemented
 in `mica-core` since its release `20260915-0728` (`2a4c98d`,
 `mica-core:docs/task/20260915-0657-update-packages.md`); `mica-build` writes

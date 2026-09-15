@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 18:48 [progress]
+
+The stable root and kernel component identities are implemented. `mica-build`
+`7d18da6` (ci run 35008433331 green) names the kernel packager by the tools
+image label `mica.boot.inputs` over its pinned inputs (K1), runs `ukify` and
+`sbsign` under `faketime` frozen at `SOURCE_DATE_EPOCH` so two signings are
+byte-identical (K2), and refuses at release a kernel with the previous
+`buildId` but another identity. Builds at two commits and after rebuilt tool
+images give identical ids, and the rootfs ids equal those published in
+`x64/20260915-1458` and `cx3576/20260915-1515`; R1 and R2 were already in
+`mica-core` `20260915-1135` and `mica-build` `fe3ad07`. From the next scoped
+releases, `root`-only and `kernel`-only update archives are published when
+only the other component changed.
+
 ## 2026-09-15 18:01 [decision]
 
 User correction, replacing the removal of the minimal products ("按推荐处理，minimal只是本地编译和ci用，不发布"):
