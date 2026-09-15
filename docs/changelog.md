@@ -2711,3 +2711,27 @@ Corrected here:
 - `design/micad.md`'s reconciler table.
 
 `make docs-verify` passes 8/8.
+
+## 2026-09-15 04:25 [progress]
+
+`design/micad.md` was 575 lines and shared five subjects with
+`mica-core:docs/design/micad.md`, which had already drifted from it. Applying the rule —
+product documentation here, module documentation with the module — it is now 369 lines of
+contract:
+
+- **Kept**: the D-Bus-not-a-second-IPC-stack decision, the `/mica/config/` rules a subsystem
+  inherits, per-document schema versions and what an A/B rollback costs, fail-closed on the
+  medium, and the boundary the bus draws — root-only in both directions, no `com.mica.Item1`
+  façade, apid as a client rather than a second authority, a power action recorded before it
+  is executed, and secrets that never round-trip through settings.
+- **Moved to `mica-core`** (commit `2fead65` there): the measured detail behind each
+  registered reconciler, the network reconciler's kinds, netdevs and teardown, the apply
+  queue's segment-wise folding and its locks, and the ordering `power.rs` logs in. The
+  member list of `com.mica.micad1` goes with it; this document names the interface and who
+  may call it, not its methods.
+- **Replaced** by a contract section: what every reconciler answers to — render to `/run`
+  and enable at runtime scope, because a persistent enable would fail with EROFS on a
+  read-only root; and tear down what you created, because removing a unit file does not
+  reap a device networkd built.
+
+`make docs-verify` passes 8/8.
