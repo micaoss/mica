@@ -201,6 +201,7 @@ signed loader) stay in place. Nothing is published from a workstation.
   `mica-build` moves to them in stage 4.
 - 2026-09-15: the first per-board `mica-boards` releases are
   `x64/20260915-0824`, `virt-arm64/20260915-0824`, `cx3576/20260915-0824` and
-  `s905x5m/20260915-0824` at `0f8e313`; `20260914-1603` is deleted.
+  `s905x5m/20260915-0824` at `0f8e313`; `20260914-1603` is deleted. The current releases
+  are `<board>/20260915-1128` at `ebf93f7`.
   `mica-build` reads them as `locks/mica-boards.<board>.lock` in its per-board
   switch (`docs/task/20260914-2042-release-lock-offline-build.md`).

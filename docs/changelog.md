@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-15 11:37 [progress]
+
+`mica-boards` `<board>/20260915-1128` at `ebf93f7` are its first releases
+under the package-version rules, for `x64`, `virt-arm64`, `cx3576` and
+`s905x5m`: every package `0.1.0-1` with no `Mica-Source-Commit` and a
+declared `SOURCE_DATE_EPOCH`, pools annotated only `mica.source-repo` and
+`mica.arch` with `mica.inputs` on each layer, and the board components reused
+by digest from `<board>/20260915-0945`. `mica-build` pins them with
+`mica-podman` `20260915-1057` and `mica-system-base` `20260915-1102` before
+its first scoped release.
+
 ## 2026-09-15 11:20 [progress]
 
 `mica-podman` `20260915-1057` at `d47ffbc` is its first release under the

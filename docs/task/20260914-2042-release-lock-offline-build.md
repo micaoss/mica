@@ -428,3 +428,37 @@ Moving the repositories to the release lock format
     needed: the first proof of reuse under the rules.
   - `mica-build` (adaptation on `main` `c44dc645`) pins it together with
     `mica-system-base` `20260915-1102` before its first scoped release.
+- 2026-09-15: `mica-boards` `<board>/20260915-1128` are its first releases
+  under the package-version rules (`docs/decisions/2026-09-15-package-versions.md`).
+  - Commit `ebf93f7`; ci run 34960627367 green; release runs 34963489937,
+    34963490140, 34963491962 and 34963493385 green; verified anonymously.
+  - `SHA256SUMS` sha256: `x64`
+    `aa660c5cbd760bedf2550addd9dec26a2f1eac21395fe6a3291bb241970cd943`;
+    `virt-arm64`
+    `d7f2e84275ea1459f4f16951eb94835275997c2a3b3ad7378eb9710f4f7ed18f`;
+    `cx3576`
+    `1274a40264f793358eee4119772d37e7ea7bbaccd5712a0777bb212d43da0058`;
+    `s905x5m`
+    `eccd72480d67b17ccf6f5ff7a3114e0fe4befb589efcaa21bc90cc8bd5301bd2`.
+  - Pools: `x64` `pool.x64.amd64` at
+    `sha256:f1c89093da7e63fdb607657fe0658383d47ad49f9241ba39ba677c122218c7a4`;
+    `virt-arm64` at
+    `sha256:41f077a8180ae67ac89ee2cf936bddfea5bb5837e65fcda36226b45d357b3466`;
+    `cx3576` at
+    `sha256:c300d3c686a11a2de07f0b6324abd7f42bc3c85c8a11d245216fe2512cc3b47e`;
+    `s905x5m` at
+    `sha256:4f7d343f24b897343dc6daf1b295d3dcbd0203f2cf6316da23bc10b817e6f86b`.
+    The manifests carry only `mica.source-repo` and `mica.arch`, and the
+    layers `mica.inputs`.
+  - Every package is `0.1.0-1`, with no `Mica-Source-Commit`;
+    `SOURCE_DATE_EPOCH` `1789430400`. The `board`, `kernel`, `uboot` and
+    `firmware` components are reused by digest from `<board>/20260915-0945`,
+    unchanged.
+  - The `<board>/20260915-0945` releases stay until `mica-build` has re-pinned
+    and the user decides the clean-up; the `<board>/20260915-0824` releases
+    are no longer listed.
+  - `mica-build` pins the four boards with `mica-podman` `20260915-1057` and
+    `mica-system-base` `20260915-1102` before its first scoped release.
+    `mica-boards` next investigates kernel build speed, including pinning the
+    Debian toolchain packages that the `s905x5m` bluetooth userland build
+    installs.

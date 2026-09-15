@@ -83,9 +83,9 @@ artifacts (2026-09-15, agreed by `mica-boards` and `mica-build`), published
 by `mica-boards:tools/publish-boards.sh` in a per-board `mica-boards` release
 `<board>/<YYYYMMDD-HHMM>` beside `pool.<board>.<arch>.<YYYYMMDD-HHMM>`
 (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first
-per-board releases are `x64/20260915-0824`, `virt-arm64/20260915-0824`,
-`cx3576/20260915-0824` and `s905x5m/20260915-0824`, and the earlier unscoped
-`20260914-1603` is deleted). Each component is the OCI artifact
+per-board releases were `<board>/20260915-0824`, the current ones are
+`<board>/20260915-1128`, the first under the package-version rules, and the
+earlier unscoped `20260914-1603` is deleted). Each component is the OCI artifact
 `ghcr.io/micaoss/mica-boards:<component>.<board>.<YYYYMMDD-HHMM>`:
 
 | Component | `artifactType` | Content |
@@ -103,8 +103,7 @@ component's input key), `mica.source-commit` and `mica.source-repo` (always
 assembly refuses any other value). `mica.verity-cert-sha256` is required on
 the `board` and `kernel` components, which carry the verity trust; a `uboot`
 or `firmware` component may carry it, and then it must match
-(`mica-build:tools/board-pool.sh`, as the `<board>/20260915-0824` releases
-publish it).
+(`mica-build:tools/board-pool.sh`, as the per-board releases publish it).
 A board release reuses an unchanged component by digest: the same manifest
 bytes under the new release's tag, never a re-pointed tag. The board's lock
 names each component as a `board` row (`docs/design/release-lock.md` 1.2).

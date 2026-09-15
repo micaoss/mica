@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner; the consumer side, the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); implemented at `mica-boards` `0f8e313` with the per-board releases `x64/20260915-0824`, `virt-arm64/20260915-0824`, `cx3576/20260915-0824` and `s905x5m/20260915-0824`; specified in `docs/design/release-lock.md` 1.0 and section 4; the board list format is `mica-boards`' own (`mica-boards` `ce44907`, `docs/boards/contract.md` section 3)
+- **status**: accepted (user, 2026-09-15); implemented since `mica-boards` `0f8e313` (the first per-board releases `<board>/20260915-0824`); current releases `<board>/20260915-1128` at `ebf93f7`, the first under `docs/decisions/2026-09-15-package-versions.md`; specified in `docs/design/release-lock.md` 1.0 and section 4; the board list format is `mica-boards`' own (`mica-boards` `ce44907`, `docs/boards/contract.md` section 3)
 
 ## Decision
 

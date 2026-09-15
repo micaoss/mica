@@ -36,7 +36,7 @@ the new format.
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
 | 3 | `mica-podman` (done: `20260915-0245`), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
-| 4 | `mica-boards` (done: `<board>/20260915-0824`), `mica-build` (in progress: per-board inputs and update packages on `main` `0094a097`; product builds and scoped releases pending) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
+| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (in progress: per-board inputs and update packages on `main` `0094a097`; product builds and scoped releases pending) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
 the new format before `mica-build` switches.
@@ -260,3 +260,10 @@ owner, dispatched by the coordinator.
   Its Base move to `20260915-1102` (`0ed321e`) kept the same inputs and bytes,
   proving reuse without a new release. `mica-build` pins `20260915-1057` and
   Base `20260915-1102` before its first scoped release.
+- 2026-09-15: `mica-boards` `<board>/20260915-1128` at `ebf93f7` are its first
+  releases under the package-version rules: every package `0.1.0-1` with no
+  `Mica-Source-Commit`, pools annotated only `mica.source-repo` and
+  `mica.arch` with `mica.inputs` layers, and the board components reused by
+  digest from `<board>/20260915-0945`. `mica-build` pins them with
+  `mica-podman` `20260915-1057` and `mica-system-base` `20260915-1102` before
+  its first scoped release.
