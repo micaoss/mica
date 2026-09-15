@@ -87,6 +87,22 @@ Setting `CATALOG_DEMO=1` (and no source) serves a sample catalogue that answers
 `"sample": true`, which the page renders behind a banner saying so. It exists to exercise
 the filters and the history control; it is not a release and must not be presented as one.
 
+## Adding a board
+
+A board is two lines of copy and a deploy:
+
+1. Add a row to `boards.rows` in `src/shared/i18n/zh.ts` — `board`, `hw`, `status`.
+2. Add the same `board` to `src/shared/i18n/en.ts`, with the English `hw` and `status`.
+3. Deploy.
+
+That row is the whole source: the landing page's board table, the card on `/download/`, and
+the `/download/<board>/` pages of both locales, which `getStaticPaths()` generates from it.
+Nothing else needs changing — whether a board has anything to download comes from
+`/api/catalog` at runtime, and a board with nothing published says so.
+
+The `board` identifier has to match between the locales, because each generates its own
+routes; `src/shared/i18n/boards.test.ts` fails the build when they drift.
+
 ## Layout
 
 ```text
