@@ -95,13 +95,18 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
   return stored
 }
 
-async function catalogue(env: Env): Promise<Response> {
+async function catalogue(env: Env, ctx: ExecutionContext): Promise<Response> {
   if (env.CATALOG_DEMO === '1')
     return json({ downloads: SAMPLE, sample: true, refreshedAt: null }, CACHE_SECONDS)
 
   const stored = await env.CATALOG.get<StoredCatalogue>(KEY, 'json')
-  if (!stored)
+  if (!stored) {
+    // Nothing stored yet — a fresh deployment, before the first cron. Fill it in
+    // the background rather than making this request wait on GitHub, and hold
+    // the empty answer briefly so the next request finds the catalogue.
+    ctx.waitUntil(refresh(env).catch(() => {}))
     return json({ downloads: [], refreshedAt: null }, 60)
+  }
 
   return json(stored, CACHE_SECONDS)
 }
@@ -124,7 +129,7 @@ async function manualRefresh(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
     if (url.pathname === REFRESH_PATH) {
@@ -138,7 +143,7 @@ export default {
     if (request.method !== 'GET')
       return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } })
 
-    return catalogue(env)
+    return catalogue(env, ctx)
   },
 
   /** The cron trigger; a failure leaves the stored copy standing. */

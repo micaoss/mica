@@ -7,22 +7,17 @@
   "assets": {
     "directory": "./dist"
   },
-  // The parsed catalogue lives in KV; the read path never calls GitHub. Create
-  // the namespace with `wrangler kv namespace create CATALOG`, paste the id, and
-  // uncomment both blocks — deploying with a namespace that does not exist fails.
-  // "kv_namespaces": [
-  //   { "binding": "CATALOG", "id": "..." }
-  // ],
-  // The cron rebuilds the stored catalogue; a manual refresh is
-  // POST /api/catalog/refresh with the REFRESH_TOKEN secret.
-  // "triggers": {
-  //   "crons": ["*/30 * * * *"]
-  // },
+  // The parsed catalogue lives in KV; the read path never calls GitHub.
+  "kv_namespaces": [
+    { "binding": "CATALOG", "id": "c55809c8a72a4d1b9ac52c2484cc9c29" }
+  ],
+  // Rebuilds the stored catalogue. A manual refresh is POST /api/catalog/refresh
+  // with the REFRESH_TOKEN secret.
+  "triggers": {
+    "crons": ["*/30 * * * *"]
+  },
   "vars": {
-    "CATALOG_REPO": "micaoss/mica-build",
-    // Temporary: answers the labelled sample instead of KV. Remove once the
-    // namespace exists and a refresh has run.
-    "CATALOG_DEMO": "1"
+    "CATALOG_REPO": "micaoss/mica-build"
   },
   // Both hostnames resolve to this Worker; the zone has to be on the same
   // Cloudflare account.

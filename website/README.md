@@ -76,17 +76,20 @@ and a rule written now would be a guess.
 
 ### Setting it up
 
-1. `wrangler kv namespace create CATALOG`, then paste the id into `wrangler.jsonc` and
-   uncomment the `kv_namespaces` and `triggers` blocks.
-2. `wrangler secret put REFRESH_TOKEN` — the bearer token the manual refresh requires. With
-   no token configured the endpoint answers 401 to everyone: a refresh anyone can trigger is
-   a way to spend the upstream rate limit.
-3. `wrangler secret put GITHUB_TOKEN` — a read-only token. Optional, but the anonymous API
-   allows 60 calls an hour per IP and the Worker's egress is shared.
-4. Remove `CATALOG_DEMO` from `vars` and deploy.
-5. Refresh once: `curl -X POST -H "Authorization: Bearer <token>" https://micaos.dev/api/catalog/refresh`.
+The KV namespace and the cron are configured. Nothing else is required: a request that finds
+no stored catalogue fills it in the background, so the first deployment is current within a
+request or two, and the cron keeps it so.
 
-`CATALOG_REPO` selects the repository, defaulting to `micaoss/mica-build`.
+Two secrets are optional and worth setting:
+
+- `wrangler secret put REFRESH_TOKEN` — the bearer token `POST /api/catalog/refresh`
+  requires. Without it the endpoint answers 401 to everyone, and refreshing waits for the
+  cron. A refresh anyone can trigger is a way to spend the upstream rate limit.
+- `wrangler secret put GITHUB_TOKEN` — a read-only token. The anonymous API allows 60 calls
+  an hour per IP and the Worker's egress is shared.
+
+`CATALOG_REPO` selects the repository, defaulting to `micaoss/mica-build`. Setting
+`CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
 
 ### The sample
 
