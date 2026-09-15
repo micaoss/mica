@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 15:17 [progress]
+
+The first `mica-build` scoped release, `x64/20260915-1458` at `9fe2d18`, is
+published and verified anonymously (trust hash
+`97126a89da28280433b0e6efdf87c004a15aad7ea5cdcbf2f155530a098910aa`): products
+`x64-dev` and `x64-minimal` at generation 2, built on boards
+`x64/20260915-1128`, build-env `20260915-0138`, core `20260915-1135`, podman
+`20260915-1057` and Base `20260915-1102`, published as the `image` and
+`update` bundles in `ghcr.io/micaoss/mica-build` and as release assets (a
+disk image and a `full` update archive per product). Three failed earlier
+cuts without assets were deleted with their tags; CI now runs the same
+reusable release-product workflow as the release. Next is the `cx3576` scope.
+
 ## 2026-09-15 12:44 [progress]
 
 Clean-up batch 2: after `mica-build` `fe3ad07` pinned `mica-core`

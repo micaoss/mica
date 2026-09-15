@@ -96,7 +96,10 @@ another measured record. The composed root is not published on its own: a
 scoped release publishes each product's image kinds and update archives as
 `ghcr.io/micaoss/mica-build:image.<product>.<YYYYMMDD-HHMM>` and
 `update.<product>.<YYYYMMDD-HHMM>` and as release assets
-(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, beside `mica-build.lock` and
+`SHA256SUMS` (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`). The
+first, `x64/20260915-1458`, carries `mica-x64-dev-20260915-1458.img` and
+`.micaupd` and the same pair for `x64-minimal`.
 The output directory must not exist. A failed assembly must not be published.
 
 The current `GENERATED` marker has exactly one declaration:

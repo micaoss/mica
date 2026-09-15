@@ -128,8 +128,8 @@ never a commit or a hash
 (`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`).
 `mica-build` publishes only its product bundles, `image.<product>.<release>`
 and `update.<product>.<release>`, in its scoped releases
-(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); it publishes no
-root on its own. `mica-boards` names its artifacts by
+(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`; the first is
+`x64/20260915-1458`); it publishes no root on its own. `mica-boards` names its artifacts by
 per-board release: `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
 `<component>.<board>.<YYYYMMDD-HHMM>` per board component (`board`, `kernel`,
 `uboot`, `firmware`, `packer`; `docs/boards/contract.md` section 3).

@@ -563,3 +563,40 @@ Moving the repositories to the release lock format
   - Verified: the `mica-core` releases and remote tags are exactly
     `20260915-1135`, and ghcr holds exactly the 2 pool digests of its lock,
     both readable anonymously.
+- 2026-09-15: the first `mica-build` scoped release `x64/20260915-1458` is
+  published and verified anonymously
+  (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
+  - Target `9fe2d1841716905184b3bc429db53e8211ed392b`; release run
+    34985278894 green (plan 13s, product `x64-dev` 6m05s, `x64-minimal`
+    4m24s, publish 6m02s). CI on `9fe2d184` (run 34984000340, 17 jobs)
+    includes the release-product jobs (`x64-minimal` 5m31s,
+    `cx3576-minimal` 8m47s) through the reusable
+    `.github/workflows/release-product.yml` shared with `release.yml`.
+  - `SHA256SUMS` sha256
+    `97126a89da28280433b0e6efdf87c004a15aad7ea5cdcbf2f155530a098910aa`;
+    `mica-build.lock` sha256
+    `432bac4489c8e0283e027df2edff2e0f0c40f5e4abeab6c369db84ab5097e344`;
+    `tools/locks.py` and `mica`'s reference checker accept the lock.
+  - Inputs: `mica-boards.x64` `20260915-1128`, `mica-build-env`
+    `20260915-0138`, `mica-core` `20260915-1135`, `mica-podman`
+    `20260915-1057`, `mica-system-base` `20260915-1102`.
+  - Products at generation 2: `x64-dev` (deployment `d48d43a9...`, kernel
+    `6e7ccf8b...`, rootfs `02a3045d...`) and `x64-minimal` (deployment
+    `c7265e3b...`, kernel `5f1c90ce...`, rootfs `24810a9b...`).
+  - Bundles in `ghcr.io/micaoss/mica-build` (public):
+    `image.x64-dev.20260915-1458`, `update.x64-dev.20260915-1458`,
+    `image.x64-minimal.20260915-1458`, `update.x64-minimal.20260915-1458`.
+  - Assets: `mica-x64-dev-20260915-1458.img` (1881145344 bytes) and
+    `.micaupd` (81425461), `mica-x64-minimal-20260915-1458.img` (1881145344)
+    and `.micaupd` (47510585); `full` archives only, as the first release.
+  - The failed earlier cuts `x64/20260915-1243`, `x64/20260915-1252` and
+    `x64/20260915-1312` (no assets) were deleted with their tags by the
+    coordinator under the user's development-phase deletion authorization.
+    Fixes: `5e470205` (plan skips the current and empty releases), `8996653a`,
+    `dc3a6483` and `4cf3b7d8` (fetches on a fresh runner), `c91c5fe1`
+    (containerd image store), `1fc66393` (update archives mode 0644),
+    `c843bd02` (the reusable release-product workflow and its CI jobs),
+    `1fa95611`, `0b6bd6d2`, `9e5abf70`, `d2312c35`, `d2a2a11d`, `9fe2d184`.
+  - Next: the `cx3576` scope; K1 and K2 after the first scoped releases; the
+    user still decides `s905x5m` as a release target and a compressed image
+    kind.
