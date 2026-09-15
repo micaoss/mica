@@ -54,21 +54,46 @@ curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
 ```
 
-`SHA256SUMS` 列出该发布的 lock 以及全部镜像和更新归档；`sha256sum SHA256SUMS`
-是这个发布的信任哈希，也是消费方记录在 pin 里的值。
-
-压缩镜像同时携带它解压后的身份，因此在写入任何介质之前就能校验裸镜像：
-
-```sh
-gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
-```
-
-把这个值与 `mica-index.json` 中该文件的 `uncompressedSha256` 比较。镜像的 OCI
-层携带同样的值，记作 `mica.uncompressed-sha256` 和 `mica.uncompressed-size`。
+这是唯一不需要其它输入的校验。其余的——lock、索引、OCI 层——是从不同方向重复
+陈述同一批摘要，见第 4 节。
 
 > status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
-## 4. 用源头证明一个发布
+## 4. 哪一步该核对哪个摘要
+
+同一个镜像有四条互相独立的陈述，它们在不同地方被核对：
+
+1. **发布清单。** `SHA256SUMS` 覆盖该发布的 lock 和每一个镜像、更新资产——覆盖的是
+   压缩文件，不是里面的镜像。`sha256sum SHA256SUMS` 是这个发布的信任哈希，也是
+   lock 和索引条目引用的值。
+2. **lock 的 `asset` 行**记录同一个摘要，于是信任 lock 的读者不必再信任清单：
+   ```sh
+   awk -F'\t' '$1 == "asset" && $2 == "x64-dev"' mica-build.lock
+   ```
+3. **索引**同时描述两种形态：`sha256` 和 `size` 属于 `.gz`，
+   `uncompressedSha256` 和 `uncompressedSize` 属于 `gzip -dc` 的输出。
+   ```sh
+   gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
+   jq -r '.products[]|select(.product=="x64-dev")|.images[]
+          |[.file,.sha256,.size,.uncompressedSha256,.uncompressedSize]|@tsv' mica-index.json
+   ```
+4. **OCI 层**携带同样的事实，且可匿名读取；层摘要等于 asset 行的 sha256，它的
+   `mica.uncompressed-*` 注解等于索引里的字段：
+   ```sh
+   REF=$(jq -r '.products[]|select(.product=="x64-dev")|.bundles.image' mica-index.json)
+   T=$(curl -fsS "https://ghcr.io/token?scope=repository:micaoss/mica-build:pull&service=ghcr.io" | jq -r .token)
+   curl -fsSL -H "Authorization: Bearer $T" \
+     -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+     "https://ghcr.io/v2/micaoss/mica-build/manifests/${REF##*@}" | jq '.layers'
+   ```
+
+在索引发布内部也是同一套做法：`sha256sum -c SHA256SUMS`、用 `jq -r .lock.sha256`
+对照 `sha256sum mica-build.lock`、用 `jq -r .previous.trust` 对照上一个索引的信任
+哈希。
+
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+
+## 5. 用源头证明一个发布
 
 lock 是 `mica-lock v1` 文件，记录发布的提交以及进入它的每一项输入——包、池、
 板卡、上游镜像，作用域发布还包括镜像和归档本身。在索引所指提交上的干净
@@ -85,7 +110,7 @@ bash tools/release.sh verify-index mica/<index release> --full
 
 > status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
 
-## 5. 下一步
+## 6. 下一步
 
 - 把镜像写入板卡：[刷写](../../user/flashing.md)。
 - 改为升级在运行的设备：[更新包](../../user/update-packages.md)。

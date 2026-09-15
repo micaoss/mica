@@ -1,6 +1,6 @@
 # 20260915-2327-product-guides Complete the product documentation: overview, build, porting, flashing, updates and releasing
 
-- **status**: completed
+- **status**: in_progress
 - **priority**: P1
 - **owner**: olea2l5k
 - **createdAt**: 2026-09-15 23:27
@@ -65,3 +65,11 @@ Writing the product guides
 - 2026-09-15: the Chinese set keeps pace only where a translation already
   existed (`download.md`, `quickstart.md`, `install.md`, retranslated with
   their English pages). The five new pages carry `not-translated` rows.
+- 2026-09-15: reopened. The coordinator delivered the completing handoffs:
+  `mica-boards` section 8 (cx3576 end to end at `9ce875d`, s905x5m has no write
+  path, the x64 kernel's media drivers, the virt-arm64 device constraints),
+  `mica-build` sections 10 and 11 (the x64 write form and Secure Boot, the QEMU
+  lines, the four-step digest chain, first boot, update-server, defaults.toml
+  and loader selection) and `mica-core-facts.md` (the device-side refusals,
+  the install and confirmation flow, first boot and thirteen traps, marked
+  SOURCE / TESTED / NOT VERIFIED). The guides are being completed from them.

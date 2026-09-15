@@ -62,24 +62,52 @@ curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # lists the lock and every asset
 ```
 
-`SHA256SUMS` lists the lock and every image and update archive of that
-release; `sha256sum SHA256SUMS` is the release's trust hash, and it is what a
-consumer records in its pin.
-
-The compressed image also carries its uncompressed identity, so the raw image
-can be checked before anything is written:
-
-```sh
-gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
-```
-
-Compare that with `uncompressedSha256` for the file in `mica-index.json`. The
-image's OCI layer carries the same values as `mica.uncompressed-sha256` and
-`mica.uncompressed-size`.
+That is the one check that needs no other input. Everything else — the lock,
+the index and the OCI layer — states the same digests again from a different
+direction, which is section 4.
 
 > status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
-## 4. Prove the release against its sources
+## 4. Which digest at which step
+
+Four independent statements cover one image, and they are checked in
+different places:
+
+1. **The release list.** `SHA256SUMS` covers the lock and every image and
+   update asset of that release — the compressed file, not the image inside
+   it. `sha256sum SHA256SUMS` is the release's trust hash, the value locks and
+   index entries quote.
+2. **The lock's `asset` row** names the same digest, so a reader who trusts
+   the lock does not have to trust the list:
+   ```sh
+   awk -F'\t' '$1 == "asset" && $2 == "x64-dev"' mica-build.lock
+   ```
+3. **The index** describes both forms: `sha256` and `size` are the `.gz`,
+   `uncompressedSha256` and `uncompressedSize` are what `gzip -dc` produces.
+   ```sh
+   gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
+   jq -r '.products[]|select(.product=="x64-dev")|.images[]
+          |[.file,.sha256,.size,.uncompressedSha256,.uncompressedSize]|@tsv' mica-index.json
+   ```
+4. **The OCI layer** carries the same facts and is readable anonymously; the
+   layer digest equals the asset row's sha256, and its `mica.uncompressed-*`
+   annotations equal the index's fields:
+   ```sh
+   REF=$(jq -r '.products[]|select(.product=="x64-dev")|.bundles.image' mica-index.json)
+   T=$(curl -fsS "https://ghcr.io/token?scope=repository:micaoss/mica-build:pull&service=ghcr.io" | jq -r .token)
+   curl -fsSL -H "Authorization: Bearer $T" \
+     -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+     "https://ghcr.io/v2/micaoss/mica-build/manifests/${REF##*@}" | jq '.layers'
+   ```
+
+Inside an index release the same idea applies to the index itself:
+`sha256sum -c SHA256SUMS`, `jq -r .lock.sha256` against
+`sha256sum mica-build.lock`, and `jq -r .previous.trust` against the previous
+index's trust hash.
+
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+
+## 5. Prove the release against its sources
 
 The lock is a `mica-lock v1` file naming the release's commit and every input
 that went into it — pools, packages, boards, upstream images and, for a
@@ -100,7 +128,7 @@ half.
 
 > status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
 
-## 5. Next
+## 6. Next
 
 - Write the image to a board: [flashing](flashing.md).
 - Update a running device instead: [update packages](update-packages.md).
