@@ -6,106 +6,164 @@ partition table, the boot pieces, the signed root and an empty DATA. This page
 is how it reaches a board, board by board, and what is not a verified
 procedure yet.
 
-- Picking a release and getting the file: [download](download.md).
+- Picking a release and checking the digests: [download](download.md).
 - What the image contains and how big each partition is:
   [storage](../design/storage.md).
 - After the board boots: [first run](first-run.md).
 - Replacing a running system instead of writing a whole image:
   [update packages](update-packages.md).
 
+**What is qualified, stated once.** Every boot anyone here has seen was QEMU.
+No Mica OS image has been written to a USB stick, a SATA disk, an NVMe drive
+or an eMMC, and no physical board has booted one. The QEMU sections below are
+run; the hardware sections are read out of the repositories and are marked
+where they are not verified.
+
+> status: board-dependent — evidence: `mica-boards:boards/x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+
 ## 1. Before you write
 
-Verify the file first. Both steps are anonymous, no token and no registry
-login:
+Verify the file, then decompress it:
 
 ```sh
-sha256sum -c SHA256SUMS                          # the release's own list
-gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
+sha256sum -c SHA256SUMS                              # the release's own list, covers the .gz
+gzip -dc mica-x64-dev-<release>.img.gz > disk.img
+sha256sum disk.img                                   # compare with uncompressedSha256
 ```
 
-The second value is the raw image the build signed and gated. Compare it with
-`uncompressedSha256` for that file in `mica-index.json`
-([version index](../design/mica-index.md)); the image's OCI layer carries the
-same value as `mica.uncompressed-sha256`.
-
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/mica-index.md`, `docs/design/release-lock.md`
+The full chain — release list, the lock's `asset` row, the index's
+`uncompressedSha256`, the OCI layer annotations — is
+[download](download.md#4-which-digest-at-which-step). For
+`mica-x64-dev-20260915-2230.img.gz` the decompressed image is 1 881 145 344
+bytes with sha256 `e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`,
+which the index and the OCI layer both state.
 
 Then know three things about the write:
 
 - **It replaces the medium.** The image is a whole disk: writing it destroys
   every partition on the target within the image's extent. Identify the device
   before writing, not after.
-- **The image is signed, and the board must trust the signer.** The kernel and
-  boot components are signed with the release's boot key; a UEFI platform that
-  does not carry that certificate refuses to start the image, and a FIT board's
-  U-Boot refuses an unsigned or foreign-signed kernel. Development releases are
-  signed with development certificates
-  ([release signing](../design/release-signing.md),
-  [key delivery](../design/key-delivery.md)).
+- **The image is signed, and the board must trust the signer.** Releases are
+  signed with the Mica development boot certificate. A UEFI machine that
+  trusts only the Microsoft keys refuses the loader and falls through to the
+  next boot entry or shows a Secure Boot violation; there is no unsigned
+  fallback. A FIT board's U-Boot accepts only a kernel signed by the
+  certificate built into it.
 - **DATA is small on purpose.** It ships at 256 MiB and grows to the medium on
   first boot; SYSTEM is exactly 1 GiB and holds both deployments.
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/design/release-signing.md`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
 
 ## 2. What the image carries, per board
 
-Every board declares exactly one image kind, `disk`, built in (no vendor
-packer is implemented). What differs is where the bootloader lives.
+Every board declares exactly one image kind, `disk`, built in — no vendor
+packer is implemented. What differs is where the bootloader lives.
 
-| Board | Firmware format | Does the raw image boot a blank board? | Qualified |
+| Board | Firmware format | Does the raw image boot a blank board? | State |
 |---|---|---|---|
-| `x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | under QEMU only |
-| `virt-arm64` | `efi` (systemd-boot in the ESP) | yes, as a QEMU guest | QEMU, not a release target |
-| `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not on hardware |
-| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no, not a release target |
+| `x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
+| `virt-arm64` | `efi` (systemd-boot in the ESP) | yes, as a QEMU guest | the acceptance path |
+| `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
+| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
 Only `x64` and `cx3576` are release targets, so only their images exist as
 release assets. There is no A/B partition pair to choose between and no
 conversion from an older layout: a write is a full write.
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
 ## 3. x64
 
-The x64 image is a GPT disk with `ESP` (512 MiB, FAT, label `MICAESP`,
-carrying `EFI/BOOT/BOOTX64.EFI` and `loader/loader.conf`), `SYSTEM` (1 GiB)
-and `DATA`. It boots wherever UEFI firmware starts `BOOTX64.EFI`, so the whole
-image is written to the target medium — a USB stick, a SATA or NVMe disk.
+### The image
 
-**The x64 path is qualified under QEMU only.** The assembly's acceptance runs
-`qemu-system-x86_64 -machine q35` with OVMF secure-boot firmware and the
-release's boot certificate enrolled in disposable variables; nobody has booted
-a physical x64 machine from one of these images, and `mica-boards`'
-`evidence.json` records the board's qualification as that disposable
-enrollment, not physical firmware.
+The published x64 image is a GPT disk with disk GUID
+`5AC35760-0064-4000-8000-000000000000` and three partitions, read out of
+`mica-x64-dev-20260915-2230.img`:
 
-The QEMU path is the same shape as [section 4](#4-qemu-x64-and-virt-arm64); it
-is what `make lifecycle-uefi PRODUCT=x64-dev` and the apid API harness drive.
+| Partition | Type | Start sector | Size |
+|---|---|---|---|
+| `esp` | `C12A7328-F81F-11D2-BA4B-00A0C93EC93B` | 2048 | 512 MiB |
+| `system` | `0FC63DAF-8483-4772-8E79-3D69D8477DE4` | 1050624 | 1024 MiB |
+| `data` | `0FC63DAF-8483-4772-8E79-3D69D8477DE4` | 3147776 | 256 MiB |
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
+The ESP is FAT, labelled `MICAESP`, and carries `EFI/BOOT/BOOTX64.EFI` and
+`loader/loader.conf`. The image boots wherever UEFI firmware starts
+`BOOTX64.EFI`, so the whole image goes to the target medium.
 
-**Not verified — writing to physical media.** No physical x64 write has been
-performed or witnessed here, so the following is a description of the image,
-not a qualified procedure. The image is a raw GPT disk image and would be
-written the way any raw image is:
+> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-build:build/src/file-layout.ts`
+
+### Which media the kernel can drive
+
+The pinned x64 kernel has built in: USB host XHCI and EHCI with
+`USB_STORAGE`, SATA through AHCI and `ATA_PIIX`, NVMe, and virtio-blk and
+virtio-scsi for VMs. `CONFIG_USB_UAS` is not set, so a UAS-only enclosure
+falls back to bulk-only transport or is not driven, and `CONFIG_MMC` is not
+set at all: an SD card reader on an MMC controller is not driven, though a USB
+card reader is ordinary USB mass storage.
+
+So the driver answer is USB sticks and disks, SATA and NVMe. Which of those
+media the assembly qualifies is still open — nothing physical has been tested.
+
+> status: board-dependent — evidence: `mica-boards:boards/x64/kernel/config/x64.config`, `mica-boards:make kernel-config-test`
+
+### Writing it (not verified)
+
+No physical x64 write has been performed or witnessed here. The commands below
+are the form the assembly would document; publish nothing from this block as
+qualified, and expect the target identification to be the risky part:
 
 > ```sh
 > # NOT VERIFIED: never run against physical hardware by this project
+> lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS      # before and after plugging it in
+> udevadm info --query=property --name=/dev/sdX | grep -E 'ID_BUS|ID_MODEL|ID_SERIAL'
 > gzip -dc mica-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+> sync
+> sudo cmp -n 1881145344 /dev/sdX disk.img            # or re-read and compare sha256
+> sudo sfdisk -d /dev/sdX                             # expect 2048, 1050624, 3147776
 > ```
 >
-> A stock machine carrying only the Microsoft keys refuses a development-signed
-> image unless Secure Boot is turned off or the release's boot certificate is
-> enrolled first. Which media the assembly would qualify — USB, SATA, NVMe —
-> is undecided.
+> Write to the whole device (`/dev/sdX`), never to a partition; unmount
+> whatever the desktop auto-mounted first. `bs=4M` is a throughput choice,
+> `conv=fsync` plus `sync` is what makes the write durable before the medium
+> is pulled.
+
+> status: unsupported
+
+### Secure Boot on a real machine (not verified)
+
+To boot a release image the operator must either enrol the release's boot
+certificate into the firmware `db` — usually through the firmware's Setup
+Mode, which is vendor-specific — or disable Secure Boot. Disabling it does not
+weaken the root: the signed kernel command line still carries
+`dm_verity.require_signatures=1`, so the root stays verity-protected. Secure
+Boot governs who may load the kernel, not whether the root is verified.
 
 > status: unsupported
 
 ## 4. QEMU: x64 and virt-arm64
 
 This is the path that is actually run. `virt-arm64` exists for it: it is a
-QEMU board, not a release target, and the suite boots the product image as a
-virtio disk behind secure-boot firmware.
+QEMU board, not a release target.
+
+Firmware files, as the acceptance lab uses them:
+
+| Guest | Code | Variables | Machine |
+|---|---|---|---|
+| amd64 | `/usr/share/OVMF/OVMF_CODE_4M.secboot.fd` | `/usr/share/OVMF/OVMF_VARS_4M.fd` | `qemu-system-x86_64 -machine q35` |
+| arm64 | `/usr/share/AAVMF/AAVMF_CODE.secboot.fd` | `/usr/share/AAVMF/AAVMF_VARS.fd` | `qemu-system-aarch64 -machine virt` |
+
+Build the variable store once, enrolling the release's boot certificate — this
+is what makes the guest trust the image:
+
+```sh
+cp /usr/share/AAVMF/AAVMF_VARS.fd vars.template.fd          # OVMF_VARS_4M.fd for x64
+virt-fw-vars --input vars.template.fd --output vars.fd \
+  --set-pk 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
+  --add-kek 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
+  --add-db 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem --no-microsoft --sb
+```
+
+Then boot the image:
 
 ```sh
 qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
@@ -113,18 +171,34 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
   -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
   -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.secboot.fd \
   -drive if=pflash,format=raw,unit=1,file=vars.fd \
-  -drive if=none,id=disk0,format=raw,file=image/disk.img \
+  -drive if=none,id=disk0,format=raw,file=disk.img \
   -device virtio-blk-pci,drive=disk0,bootindex=0
 ```
 
-- `image/disk.img` is the decompressed image, copied — the guest writes to it.
-- `vars.fd` is made once from `AAVMF_VARS.fd` with
-  `virt-fw-vars … --set-pk/--add-kek/--add-db <the release's boot certificate>
-  --no-microsoft --sb`, which is what makes the guest trust the release.
-- x64 is the same line with `qemu-system-x86_64 -machine q35` and the OVMF
-  secure-boot firmware.
-- An offline update medium is handed in over 9p:
-  `-fsdev local,id=import,path=<dir>,security_model=none,readonly=on -device virtio-9p-pci,fsdev=import,mount_tag=mica-update`.
+x64 is the same line with `qemu-system-x86_64 -machine q35` and the OVMF
+files. Append `,readonly=on` to the `-drive if=none,id=disk0,…` value to boot
+the image read-only. The guest writes to `disk.img`, so copy it first.
+
+The devices are not free choices on `virt-arm64`: after the kernel trim the
+guest has no SCSI, SATA, NVMe, MMC, USB or virtio-scsi driver at all, so the
+disk must be `virtio-blk-pci` and the network `virtio-net-pci`; the console is
+PL011 (`console=ttyAMA0,115200n8`), the watchdog the built-in i6300esb, the
+RTC PL031, and ACPI button is on so a host-requested graceful powerdown
+reaches the guest.
+
+An offline update medium is handed in over 9p:
+
+```sh
+  -fsdev local,id=import,path=/path/to/offline,security_model=none,readonly=on \
+  -device virtio-9p-pci,fsdev=import,mount_tag=mica-update
+```
+
+and on the device the suite mounts and imports it:
+
+```sh
+mount -t 9p -o trans=virtio,version=9p2000.L,ro mica-update /run/mica/import
+mica-deploy import /run/mica/import/update.micaupd
+```
 
 The whole acceptance suite — boot, runtime, updates, faults, reset, shutdown —
 is one target in `mica-build`:
@@ -133,83 +207,142 @@ is one target in `mica-build`:
 make lifecycle-uefi PRODUCT=virt-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `docs/boards/virt-arm64.md`
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/virt-arm64/kernel/config`, `docs/boards/virt-arm64.md`
+
+A stock release image boots to its login prompt and its services. The
+`FILE_AB_*` markers the acceptance console prints come from the suite's own
+in-image script, not from a shipped image; do not expect them on a device.
+
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`
 
 ## 5. cx3576
 
 On cx3576 the image is the whole medium and carries the bootloader: GPT with
-`FIRMWARE` at sector 64, `SYSTEM` (1 GiB, ext4 + verity) and `DATA`. Our
-U-Boot (`u-boot-rockchip.bin`, idbloader + FIT) sits inside the image at
-sector 64, inside the protected range, and the two 64 KiB CRC-protected boot
-records are at 16 MiB and 17 MiB. Writing the image therefore writes the
-bootloader too: there is no separate idblock step, and no vendor `update.img`
-is produced for this board.
+`FIRMWARE` (LBA 64–36863), `SYSTEM` (36864–2134015, ext4 + verity) and `DATA`
+(2134016–2658303). Our U-Boot (`u-boot-rockchip.bin`, idbloader + FIT) sits at
+sector 64, inside the protected range — the four bytes `RKNS` at byte offset
+32768 are its magic — and the two 64 KiB CRC-protected boot records are at
+16 MiB and 17 MiB. Writing the image writes the bootloader too: there is no
+separate idblock step, and no vendor `update.img` is produced for this board.
 
-`mica-boards` carries the write path, over `rkdeveloptool` on USB:
+The write path lives in `mica-boards` (read at `9ce875d`), over
+`rkdeveloptool` on USB:
 
 ```sh
-make -C boards/cx3576 flash-mica      # the device is already in loader mode
+make -C boards/cx3576 flash-mica      # the device is already in Loader/RockUSB mode
 make -C boards/cx3576 flash-maskrom   # the device is in Maskrom
 ```
 
-Both validate the image first, write it, read every written byte back and
-compare it — the firmware and counter region first — and only then reset the
-board. `flash-maskrom` first downloads the committed vendor loader
-`boards/cx3576/loader/MiniLoaderAll.bin` with `rkdeveloptool db`; that loader
-is never embedded in the image and is not a U-Boot build input. **Do not cut
-power, unplug or reset the board between the loader download and the final
-reset.**
+`MICA_IMAGE=<path>` selects the image; without it the Makefile takes the
+newest `_out/image/mica-cx3576-*.img`. **It must be the decompressed `.img`**:
+the preflight asserts the file is exactly 1 299 MiB = 1 362 100 224 bytes, so
+a `.img.gz` fails immediately with `wrong factory image size`.
 
-Recovery for a board that no longer boots is the same route: enter Maskrom,
-the SoC's USB recovery mode, and run `flash-maskrom`.
+What each target does, in order:
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/cx3576/loader`, `mica-boards:make flash-verify-test`, `docs/boards/cx3576.md`
+| Step | `flash-mica` | `flash-maskrom` |
+|---|---|---|
+| 1 | preflight `--check` | preflight `--check` |
+| 2 | `rkdeveloptool wl 0 <image>` | `sha256sum -c loader/MiniLoaderAll.bin.sha256` |
+| 3 | readback: `--check` again, then `rl 0 36864` and `rl 36864 2623488`, each compared with the image | `rkdeveloptool db loader/MiniLoaderAll.bin` |
+| 4 | `rkdeveloptool rd` — the reset, only after both comparisons passed | the whole `flash-mica` sequence |
 
-Not verified, and needed before this is a procedure someone can follow
-unattended: no cx3576 has been flashed from a release image on hardware here;
-the physical button or pad sequence that enters Maskrom on this board is not
-written down; and no SD-card boot fallback has been exercised. The host tests
-prove the preflight, readback and reset ordering against a stubbed
-`rkdeveloptool`, not that a board came up.
+The preflight touches no device: it checks the size, both GPTs (header CRC,
+version, the 128×128-byte table and its CRC, the byte-identical backup at the
+last LBA), the three partition ranges and labels, and the `RKNS` magic. On
+success it prints `Factory geometry verified: 1362100224 bytes`; after the
+readback, `Verified all 1362100224 written bytes; firmware and counter region
+first.`
+
+The committed vendor loader `boards/cx3576/loader/MiniLoaderAll.bin`
+(786 937 bytes) is downloaded into RAM by `rkdeveloptool db`; it is never
+embedded in the image and is not a U-Boot build input. **Do not cut power,
+unplug or reset the board between `db` and `rd`.**
+
+If a step fails: a failed preflight means nothing was written. A readback
+mismatch prints `device readback differs at image byte N` and
+`Readback retained at <path>`, and `rd` is *not* run — the device stays in
+Loader mode and can be re-flashed straight away. Recovery for a board that no
+longer boots is Maskrom, the SoC's USB recovery mode, plus `flash-maskrom`.
+
+Operator prerequisites: `python3` and `rkdeveloptool` on `PATH` and USB access
+to the device. On macOS, `brew install autoconf automake libusb pkg-config`
+then `make -C boards/cx3576 rkdeveloptool-macos`, which builds upstream
+`rkdeveloptool` at a pinned commit with two committed patches and installs it
+where the Makefile looks for it.
+
+> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/cx3576/flash/scripts/verify-flash.py`, `mica-boards:boards/cx3576/loader`, `docs/boards/cx3576.md`
+
+What is proven is the control flow, not a board: the repository's
+`cx3576-flash-verify-test.sh` drives the whole target against a stub
+`rkdeveloptool` and a fabricated image, asserting the call order, the two
+readback ranges and that a single corrupted byte in the loader, at 20 MiB and
+near the end is detected and leaves `rd` unrun. Not verified: every step
+against real hardware, the button or pad sequence that enters Maskrom, the
+udev rules or permissions a non-root operator needs (the repository ships
+none), and any SD-card boot fallback.
 
 > status: unsupported
 
 ## 6. s905x5m
 
 There is no supported way to put Mica OS on a blank s905x5m today, and no
-release carries it: `BOARD_RELEASE_TARGET=0`.
+release carries it: `BOARD_RELEASE_TARGET=0` and the board's physical
+qualification is pending.
 
 The reason is where the firmware lives. Mica OS U-Boot (`u-boot.bin.signed`)
-executes from the eMMC boot0 area, behind a 512-byte Amlogic header, and the
-loader refuses an automatic boot when its source is not boot0. The disk image
-covers the SD medium only — `FIRMWARE` at sector 64, `SYSTEM`, `DATA` — so
-writing it to an SD card installs no bootloader, and a board whose boot0 does
-not already carry Mica OS U-Boot will not boot from it.
+executes from the eMMC boot0 area, behind a target-generated 512-byte Amlogic
+header, and the loader refuses an automatic boot when its source is not boot0.
+The disk image covers the SD medium only — `FIRMWARE` at sector 64, `SYSTEM`,
+`DATA` — so writing it to a card installs no bootloader, and only a board
+whose boot0 already carries the paired Mica OS U-Boot boots from it.
 
-The repository does build the vendor burn image
-(`make -C boards/s905x5m uboot-package`, an Amlogic v2 `update.img` carrying
-the signed U-Boot as `bootloader.PARTITION`, deliberately without `gpt.bin` or
-`bootloader_a` so the burn does not touch a user-area GPT). How that image is
-delivered to the board, how boot0 is written and read back, and how a bricked
-board is recovered are all unwritten and untested. Treat the board as
-bring-up work, not as an installation target.
+What exists towards a future procedure: `make -C boards/s905x5m uboot` builds
+the signed U-Boot and its DDR blob, and `make -C boards/s905x5m uboot-package`
+builds an Amlogic v2 `update.img` (pinned `aml_image_v2_packer`, verified by
+unpacking it again) carrying the signed U-Boot as `bootloader.PARTITION` and
+deliberately omitting `gpt.bin` and `bootloader_a`, so a burn frames the
+hardware boot areas and cannot touch a user-area GPT. Which host tool consumes
+that image, how boot0 is written and read back, and how a bricked board is
+recovered are all unwritten and untested — bench work owned jointly by
+`mica-boards` and `mica-build`.
 
 > status: unsupported
 
 ## 7. First boot
 
-The factory image ships two signed deployment records, generations g-1 and g,
-as files on SYSTEM; DATA is shared. On first boot systemd-repart grows DATA to
-the physical medium — only DATA grows — and the device establishes its
-persistent identity there. What happens next, including the offline
-provisioning document, is [first run](first-run.md); the failure paths are
-[recovery](recovery.md).
+- **DATA grows.** `systemd-repart` grows the DATA partition to the device and
+  `systemd-growfs@mnt-data` grows its filesystem; both units must be active,
+  and the acceptance suite fails a boot where they are not.
+  `make os-repart-test` (privileged docker) proves the growth cannot wipe the
+  loader; it exists and CI does not run it.
+- **Two deployments from the start.** The factory image carries two signed
+  deployment records, generations g-1 and g — for `x64-dev` `20260915-2230`,
+  generations 3 and 4. On the device that is exactly two descriptors in
+  `/mnt/system/deployments/` and exactly two boot entries; an update never
+  leaves a device without a bootable fallback.
+- **How the loader chooses.** The factory ESP carries `loader/loader.conf`
+  with `timeout 0`, `editor no` and `auto-entries no`, and one entry per
+  deployment named `loader/entries/mica-<deployment id>+3.conf` — systemd-boot
+  boot counting, three tries, renamed on a successful bless. Kernels live at
+  `EFI/mica/kernels/<kernel id>.efi`. FIT boards keep the same records, with
+  `tries = 3`, in the redundant U-Boot environment inside the firmware region.
+- **No factory provisioning seed today.** A product may carry a
+  `provisioning.toml`, which the build places on the ESP as
+  `mica-provisioning.toml` (UEFI boards only); no product in the tree carries
+  one, so shipped images have none. What a device does with one is
+  [first run](first-run.md).
+- **Which version is running.** `mica-deploy status` and `mica-deploy booted`
+  report the running deployment id; map it back with the index:
+  `jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json`.
 
-The growth targets exist (`make os-repart-test` under privileged docker, and
-`make product-repart-test PRODUCT=<name>` over a built product) but are not
-run in CI.
+> status: shipped — evidence: `mica-build:build/src/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `mica-build:make os-repart-test`, `docs/design/storage.md`
+No full device cycle — write, first boot, update, confirmation, rollback — has
+been run on hardware. The device-side half of this section is read out of
+`mica-core` and exercised in QEMU, not on a board.
+
+> status: unsupported
 
 ## 8. What flashing does not cover
 
@@ -218,8 +351,8 @@ run in CI.
   carries the raw disk image and the update archives, nothing else.
 - **No partition-level A/B.** Both deployments are files on SYSTEM, so there
   is no "other slot" to flash ([updates](../design/updates.md)).
-- **No upgrade by re-flashing.** Writing an image wipes DATA. To move a running
-  device to a newer release, take an update archive
+- **No upgrade by re-flashing.** Writing an image wipes DATA. To move a
+  running device to a newer release, take an update archive
   ([update packages](update-packages.md)).
 
 > status: shipped — evidence: `mica-boards:boards/x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`
