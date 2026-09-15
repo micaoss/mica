@@ -84,7 +84,7 @@ by `mica-boards:tools/publish-boards.sh` in a per-board `mica-boards` release
 `<board>/<YYYYMMDD-HHMM>` beside `pool.<board>.<arch>.<YYYYMMDD-HHMM>`
 (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first
 per-board releases were `<board>/20260915-0824`, the first under the
-package-version rules `<board>/20260915-1128`, the current ones are
+package-version rules `<board>/20260915-1128` (deleted), the current ones are
 `<board>/20260915-1926`, and the earlier unscoped `20260914-1603` is
 deleted). Each component is the OCI artifact
 `ghcr.io/micaoss/mica-boards:<component>.<board>.<YYYYMMDD-HHMM>`:

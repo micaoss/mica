@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 20:43 [progress]
+
+`mica-build` `a1f13280` (ci run 35019880080 green) pins `mica-boards`
+`<board>/20260915-1926`; its `virt-arm64` acceptance passed on the trimmed
+kernel (smoke, verify, negatives, repart and `lifecycle-uefi` with quotas,
+podman, updates, the 9p import and faults; `os-netavark-kernel-test`
+121/121), and ACPI stays. The coordinator then deleted the superseded
+`mica-boards` `<board>/20260915-1128` releases and tags and the 7 ghcr
+versions no `1926` lock references, leaving exactly the 16 digests of the
+`1926` locks. The board inputs recorded by `x64/20260915-1458` and
+`cx3576/20260915-1515` are therefore no longer downloadable; their own assets
+and bundles are unaffected.
+
 ## 2026-09-15 20:32 [progress]
 
 `mica-boards` `94e1dc4` enables CI reuse of unchanged kernel and U-Boot

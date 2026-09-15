@@ -792,3 +792,26 @@ Moving the repositories to the release lock format
     a `build.yml` change forces all, 62.4 and 16.6 (run 35016915074). Pool
     jobs, the version guard and the package gates still run on every push.
   - Steps (1), (2), (3) and (5) are done; (4), ccache, is not used now.
+- 2026-09-15: `mica-build` `a1f132803c3a7944b6b9696d2fddc30219d6d924` (ci run
+  35019880080 green) pins `mica-boards` `<board>/20260915-1926`, after the
+  pin commit `55bf2d2d` and the linux/amd64 packaging tools fix. The
+  `virt-arm64` acceptance passed: `virt-arm64-dev` smoke 11 plus crun
+  (executor-limited), verify 102, negatives 3/3, the gate, repart, and
+  `lifecycle-uefi` including quotas, podman, updates, the 9p import and
+  faults; `virt-arm64-minimal` verify 66; `os-netavark-kernel-test` 121/121.
+  The kept ACPI (`ACPI_BUTTON`, `GPIO_PL061`) raised no suite objection.
+- 2026-09-15: the superseded `mica-boards` `<board>/20260915-1128` releases
+  were cleaned up by the coordinator under the development-phase deletion
+  authorization, starting from that pin commit.
+  - Deleted with `gh`: the releases and tags `x64`, `virt-arm64`, `cx3576`
+    and `s905x5m` `/20260915-1128`.
+  - ghcr `mica-boards`: the 7 versions no `1926` lock references
+    (`pool.s905x5m.arm64.20260915-1128`; the old `kernel` digests of `x64`,
+    `virt-arm64`, `cx3576` and `s905x5m`; the old `uboot` digests of `cx3576`
+    and `s905x5m`, which also carried the `0824` and `0945` tags).
+  - Verified: the releases and remote tags are exactly the four
+    `<board>/20260915-1926`; ghcr holds exactly the 16 digests of the `1926`
+    locks, all readable anonymously.
+  - The published `mica-build` releases `x64/20260915-1458` and
+    `cx3576/20260915-1515` recorded boards `1128` as inputs; those inputs are
+    no longer downloadable, while their own assets and bundles are unaffected.

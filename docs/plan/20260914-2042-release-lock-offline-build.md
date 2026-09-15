@@ -393,3 +393,9 @@ owner, dispatched by the coordinator.
   full build when unhashed build files change: a push that touches no
   component input now takes 4.3 runner-minutes instead of 65.5. Steps 1, 2, 3
   and 5 of that decision are done.
+- 2026-09-15: `mica-build` `a1f13280` pins boards `<board>/20260915-1926`
+  with the `virt-arm64` acceptance passed, and the superseded boards
+  `<board>/20260915-1128` releases and their unreferenced ghcr versions are
+  deleted; ghcr holds exactly the 16 digests of the `1926` locks. The inputs
+  that `x64/20260915-1458` and `cx3576/20260915-1515` recorded from `1128` are
+  no longer downloadable.
