@@ -7,6 +7,11 @@
   "assets": {
     "directory": "./dist"
   },
+  // Temporary: serves the labelled sample catalogue so the download filters can
+  // be seen working. Remove it when CATALOG_SOURCE points at real metadata.
+  "vars": {
+    "CATALOG_DEMO": "1"
+  },
   // Both hostnames resolve to this Worker; the zone has to be on the same
   // Cloudflare account.
   "routes": [
