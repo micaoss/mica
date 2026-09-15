@@ -43,7 +43,8 @@ match authenticated metadata. `MICAUPD1` offline imports carry the same signed
 deployment and at most five unique objects, with no archive paths or links.
 Decided 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and
 implemented in `mica-core` since its release `20260915-0728` (`2a4c98d`;
-`mica-build`'s writer and update-server are pending): an import may carry from 0 to the
+written by `mica-build` and served by its update-server since `0094a097`, not
+released yet): an import may carry from 0 to the
 descriptor's object count (a `root` or `kernel` archive), and every missing
 object must already be in the store. The `mica/deployment/v2` descriptor's
 required signed `product` field must equal the device's product: the single

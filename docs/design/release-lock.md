@@ -251,8 +251,10 @@ package of the repository that publishes them.
     `outputs.tsv`, `images.tsv`, the trust certificate and `evidence.json`.
 
   Annotations: `mica.board`, `mica.arch`, `mica.component`,
-  `mica.inputs=<sha256>` (the component's input key), `mica.verity-cert-sha256`
-  and the source annotations (`docs/boards/contract.md` section 3). A board
+  `mica.inputs=<sha256>` (the component's input key), the source annotations,
+  and `mica.verity-cert-sha256`, required on `board` and `kernel` and matching
+  where a `uboot` or `firmware` component carries it
+  (`docs/boards/contract.md` section 3). A board
   release reuses an unchanged component by digest: the same manifest bytes
   under the new release's tag, never a re-pointed tag. The `mica-kernel-<board>`
   packages are retired; the assembly takes the kernel files from the `kernel`

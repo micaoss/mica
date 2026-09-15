@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; the `mica-build.lock` rows are specified in `docs/design/release-lock.md` 1.2.2 (accepted with `docs/decisions/2026-09-15-update-packages.md`)
+- **status**: accepted (user, 2026-09-15); `mica-build` `main` `0094a097` reads its inputs per board and writes the update packages, and no scoped release is cut yet; the `mica-build.lock` rows are specified in `docs/design/release-lock.md` 1.2.2 (accepted with `docs/decisions/2026-09-15-update-packages.md`)
 
 ## Decision
 

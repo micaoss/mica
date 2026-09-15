@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-15 09:13 [progress]
+
+`mica-build` `main` `0094a097` has switched to the per-board `mica-boards`
+releases (`locks/mica-boards.<board>.lock` with `SCOPE` pins, component
+board fetch checked against `outputs.tsv`) and to `mica-core`
+`20260915-0728` (the `mica/deployment/v2` writer with the product, `full`,
+`root` and `kernel` update archives, update-server catalog v2), with the
+image-kinds executor and the `images.tsv` update-row reader. `60a93a48`
+renames the development certificates `MICA-development-<domain>`, and the
+repository variables now equal `mica-boards`'. CI and the eight product
+builds are running; the scoped releases follow. `docs/boards/contract.md`
+section 3 now states that `mica.verity-cert-sha256` is required on the
+`board` and `kernel` components and must match where `uboot` or `firmware`
+carries it.
+
 ## 2026-09-15 09:04 [progress]
 
 Release-lock migration stage 4, `mica-boards` part, complete: the first

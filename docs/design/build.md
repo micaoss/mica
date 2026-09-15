@@ -30,7 +30,7 @@ private key directories are never added to source control.
 | Root | Resolved userspace packages and public factory defaults | `rootfs-verity.img`, exact geometry, manifest/debug/license evidence |
 | Kernel/support | BSP kernel/modules/firmware, native init, public policy and explicit signing inputs | Signed UKI/FIT plus signed support image and component metadata |
 | Firmware | Patched systemd-boot or cx3576 loader and metadata signer | Independent signed firmware package |
-| Deployment | Exact kernel/root descriptors, the product and the metadata signer | Signed `mica/deployment/v2` envelope (read by `mica-core` since `20260915-0728`; this writer is pending) |
+| Deployment | Exact kernel/root descriptors, the product and the metadata signer | Signed `mica/deployment/v2` envelope with the product (written since `mica-build` `0094a097`, read by `mica-core` since `20260915-0728`) |
 | Factory disk | Two deployments, all referenced components and authenticated firmware | Current three-partition full image |
 | Offline update | Signed deployment and its exact objects | `.micaupd` archive |
 
@@ -97,20 +97,18 @@ directory is empty, the lineage record requires each directory at its pin,
 and `make deps-bump DEP=<repository>` is the reviewable import, like a
 package pin.
 
-A board is the fourth kind of pin: `deps/boards/<board>.json` names the
-board, `mica-boards`, its commit, its architecture and the manifest
-digest of `ghcr.io/micaoss/mica-boards:board.<board>.<YYYYMMDD-HHMM>` (a
-`mica-boards` release; `main` still pins the deleted `20260914-1603`, and the
-per-board switch moves it to the component artifacts of
-`<board>/20260915-0824`), the
-bundle artifact (one layer per bundle file, `docs/boards/contract.md` §3);
-`--pin` refuses a manifest whose `mica.source-repo` names another repository.
-`make board-fetch BOARD=<board>` (`tools/board-pool.sh --fetch`) reads the
-layers by digest into `_out/boards/<board>/`, refusing a bundle built
-against another verity trust certificate, and `make board-add BOARD=<board>`
-(`--pin`, then the board's packages) is how a board enters the assembly.
-`make product-release PRODUCT=<name>` pushes the product's composed root as
-the OCI image `ghcr.io/micaoss/mica-build:root.<name>.build-<commit12>`.
+A board is an input like any other (`mica-build` `0094a097`): one
+`locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
+(`SCOPE=<board>`) per board, today the per-board releases
+`<board>/20260915-0824`; the former `deps/boards/` pins are removed. `make
+board-fetch BOARD=<board>` (`tools/board-pool.sh`) reads the board's component
+artifacts by the digests of its `board` rows into `_out/boards/<board>/`,
+checks them against the board's `outputs.tsv`, and refuses a component whose
+`mica.source-repo` is not `mica-boards` or whose verity trust certificate is
+not the assembly's (`docs/boards/contract.md` section 3); `make
+board-fetch-all` does the same for every board row, and `os-pool` runs it.
+Products are published by the scoped releases of
+`docs/decisions/2026-09-15-mica-build-scoped-releases.md`.
 
 A package is the repository that publishes it, and the artifact kind leads
 the tag: `source.build-<commit12>`, `pool.<arch>.build-<commit12>`,

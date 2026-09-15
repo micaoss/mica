@@ -365,3 +365,19 @@ Moving the repositories to the release lock format
     products and the scoped releases; `mica-boards` investigates kernel build
     speed (user request) and adds the `images.tsv` update rows once
     `mica-build` confirms its reader.
+- 2026-09-15: stage 4, `mica-build` part: `main` `0094a097`.
+  - Inputs: the four `mica-boards` `<board>/20260915-0824` pins
+    (`locks/mica-boards.<board>.lock` and pins with `SCOPE`); the legacy
+    boards path removed; component board fetch with `outputs.tsv` checks;
+    `tools/locks.py` at `mica` `a0ec066`.
+  - Images and updates: the image-kinds executor and the `images.tsv`
+    update-row reader; `mica-core` `20260915-0728` adopted with the
+    `mica/deployment/v2` writer (product), the `full`, `root` and `kernel`
+    `MICAUPD1` variants, and the update-server with catalog v2 and import.
+  - Certificates: `60a93a48` lands the development certificate CN change;
+    the repository variables `MICA_VERITY_TRUST_CERT` and
+    `MICA_BOOT_TRUST_CERT` now equal `mica-boards`' (file sha256
+    `c854172f...` and `9357ccc9...`, CN `MICA-development-verity` and
+    `MICA-development-boot`); `MICA_UPDATES_PUBLIC_KEY` unchanged; the three
+    release key secrets rewritten.
+  - CI and the eight product builds are running; the scoped releases follow.

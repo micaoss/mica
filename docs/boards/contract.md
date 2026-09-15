@@ -98,9 +98,13 @@ per-board releases are `x64/20260915-0824`, `virt-arm64/20260915-0824`,
 
 Each has one layer per file (`firmware.tar` as one layer) and is annotated
 `mica.board`, `mica.arch`, `mica.component`, `mica.inputs=<sha256>` (the
-component's input key), `mica.verity-cert-sha256`, `mica.source-commit` and
-`mica.source-repo` (always `mica-boards`: a package holds only its own
-repository's artifacts, and the assembly's `--pin` refuses any other value).
+component's input key), `mica.source-commit` and `mica.source-repo` (always
+`mica-boards`: a package holds only its own repository's artifacts, and the
+assembly refuses any other value). `mica.verity-cert-sha256` is required on
+the `board` and `kernel` components, which carry the verity trust; a `uboot`
+or `firmware` component may carry it, and then it must match
+(`mica-build:tools/board-pool.sh`, as the `<board>/20260915-0824` releases
+publish it).
 A board release reuses an unchanged component by digest: the same manifest
 bytes under the new release's tag, never a re-pointed tag. The board's lock
 names each component as a `board` row (`docs/design/release-lock.md` 1.2).

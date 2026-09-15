@@ -36,7 +36,7 @@ the new format.
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
 | 3 | `mica-podman` (done: `20260915-0245`), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
-| 4 | `mica-boards` (done: `<board>/20260915-0824`), `mica-build` (in progress) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
+| 4 | `mica-boards` (done: `<board>/20260915-0824`), `mica-build` (in progress: per-board inputs and update packages on `main` `0094a097`; product builds and scoped releases pending) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
 the new format before `mica-build` switches.
@@ -240,3 +240,12 @@ owner, dispatched by the coordinator.
   each with only `mica-boards.lock` and `SHA256SUMS` and its board's component
   artifacts; `20260914-1603` deleted. Next: the `mica-build` per-board switch,
   the certificate switch, eight products and the scoped releases.
+- 2026-09-15: `mica-build` `main` `0094a097` has switched to the per-board
+  `mica-boards` inputs and `mica-core` `20260915-0728`: the four
+  `<board>/20260915-0824` locks with `SCOPE` pins, component board fetch with
+  `outputs.tsv` checks, the image-kinds executor, the `images.tsv` update-row
+  reader, `tools/locks.py` at `mica` `a0ec066`, and the `mica/deployment/v2`
+  writer, `full`/`root`/`kernel` archives and update-server catalog v2.
+  `60a93a48` switched the development certificates to
+  `MICA-development-<domain>`. CI and the eight product builds are running;
+  the scoped releases follow.
