@@ -334,3 +334,34 @@ Moving the repositories to the release lock format
   - `mica-build` pins `20260915-0728`, copies the contract files and
     implements the v2 descriptor, catalog v2 and the three archives, before
     the scoped releases.
+- 2026-09-15: stage 4, `mica-boards` part, complete.
+  - History: root `219527deffcbd9a0ff76cfa38272e07e8963c64c` (squash), then
+    `55d0206` (`images.tsv`, `IMAGE_KINDS` removed, the contract rule) and
+    `0f8e313516288aa3a9f6bc1547f96be7907aeae8` (single-artifact workflow fix:
+    `ci-outputs.sh` tars with merge-multiple downloads, plan outputs, the
+    `build-board` CI job). ci run 34943722823 green.
+  - Four per-board releases at `0f8e313`, stamp `20260915-0824`, each with
+    exactly `mica-boards.lock` and `SHA256SUMS`, accepted by
+    `tools/docs/release-lock-check.py` and verified anonymously. `SHA256SUMS`
+    sha256: `x64`
+    `420dd058e5daccaf3533a0fa8d6e30735a216285551212447a6577b3db0f8707`;
+    `virt-arm64`
+    `52b93bd6f5aea994a8e03443ed9e01f7df09fb1ca730efa283e45c886b954cea`;
+    `cx3576`
+    `f3e3cd49a6052b92f70e994943e1408b3d3560a017d51c91b5d7cf169dcaef78`;
+    `s905x5m`
+    `22bbffb4c9576886cedbc93b22512a9a70d7ced1d9267b9d5e99416dbc3a8545`.
+  - Components: `x64` and `virt-arm64` `board` and `kernel`; `cx3576` and
+    `s905x5m` `board`, `kernel`, `uboot` and `firmware`; FIT boards carry
+    `kernel/dev` and `kernel/prod`; `mica-kernel-<board>` retired; arm64
+    kernels built natively. Every board's `images.tsv` declares only
+    `image disk builtin mica-build-env:base img`.
+  - An earlier cut `20260915-0715` failed in `release.yml`
+    (`download-artifact` extracts a single artifact without a subdirectory)
+    and was deleted with its tags on user instruction; `20260914-1603` and
+    its ghcr versions were deleted; all Actions runs were deleted; ghcr holds
+    exactly the 16 versions the four locks reach.
+  - Next: the `mica-build` per-board switch, the certificate switch, eight
+    products and the scoped releases; `mica-boards` investigates kernel build
+    speed (user request) and adds the `images.tsv` update rows once
+    `mica-build` confirms its reader.

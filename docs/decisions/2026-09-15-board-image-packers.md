@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner (`images.tsv`, the `packer` component, the packers); the mica-build owner (the executor, product subsets, publication)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed; `images.tsv` also declares update kinds (`docs/decisions/2026-09-15-update-packages.md`)
+- **status**: accepted (user, 2026-09-15); `mica-boards` `55d0206` adds `images.tsv` (every board `disk` only) and removes `IMAGE_KINDS`; the `packer` component and `mica-build`'s executor are not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed; `images.tsv` also declares update kinds (`docs/decisions/2026-09-15-update-packages.md`)
 
 ## Decision
 

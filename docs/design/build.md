@@ -100,7 +100,9 @@ package pin.
 A board is the fourth kind of pin: `deps/boards/<board>.json` names the
 board, `mica-boards`, its commit, its architecture and the manifest
 digest of `ghcr.io/micaoss/mica-boards:board.<board>.<YYYYMMDD-HHMM>` (a
-`mica-boards` release, the first being `20260914-1603`), the
+`mica-boards` release; `main` still pins the deleted `20260914-1603`, and the
+per-board switch moves it to the component artifacts of
+`<board>/20260915-0824`), the
 bundle artifact (one layer per bundle file, `docs/boards/contract.md` §3);
 `--pin` refuses a manifest whose `mica.source-repo` names another repository.
 `make board-fetch BOARD=<board>` (`tools/board-pool.sh --fetch`) reads the

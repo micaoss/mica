@@ -231,3 +231,8 @@ Moving mica-build onto the released inputs
   `20260915-0728` and `mica-podman` `20260915-0245`, all in the `mica-lock v1`
   format (`docs/task/20260914-2042-release-lock-offline-build.md`);
   `mica-build` moves to them in stage 4.
+- 2026-09-15: the first per-board `mica-boards` releases are
+  `x64/20260915-0824`, `virt-arm64/20260915-0824`, `cx3576/20260915-0824` and
+  `s905x5m/20260915-0824` at `0f8e313`; `20260914-1603` is deleted.
+  `mica-build` reads them as `locks/mica-boards.<board>.lock` in its per-board
+  switch (`docs/task/20260914-2042-release-lock-offline-build.md`).

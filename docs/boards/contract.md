@@ -82,8 +82,10 @@ Everything the assembly takes from a board travels as the board's component
 artifacts (2026-09-15, agreed by `mica-boards` and `mica-build`), published
 by `mica-boards:tools/publish-boards.sh` in a per-board `mica-boards` release
 `<board>/<YYYYMMDD-HHMM>` beside `pool.<board>.<arch>.<YYYYMMDD-HHMM>`
-(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first,
-unscoped release was `20260914-1603`). Each component is the OCI artifact
+(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first
+per-board releases are `x64/20260915-0824`, `virt-arm64/20260915-0824`,
+`cx3576/20260915-0824` and `s905x5m/20260915-0824`, and the earlier unscoped
+`20260914-1603` is deleted). Each component is the OCI artifact
 `ghcr.io/micaoss/mica-boards:<component>.<board>.<YYYYMMDD-HHMM>`:
 
 | Component | `artifactType` | Content |

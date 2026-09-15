@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 09:04 [progress]
+
+Release-lock migration stage 4, `mica-boards` part, complete: the first
+per-board releases `x64/20260915-0824`, `virt-arm64/20260915-0824`,
+`cx3576/20260915-0824` and `s905x5m/20260915-0824` at `0f8e313`, each with
+only `mica-boards.lock` and `SHA256SUMS`, carry the boards as component
+artifacts (`board` and `kernel` on `x64` and `virt-arm64`, plus `uboot` and
+`firmware` on the FIT boards), with `mica-kernel-<board>` retired and every
+board's `images.tsv` declaring `disk`. The failed cut `20260915-0715`, the
+unscoped `20260914-1603` and all old ghcr versions and Actions runs are
+deleted. Next are the `mica-build` per-board switch, the certificate switch,
+eight products and the scoped releases.
+
 ## 2026-09-15 07:45 [progress]
 
 `mica-core` `20260915-0728` at `2a4c98d` implements the accepted update
