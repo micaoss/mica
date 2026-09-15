@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 06:39 [decision]
+
+Update packages reuse `images.tsv` (user): the kernel and the system are
+upgraded independently, so a board's `images.tsv` also declares its update
+kinds, proposed as `update <kind> <packer> <runtime image> <suffix>` with
+`root`, `kernel` and `full` and the `builtin` packer (`mica-build` signs and
+packs `MICAUPD1`). Products select `UPDATE_KINDS` beside `IMAGE_KINDS`; a
+`kernel` or `root` package is produced only when that part changed, a `full`
+package every release. The exact row is pending `mica-build`'s proposal.
+`docs/decisions/2026-09-15-board-image-packers.md`, `docs/boards/contract.md`
+3.1.
+
 ## 2026-09-15 06:38 [decision]
 
 Flashing formats, replacing the earlier split (user): `mica-boards` declares

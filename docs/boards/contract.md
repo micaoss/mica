@@ -203,6 +203,15 @@ release. Each kind is published as the release asset
 name, annotation `mica.image-kind`) of the OCI manifest
 `image.<product>.<YYYYMMDD-HHMM>`.
 
+`images.tsv` also declares the update packages a board supports, because the
+kernel and the system are upgraded independently (user, 2026-09-15): proposed
+rows `update <kind> <packer> <runtime image> <suffix>` with the kinds `root`,
+`kernel` and `full` and the `builtin` packer (`mica-build` signs and packs the
+`MICAUPD1` archives), selected per product by `product.env` `UPDATE_KINDS`
+and published as layers of `update.<product>.<YYYYMMDD-HHMM>`. The exact row
+is pending `mica-build`'s update proposal; boards add update rows only after
+it (`docs/decisions/2026-09-15-board-image-packers.md`).
+
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there
 before udev. The factory assembler consumes already built components, so

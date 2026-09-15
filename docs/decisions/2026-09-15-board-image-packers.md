@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner (`images.tsv`, the `packer` component, the packers); the mica-build owner (the executor, product subsets, publication)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed
+- **status**: accepted (user, 2026-09-15); not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed; `images.tsv` also declares update kinds, their exact row pending `mica-build`'s proposal
 
 ## Decision
 
@@ -59,6 +59,27 @@ one release asset `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` per kind; one
 OCI manifest `image.<product>.<YYYYMMDD-HHMM>` with one layer per kind
 (title the file name, annotation `mica.image-kind`); `asset` rows per kind in
 `mica-build.lock` (row shape still proposed by `mica-build`).
+
+**Update packages** (user, 2026-09-15: "可以复用images.tsv，因为我们可以独立升级内核和系统").
+`images.tsv` also declares what a board can be updated with, since the kernel
+and the system (root) are upgraded independently. The proposed row is
+`update <kind> <packer> <runtime image> <suffix>`; its exact columns are
+pending `mica-build`'s root/kernel update proposal, and `mica-boards` adds
+update rows only once that proposal fixes them:
+
+- kinds `root` (the system only), `kernel` (the kernel component only) and
+  `full` (root, kernel and firmware); a board declares the kinds it supports
+  and may later add others, such as `firmware`;
+- packer `builtin` for these: `mica-build` signs and packs the `MICAUPD1`
+  archives itself, since signing stays in `mica-build`;
+- a product selects subsets of both in `product.env`, `IMAGE_KINDS` and
+  `UPDATE_KINDS` (default: all);
+- per product release, each update kind is a release asset
+  `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and a layer of
+  `update.<product>.<YYYYMMDD-HHMM>`, with an `asset` row per kind;
+- a `kernel` package is produced only when the product's kernel component
+  changed (boards reuse components by digest), a `root` package only when the
+  root changed, and a `full` package every release.
 
 ## Order
 
