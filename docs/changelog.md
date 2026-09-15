@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-15 18:51 [decision]
+
+No manually triggered release workflow (user): there is no `cut-release.yml`,
+and releases stay `gh release create` only. The release-lock reader keeps the
+`mica-<product>-<release>.` prefix rule for asset files and does not require
+`.gz`, so the published `x64/20260915-1458` and `cx3576/20260915-1515` locks
+with raw `.img` assets stay readable; the form of the OCI image layer is being
+reconsidered and section 2 of the spec waits for it.
+
 ## 2026-09-15 18:50 [decision]
 
 `mica-build`'s compressed-image form B is accepted within the gzip decision:

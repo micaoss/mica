@@ -693,3 +693,10 @@ Moving the repositories to the release lock format
     OVMF.
   - From the next scoped releases on, `root`-only and `kernel`-only update
     archives are published whenever only the other component changed.
+- 2026-09-15: the reference checker keeps the asset prefix rule and does not
+  require `.gz`, since `mica-build` reads the earlier scoped release locks
+  with raw `.img` assets (`x64/20260915-1458`, `cx3576/20260915-1515`); the
+  form of the OCI image layer (the `.gz` or the raw image) is being
+  reconsidered by the user, so `docs/design/release-lock.md` section 2 waits.
+  User decision: no manually triggered release workflow (no
+  `cut-release.yml`); releases stay `gh release create` only.

@@ -147,6 +147,12 @@ A `mica-build` release lock (user, 2026-09-15,
   (`kernel.micaupd`), `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`
   (`docs/decisions/2026-09-15-release-images-and-products.md`).
 
+A reader checks an asset's `<file>` only for the
+`mica-<product>-<YYYYMMDD-HHMM>.` prefix, not for the `.gz` suffix *(fixed
+here)*: `mica-build` reads the earlier scoped release locks
+`x64/20260915-1458` and `cx3576/20260915-1515`, whose image assets are raw
+`.img`, to compute generations and the `root` and `kernel` conditions.
+
 Every `bundle` and `asset` names a product with a `product` row
 (`bundle-without-product`), every `asset` a `bundle` of its type
 (`asset-without-bundle`), and every update bundle has a `full` asset

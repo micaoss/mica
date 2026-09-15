@@ -66,6 +66,8 @@ archives are `full`, `root` and `kernel`
 - A release carries image assets beside `mica-build.lock` and `SHA256SUMS`,
   instead of exactly the lock and `SHA256SUMS`.
 - A release covers its scope only, not every product.
+- A release is still cut only with `gh release create`; there is no manually
+  triggered release workflow such as a `cut-release.yml` (user, 2026-09-15).
 
 Every other repository keeps the uniform rules, except that `mica-boards`
 also releases by scope (per board) with the uniform assets.
