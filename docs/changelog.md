@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 03:00 [progress]
+
+Release-lock migration stage 3 complete: `mica-podman`'s clean release. Its
+history is the root `b385fa19` (force-pushed by the user), the releases
+`20260915-0138` and `20260914-0158` and 25 old Actions runs are deleted, and
+`20260915-0245` (trust hash
+`64e2ec07c90947e5e323d15537033f14f720256e304134cc1810c8a34a09bf32`) carries
+only `mica-podman.lock` and `SHA256SUMS`, with pools
+`pool.<arch>.20260915-0245` and `mica-podman` `5.8.6+gitb385fa19ea71-1` per
+architecture, built on build-env `20260915-0138` and Base `20260915-0209`;
+ghcr holds only its two pools. Every input `mica-build` adopted in
+`20260914-0558` is now deleted, and stage 4 (`mica-boards`, then `mica-build`
+and the final image assembly) has started.
+
 ## 2026-09-15 02:52 [progress]
 
 Release-lock migration stage 3, `mica-core` part, done under the user's
