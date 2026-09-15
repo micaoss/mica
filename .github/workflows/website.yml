@@ -48,10 +48,10 @@ jobs:
       - run: bun run build
         working-directory: website
       - name: Upload to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
-          # The action defaults to Wrangler 3, which demands an entry point.
-          # Serving assets without a Worker script needs Wrangler 4.
+          # v4 defaults to whatever Wrangler 4 is latest; pinned so a deploy is
+          # reproducible. Wrangler 3 cannot deploy assets without an entry point.
           wranglerVersion: '4.131.2'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
