@@ -279,3 +279,11 @@ owner, dispatched by the coordinator.
   - After `mica-core`'s first release under the rules and `mica-build`'s pin
     of it: delete `mica-core` `20260915-0235` and `20260915-0728` the same
     way.
+- 2026-09-15: `mica-build` `main` `718a1226` implements the scoped releases:
+  `release.sh` `plan`, `collect`, `publish` and `attach`; `generation` is the
+  previous `product` row's plus one, starting at 2; `root` and `kernel`
+  assets only when the other identity is unchanged; a registry client;
+  `release-test` 17/17; a local rehearsal of `x64-minimal` passed. The first
+  `x64` cut waits for the new pins. No lock row or decision produces a
+  `mica-build:root.<product>.<release>` tag, so the spec's tag list and the
+  build and artifact designs name only the image and update bundles.

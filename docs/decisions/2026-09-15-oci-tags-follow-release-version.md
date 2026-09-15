@@ -22,7 +22,8 @@ An OCI tag names the release that published it, never a hash or a commit
   `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
   `firmware`),
   `mica-boards:pool.<board>.<arch>.<release>`,
-  `mica-system-base:rootfs.<release>`, `mica-build:root.<product>.<release>`,
+  `mica-system-base:rootfs.<release>`, `mica-build:image.<product>.<release>`,
+  `mica-build:update.<product>.<release>`,
   `<repository>:source.<release>`.
 - For a scoped release (`<scope>/<YYYYMMDD-HHMM>`, `mica-boards` and
   `mica-build` only) the tag's last part is the `<YYYYMMDD-HHMM>` part, and

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 11:43 [progress]
+
+`mica-build` `main` `718a1226` implements scoped releases (`release.sh`
+`plan`, `collect`, `publish`, `attach`; `generation` the previous product
+row's plus one, starting at 2; `root` and `kernel` assets only when the other
+identity is unchanged; `release-test` 17/17; a local `x64-minimal` rehearsal
+passed); the first `x64` cut waits for the new pins. The release-lock tag
+list drops `mica-build:root.<product>.<release>`, which nothing produces:
+`mica-build` publishes only `image.<product>.<release>` and
+`update.<product>.<release>`. `docs/design/release-lock.md` 1.3,
+`docs/design/build.md`, `docs/design/release-artifacts.md`, the OCI-tag and
+scoped-release decisions.
+
 ## 2026-09-15 11:39 [decision]
 
 The releases from before the package-version rules are cleaned up once

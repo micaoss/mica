@@ -120,12 +120,13 @@ Products are published by the scoped releases of
 `docs/decisions/2026-09-15-mica-build-scoped-releases.md`.
 
 A package is the repository that publishes it, and the artifact kind leads
-the tag: `source.build-<commit12>`, `pool.<arch>.build-<commit12>`,
-`root.<product>.build-<commit12>` on `mica-build`'s `main` today. By user
-decision every OCI tag names its release instead,
-`<kind>[.<name>]*.<YYYYMMDD-HHMM>`, never a commit or a hash
-(`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`); these
-`build-<commit12>` tags go when the assembly moves. `mica-boards` names its artifacts by
+the tag. Every OCI tag names its release, `<kind>[.<name>]*.<YYYYMMDD-HHMM>`,
+never a commit or a hash
+(`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`).
+`mica-build` publishes only its product bundles, `image.<product>.<release>`
+and `update.<product>.<release>`, in its scoped releases
+(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); it publishes no
+root on its own. `mica-boards` names its artifacts by
 per-board release: `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
 `<component>.<board>.<YYYYMMDD-HHMM>` per board component (`board`, `kernel`,
 `uboot`, `firmware`, `packer`; `docs/boards/contract.md` section 3).

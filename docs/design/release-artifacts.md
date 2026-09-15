@@ -92,11 +92,11 @@ Paths resolve from the repository root. Repeat `--public-key FILE` for an
 explicit overlap set. Each file contains one base64 Ed25519 public anchor, not a
 private key or certificate. The board evidence defaults to the fetched
 bundle's `_out/boards/BOARD/evidence.json`; `--evidence FILE` selects
-another measured record. The product's composed root is published beside
-the release by `make product-release PRODUCT=<name>`, as the OCI image
-`ghcr.io/micaoss/mica-build:root.<name>.build-<commit12>` on `main` today, to
-become `root.<name>.<YYYYMMDD-HHMM>`
-(`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`).
+another measured record. The composed root is not published on its own: a
+scoped release publishes each product's image kinds and update archives as
+`ghcr.io/micaoss/mica-build:image.<product>.<YYYYMMDD-HHMM>` and
+`update.<product>.<YYYYMMDD-HHMM>` and as release assets
+(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
 The output directory must not exist. A failed assembly must not be published.
 
 The current `GENERATED` marker has exactly one declaration:

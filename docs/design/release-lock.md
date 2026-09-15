@@ -172,8 +172,9 @@ carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
 - `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
   `firmware`, `packer`);
 - `mica-system-base:rootfs.<release>`;
-- `mica-build:root.<product>.<release>`, `mica-build:image.<product>.<release>`
-  and `mica-build:update.<product>.<release>`;
+- `mica-build:image.<product>.<release>` and
+  `mica-build:update.<product>.<release>` (the product bundles of 1.2.2;
+  `mica-build` publishes no root on its own);
 - `<repository>:source.<release>`.
 
 In an offline OCI layout the last part is `offline` (section 6).
