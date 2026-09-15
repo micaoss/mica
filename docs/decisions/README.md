@@ -22,3 +22,4 @@ Kinds:
 | [One release lock format and an offline build](2026-09-14-release-lock-and-offline-build.md) | engineering decision | 2027-03-14 |
 | [OCI tags follow the release version](2026-09-15-oci-tags-follow-release-version.md) | engineering decision | 2027-03-15 |
 | [mica-build releases are scoped and carry image files](2026-09-15-mica-build-scoped-releases.md) | engineering decision | 2027-03-15 |
+| [mica-boards releases per board](2026-09-15-mica-boards-per-board-releases.md) | engineering decision | 2027-03-15 |

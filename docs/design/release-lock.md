@@ -23,11 +23,24 @@ This holds from a repository's first release in this format on: there is no
 transition period and no release carries old assets beside the lock (user,
 2026-09-14).
 
-`mica-build`, which nothing consumes, is the one exception: its releases are
-scoped to a board or a product, tagged `<scope>/<YYYYMMDD-HHMM>`, and carry
-image files beside `mica-build.lock` and `SHA256SUMS`
-(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its lock rows
-are pending.
+### 1.0 Scoped releases
+
+Two repositories release by scope instead of all at once (user, 2026-09-15);
+every other repository's release is unscoped:
+
+- `mica-boards` releases per board: the tag and GitHub Release are
+  `<board>/<YYYYMMDD-HHMM>`, a release builds and publishes only that board,
+  and it carries exactly `mica-boards.lock` and `SHA256SUMS`
+  (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`);
+- `mica-build`, which nothing consumes, releases per board (all its products)
+  or per product: the tag is `<scope>/<YYYYMMDD-HHMM>`, and it also carries
+  image files beside `mica-build.lock` and `SHA256SUMS`
+  (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its `input` and
+  `asset` rows are pending.
+
+`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). The lock's release
+row carries the scoped tag (1.2), OCI tags carry the scope before the release
+(1.3), and a consumer keeps each scope as its own input (section 4).
 
 ### 1.1 File rules
 
@@ -43,7 +56,7 @@ are pending.
 
 | Kind | Columns | Key | Meaning |
 |---|---|---|---|
-| `release` | `release <repository> <YYYYMMDD-HHMM> <commit>` | -- | exactly once, the first row; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` as release |
+| `release` | `release <repository> <release> <commit>` | -- | exactly once, the first row; `<release>` is `<YYYYMMDD-HHMM>`, or `<scope>/<YYYYMMDD-HHMM>` for `mica-boards` and `mica-build` only (1.0), for example `release mica-boards x64/20260915-0300 <commit>`; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` in place of `<YYYYMMDD-HHMM>` (`<scope>/offline` for a scoped repository, *fixed here*) |
 | `image` | `image <source> <name> <platform> <reference>` | source, name, platform | `<source>` is the producing repository or `upstream` (1.2.1); `<platform>` is `index`, `amd64`, `arm64` or `386` |
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
@@ -106,12 +119,14 @@ there.
 Tags follow the release version (user, 2026-09-15,
 `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`): every OCI
 tag in `ghcr.io/micaoss/<repository>` is `<kind>[.<name>]*.<YYYYMMDD-HHMM>`,
-its last part exactly the release tag that published it, and no tag carries
-a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
+its last part exactly the release tag that published it (for a scoped release
+its `<YYYYMMDD-HHMM>` part, with the scope named before it), and no tag
+carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
 
 - `mica-build-env:base.<release>` (an image index) and
   `mica-build-env:<image>.<arch>.<release>` (a per-architecture build push);
-- `<repository>:pool.<arch>.<release>`;
+- `<repository>:pool.<arch>.<release>`, and for `mica-boards`
+  `mica-boards:pool.<board>.<arch>.<release>`;
 - `mica-boards:board.<board>.<release>`;
 - `mica-system-base:rootfs.<release>`;
 - `mica-build:root.<product>.<release>`;
@@ -138,7 +153,8 @@ the ones the vectors use:
 | `image-source` | an `image` row whose source is neither `upstream` nor a repository name, or a repository other than the release row's |
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
-| `field-value` | a value outside its form (release tag, commit, arch, platform, name, version, sha256, url, roots, apt) |
+| `release-scope` | a scoped release (`<scope>/...`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
+| `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, version, sha256, url, roots, apt) |
 | `reference-digest` | a reference without `@sha256:<digest>` |
 | `reference-registry` | a `pool`, `board` or repository image reference outside `ghcr.io/micaoss/` and `local/`, `local/` in a published lock, or `ghcr.io/micaoss/` in an offline lock |
 | `reference-repository` | a `pool` or `board` reference to another repository than the release row's, or a repository image reference to another repository than its source |
@@ -157,7 +173,8 @@ and every `package` sha256 is a layer of that architecture's pool.
 Pools, boards and images live in `ghcr.io/micaoss/<repository>`, in the
 package of the repository that publishes them.
 
-- **Pool** `pool.<arch>.<release>`: one OCI image manifest per architecture,
+- **Pool** `pool.<arch>.<release>` (`pool.<board>.<arch>.<release>` in
+  `mica-boards`): one OCI image manifest per architecture,
   `artifactType` `application/vnd.mica.pool`, an empty config, one layer per
   archive with `mediaType` `application/vnd.mica.deb` and
   `org.opencontainers.image.title` the archive's file name with its real `+`.
@@ -197,14 +214,19 @@ The policy stays `docs/decisions/2026-09-14-base-pins-upstream-packages.md`.
 ## 4. The consumer: `locks/` and `mica-pin v1`
 
 A consumer keeps its inputs at its root, one lock and one pin per producing
-repository it reads (user, 2026-09-14):
+repository it reads (user, 2026-09-14), and per scope for a scoped repository
+(1.0; user, 2026-09-15):
 
 - `locks/<repository>.lock`: that producer's lock asset, unchanged;
 - `locks/pins/<repository>.pin`: that input's own record. `locks/pins` is a
   directory, so moving one input never edits a shared file and cannot
   corrupt another input's record. The `.pin` suffix is `mica-build`'s reading
   of the user's words; the directory and the one-record-per-repository rule
-  are the user's.
+  are the user's;
+- for a scoped input, `locks/<repository>.<scope>.lock` and
+  `locks/pins/<repository>.<scope>.pin`, one pair per board or product the
+  consumer reads (`locks/mica-boards.x64.lock`,
+  `locks/pins/mica-boards.x64.pin`).
 
 A pin file is, in this order and nothing else:
 
@@ -212,6 +234,17 @@ A pin file is, in this order and nothing else:
 # mica-pin v1
 REPOSITORY=<repository>
 RELEASE=<YYYYMMDD-HHMM>
+SHA256SUMS=<sha256 of that release's SHA256SUMS>
+```
+
+A scoped pin has one more line after `REPOSITORY`, `SCOPE=<scope>`, and its
+`RELEASE` is the `<YYYYMMDD-HHMM>` part of the scoped tag:
+
+```text
+# mica-pin v1
+REPOSITORY=mica-boards
+SCOPE=x64
+RELEASE=20260915-0300
 SHA256SUMS=<sha256 of that release's SHA256SUMS>
 ```
 
@@ -224,27 +257,34 @@ Rules:
 
 - the file rules of 1.1 apply (UTF-8, LF, final LF); no comment lines after
   the header *(fixed here)*;
-- `REPOSITORY` equals the file name and the lock's release row;
-- `RELEASE` equals the lock's release row (`offline` for an offline lock),
-  and the lock itself passes section 1;
-- every `locks/<repository>.lock` of a producer has exactly one pin, and no
-  pin exists without its lock; `locks/upstream.lock` (4.1) has no pin;
+- `REPOSITORY` equals the file name's repository and the lock's release row;
+- `SCOPE` is present exactly for `mica-boards` and `mica-build`, and equals the
+  file name's scope and the scope of the lock's release row;
+- `RELEASE` equals the lock's release row without its scope (`offline` for an
+  offline lock), and the lock itself passes section 1;
+- every `locks/<repository>[.<scope>].lock` of a producer has exactly one pin
+  of the same name, and no pin exists without its lock; `locks/upstream.lock`
+  (4.1) has no pin;
 - an offline pin is refused under CI (`CI` or `GITHUB_ACTIONS` set) and in
   every release build.
 
 Moving one input replaces `locks/<repository>.lock` and
-`locks/pins/<repository>.pin` together and touches no other file.
+`locks/pins/<repository>.pin` together and touches no other file; moving one
+board or product replaces exactly its `locks/<repository>.<scope>.lock` and
+`locks/pins/<repository>.<scope>.pin`.
 
 | Rule | Refused when |
 |---|---|
 | `header`, `encoding` | line 1 is not `# mica-pin v1`, or as in 1.5 |
 | `pin-format` | a key missing, extra, repeated or out of order, `CHECKOUT` on a pin whose release is not `offline`, or no `CHECKOUT` on one that is |
-| `field-value` | repository, release or sha256 out of form, or a `CHECKOUT` path that is not absolute |
-| `name-mismatch` | `REPOSITORY` differs from the file name |
-| `pin-without-lock` | a pin without `locks/<repository>.lock` |
-| `lock-without-pin` | a lock without `locks/pins/<repository>.pin` |
+| `field-value` | repository, scope, release or sha256 out of form, or a `CHECKOUT` path that is not absolute |
+| `name-mismatch` | `REPOSITORY` differs from the file name's repository |
+| `scope-mismatch` | `SCOPE` (or its absence) differs from the file name's scope, or the lock's release row names another scope |
+| `release-scope` | a `SCOPE` on a pin of a repository without scoped releases, or none on a pin of `mica-boards` or `mica-build` |
+| `pin-without-lock` | a pin without its lock of the same name |
+| `lock-without-pin` | a lock without its pin of the same name |
 | `lock-invalid` | a lock that fails section 1, or whose release row names another repository |
-| `release-mismatch` | `RELEASE` differs from the lock's release row |
+| `release-mismatch` | `RELEASE` differs from the lock's release row without its scope |
 | `checkout-in-ci` | an offline pin (`CHECKOUT`) under CI or in a release build |
 
 ### 4.1 Third-party inputs: `locks/upstream.lock`
@@ -322,8 +362,9 @@ local image store; offline, a missing one is refused.
 Each repository's `make offline` builds its release outputs from `locks/`
 into `_out/offline/`:
 
-- `<repository>.lock`: a lock whose release row has `offline` and the
-  checked-out commit; a dirty tree is refused;
+- `<repository>.lock`: a lock whose release row has `offline` (or
+  `<scope>/offline`, one lock per scope built) and the checked-out commit; a
+  dirty tree is refused;
 - `oci/`: an OCI image layout holding every pool, board and image the lock
   names, by digest;
 - `SHA256SUMS` over the lock.
@@ -334,10 +375,10 @@ inside that checkout's `_out/offline/oci/`.
 
 ## 7. `tools/local-lock.sh`
 
-`tools/local-lock.sh <repository> <checkout>` verifies
+`tools/local-lock.sh <repository>[.<scope>] <checkout>` verifies
 `<checkout>/_out/offline/SHA256SUMS` and every digest the lock names in the
-checkout's OCI layout, writes `locks/<repository>.lock` unchanged and the
-offline pin `locks/pins/<repository>.pin`. It is refused under GitHub Actions and in every
+checkout's OCI layout, writes `locks/<repository>[.<scope>].lock` unchanged
+and the offline pin `locks/pins/<repository>[.<scope>].pin`. It is refused under GitHub Actions and in every
 release build. Its result is committed on a local branch that is never pushed,
 so a composer still binds to a clean commit. It replaces `local-pins.sh` in
 `mica-build`.
@@ -368,7 +409,8 @@ The vectors are files every repository copies into its own tests:
   `upstream` rows with the original names and index-digest references and a
   `386` row), `mica-core.lock`
   (`pool`, `package`),
-  `mica-boards.lock` (`board`, an `all` package on both architectures),
+  `mica-boards.x64.lock` (a scoped release row, `pool.<board>.<arch>` tags,
+  `board`, an `all` package),
   `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, `apt`, a
   comment), `offline-mica-core.lock` (an offline lock with `local/`
   references).
@@ -378,14 +420,19 @@ The vectors are files every repository copies into its own tests:
   (`reference-repository`, a reference outside the source's repository),
   `image-registry.lock` (`reference-registry`),
   `upstream-image-republished.lock` (`reference-upstream`) and
-  `upstream-image-without-digest.lock` (`reference-digest`).
+  `upstream-image-without-digest.lock` (`reference-digest`); the scope
+  refusals are `scoped-release-not-allowed.lock` and `unscoped-release.lock`
+  (`release-scope`).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
-  (the `.lock` files and `pins/<repository>.pin`); `release` (checked in `ci`
-  mode) and `offline-checkout` (in `local` mode) are valid; one directory per
+  (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release` and
+  `scoped` (two `mica-boards` boards beside `mica-build-env`, both checked in
+  `ci` mode) and `offline-checkout` (in `local` mode) are valid; one directory per
   rule of section 4: `name-mismatch`, `release-mismatch`, `pin-without-lock`,
   `lock-without-pin`, `checkout-in-ci`, plus `header`, `key-order` and
   `checkout-without-offline` (`pin-format`), `checkout-relative`
-  (`field-value`) and `lock-invalid`.
+  (`field-value`), `lock-invalid`, and for scopes `scope-file-name` and
+  `scope-release-row` (`scope-mismatch`) and `scope-not-allowed`
+  (`release-scope`).
 - `upstream/valid/upstream.lock` (`image`, `source` including an `all` row,
   `git`) and `upstream/refused/`: `release-row.lock`
   (`upstream-release-row`), `other-kind.lock` (`kind-unknown`),

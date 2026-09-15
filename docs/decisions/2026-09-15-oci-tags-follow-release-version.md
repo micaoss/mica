@@ -19,8 +19,12 @@ An OCI tag names the release that published it, never a hash or a commit
 - Examples: `mica-build-env:base.20260915-0138` (an index),
   `mica-build-env:<image>.<arch>.<release>` (a per-architecture build push),
   `<repository>:pool.<arch>.<release>`, `mica-boards:board.<board>.<release>`,
+  `mica-boards:pool.<board>.<arch>.<release>`,
   `mica-system-base:rootfs.<release>`, `mica-build:root.<product>.<release>`,
   `<repository>:source.<release>`.
+- For a scoped release (`<scope>/<YYYYMMDD-HHMM>`, `mica-boards` and
+  `mica-build` only) the tag's last part is the `<YYYYMMDD-HHMM>` part, and
+  the scope is named earlier in the tag.
 - A tag that already holds another digest is refused, never re-pointed.
 - An artifact unchanged across releases is reused by digest: the new
   release's tag points at the existing digest. A rebuild key is not a tag;

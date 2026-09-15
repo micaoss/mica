@@ -81,8 +81,10 @@ Everything the assembly takes from a board travels in one bundle, packed by
 under `/usr/lib/mica/board/<board>/` (never installed into a root; the
 package gate gates it) and published by `mica-boards:tools/publish-boards.sh`
 as the OCI artifact `ghcr.io/micaoss/mica-boards:board.<board>.<YYYYMMDD-HHMM>`
-of a `mica-boards` release (beside `pool.<arch>.<YYYYMMDD-HHMM>`; the first
-release is `20260914-1603`),
+of a per-board `mica-boards` release `<board>/<YYYYMMDD-HHMM>` (beside
+`pool.<board>.<arch>.<YYYYMMDD-HHMM>`,
+`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first,
+unscoped release was `20260914-1603`),
 one layer per file below (`firmware/` as one tar), annotated `mica.board`,
 `mica.arch`, `mica.verity-cert-sha256`, `mica.source-commit` and
 `mica.source-repo` (always `mica-boards`: a package holds only its own

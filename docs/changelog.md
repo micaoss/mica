@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-15 03:43 [decision]
+
+`mica-boards` is not merged into `mica-build`; it releases per board (user):
+tag and GitHub Release `<board>/<YYYYMMDD-HHMM>`, only that board built and
+published, OCI tags `board.<board>.<release>` and
+`pool.<board>.<arch>.<release>`, assets exactly `mica-boards.lock` and
+`SHA256SUMS`, and a machine-readable board list in `boards/`. The release-lock
+spec gains scoped releases (1.0) for `mica-boards` and `mica-build` only: the
+release row may carry `<scope>/<YYYYMMDD-HHMM>` (refused elsewhere as
+`release-scope`), and a consumer keeps each scope as
+`locks/<repository>.<scope>.lock` with `locks/pins/<repository>.<scope>.pin`
+(`SCOPE=`), refused on a mismatch as `scope-mismatch`. The checker and vectors
+follow (114 checks). `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`;
+the `mica-build`, release-lock and OCI-tag decisions, `docs/boards/contract.md`,
+plan and task `20260914-2042-release-lock-offline-build`. Stage 4 runs
+`mica-boards` per-board releases first, then `mica-build`.
+
 ## 2026-09-15 03:19 [decision]
 
 Two user decisions for `mica-build`, the last exit of the system, which

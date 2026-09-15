@@ -278,3 +278,28 @@ Moving the repositories to the release lock format
     each asset to its OCI digest and records the five input releases.
   - Pending: the `mica-build.lock` row kinds (input, asset), proposed by
     `mica-build`, enter the spec with its first scoped release.
+- 2026-09-15 (user), stage 4: `mica-boards` releases per board
+  (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`).
+  - Not merged into `mica-build`. Tag and GitHub Release
+    `<board>/<YYYYMMDD-HHMM>`; a release builds and publishes only that
+    board; OCI tags `board.<board>.<YYYYMMDD-HHMM>` and
+    `pool.<board>.<arch>.<YYYYMMDD-HHMM>`; assets exactly `mica-boards.lock`
+    and `SHA256SUMS`; release row
+    `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`.
+  - Spec: scoped releases (1.0) for `mica-boards` (per board) and
+    `mica-build` (per board or product; its `asset` and `input` rows still
+    pending); the release field may be `<scope>/<YYYYMMDD-HHMM>` for those two
+    only (`release-scope`); a consumer keeps a scoped input as
+    `locks/<repository>.<scope>.lock` with
+    `locks/pins/<repository>.<scope>.pin` (`REPOSITORY`, `SCOPE`, `RELEASE`,
+    `SHA256SUMS`), names and release row matching (`scope-mismatch`).
+    Vectors: `lock/valid/mica-boards.x64.lock`, `pins/valid/scoped`,
+    `lock/refused/scoped-release-not-allowed.lock`,
+    `lock/refused/unscoped-release.lock`, `pins/refused/scope-file-name`,
+    `pins/refused/scope-release-row`, `pins/refused/scope-not-allowed`
+    (114 vector checks).
+  - `mica-boards` keeps a machine-readable board list in `boards/` with every
+    supported board and its expected outputs; its format is `mica-boards`'
+    and is cited once it lands.
+  - Order: `mica-boards` per-board releases first, then its clean-up;
+    `mica-build` after.

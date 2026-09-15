@@ -51,6 +51,14 @@ sibling's offline output in `locks/`.
 The workspace driver that chains the offline builds is
 `mica-build:tools/offline-chain.sh` (user, 2026-09-14, as proposed).
 
+**Scoped releases** (user, 2026-09-15). `mica-boards` releases per board and
+`mica-build` per board or product, tagged `<scope>/<YYYYMMDD-HHMM>`; their
+release row carries that tag, and a consumer keeps each scope as
+`locks/<repository>.<scope>.lock` with `locks/pins/<repository>.<scope>.pin`
+(`SCOPE=<scope>`). No other repository has scoped releases
+(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`,
+`docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
+
 **Image rows** (user, 2026-09-15, replacing the ghcr mirrors of
 2026-09-14). An `image` row is `image <source> <name> <platform> <reference>`:
 the producing repository's name for an image it builds and publishes on

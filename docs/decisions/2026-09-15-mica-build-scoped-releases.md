@@ -12,7 +12,10 @@
 repository consumes it. It therefore follows its own release logic, an
 explicit exception to the uniform release rules (the workspace release rules
 and `docs/design/release-lock.md` section 1) that applies to `mica-build`
-only (user, 2026-09-15).
+only (user, 2026-09-15). The scoped tag and scoped release row are shared with
+`mica-boards`, which releases per board
+(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`); the image
+assets and product scopes are `mica-build`'s alone.
 
 **Scoped releases.** A release is scoped to a board, meaning all of that
 board's products, or to a single product. Its git tag and GitHub Release are
@@ -33,7 +36,11 @@ canonical copies, where `<release>` is the `<YYYYMMDD-HHMM>` part of the
 scoped tag (`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`).
 `mica-build.lock` ties each asset to its OCI digest and records the five
 input releases (`mica-build-env`, `mica-system-base`, `mica-core`,
-`mica-podman`, `mica-boards`).
+`mica-podman`, and the per-board `mica-boards` release of each board in the
+scope). Its release row is `release mica-build <scope>/<YYYYMMDD-HHMM>
+<commit>`, and its inputs are read from `locks/` like any consumer, a board as
+`locks/mica-boards.<board>.lock` (`docs/design/release-lock.md` 1.0 and
+section 4).
 
 **Pending.** The exact row kinds of `mica-build.lock` (an input row and an
 asset row) are proposed by `mica-build`. They are added to
@@ -47,7 +54,8 @@ this record fixes only what the lock must state, not its row shapes.
   instead of exactly the lock and `SHA256SUMS`.
 - A release covers its scope only, not every product.
 
-Every other repository keeps the uniform rules.
+Every other repository keeps the uniform rules, except that `mica-boards`
+also releases by scope (per board) with the uniform assets.
 
 ## Rationale
 

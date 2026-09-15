@@ -219,3 +219,14 @@ owner, dispatched by the coordinator.
   `update.<product>.<release>` in `ghcr.io/micaoss/mica-build` are the
   canonical copies. The lock row kinds (input, asset) are pending, proposed
   by `mica-build`.
+- 2026-09-15 (user), stage 4: `mica-boards` is not merged into `mica-build`
+  and releases per board (`<board>/<YYYYMMDD-HHMM>`, only that board, OCI
+  tags `board.<board>.<release>` and `pool.<board>.<arch>.<release>`, assets
+  exactly `mica-boards.lock` and `SHA256SUMS`), and keeps a machine-readable
+  board list in `boards/`
+  (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`). The spec
+  gains scoped releases for `mica-boards` and `mica-build` only and scoped
+  consumer inputs `locks/<repository>.<scope>.lock` with
+  `locks/pins/<repository>.<scope>.pin` (spec 1.0, section 4; vectors and
+  checker updated). Stage 4 order: `mica-boards` per-board releases first,
+  then its clean-up; `mica-build` after.

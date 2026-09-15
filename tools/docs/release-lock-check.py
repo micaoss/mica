@@ -10,7 +10,7 @@ out of its scope.
 
     release-lock-check.py lock <file>
     release-lock-check.py upstream <file>              (locks/upstream.lock)
-    release-lock-check.py pins <locks-dir> ci|local    (<locks-dir> holds *.lock and pins/*.pin)
+    release-lock-check.py pins <locks-dir> ci|local    (<locks-dir> holds <repository>[.<scope>].lock and pins/<repository>[.<scope>].pin)
     release-lock-check.py repos <dir> offline
 """
 import hashlib
@@ -30,6 +30,8 @@ REPOSITORY = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 RELEASE = re.compile(r"^[0-9]{8}-[0-9]{4}$")
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
+SCOPED = {"mica-boards", "mica-build"}
+SCOPE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 ARCH = {"amd64", "arm64"}
 PLATFORM = {"index", "amd64", "arm64", "386"}
 NAME = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
@@ -84,7 +86,11 @@ def check_lock(path):
     if not rows or rows[0][0] != "release" or sum(r[0] == "release" for r in rows) != 1:
         raise Refused("release-row")
     _, repository, release, commit = rows[0]
-    field(REPOSITORY.match(repository) and (RELEASE.match(release) or release == "offline") and COMMIT.match(commit))
+    scope, _, release = release.rpartition("/")
+    field(REPOSITORY.match(repository) and (RELEASE.match(release) or release == "offline") and COMMIT.match(commit)
+          and (scope == "" or SCOPE.match(scope)))
+    if (scope != "") != (repository in SCOPED):
+        raise Refused("release-scope")
     registry = "local" if release == "offline" else "ghcr.io/micaoss"
 
     def reference(value, expected=repository):
@@ -144,7 +150,7 @@ def check_lock(path):
         raise Refused("package-without-pool")
     if sort_keys != sorted(sort_keys):
         raise Refused("sort-order")
-    return repository, release
+    return repository, scope, release
 
 
 UPSTREAM_COLUMNS = {"image": 5, "source": 6, "git": 5}
@@ -198,10 +204,12 @@ def read_pin(path):
     keys = [k for k, _ in pairs]
     values = dict(pairs)
     offline = values.get("RELEASE") == "offline"
-    if keys != (["REPOSITORY", "RELEASE", "SHA256SUMS"] + (["CHECKOUT"] if offline else [])):
+    scoped = "SCOPE" in values
+    if keys != (["REPOSITORY"] + (["SCOPE"] if scoped else []) + ["RELEASE", "SHA256SUMS"]
+                + (["CHECKOUT"] if offline else [])):
         raise Refused("pin-format")
     field(REPOSITORY.match(values["REPOSITORY"]) and SHA256.match(values["SHA256SUMS"])
-          and (offline or RELEASE.match(values["RELEASE"])))
+          and (offline or RELEASE.match(values["RELEASE"])) and (not scoped or SCOPE.match(values["SCOPE"])))
     if offline:
         field(os.path.isabs(values["CHECKOUT"]))
     return values
@@ -212,24 +220,31 @@ def check_pins(directory, mode):
     pins = sorted(f[:-4] for f in os.listdir(pins_dir) if f.endswith(".pin"))
     locks = sorted(f[:-5] for f in os.listdir(directory) if f.endswith(".lock") and f != "upstream.lock")
     records = {}
-    for repository in pins:
-        values = read_pin(os.path.join(pins_dir, repository + ".pin"))
+    for name in pins:
+        values = read_pin(os.path.join(pins_dir, name + ".pin"))
+        repository, _, scope = name.partition(".")
         if values["REPOSITORY"] != repository:
             raise Refused("name-mismatch")
-        records[repository] = values
-    for repository in pins:
-        if repository not in locks:
+        if values.get("SCOPE", "") != scope:
+            raise Refused("scope-mismatch")
+        if ("SCOPE" in values) != (repository in SCOPED):
+            raise Refused("release-scope")
+        records[name] = values
+    for name in pins:
+        if name not in locks:
             raise Refused("pin-without-lock")
-    for repository in locks:
-        if repository not in pins:
+    for name in locks:
+        if name not in pins:
             raise Refused("lock-without-pin")
-    for repository, values in records.items():
+    for name, values in records.items():
         try:
-            lock_repository, lock_release = check_lock(os.path.join(directory, repository + ".lock"))
+            lock_repository, lock_scope, lock_release = check_lock(os.path.join(directory, name + ".lock"))
         except Refused:
             raise Refused("lock-invalid")
-        if lock_repository != repository:
+        if lock_repository != values["REPOSITORY"]:
             raise Refused("lock-invalid")
+        if lock_scope != values.get("SCOPE", ""):
+            raise Refused("scope-mismatch")
         if lock_release != values["RELEASE"]:
             raise Refused("release-mismatch")
         if "CHECKOUT" in values and mode == "ci":
