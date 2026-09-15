@@ -277,3 +277,68 @@ qualification matrix filled with dated rows; tier assigned; the power-cut rig
 run done before the board is called supported.
 
 **Contract artifact.** The board dossier and the BSP contract's board table.
+
+## The board's files, in one list
+
+A board is a data directory. `bash tools/new-board.sh <name> --from <board>`
+in `mica-boards` creates it; these are the files it must end up with, and the
+contract for each is [contract.md](contract.md):
+
+| Path | Holds |
+|---|---|
+| `boards/boards.tsv` (one row) | `<board> <arch> <boot backend>`, the machine-readable board list |
+| `boards/<board>/board.env` | the board definition: layout, features, firmware and hwinit lists, the authenticated boot facts, `BOARD_RELEASE_TARGET` ([board-env.md](board-env.md)) |
+| `boards/<board>/manifests/` | `board.pkgs`, `radio-<r>.pkgs` and `component-<c>.pkgs`: what the board installs |
+| `boards/<board>/kernel/` | the kernel build, its `config`, and `config/<board>.required`, the symbols the assembly's suites need (`builtin` as `=y`, `runtime` as `=y` or `=m`) |
+| `boards/<board>/loader/`, `bsp.env` | a FIT board's U-Boot build and its file names |
+| `boards/<board>/images.tsv` | the flashing formats and update kinds: `image disk builtin - img` is mandatory, `update full builtin - micaupd` and the optional `root` and `kernel` rows beside it |
+| `boards/<board>/outputs.tsv` | what a release of this board outputs: `package <name>` rows and `file <component> <path>` rows; it travels in the board component |
+| `boards/<board>/meta/`, `package/` | the board package's payload and policy |
+| `boards/<board>/evidence.json` | the board's assurance statements ([assurance.md](assurance.md)) |
+
+A release publishes the board as component artifacts — `board`, `kernel`,
+`uboot` (FIT boards), `firmware` (when the board carries firmware) and
+`packer` (only when a non-builtin image kind exists) — plus the board's
+package pool. The `board` and `kernel` components carry the verity trust
+certificate annotation; a component whose inputs are unchanged is reused from
+the board's latest release by digest.
+
+> status: shipped — evidence: `mica-boards:tools/new-board.sh`, `mica-boards:boards/boards.tsv`, `mica-boards:boards/x64/images.tsv`, `mica-boards:boards/x64/outputs.tsv`, `docs/boards/contract.md`
+
+The board's packages are built by the producers in `mica-boards:producers/`
+(`board`, `radio`, `radio-wifi`, `radio-bluetooth`). Each package declares its
+own version and `SOURCE_DATE_EPOCH`; a release never changes a version, and an
+unchanged package is reused from the previous release of that board
+([package versions](../decisions/2026-09-15-package-versions.md)).
+
+> status: shipped — evidence: `mica-boards:producers`, `docs/decisions/2026-09-15-package-versions.md`
+
+## Gates
+
+`make check` in `mica-boards` runs the lint and the suites the contract
+depends on: `locks-test`, `ci-outputs-test`, `board-contract-test`,
+`uboot-env-test`, `kernel-config-test`, `kernel-cmdline-test`,
+`bench-collector-test`, `mac-stable-test`, `can-network-test`,
+`gadget-configfs-test`, `flash-verify-test` and `wireless-test`. A new board
+is not done until they pass with its directory in the tree;
+`board-contract-test` is the one that reads the layout above, and
+`kernel-config-test` the one that reads `config/<board>.required`.
+
+> status: shipped — evidence: `mica-boards:Makefile`, `mica-boards:tools/kernel-config-test.sh`
+
+## The first release, and what the assembly needs
+
+1. `mica-boards` cuts the board's first release on GitHub,
+   `<board>/<YYYYMMDD-HHMM>`, which builds that board alone and publishes its
+   components and pool; the release carries `mica-boards.lock` and
+   `SHA256SUMS` ([releasing](../user/releasing.md)).
+2. `mica-build` pins it as `locks/mica-boards.<board>.lock` with
+   `locks/pins/mica-boards.<board>.pin` (`SCOPE=<board>`) and fetches the
+   components, checking them against the board's `outputs.tsv`.
+3. `mica-build` carries a `<board>-dev` product and a `<board>-minimal`
+   product for the board; the minimal product is built locally and in CI and
+   is never released. A release-target board also carries `<board>-prod`.
+4. Only then does `BOARD_RELEASE_TARGET=1` mean anything: the board's
+   products are built and published by `mica-build`'s scoped releases.
+
+> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-minimal-products-not-released.md`, `mica-build:locks`
