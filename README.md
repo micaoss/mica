@@ -1,5 +1,7 @@
 # Mica OS
 
+> English | [中文](README.zh-CN.md)
+
 **An embedded Linux operating system for devices that ship to the field.**
 
 Mica OS is for teams that build a product, not a distribution: you choose the
@@ -63,7 +65,7 @@ page is the authoritative, up-to-date table and explains what each tier means.
 
 | Repository | What it holds |
 |---|---|
-| **`mica`** (this one) | documentation, design, decisions, and the project's task and plan records |
+| **`mica`** (this one) | the product documentation: architecture, user documentation, decisions, and the project's task and plan records |
 | `mica-build` | the image assembly: composes, signs, verifies and tests a product image |
 | `mica-core` | the management plane (`micad`, `mica-apid`, the dashboard) and the on-device deployment client |
 | `mica-system-base` | the board-independent base system: the pinned Debian packages and the system policy |
@@ -71,7 +73,9 @@ page is the authoritative, up-to-date table and explains what each tier means.
 | `mica-podman` | the container engine package |
 | `mica-build-env` | the build environment images every repository builds in |
 
-Documents here cite code in the other repositories as `<repository>:<path>`.
+Product documentation lives here; each module's documentation lives in the repository
+that produces it. Documents here cite code in the other repositories as
+`<repository>:<path>`.
 
 ## Packages
 

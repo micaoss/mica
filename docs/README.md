@@ -27,9 +27,28 @@ The product is **Mica OS** (identifier `mica`). Package, binary, service, bus
 and path names use the `mica` prefix — `micad`, `mica-deploy`, `com.mica.micad`,
 `/mica/config` — and documents quote them verbatim.
 
+## Where documentation lives
+
+Mica OS is seven repositories. **This one holds the product documentation; each module's
+documentation lives in the repository that produces it.**
+
+| Here | In the module's repository |
+|---|---|
+| what the product is, and how the parts fit together (`architecture.md`) | how a module is built, tested and released |
+| the contracts modules answer to — the board contract, the release lock, release signing | the implementation of those contracts |
+| the user and integrator documentation, and the website briefs behind micaos.dev | the module's own task, plan and changelog records |
+| decisions that bind more than one repository | decisions local to one module |
+
+A reference to another repository is written `<repository>:<path>` — for example
+`mica-core:crates/micad`. Subsystem designs that describe one module are moving to that
+module's repository; where a contract and an implementation both exist, the contract stays
+here and the module links to it rather than restating it
+(task `20260915-0316-docs-multi-repo-ownership`).
+
 ## Ownership
 
-Each fact has one owner; other documents link to it instead of restating it.
+Within this repository, each fact has one owner; other documents link to it instead of
+restating it.
 
 | Directory | Owns | Does not hold |
 |---|---|---|

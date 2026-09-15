@@ -17,14 +17,14 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
 
 | Layer | What it is | Where |
 |---|---|---|
-| OS core | Debian trixie with systemd as PID 1, packed into a squashfs with a dm-verity hash tree over it | `rootfs/` |
-| Management plane | `micad` — a settings tree, reconcilers that drive units, and a D-Bus surface | `mica-core:micad/`, `docs/design/micad.md` |
-| API | `apid` — the HTTPS daemon; the dashboard is one client of the API it serves | `mica-core:apid/`, `docs/design/api.md` |
-| Application data | `mica-mqttd` bridges only exact package-enrolled `com.mica.<class>[.<suffix>]` application item trees to MQTT; `com.mica.micad` is forbidden | `mica-core:mqttd/`, `mica-core:broker/`, `docs/design/bus.md` |
-| A/B installer | Native durable file transactions with UEFI/FIT trial records | `mica-deploy`, `docs/design/uboot-ab-handshake.md` |
-| Update trust | Signed deployment/catalog envelopes and kernel-enforced root/support signatures | `mica-deploy`, `docs/design/release-signing.md` |
-| BSP artifacts | per-board buildkit Dockerfiles producing kernel, device tree and bootloader | `boards/`, `docs/boards/contract.md` |
-| Workloads | podman plus the Quadlet systemd generator, off by default | `mica-podman`, `docs/design/containers.md` |
+| OS core | Debian trixie with systemd as PID 1, packed into a squashfs with a dm-verity hash tree over it | `mica-system-base:src/`, `mica-build:rootfs/` |
+| Management plane | `micad` — a settings tree, reconcilers that drive units, and a D-Bus surface | `mica-core:crates/micad/`, `docs/design/micad.md` |
+| API | `mica-apid` — the HTTPS daemon; the dashboard is one client of the API it serves | `mica-core:crates/mica-apid/`, `docs/design/api.md` |
+| Application data | `mica-mqttd` bridges only exact package-enrolled `com.mica.<class>[.<suffix>]` application item trees to MQTT; `com.mica.micad` is forbidden | `mica-core:crates/mica-mqttd/`, `mica-core:crates/mica-mqtt-broker/`, `docs/design/bus.md` |
+| A/B installer | Native durable file transactions with UEFI/FIT trial records | `mica-core:crates/mica-deploy/`, `docs/design/uboot-ab-handshake.md` |
+| Update trust | Signed deployment/catalog envelopes and kernel-enforced root/support signatures | `mica-core:crates/mica-deploy/`, `docs/design/release-signing.md` |
+| BSP artifacts | per-board kernel, device tree and loader inputs, built into a board bundle | `mica-boards:boards/`, `docs/boards/contract.md` |
+| Workloads | podman plus the Quadlet systemd generator, off by default | `mica-podman:deb/`, `docs/design/containers.md` |
 
 ## 2. Component inventory (runtime)
 
@@ -50,12 +50,12 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
   (`docs/design/wifi.md`).
 - **`micad`** owns the settings tree persisted on DATA/state, exports it over the
   system bus as `com.mica.micad`, and runs one reconciler per concern in
-  `mica-core:micad/src/reconciler/`. Its unit is `Type=dbus` (`mica-core:dist/micad.service`).
+  `mica-core:crates/micad/src/reconciler/`. Its unit is `Type=dbus` (`mica-core:crates/micad/dist/micad.service`).
 - **`apid`** terminates TLS, authenticates the operator, and reads and writes
   device state by calling micad over that bus; its TLS material, login-backoff
   counters and audit ring live under `/var/lib/mica/apid`
-  (`mica-core:dist/apid.service`). The dashboard is one of its clients, and
-  `mica-core:apid/openapi.json` is generated from the handlers.
+  (`mica-core:crates/mica-apid/dist/apid.service`). The dashboard is one of its clients, and
+  `mica-core:crates/mica-apid/openapi.json` is generated from the handlers.
 - **Networking** is micad's `network`, `wifi.client` and `wifi.ap` subtrees,
   reconciled into systemd-networkd, wpa_supplicant and hostapd units. Wi-Fi
   is a pair of reconcilers, not a separate daemon (`docs/design/wifi.md`).
@@ -63,7 +63,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
   `bridge` or `wireguard` — and the one optional block that belongs to it. The
   block is authoritative and the interface name is not:
   *"`eth0.100` is a convention, not a declaration"*
-  (`mica-core:micad-settings/src/model.rs`). A physical entry renders
+  (`mica-core:crates/micad-settings/src/model.rs`). A physical entry renders
   one `.network` file, as it always did; each of the other three additionally
   renders a `.netdev` that creates the device, and the attachment is a line on
   the *other* interface's unit — `VLAN=` on the parent, `Bridge=` on the port.
@@ -79,7 +79,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
   configuration, health, updates and power stay on the management plane and
   never become MQTT items (`docs/design/bus.md`). `mica-mqtt-broker` is the
   local broker, built from `rumqttd` as a library
-  (`mica-core:Cargo.toml`).
+  (`mica-core:Cargo.toml`, one Cargo workspace over `crates/`).
 - **Containers** run through podman with the Quadlet generator. While the
   `container.enabled` switch is false — the default — `/etc/containers/systemd`
   is not mounted and no container unit exists (`docs/design/containers.md`).
@@ -141,46 +141,36 @@ DATA/meta lockdown is designed, and marked not implemented
 
 ## 6. Repository map
 
-```
-mica-build/
-├── boards/        one board.env (and evidence.json) per board, derived from the
-│                  pinned mica-kernel-<board> archive; the BSP, overlay and packaging
-│                  live in mica-boards
-├── boot/          mica-boot, a source pin: UKI/FIT tooling, initramfs, development keys;
-│                  these tools move into this repository and the pin goes when
-│                  mica-boot is split and retired (decision 2026-09-14)
-├── build/         TypeScript: image assemblers, component and archive producers, toolset wrappers
-├── build-env/     mica-build-env, a source pin: pinned builder images and the .deb helpers
-├── deps/          sources/ (source pins: mica-boot, mica-build-env, mica-debian) and
-│                  packages/ (one pin per imported package, from the release of its repository)
-├── meta.example/  committed public factory defaults; private meta/ is git-ignored
-├── rootfs/        the composer: debian/ (mica-debian, a source pin), packages/ (manifests
-│                  and resolver), runtime/ (selection and composition), compose/ (the two
-│                  composition Dockerfiles), scripts/ and build.sh
-├── shared/        TypeScript shared by build/, verify/ and update-server/
-├── tests/         shell and fixture suites over packages, boot paths and built images
-├── tools/         QEMU and development helpers, and the pool readers (board-pool.sh,
-│                  deploy-pool.sh, micad-pool.sh, podman-pool.sh)
-├── update-server/ Bun service that serves signed catalogs, components and firmware
-├── verify/        TypeScript: the board model and the checks an assembled image must pass
-└── Makefile       top-level routing; `make help` lists every target
-```
+Mica OS is seven repositories. Each produces one thing, and consumes the others only at a
+pinned release — never by reaching into another's build tree.
 
-The assembly builds no package. Every archive in `_out/debs/<arch>/` is
-imported at its pin from the release of the repository that owns it:
-`mica-system-base` (the system policy, BusyBox, CA trust and the unsigned
-systemd-boot loader), `mica-core` (micad, mica-apid, the MQTT services, the
-SFTP server, mica-deploy and the lifecycle executable), `mica-podman` and
-`mica-boards` (every board's kernel, firmware, board package and the radio
-packages). Documentation and the
-task and plan records live in `mica`.
+| Repository | Produces | Consumes |
+|---|---|---|
+| `mica` | the product documentation, decisions and the project's task and plan records | nothing |
+| `mica-build-env` | four build-env images (`base`, `c`, `go`, `rust`) and `RULES.md`, the rules every repository implements | nothing |
+| `mica-system-base` | the board-independent base: the pinned Debian lock, the Base's own packages, the base root | `mica-build-env` |
+| `mica-core` | the management plane as Debian packages: `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` | `mica-build-env`, `mica-system-base` |
+| `mica-podman` | `mica-podman`, the container engine package, from pinned upstream source | `mica-build-env`, `mica-system-base` |
+| `mica-boards` | per board: kernel, device tree, loader, firmware and the board package; plus the radio packages | `mica-build-env`, `mica-system-base` |
+| `mica-build` | the products: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
 
-The rootfs is **composed**: one APT transaction installs a resolved set of Mica OS
-`.deb` packages out of the local pool at `_out/debs/<arch>/` onto a
-digest-pinned Debian base, and one finalizer closes and packs the result
-(`rootfs/compose/`, two files). What is in an image is a package list, and
-what orders the configuration is `Depends` — adding a component is adding a
-producer, not a stage. `docs/design/build.md` §1.1 has the whole model.
+The interfaces between them are files, not directories:
+
+- **`build-env-image.lock`** — the build-env release every repository builds in.
+- **`mica-system-base.lock`** and its `locks/pins/<repository>.pin` — the base root, the
+  Debian pools by digest and the archive any other package resolves from
+  ([release lock](design/release-lock.md)).
+- **The Debian pool** — every `.deb` a product installs is imported at its pin from the
+  release of the repository that produces it. `mica-build` builds no package.
+- **The board bundle** — `mica-boards` publishes a board's kernel, firmware and board
+  package; `mica-build` consumes them and never reaches into a board's build
+  (`docs/boards/contract.md`).
+- **The signed deployment envelope** — what `mica-build` signs and what `mica-deploy`
+  authenticates on the device ([release signing](design/release-signing.md)).
+
+Each repository's own layout is documented in its README; this map does not restate it.
+Product documentation lives here, module documentation lives with the module
+(`docs/README.md`, *Where documentation lives*).
 
 ## 7. Boards
 

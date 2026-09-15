@@ -1,5 +1,5 @@
 {
-  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is a document under docs/user/; `locales` defaults to both, and a Chinese-only entry falls back to the Chinese page marked untranslated. Groups are the sidebar's, in order.",
+  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is a document under docs/user/; `locales` defaults to both; narrow it only when the English original is genuinely missing. Groups are the sidebar's, in order.",
   "groups": [
     {
       "id": "start",
@@ -15,14 +15,14 @@
       "docs": [
         { "name": "configuration" },
         { "name": "applications" },
-        { "name": "update-rollback", "locales": ["zh"] },
-        { "name": "storage", "locales": ["zh"] }
+        { "name": "update-rollback" },
+        { "name": "storage" }
       ]
     },
     {
       "id": "trouble",
       "docs": [
-        { "name": "troubleshooting", "locales": ["zh"] },
+        { "name": "troubleshooting" },
         { "name": "recovery" }
       ]
     },
@@ -33,7 +33,7 @@
         { "name": "security" },
         { "name": "api" },
         { "name": "release-notes" },
-        { "name": "support", "locales": ["zh"] }
+        { "name": "support" }
       ]
     }
   ]

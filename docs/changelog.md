@@ -2653,3 +2653,28 @@ The five defect clusters, by outcome:
 - **Test honesty**: dotted keys' missing item objects are certain rather
   than theoretical (RFCT-094), and "0 skipped" no longer hides skips
   (RFCT-096).
+
+## 2026-09-15 03:20 [progress]
+
+The documentation system starts moving to the shape the project actually has (task
+`20260915-0316`, plan `20260915-0318`). The rule, settled with the user: **product
+documentation lives in `mica`, module documentation lives in the repository that produces
+the module.**
+
+Landed here:
+
+- `README.zh-CN.md`, the Chinese edition of the repository README, with the English one
+  linking to it. Its wording follows the site, which is the product's core statement.
+- `docs/README.md` opens with *Where documentation lives* — what this repository keeps
+  against what a module's repository keeps, and the `<repository>:<path>` reference form.
+- `architecture.md` no longer maps a repository that does not exist. Its component table
+  cited `rootfs/` and `boards/` as local directories and `mica-core:micad/`,
+  `mica-core:apid/`, `mica-core:mqttd/`, `mica-core:broker/` as component paths; `mica-core`
+  is one Cargo workspace under `crates/`, and the two directories belong to `mica-build` and
+  `mica-boards`. Every path was checked against the repository it names.
+- Section 6 was a directory tree of `mica-build` — including `boot/`, the pin for the
+  retired `mica-boot`. It is now a map of the seven repositories: what each produces, what
+  it consumes, and the five files that are the interfaces between them.
+
+Still open: the five subsystem designs that exist in both `mica` and `mica-core` and have
+diverged, the per-repository moves, and the gate that would have caught the divergence.
