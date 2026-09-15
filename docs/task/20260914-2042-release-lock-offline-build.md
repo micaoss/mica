@@ -303,3 +303,34 @@ Moving the repositories to the release lock format
     and is cited once it lands.
   - Order: `mica-boards` per-board releases first, then its clean-up;
     `mica-build` after.
+- 2026-09-15: `mica-core` `20260915-0728` at `2a4c98d` implements the
+  accepted update packages (`docs/decisions/2026-09-15-update-packages.md`,
+  `mica-core:docs/task/20260915-0657-update-packages.md` completed).
+  - `SHA256SUMS` sha256
+    `75187b8a312aae80cb02d34e8f92fbab310a742a79a4d75ebc30f4bfbea37590`;
+    `mica-core.lock` sha256
+    `8af278938b8333749da5cb6f20ad13b025158fc2c27147dbddf00cb0a04cf999`; pools
+    `pool.amd64.20260915-0728@sha256:9bb23e1dec0429a05989cbe9d3b7dcc71a7da14c0366e0941d52c4906c88558d`
+    and
+    `pool.arm64.20260915-0728@sha256:fd7f4f4c3ea13c64a5dfb443c67c1daa7f3831c6c906466b49a1dbe979187ec9`;
+    14 packages at `0.1.0+git2a4c98de1f64-1`. ci run 34940701911 and release
+    run 34941852808 green; `make check` 1236 tests, package gate 99/99.
+  - Code: partial `MICAUPD1` import (0 to the descriptor's objects; missing
+    ones must be installed or verified, else "deployment objects are
+    incomplete"); `mica/deployment/v2` with the signed `product`; the device
+    product is the single unquoted `PRODUCT=` line of
+    `/usr/lib/mica/product.conf`; check, fetch, import and install refuse
+    another product; `mica/catalog/v2` heads
+    `{board, product, channel, releaseId, generation}`.
+  - Contract files `mica-core:crates/mica-deploy/tests/component-contracts/`
+    at `2a4c98d`: `cases.json`
+    (`6a52186d43d9d21d2b2f1f68bfd5103f02001a97de503b8b3c82b2928b20cfb1`),
+    `deployment.json`
+    (`7ef5225854a55b55906ea6fea26267225889379fe093dbfc2fb44116dca76f33`),
+    `envelope.json`
+    (`1132d5c780ab3f909d08d70d6cd5ffbea91a17952e4c2d15d3ae7ec77cc0671f`),
+    `firmware.json` unchanged
+    (`79d2a4ff72df13e0940b5af32fe1816906fd3f1a53f3cc1d816fcc82c3760ad3`).
+  - `mica-build` pins `20260915-0728`, copies the contract files and
+    implements the v2 descriptor, catalog v2 and the three archives, before
+    the scoped releases.

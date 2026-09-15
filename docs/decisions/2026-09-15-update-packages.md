@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner (archives, lock rows, update-server); the mica-core owner (partial import, the signed `product` field); the mica-boards owner (`update` rows in `images.tsv`)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "接受", on `mica-build`'s proposal); not implemented; order: `mica-core`, then `mica-build` with the update-server, then the `mica-boards` update rows
+- **status**: accepted (user, 2026-09-15: "接受", on `mica-build`'s proposal); `mica-core` part implemented in its release `20260915-0728` (`2a4c98d`); `mica-build` (archives, lock rows, update-server) and the `mica-boards` update rows pending; order: `mica-core`, then `mica-build` with the update-server, then the `mica-boards` update rows
 
 ## Decision
 

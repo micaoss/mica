@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 07:45 [progress]
+
+`mica-core` `20260915-0728` at `2a4c98d` implements the accepted update
+packages (trust hash
+`75187b8a312aae80cb02d34e8f92fbab310a742a79a4d75ebc30f4bfbea37590`; 14
+packages at `0.1.0+git2a4c98de1f64-1`; `make check` 1236 tests, package gate
+99/99): partial `MICAUPD1` import, `mica/deployment/v2` with the signed
+`product`, the device product from `product.conf`, and `mica/catalog/v2`
+heads keyed by board, product and channel. The contract files under
+`crates/mica-deploy/tests/component-contracts/` are regenerated. `mica-build`
+pins it next and implements the v2 descriptor, catalog v2 and the three
+archives; the design documents now name `mica-core`'s side as implemented.
+
 ## 2026-09-15 07:01 [progress]
 
 The update-package records use `mica-core`'s names (implementation in

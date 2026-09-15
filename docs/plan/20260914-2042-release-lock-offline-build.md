@@ -230,3 +230,8 @@ owner, dispatched by the coordinator.
   `locks/pins/<repository>.<scope>.pin` (spec 1.0, section 4; vectors and
   checker updated). Stage 4 order: `mica-boards` per-board releases first,
   then its clean-up; `mica-build` after.
+- 2026-09-15: `mica-core` `20260915-0728` (`2a4c98d`, `SHA256SUMS` sha256
+  `75187b8a312aae80cb02d34e8f92fbab310a742a79a4d75ebc30f4bfbea37590`)
+  implements the update packages (partial `MICAUPD1` import,
+  `mica/deployment/v2` with `product`, `mica/catalog/v2`); `mica-build` pins
+  it and implements its side before the scoped releases.

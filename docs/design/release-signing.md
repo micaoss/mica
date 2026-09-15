@@ -18,8 +18,10 @@ mappings. No earlier update format or mutable command-line trust input is read.
 The components themselves are `mica/kernel/v1` and `mica/rootfs/v1` (unchanged
 by v2), and a published update travels in a `mica/update-envelope/v1`
 envelope. `mica/deployment/v2` and `mica/catalog/v2` were decided on
-2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`); `mica-core` is
-implementing them (`mica-core:docs/task/20260915-0657-update-packages.md`).
+2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and implemented
+in `mica-core` since its release `20260915-0728` (`2a4c98d`,
+`mica-core:docs/task/20260915-0657-update-packages.md`); `mica-build`, which
+writes them, is pending.
 
 The Ed25519 envelope format is shared by Rust and Bun: its keys are ordered
 `schema`, `keyId`, `payload`, `signature`, and `keyId` is the hex SHA-256 of

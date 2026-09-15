@@ -30,7 +30,7 @@ private key directories are never added to source control.
 | Root | Resolved userspace packages and public factory defaults | `rootfs-verity.img`, exact geometry, manifest/debug/license evidence |
 | Kernel/support | BSP kernel/modules/firmware, native init, public policy and explicit signing inputs | Signed UKI/FIT plus signed support image and component metadata |
 | Firmware | Patched systemd-boot or cx3576 loader and metadata signer | Independent signed firmware package |
-| Deployment | Exact kernel/root descriptors, the product and the metadata signer | Signed `mica/deployment/v2` envelope (v1 until `mica-core` lands v2) |
+| Deployment | Exact kernel/root descriptors, the product and the metadata signer | Signed `mica/deployment/v2` envelope (read by `mica-core` since `20260915-0728`; this writer is pending) |
 | Factory disk | Two deployments, all referenced components and authenticated firmware | Current three-partition full image |
 | Offline update | Signed deployment and its exact objects | `.micaupd` archive |
 
