@@ -109,6 +109,7 @@ immutable for it (`docs/decisions/2026-09-13-ghcr-artifact-registry.md`).
 | `firmware/*`, `component-copyright` | when `BOARD_FIRMWARE_FILES` is non-empty | the support image |
 | `uboot/*` | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
 | `trust/verity-signer.cert.pem` | yes | refused when it is not the assembly's |
+| `outputs.tsv` | yes | the check of the bundle and the board's packages |
 
 On a `uboot-fit` board each of `kernel/dev/` and `kernel/prod/` is a complete
 kernel directory (`Image`, the dtb, `config`, `System.map`, `kernel.release`,
@@ -118,6 +119,26 @@ a board line that already names `mica.profile` or `mica.recovery` is refused
 (`mica-boards:boards/cx3576/kernel/configure.sh`,
 `mica-boards:producers/kernel/prepare.sh`). The user chose this shape (option
 A, 2026-09-14).
+
+The board list and each board's expected outputs are machine-readable
+(`mica-boards` `ce44907`, read by `mica-boards:tools/boards.sh`):
+
+- `mica-boards:boards/boards.tsv`: line 1 `# mica-boards boards v1`, then one
+  tab-separated row per supported board, sorted by board,
+  `<board> <arch> <boot backend>` (`cx3576 arm64 uboot-fit`,
+  `s905x5m arm64 uboot-fit`, `virt-arm64 arm64 systemd-boot`,
+  `x64 amd64 systemd-boot`).
+- `mica-boards:boards/<board>/outputs.tsv`: line 1
+  `# mica-boards board outputs v1`, then rows `package <package>` (an archive
+  of `pool.<board>.<arch>.<release>`) and `bundle <path>` (a file of
+  `board.<board>.<release>`, its path under `usr/lib/mica/board/<board>/`,
+  `outputs.tsv` itself included), sorted by kind, then value. It is staged
+  into the bundle as `usr/lib/mica/board/<board>/outputs.tsv`, so every board
+  release carries its own expected outputs.
+
+A consumer reads the board list from `boards/boards.tsv` and a board's
+expected outputs from its bundle's `outputs.tsv`; the assembly checks each
+pinned bundle and the board's packages against it.
 
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-15 04:23 [progress]
+
+`mica-boards` defined its board list (`ce44907`): `boards/boards.tsv` lists
+every supported board with its architecture and boot backend, and
+`boards/<board>/outputs.tsv` lists the board's packages and bundle files and
+travels in the bundle, so each board release carries its own expected
+outputs. `docs/boards/contract.md` section 3 and the per-board releases
+decision cite it.
+
 ## 2026-09-15 03:45 [decision]
 
 A scoped `mica-boards` lock holds only its board: every `board` row names the

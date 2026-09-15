@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner; the consumer side, the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; specified in `docs/design/release-lock.md` 1.0 and section 4; the board list format is `mica-boards`' own, cited here once it lands
+- **status**: accepted (user, 2026-09-15); not implemented; specified in `docs/design/release-lock.md` 1.0 and section 4; the board list format is `mica-boards`' own (`mica-boards` `ce44907`, `docs/boards/contract.md` section 3)
 
 ## Decision
 
@@ -24,8 +24,14 @@
   (`mica-pin v1` with `SCOPE=<board>`), so moving one board replaces exactly
   its two files.
 - `mica-boards` keeps a machine-readable board list in `boards/` naming every
-  supported board and its expected outputs; its format is `mica-boards`'
-  to define.
+  supported board and its expected outputs; its format is `mica-boards`' to
+  define, and it defined it in `ce44907`: `mica-boards:boards/boards.tsv`
+  (`# mica-boards boards v1`, rows `<board> <arch> <boot backend>`) and
+  `mica-boards:boards/<board>/outputs.tsv` (`# mica-boards board outputs v1`,
+  rows `package <package>` and `bundle <path>`), staged into each board's
+  bundle as `usr/lib/mica/board/<board>/outputs.tsv`. A consumer reads the
+  board list from `boards/boards.tsv` and a board's expected outputs from its
+  bundle (`docs/boards/contract.md` section 3).
 
 Scoped releases are allowed for `mica-boards` and `mica-build` only
 (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); the release-lock
