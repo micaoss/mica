@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner (first adopter); the mica-build owner (release-varying content in the root)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); design accepted, implementation in progress in `mica-boards`, not released; applies to `mica-boards`; whether `mica-core`, `mica-podman` and `mica-system-base` adopt it is not decided
+- **status**: superseded the same day by `docs/decisions/2026-09-15-package-versions.md` (user, 2026-09-15): packages are locked by their own version and a release never changes it; the reuse key is name, architecture and version, and the inputs hash below stays only as a guard. This record keeps the replaced design
 
 ## Problem
 

@@ -27,3 +27,4 @@ Kinds:
 | [Board flashing formats: mica-boards declares and packs, mica-build executes](2026-09-15-board-image-packers.md) | engineering decision | 2027-03-15 |
 | [Update packages: one signed deployment, full, root and kernel archives](2026-09-15-update-packages.md) | engineering decision | 2027-03-15 |
 | [Packages are reused by inputs across releases, first in mica-boards](2026-09-15-package-reuse-by-inputs.md) | engineering decision | 2027-03-15 |
+| [Packages are locked by their own version; a release never changes it](2026-09-15-package-versions.md) | engineering decision | 2027-03-15 |

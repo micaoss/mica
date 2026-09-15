@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-15 10:20 [decision]
+
+Packages are locked by their own version (user): a release never changes a
+package version (no commit, date or release stamp in the version or control
+fields; `SOURCE_DATE_EPOCH` from the version identity), and a package is
+rebuilt only when its version is bumped. Against the previous release of the
+scope, the same name, architecture and version reuses the published bytes by
+digest, a higher version is built, and a lower one is refused. The
+`mica.inputs` hash stays as a guard that refuses changed inputs without a
+bump; reused packages still rebuild byte-identically at release. Repository
+metadata changes and releases no longer affect packages. `mica-boards`
+implements it first; `mica-core`, `mica-podman` and `mica-system-base` are
+assessing it. `docs/decisions/2026-09-15-package-versions.md` supersedes
+`2026-09-15-package-reuse-by-inputs`.
+
 ## 2026-09-15 10:18 [decision]
 
 The `mica-boards` package-reuse design is accepted (implementation in
