@@ -1,6 +1,6 @@
 import type { Artifact } from './catalog'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { en } from '@/shared/i18n/en'
 import { zh } from '@/shared/i18n/zh'
 import { ARTIFACTS, filterArtifacts } from './catalog'
@@ -81,5 +81,29 @@ describe('downloadExplorer', () => {
     render(<DownloadExplorer copy={en} artifacts={[]} />)
 
     expect(screen.getByText(en.download.empty)).toBeInTheDocument()
+  })
+})
+
+describe('the catalogue endpoint', () => {
+  it('renders what /api/catalog answers', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ artifacts: SAMPLE })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<DownloadExplorer copy={zh} />)
+
+    expect(await screen.findByText('dep-aa11')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith('/api/catalog', expect.anything())
+    vi.unstubAllGlobals()
+  })
+
+  it('shows the empty state when the endpoint is unreachable', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    render(<DownloadExplorer copy={zh} />)
+
+    expect(await screen.findByText(zh.download.empty)).toBeInTheDocument()
+    vi.unstubAllGlobals()
   })
 })

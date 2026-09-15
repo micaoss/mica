@@ -1,8 +1,9 @@
 {
-  // A static site: no `main`, so Cloudflare serves the build output directly
-  // and no Worker code runs. `bun run build` produces ./dist.
+  // Static assets with one API route: Cloudflare serves ./dist directly, and a
+  // request matching no asset reaches the Worker, which answers /api/catalog.
   "name": "micaos-dev",
   "compatibility_date": "2026-09-15",
+  "main": "./worker/index.ts",
   "assets": {
     "directory": "./dist"
   },

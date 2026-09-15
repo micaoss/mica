@@ -1,6 +1,6 @@
 import type { Artifact, ArtifactKind, Profile } from '../catalog'
 import type { Copy } from '@/shared/i18n'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card } from '@/shared/components/ui/card'
 import { Input } from '@/shared/components/ui/input'
 import {
@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 import { ARTIFACTS, filterArtifacts, formatBytes } from '../catalog'
+import { parseCatalog } from '../catalog-schema'
 
 const KINDS: ArtifactKind[] = ['image', 'update', 'kernel', 'root', 'firmware']
 const PROFILES: Profile[] = ['dev', 'prod']
@@ -60,25 +61,44 @@ function Facet({ label, allLabel, value, options, onChange }: FacetProps) {
   )
 }
 
+/** Where the Worker answers the catalogue. Static pages fetch it at runtime. */
+const CATALOG_ENDPOINT = '/api/catalog'
+
 export function DownloadExplorer({
   copy,
-  artifacts = ARTIFACTS,
+  artifacts,
 }: {
   copy: Copy
-  /** Injectable, so the catalogue's source can change without the page. */
+  /** Given in tests; in the page the catalogue is fetched from the endpoint. */
   artifacts?: Artifact[]
 }) {
+  const [fetched, setFetched] = useState<Artifact[]>(ARTIFACTS)
   const [board, setBoard] = useState(ALL)
   const [profile, setProfile] = useState(ALL)
   const [kind, setKind] = useState(ALL)
   const [query, setQuery] = useState('')
 
+  useEffect(() => {
+    if (artifacts)
+      return
+    const cancel = new AbortController()
+    // A failed or unreadable catalogue leaves the empty state standing: the page
+    // says there is nothing published rather than showing a broken table.
+    fetch(CATALOG_ENDPOINT, { signal: cancel.signal })
+      .then(async response => (response.ok ? parseCatalog(await response.json()) : []))
+      .then(setFetched)
+      .catch(() => {})
+    return () => cancel.abort()
+  }, [artifacts])
+
+  const catalogue = artifacts ?? fetched
+
   const boards = useMemo(
-    () => [...new Set(artifacts.map(artifact => artifact.board))].sort(),
-    [artifacts],
+    () => [...new Set(catalogue.map(artifact => artifact.board))].sort(),
+    [catalogue],
   )
 
-  const rows = filterArtifacts(artifacts, {
+  const rows = filterArtifacts(catalogue, {
     board: board === ALL ? undefined : board,
     profile: profile === ALL ? undefined : (profile as Profile),
     kind: kind === ALL ? undefined : (kind as ArtifactKind),

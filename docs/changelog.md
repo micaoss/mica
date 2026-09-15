@@ -2777,3 +2777,21 @@ What goes with them:
 `make docs-verify` is six scripts and 1931 assertions: catalog both ways, internal links,
 truth-status evidence, board dossiers, Chinese coverage, release-lock vectors.
 `make docs-verify-test` is five.
+
+## 2026-09-15 04:40 [progress]
+
+The download page now reads its catalogue at runtime from `/api/catalog`, answered by the
+site's own Worker (`website/worker/index.ts`). The Worker is one route: static assets are
+served by Cloudflare before it runs, and only a request matching no asset reaches it.
+
+The pipeline is built ahead of the data, deliberately. No repository publishes a product
+image: `mica-build` has no release at all, and the five releases that exist
+(`mica-core`, `mica-system-base`, `mica-podman`, `mica-build-env`, `mica-boards`) carry lock
+files and `SHA256SUMS`, not images — the artifacts themselves are in GHCR. So with no
+`CATALOG_SOURCE` configured the endpoint answers `{"artifacts": []}` and the page keeps the
+empty state it has today. Pointing it at a real catalogue is one secret, no code change.
+
+Every entry is validated in the page (`catalog-schema.ts`): an entry missing a field it
+should carry, or naming a `kind` or `profile` this site does not publish, is dropped rather
+than completed with a guess — the content contract forbids hand-written release identities.
+A fetch that fails leaves the empty state standing.

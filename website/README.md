@@ -43,6 +43,29 @@ work, internal decisions and board dossiers that would mislead a visitor.
 
 `MICA_DOCS_ROOT` overrides the documentation root; it defaults to `../docs`.
 
+## The download catalogue
+
+The download page reads `/api/catalog` at runtime. `website/worker/index.ts` answers it: with
+`CATALOG_SOURCE` set — a URL serving the same JSON — it passes that through; with nothing
+configured it answers an empty catalogue, which is the current state, because no repository
+publishes a product image yet.
+
+The page validates every entry (`src/features/download/catalog-schema.ts`) and drops any it
+cannot read whole, so a malformed upstream degrades to the empty state rather than to
+invented rows. Set the source with `wrangler secret put CATALOG_SOURCE`, or as a plain var
+in `wrangler.jsonc` if it is not a secret.
+
+```json
+{ "artifacts": [
+  { "board": "x64", "profile": "dev", "version": "2026.09-1",
+    "deploymentId": "dep-aa11", "kind": "image", "bytes": 1073741824,
+    "digest": "sha256:…", "href": "https://…/disk.img" }
+] }
+```
+
+`kind` is one of `image`, `update`, `kernel`, `root`, `firmware`; `profile` is `dev` or
+`prod`. A bare array is accepted too.
+
 ## Layout
 
 ```text
