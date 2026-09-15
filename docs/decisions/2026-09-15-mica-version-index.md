@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "同意"; amended the same day for scale); implemented on `mica-build` `main` `da1d36a1` (index job live, CI dry run green), no `mica/*` release cut yet; specified in `docs/design/release-lock.md` 1.2.3 and `docs/design/mica-index.md`
+- **status**: accepted (user, 2026-09-15: "同意"; amended the same day for scale); implemented on `mica-build` `main` (index job `da1d36a1`, incremental cuts, full re-verification and the shared input table `9c2f399e`, `release-test` 43/43), no `mica/*` release cut yet; specified in `docs/design/release-lock.md` 1.2.3 and `docs/design/mica-index.md`
 
 ## Decision
 
@@ -48,22 +48,32 @@ compression and uncompressed identity from the OCI layers) and updates (with
 what they require); and a catalogue of boards and products taken from the
 index commit's tree, never from the lock (`docs/design/mica-index.md`).
 
-**Amended for scale** (user, 2026-09-15, for hundreds of products):
+**Amended for scale** (user, 2026-09-15, for hundreds of products; the shape
+as `mica-build` emits it at `9c2f399e`, `docs/design/mica-index.md`):
 
-- Generation is incremental: a new index is the previous `mica/*` index,
-  re-read and checked against its `SHA256SUMS`, plus the scoped release just
-  published. Only entering or replacing entries get the full cross-release
-  checks, with the same refusals; the first index is built in full; products
-  no longer `PUBLISH=1` are dropped from `products` and shown in the
-  catalogue.
-- A read-only full re-verification, `tools/release.sh verify-index <tag>
-  --full`, runs in `mica-build`'s `ci.yml` on pushes to `main` against the
-  newest `mica/*` index.
-- `mica-index.json` de-duplicates the inputs into one shared top-level table
-  that `releases[]` reference by id; the lock keeps the `built` rows
-  verbatim.
-- Per-board sharding is reserved in the JSON shape but not enabled.
-- The catalogue's `publish` and `releaseTarget` are booleans.
+- Generation is incremental: the previous index is the newest `mica/*` tag,
+  and a later index reads only its three files (`SHA256SUMS` listing exactly
+  the lock and the JSON, a lock that passes the checker, and JSON whose
+  lock-derived parts equal a render of the lock) plus the scoped release just
+  published. Carried entries are copied unread; entering entries are fully
+  checked, refusing a generation that goes down, conflicting trust for one
+  input, two releases of one scope, or a stamp that is not later. The first
+  index is built in full. `PUBLISH=0` products are dropped and shown in the
+  catalogue with `publish` and `indexed` false. No index is cut when nothing
+  enters or drops.
+- `tools/release.sh verify-index <tag>` re-derives an index incrementally and
+  byte-identically; `verify-index <tag> --full` rebuilds every entry and
+  publishes nothing; `ci.yml`'s `release-index` job runs `--full` against the
+  newest `mica/*` index (and `index --dry-run` before the first exists).
+- `mica-index.json` names the index it was cut from as `previous` and
+  de-duplicates the inputs into one top-level `inputs` table, one entry per
+  distinct `built` row with `id` = `<built name>/<release>`, which
+  `releases[].inputs` reference; the lock keeps the `built` rows verbatim.
+- Per-board sharding is reserved and not emitted: the proposed optional
+  `catalogue.boards[].shard` (`mica-index.<board>.json` with its sha256) and
+  the proposed threshold of 1 MiB are recorded as reserved proposals.
+- The catalogue's `releaseTarget`, `publish` and `indexed` are booleans, and
+  `features` an array of strings.
 
 ## Rationale
 

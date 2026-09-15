@@ -9,107 +9,120 @@ asset, `mica-index.json`, from which an external reader reconstructs the
 complete state (the boards, the products, their artifacts and their board and
 base inputs) without reading anything else first.
 
+This is the shape `mica-build` emits at `main` `9c2f399e` (`release-test`
+43/43).
+
 ## 1. Release assets
 
 An index release carries exactly three assets: `mica-build.lock`,
 `mica-index.json`, and `SHA256SUMS` listing both. It is the one exception to
 "a release carries only its lock and `SHA256SUMS`"
-(`docs/design/release-lock.md` section 1).
-
-Implemented on `mica-build` `main` `da1d36a1` (the index job is live; the CI
-dry run is green; the JSON key order follows this document). The schema text
-below is aligned precisely to the shape `mica-build` emits once it has sent
-that shape.
+(`docs/design/release-lock.md` section 1). The reserved shard files of 3.2
+would join these assets and `SHA256SUMS`; none is emitted today.
 
 ## 2. Encoding
 
-`mica-index.json` is canonical JSON: UTF-8, object keys in the order given
-below, no insignificant whitespace, integers for sizes and generations,
-lowercase hex for digests, and a final LF *(fixed here)*. Optional members
-(marked `?`) are omitted, never null.
+`mica-index.json` is canonical JSON: UTF-8, object keys in the order of 3, no
+insignificant whitespace, and a final LF. Members marked `?` are omitted when
+absent, never null. `releaseTarget`, `publish` and `indexed` are booleans,
+`features` is an array of strings, sizes and generations are integers, and
+digests are lowercase hex.
 
 ## 3. Shape
 
 ```text
 {
   schema: "mica/index/v1",
-  version: "<YYYYMMDD-HHMM>",                    the index release's stamp
-  commit: "<40 hex>",                            the index lock's release commit
-  lock: { file: "mica-build.lock", sha256: "<64 hex>" },
-  inputs: [                                      every distinct built row once, shared
-    { id, repository, scope?, release, trust } ],
-  releases: [                                    one per input row, sorted by release
-    { release: "<scope>/<YYYYMMDD-HHMM>",
-      trust: "<sha256 of that release's SHA256SUMS>",
-      commit: "<40 hex>",                        its origin row
-      inputs: [ <id>, ... ] } ],                 its built rows, by id into inputs
-  products: [                                    one per index row, sorted by product
-    { product, board, profile, generation,
-      deployment, kernel, rootfs,                the product row's identities
-      release: "<scope>/<YYYYMMDD-HHMM>",        the scoped release it comes from
-      bundles: { image: "<reference>", update: "<reference>" },
-      images: [
-        { kind, file, url, sha256, size,
-          compression, uncompressedSha256, uncompressedSize } ],
-      updates: [
-        { kind, file, url, sha256, size,
-          requires: { generationBelow, kernel?, rootfs? } } ] } ],
+  version: "<YYYYMMDD-HHMM>",
+  commit: "<40 hex>",
+  lock: { file: "mica-build.lock", sha256 },
+  previous?: { release: "mica/<YYYYMMDD-HHMM>", trust },
+  inputs: [ { id, repository, scope?, release, trust } ],
+  releases: [ { release, trust, commit, inputs: [ id ] } ],
+  products: [
+    { product, board, profile, generation, deployment, kernel, rootfs,
+      release,
+      bundles: { image, update },
+      images: [ { kind, file, url, sha256, size,
+                  compression, uncompressedSha256, uncompressedSize } ],
+      updates: [ { kind, file, url, sha256, size,
+                   requires: { generationBelow, kernel?, rootfs? } } ] } ],
   catalogue: {
-    boards: [ { board, arch, releaseTarget: <boolean>,
+    boards: [ { board, arch, releaseTarget,
                 pinnedBoardsRelease: { release, trust } } ],
-    products: [ { product, board, profile, features,
-                  publish: <boolean>, indexed } ] }
+    products: [ { product, board, profile, features, publish, indexed } ] }
 }
 ```
 
-- `releases`, `products` and every `bundles`, `images` and `updates` entry
-  are derived from the index lock: the `input`, `origin` and `built` rows,
-  and the copied `product`, `bundle` and `asset` rows.
-- `inputs` de-duplicates the board and base inputs (user, 2026-09-15): each
-  distinct `built` row appears once with an `id`, and every release lists its
-  inputs by `id`. The lock itself keeps every `built` row verbatim per
-  release.
-- A per-board sharding of the document is reserved in the shape but not
-  enabled; an index is one document.
-- In the catalogue, `publish` (the product's `PUBLISH`) and `releaseTarget`
-  are booleans; a product no longer published (`PUBLISH=0`) is absent from
-  `products` and appears in the catalogue with `indexed` false.
-- `url` is the GitHub Release download URL of the asset in its scoped
-  release; `size` and, for images, `compression`, `uncompressedSha256` and
-  `uncompressedSize` are read from the referenced OCI layers
-  (`mica.compression`, `mica.uncompressed-sha256`,
-  `mica.uncompressed-size`).
-- `requires` states what a device must run for an update archive to apply:
-  `generationBelow` (the archive's generation), and for a `root` or `kernel`
-  archive the identity of the component it does not carry (`kernel` for a
-  `root` archive, `rootfs` for a `kernel` archive).
-- `catalogue` is read from the index commit's tree (`products/`, the boards
-  list and the board pins) and is never part of the lock: every board with
-  its architecture, whether it is a release target and the boards release it
-  is pinned to, and every product with its board, profile, features,
-  `PUBLISH` value and whether this index includes it.
+### 3.1 Members
+
+- `version` is the index release's stamp and `commit` its lock's release
+  commit; `lock` names the lock asset and its sha256.
+- `previous` is the index this one was cut from, with `trust` the sha256 of
+  its `SHA256SUMS`; it is omitted only on the first index.
+- `inputs` has one entry per distinct `built` row of the lock, with
+  `id` = `<built name>/<release>` (for example `mica-boards.x64/20260915-1926`
+  or `mica-core/20260915-1135`), the repository, the scope where the name has
+  one, the release and its `trust`. One `id` with two trust hashes is
+  refused. The lock itself keeps every `built` row verbatim per release.
+- `releases` has one entry per `input` row: the scoped release, its `trust`,
+  its `commit` (the `origin` row) and its inputs as `id`s.
+- `products` has one entry per `index` row, with the identities of the copied
+  `product` row, the scoped `release` it comes from, the `bundles`
+  references, and its `images` and `updates` from the copied `asset` rows.
+  `url` is
+  `https://github.com/micaoss/mica-build/releases/download/<scope>/<stamp>/<file>`.
+  `size`, and for images `compression`, `uncompressedSha256` and
+  `uncompressedSize`, come from the referenced OCI layers.
+  `requires.generationBelow` is the archive's generation; a `root` archive
+  also requires `kernel` and a `kernel` archive `rootfs`, the identity of the
+  component the archive does not carry.
+- `catalogue` is read from the index commit's tree and is never part of the
+  lock: every board with its architecture, whether it is a release target
+  and the boards release it is pinned to, and every product with its board,
+  profile, features, whether it is published and whether this index includes
+  it. A product with `PUBLISH=0` is absent from `products` and listed here
+  with `publish` and `indexed` false.
+
+Sort orders: `inputs` by `id` bytes; `releases` by `release`, each with its
+`inputs` sorted; `products` by `product`; `images` and `updates` by `kind`;
+`catalogue.boards` by `board` and `catalogue.products` by `product`.
+
+### 3.2 Reserved: per-board shards
+
+Sharding is reserved and not emitted. The proposed form is an optional
+`catalogue.boards[].shard: { file: "mica-index.<board>.json", sha256 }`: when
+present, that board's `products` entries move into that file, in the same
+form, and the file joins the release assets and `SHA256SUMS`. The proposed
+threshold is an unsharded document over 1 MiB, about 500 products at the
+measured 1.9 KB per product. Both the member and the threshold are proposals.
 
 ## 4. Generation
 
-An index is generated incrementally (user, 2026-09-15, for hundreds of
-products):
-
-- The new index is the previous `mica/*` index, re-read and checked against
-  its `SHA256SUMS`, plus the scoped release just published.
-- Only entering or replacing entries get the full cross-release checks; the
-  refusals for them are unchanged. The first index is built in full.
-- A product that is no longer `PUBLISH=1` is dropped from `products` and
-  shown in the catalogue.
+- The previous index is the newest `mica/*` tag; the first index is built in
+  full.
+- A later index is incremental. It reads only the previous index's three
+  files and the scoped release just published. `SHA256SUMS` must list exactly
+  the lock and the JSON, the lock must pass the checker of
+  `docs/design/release-lock.md`, and the lock-derived parts of the JSON must
+  equal a render of that lock.
+- Carried entries are copied without being read again; entering entries are
+  fully checked.
+- A cut is refused for a generation that goes down, conflicting trust for
+  one input, two releases of one scope, or a stamp that is not later.
+- Products with `PUBLISH=0` are dropped from `products` and shown in the
+  catalogue with `publish` and `indexed` false.
+- No index is cut when nothing enters or drops.
 
 ## 5. Checks
 
 The checker of `docs/design/release-lock.md` proves the index lock's file
-rules. The cross-release checks are done when the index is cut and by the
-verifier, not by that checker: each copied row equals its source lock's row,
-each `trust` equals the referenced release's `SHA256SUMS` sha256, no product's
-generation is lower than in the previous index, and the stamp is later than
-every referenced release and the previous index. A read-only full
-re-verification of the newest `mica/*` index,
-`mica-build:tools/release.sh verify-index <tag> --full`, runs in
-`mica-build`'s `ci.yml` on pushes to `main`, so every entry is re-checked even
-though a cut checks only the entering ones.
+rules; the checks across releases are done at the cut and by the verifier:
+
+- `mica-build:tools/release.sh verify-index <tag>` re-derives an index
+  incrementally and requires byte-identical files.
+- `verify-index <tag> --full` rebuilds every entry from its sources and
+  publishes nothing.
+- `mica-build`'s `ci.yml` job `release-index` runs `--full` against the
+  newest `mica/*` index on pushes to `main`, and `index --dry-run` before the
+  first index exists.

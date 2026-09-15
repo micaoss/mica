@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 22:20 [progress]
+
+`docs/design/mica-index.md` now states exactly the `mica-index.json` shape
+that `mica-build` `9c2f399e` emits: a `previous` member naming the index it was
+cut from, one shared `inputs` table keyed `<built name>/<release>` (one id
+with two trust hashes refused), fixed sort orders, asset URLs under their
+scoped release, boolean `releaseTarget`, `publish` and `indexed`, and a
+reserved, not emitted per-board shard member with a proposed 1 MiB threshold.
+It also records incremental generation from the newest `mica/*` tag (no cut
+when nothing enters or drops) and the `verify-index` incremental and `--full`
+modes that `ci.yml` runs. The version-index decision follows.
+
 ## 2026-09-15 22:02 [decision]
 
 The Mica version index is amended for scale (user): a new index is the

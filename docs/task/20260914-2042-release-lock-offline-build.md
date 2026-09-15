@@ -866,3 +866,13 @@ Moving the repositories to the release lock format
   on `mica-build` `main` `da1d36a1` (index job live, CI dry run green, key
   order aligned to `docs/design/mica-index.md`); the schema text is aligned
   exactly once `mica-build` sends its emitted shape.
+- 2026-09-15: `mica-build` `main` `9c2f399e` (`release-test` 43/43) emits the
+  final `mica-index.json` shape, now written exactly in
+  `docs/design/mica-index.md`: a `previous` member naming the index it was
+  cut from, a shared `inputs` table with `id` = `<built name>/<release>`,
+  fixed sort orders, asset URLs under the scoped release, boolean catalogue
+  fields, and a reserved (not emitted) per-board shard member with a
+  proposed 1 MiB threshold. Cuts are incremental from the newest `mica/*`
+  index and skipped when nothing enters or drops; `verify-index <tag>` checks
+  incrementally and `--full` rebuilds every entry, run by `ci.yml`'s
+  `release-index` job.
