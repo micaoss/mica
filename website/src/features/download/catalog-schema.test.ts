@@ -36,3 +36,12 @@ describe('parseCatalog', () => {
       expect(parseCatalog(input)).toEqual([])
   })
 })
+
+describe('isSample', () => {
+  it('is true only when the payload says so', async () => {
+    const { isSample } = await import('./catalog-schema')
+    expect(isSample({ artifacts: [], sample: true })).toBe(true)
+    expect(isSample({ artifacts: [] })).toBe(false)
+    expect(isSample(null)).toBe(false)
+  })
+})

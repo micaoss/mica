@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 import { ARTIFACTS, filterArtifacts, formatBytes } from '../catalog'
-import { parseCatalog } from '../catalog-schema'
+import { isSample, parseCatalog } from '../catalog-schema'
 
 const KINDS: ArtifactKind[] = ['image', 'update', 'kernel', 'root', 'firmware']
 const PROFILES: Profile[] = ['dev', 'prod']
@@ -73,6 +73,7 @@ export function DownloadExplorer({
   artifacts?: Artifact[]
 }) {
   const [fetched, setFetched] = useState<Artifact[]>(ARTIFACTS)
+  const [sample, setSample] = useState(false)
   const [board, setBoard] = useState(ALL)
   const [profile, setProfile] = useState(ALL)
   const [kind, setKind] = useState(ALL)
@@ -85,7 +86,13 @@ export function DownloadExplorer({
     // A failed or unreadable catalogue leaves the empty state standing: the page
     // says there is nothing published rather than showing a broken table.
     fetch(CATALOG_ENDPOINT, { signal: cancel.signal })
-      .then(async response => (response.ok ? parseCatalog(await response.json()) : []))
+      .then(async (response) => {
+        if (!response.ok)
+          return []
+        const payload: unknown = await response.json()
+        setSample(isSample(payload))
+        return parseCatalog(payload)
+      })
       .then(setFetched)
       .catch(() => {})
     return () => cancel.abort()
@@ -151,40 +158,47 @@ export function DownloadExplorer({
             </p>
           )
         : (
-            <Card className="mt-8 gap-0 p-0">
-              <div className="w-full min-w-0 overflow-x-auto rounded-xl">
-                <Table className="min-w-[720px]">
-                  <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="px-5">{cols.artifact}</TableHead>
-                      <TableHead>{cols.board}</TableHead>
-                      <TableHead>{cols.profile}</TableHead>
-                      <TableHead>{cols.version}</TableHead>
-                      <TableHead>{cols.deployment}</TableHead>
-                      <TableHead className="pr-5">{cols.size}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.map(artifact => (
-                      <TableRow key={`${artifact.deploymentId}-${artifact.kind}`}>
-                        <TableCell className="px-5 text-[15px]">
-                          <a href={artifact.href}>{kinds[artifact.kind]}</a>
-                        </TableCell>
-                        <TableCell className="font-mono text-[13px]">{artifact.board}</TableCell>
-                        <TableCell className="font-mono text-[13px]">{artifact.profile}</TableCell>
-                        <TableCell className="font-mono text-[13px]">{artifact.version}</TableCell>
-                        <TableCell className="font-mono text-[13px] text-muted-foreground">
-                          {artifact.deploymentId}
-                        </TableCell>
-                        <TableCell className="pr-5 font-mono text-[13px] text-muted-foreground tabular-nums">
-                          {formatBytes(artifact.bytes)}
-                        </TableCell>
+            <>
+              {sample && (
+                <p className="mt-8 mb-0 rounded-lg border border-border bg-muted px-4 py-3 text-[13px] leading-6 text-muted-foreground">
+                  {copy.download.sample}
+                </p>
+              )}
+              <Card className="mt-4 gap-0 p-0">
+                <div className="w-full min-w-0 overflow-x-auto rounded-xl">
+                  <Table className="min-w-[720px]">
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="px-5">{cols.artifact}</TableHead>
+                        <TableHead>{cols.board}</TableHead>
+                        <TableHead>{cols.profile}</TableHead>
+                        <TableHead>{cols.version}</TableHead>
+                        <TableHead>{cols.deployment}</TableHead>
+                        <TableHead className="pr-5">{cols.size}</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {rows.map(artifact => (
+                        <TableRow key={`${artifact.deploymentId}-${artifact.kind}`}>
+                          <TableCell className="px-5 text-[15px]">
+                            <a href={artifact.href}>{kinds[artifact.kind]}</a>
+                          </TableCell>
+                          <TableCell className="font-mono text-[13px]">{artifact.board}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{artifact.profile}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{artifact.version}</TableCell>
+                          <TableCell className="font-mono text-[13px] text-muted-foreground">
+                            {artifact.deploymentId}
+                          </TableCell>
+                          <TableCell className="pr-5 font-mono text-[13px] text-muted-foreground tabular-nums">
+                            {formatBytes(artifact.bytes)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </Card>
+            </>
           )}
     </div>
   )

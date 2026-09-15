@@ -2795,3 +2795,16 @@ Every entry is validated in the page (`catalog-schema.ts`): an entry missing a f
 should carry, or naming a `kind` or `profile` this site does not publish, is dropped rather
 than completed with a guess — the content contract forbids hand-written release identities.
 A fetch that fails leaves the empty state standing.
+
+## 2026-09-15 04:55 [progress]
+
+`CATALOG_DEMO=1` makes the Worker serve a sample catalogue — six rows over the four boards,
+both profiles, four artifact kinds — so the download page's filters can be seen working
+before anything is published. The answer carries `"sample": true` and the page renders the
+rows behind a banner that says they are sample data and not a release, in both languages.
+
+The content contract refuses hand-written release identities. A labelled sample behind an
+explicit switch is the form that does not violate it: the rows never claim to be a release,
+their deployment IDs read `sample-*`, and their digests are obviously placeholder. Turning
+the switch off, or pointing `CATALOG_SOURCE` at real metadata, removes both the rows and the
+banner.

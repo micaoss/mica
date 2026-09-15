@@ -106,6 +106,7 @@ export const en: typeof zh = {
       digest: 'Digest',
     },
     empty: 'No published artifact catalogue yet. Build an image from source, or ask your integrator for one.',
+    sample: 'The rows below are sample data shown to demonstrate filtering. They are not a release.',
     obtain: {
       heading: 'How to get an image',
       build: {

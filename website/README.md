@@ -56,15 +56,28 @@ invented rows. Set the source with `wrangler secret put CATALOG_SOURCE`, or as a
 in `wrangler.jsonc` if it is not a secret.
 
 ```json
-{ "artifacts": [
-  { "board": "x64", "profile": "dev", "version": "2026.09-1",
-    "deploymentId": "dep-aa11", "kind": "image", "bytes": 1073741824,
-    "digest": "sha256:…", "href": "https://…/disk.img" }
-] }
+{
+  "artifacts": [
+    {
+      "board": "x64",
+      "profile": "dev",
+      "version": "2026.09-1",
+      "deploymentId": "dep-aa11",
+      "kind": "image",
+      "bytes": 1073741824,
+      "digest": "sha256:…",
+      "href": "https://…/disk.img"
+    }
+  ]
+}
 ```
 
 `kind` is one of `image`, `update`, `kernel`, `root`, `firmware`; `profile` is `dev` or
 `prod`. A bare array is accepted too.
+
+Setting `CATALOG_DEMO=1` (and no source) serves a sample catalogue that answers
+`"sample": true`, which the page renders behind a banner saying so. It exists to exercise
+the filters; it is not a release and must not be presented as one.
 
 ## Layout
 

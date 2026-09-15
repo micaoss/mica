@@ -116,6 +116,7 @@ export const zh = {
       digest: '摘要',
     },
     empty: '当前没有已发布的产物目录。镜像从源码构建，或向集成方索取。',
+    sample: '以下为示例数据，用于展示筛选，不是真实发布。',
     obtain: {
       heading: '怎么拿到镜像',
       build: {

@@ -38,6 +38,12 @@ function readArtifact(value: unknown): Artifact | null {
   }
 }
 
+/** Whether the payload declares itself a sample rather than published metadata. */
+export function isSample(payload: unknown): boolean {
+  return typeof payload === 'object' && payload !== null
+    && (payload as { sample?: unknown }).sample === true
+}
+
 /** Accepts `{ artifacts: [...] }` or a bare array; anything else reads as empty. */
 export function parseCatalog(payload: unknown): Artifact[] {
   const list = Array.isArray(payload)

@@ -14,7 +14,23 @@
 interface Env {
   /** URL of the upstream catalogue. Unset until something publishes one. */
   CATALOG_SOURCE?: string
+  /** `1` serves the sample catalogue below, marked as a sample in the answer. */
+  CATALOG_DEMO?: string
 }
+
+/**
+ * A sample, and labelled as one everywhere it surfaces. Nothing here is a
+ * release: no repository publishes a product image yet, and the content
+ * contract refuses hand-written release identities presented as real.
+ */
+const SAMPLE = [
+  { board: 'x64', profile: 'dev', version: '2026.09-1', deploymentId: 'sample-x64-dev', kind: 'image', bytes: 1_073_741_824, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/' },
+  { board: 'x64', profile: 'prod', version: '2026.09-1', deploymentId: 'sample-x64-prod', kind: 'image', bytes: 1_020_000_000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/' },
+  { board: 'virt-arm64', profile: 'dev', version: '2026.09-1', deploymentId: 'sample-virt-dev', kind: 'image', bytes: 998_000_000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/' },
+  { board: 'cx3576', profile: 'prod', version: '2026.08-3', deploymentId: 'sample-cx3576', kind: 'update', bytes: 52_428_800, digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333', href: 'https://micaos.dev/docs/user/download/' },
+  { board: 'cx3576', profile: 'prod', version: '2026.08-3', deploymentId: 'sample-cx3576', kind: 'kernel', bytes: 18_874_368, digest: 'sha256:4444444444444444444444444444444444444444444444444444444444444444', href: 'https://micaos.dev/docs/user/download/' },
+  { board: 's905x5m', profile: 'dev', version: '2026.08-1', deploymentId: 'sample-s905x5m', kind: 'firmware', bytes: 4_194_304, digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555', href: 'https://micaos.dev/docs/user/download/' },
+]
 
 const CATALOG_PATH = '/api/catalog'
 /** Long enough to stay inside GitHub's rate limit, short enough to be current. */
@@ -30,8 +46,11 @@ function json(body: unknown, seconds: number): Response {
 }
 
 async function catalog(env: Env): Promise<Response> {
-  if (!env.CATALOG_SOURCE)
-    return json({ artifacts: [] }, CACHE_SECONDS)
+  if (!env.CATALOG_SOURCE) {
+    return env.CATALOG_DEMO === '1'
+      ? json({ artifacts: SAMPLE, sample: true }, CACHE_SECONDS)
+      : json({ artifacts: [] }, CACHE_SECONDS)
+  }
 
   try {
     const upstream = await fetch(env.CATALOG_SOURCE, {
