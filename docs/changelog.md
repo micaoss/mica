@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-15 05:47 [decision]
+
+Agreed by `mica-boards` and `mica-build`: a board is published as separate
+component artifacts, `kernel`, `uboot` (FIT boards), `firmware` and `board`,
+tagged `<component>.<board>.<YYYYMMDD-HHMM>` with `artifactType`
+`application/vnd.mica.board[.kernel|.uboot|.firmware]` and the annotations
+`mica.component` and `mica.inputs`, and a board release reuses an unchanged
+component by digest. The release-lock `board` row becomes
+`board <board> <component> <arch> <reference>` (key board and component, two
+to four per lock), and `scope-content` also checks each component's tag; the
+checker and vectors follow (124 checks). The `mica-kernel-<board>` packages
+are retired, and `boards/<board>/outputs.tsv` rows become `package <name>` and
+`file <component> <path>`. `docs/design/release-lock.md` 1.0, 1.2, 1.3, 1.5,
+2 and 9, `docs/boards/contract.md` section 3, the per-board releases and
+OCI-tag decisions, `docs/design/build.md` and `README.md`.
+
 ## 2026-09-15 04:23 [progress]
 
 `mica-boards` defined its board list (`ce44907`): `boards/boards.tsv` lists

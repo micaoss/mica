@@ -40,8 +40,9 @@ every other repository's release is unscoped:
 
 `<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). A scoped
 `mica-boards` lock holds only its board: every `board` row names the scope's
-board and every `pool` tag is `pool.<scope>.<arch>.<release>`
-(`scope-content`). The lock's release
+board with a reference tag `<component>.<scope>.<release>`, and every `pool`
+tag is `pool.<scope>.<arch>.<release>` (`scope-content`). A `mica-boards` lock
+has two to four `board` rows, one per component the board publishes. The lock's release
 row carries the scoped tag (1.2), OCI tags carry the scope before the release
 (1.3), and a consumer keeps each scope as its own input (section 4).
 
@@ -63,7 +64,7 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 | `image` | `image <source> <name> <platform> <reference>` | source, name, platform | `<source>` is the producing repository or `upstream` (1.2.1); `<platform>` is `index`, `amd64`, `arm64` or `386` |
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
-| `board` | `board <board> <arch> <reference>` | board | a board bundle (`mica-boards`) |
+| `board` | `board <board> <component> <arch> <reference>` | board, component | one component artifact of a board (`mica-boards`); `<component>` is `board`, `kernel`, `uboot` or `firmware` (section 2) |
 | `upstream` | `upstream <name> <arch> <version> <sha256> <url> <roots>` | name, arch | a third-party archive pinned for later stages; `<url>` is https; `<roots>` is the comma-separated, sorted, duplicate-free list of `upstream.pkgs` roots it is pinned for (*fixed here*, as Base publishes today); `mica-system-base` only |
 | `apt` | `apt <uri> <suite> <components> <signed-by>` | at most one | the one apt source; `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
 
@@ -130,7 +131,8 @@ carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
   `mica-build-env:<image>.<arch>.<release>` (a per-architecture build push);
 - `<repository>:pool.<arch>.<release>`, and for `mica-boards`
   `mica-boards:pool.<board>.<arch>.<release>`;
-- `mica-boards:board.<board>.<release>`;
+- `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
+  `firmware`);
 - `mica-system-base:rootfs.<release>`;
 - `mica-build:root.<product>.<release>`;
 - `<repository>:source.<release>`.
@@ -157,8 +159,8 @@ the ones the vectors use:
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
 | `release-scope` | a scoped release (`<scope>/...`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
-| `scope-content` | in a scoped `mica-boards` lock, a `board` row naming another board than the scope, or a `pool` reference whose tag is not `pool.<scope>.<arch>.<...>` for its row's arch (an untagged pool reference included) |
-| `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, version, sha256, url, roots, apt) |
+| `scope-content` | in a scoped `mica-boards` lock, a `board` row naming another board than the scope or whose reference tag is not `<component>.<scope>.<...>` for its row's component, or a `pool` reference whose tag is not `pool.<scope>.<arch>.<...>` for its row's arch (an untagged reference included) |
+| `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, component, version, sha256, url, roots, apt) |
 | `reference-digest` | a reference without `@sha256:<digest>` |
 | `reference-registry` | a `pool`, `board` or repository image reference outside `ghcr.io/micaoss/` and `local/`, `local/` in a published lock, or `ghcr.io/micaoss/` in an offline lock |
 | `reference-repository` | a `pool` or `board` reference to another repository than the release row's, or a repository image reference to another repository than its source |
@@ -185,10 +187,28 @@ package of the repository that publishes them.
   An `all` archive is a layer of both pools. Manifest annotations:
   `org.opencontainers.image.revision`, `.created` (the commit time), `.source`,
   `.version`, `mica.source-repo`, `mica.source-commit`, `mica.arch`.
-- **Board** `board.<board>.<release>` (`mica-boards`): as today,
-  `application/vnd.mica.board`, one layer per bundle path (`firmware/` as one
-  tar), annotations `mica.board`, `mica.arch`, `mica.verity-cert-sha256` and
-  the source annotations (`docs/boards/contract.md` §3).
+- **Board components** `<component>.<board>.<release>` (`mica-boards`): a
+  board is published as separate component artifacts (2026-09-15, agreed by
+  `mica-boards` and `mica-build`), each an OCI image manifest with an empty
+  config and one layer per file:
+  - `kernel`, `artifactType` `application/vnd.mica.board.kernel`: a UEFI
+    board's `kernel/`, or a FIT board's `kernel/dev/` and `kernel/prod/`
+    with the DTB;
+  - `uboot` (FIT boards), `application/vnd.mica.board.uboot`: the U-Boot
+    binaries, the control dtb, the config and the host tools, kept x86-64
+    (`uboot-package/` on s905x5m);
+  - `firmware`, `application/vnd.mica.board.firmware`: `firmware.tar` and
+    `component-copyright`;
+  - `board`, `application/vnd.mica.board`: `board.env`, `manifests/`,
+    `outputs.tsv`, the trust certificate and `evidence.json`.
+
+  Annotations: `mica.board`, `mica.arch`, `mica.component`,
+  `mica.inputs=<sha256>` (the component's input key), `mica.verity-cert-sha256`
+  and the source annotations (`docs/boards/contract.md` section 3). A board
+  release reuses an unchanged component by digest: the same manifest bytes
+  under the new release's tag, never a re-pointed tag. The `mica-kernel-<board>`
+  packages are retired; the assembly takes the kernel files from the `kernel`
+  artifact.
 - **Images** (build-env images, the Base rootfs): an OCI index and its
   platform manifests; the lock names both (`image` rows with the repository as
   source, `index`, `amd64`, `arm64`). Third-party images are not published here (1.2.1).
@@ -414,7 +434,8 @@ The vectors are files every repository copies into its own tests:
   `386` row), `mica-core.lock`
   (`pool`, `package`),
   `mica-boards.x64.lock` (a scoped release row, `pool.<board>.<arch>` tags,
-  `board`, an `all` package),
+  `board` rows for the `board`, `firmware` and `kernel` components, an `all`
+  package),
   `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, `apt`, a
   comment), `offline-mica-core.lock` (an offline lock with `local/`
   references).
@@ -426,11 +447,14 @@ The vectors are files every repository copies into its own tests:
   `upstream-image-republished.lock` (`reference-upstream`) and
   `upstream-image-without-digest.lock` (`reference-digest`); the scope
   refusals are `scoped-release-not-allowed.lock` and `unscoped-release.lock`
-  (`release-scope`), and `scope-content-board.lock` and
-  `scope-content-pool.lock` (`scope-content`).
+  (`release-scope`), `scope-content-board.lock`, `scope-content-pool.lock`
+  and `scope-content-tag.lock` (`scope-content`); the component refusals are
+  `board-component.lock` (`field-value`) and `board-duplicate-component.lock`
+  (`duplicate-key`).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
   (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release` and
-  `scoped` (two `mica-boards` boards beside `mica-build-env`, both checked in
+  `scoped` (two `mica-boards` boards, one with all four components, beside
+  `mica-build-env`, both checked in
   `ci` mode) and `offline-checkout` (in `local` mode) are valid; one directory per
   rule of section 4: `name-mismatch`, `release-mismatch`, `pin-without-lock`,
   `lock-without-pin`, `checkout-in-ci`, plus `header`, `key-order` and

@@ -76,40 +76,54 @@ no persistent boot command script.
 
 ## 3. The board bundle
 
-Everything the assembly takes from a board travels in one bundle, packed by
-`producers/kernel` (one producer over every board) as the archive `mica-kernel-<board>`
-under `/usr/lib/mica/board/<board>/` (never installed into a root; the
-package gate gates it) and published by `mica-boards:tools/publish-boards.sh`
-as the OCI artifact `ghcr.io/micaoss/mica-boards:board.<board>.<YYYYMMDD-HHMM>`
-of a per-board `mica-boards` release `<board>/<YYYYMMDD-HHMM>` (beside
-`pool.<board>.<arch>.<YYYYMMDD-HHMM>`,
-`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first,
-unscoped release was `20260914-1603`),
-one layer per file below (`firmware/` as one tar), annotated `mica.board`,
-`mica.arch`, `mica.verity-cert-sha256`, `mica.source-commit` and
+Everything the assembly takes from a board travels as the board's component
+artifacts (2026-09-15, agreed by `mica-boards` and `mica-build`), published
+by `mica-boards:tools/publish-boards.sh` in a per-board `mica-boards` release
+`<board>/<YYYYMMDD-HHMM>` beside `pool.<board>.<arch>.<YYYYMMDD-HHMM>`
+(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first,
+unscoped release was `20260914-1603`). Each component is the OCI artifact
+`ghcr.io/micaoss/mica-boards:<component>.<board>.<YYYYMMDD-HHMM>`:
+
+| Component | `artifactType` | Content |
+|---|---|---|
+| `kernel` | `application/vnd.mica.board.kernel` | UEFI boards: `kernel/`; FIT boards: `kernel/dev/` and `kernel/prod/` with the DTB |
+| `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the host tools, kept x86-64 (`uboot-package/` on s905x5m) |
+| `firmware` | `application/vnd.mica.board.firmware` | `firmware.tar` and `component-copyright`, when the board carries firmware |
+| `board` | `application/vnd.mica.board` | `board.env`, `manifests/`, `outputs.tsv`, the trust certificate and `evidence.json` |
+
+Each has one layer per file (`firmware.tar` as one layer) and is annotated
+`mica.board`, `mica.arch`, `mica.component`, `mica.inputs=<sha256>` (the
+component's input key), `mica.verity-cert-sha256`, `mica.source-commit` and
 `mica.source-repo` (always `mica-boards`: a package holds only its own
 repository's artifacts, and the assembly's `--pin` refuses any other value).
+A board release reuses an unchanged component by digest: the same manifest
+bytes under the new release's tag, never a re-pointed tag. The board's lock
+names each component as a `board` row (`docs/design/release-lock.md` 1.2).
+The `mica-kernel-<board>` packages are retired: the pools hold
+`mica-board-<board>`, the radio packages and s905x5m's component packages,
+and the assembly takes the kernel files from the `kernel` artifact.
 The publisher checks the complete annotation set when it reads the pushed
 manifest back. The
 assembly pins the manifest's digest (`mica-build:deps/boards/<board>.json`)
-and reads the board out of the artifact. A pin recorded before the move to
+and reads the board out of the artifacts, assembling the components into one
+board tree with the paths below. A pin recorded before the move to
 per-repository packages may still name the historical
 `mica-board:<board>.build-<commit12>`; that artifact stays published and
 immutable for it (`docs/decisions/2026-09-13-ghcr-artifact-registry.md`).
 
-| Path | Required | Consumer in the assembly |
-|---|---|---|
-| `board.env` | yes | every host-time reader, through `_out/boards/<board>/` |
-| `evidence.json` | when the board carries one | the release manifest |
-| `manifests/board.pkgs` | yes | the resolver |
-| `manifests/radio-<r>.pkgs` | when the radio needs board transport packages | the resolver |
-| `manifests/component-<c>.pkgs` | per optional component | the resolver |
-| `kernel/{Image\|bzImage,config,kernel.release,modules.tar,<dtb>}` | UEFI boards: yes, one kernel with an empty `CONFIG_CMDLINE` | the kernel component |
-| `kernel/dev/`, `kernel/prod/` | `BOOT_BACKEND=uboot-fit` boards: both, and no top-level `kernel/` | the kernel component, which takes `kernel/<product profile>/` |
-| `firmware/*`, `component-copyright` | when `BOARD_FIRMWARE_FILES` is non-empty | the support image |
-| `uboot/*` | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
-| `trust/verity-signer.cert.pem` | yes | refused when it is not the assembly's |
-| `outputs.tsv` | yes | the check of the bundle and the board's packages |
+| Path | Component | Required | Consumer in the assembly |
+|---|---|---|---|
+| `board.env` | `board` | yes | every host-time reader, through `_out/boards/<board>/` |
+| `evidence.json` | `board` | when the board carries one | the release manifest |
+| `manifests/board.pkgs` | `board` | yes | the resolver |
+| `manifests/radio-<r>.pkgs` | `board` | when the radio needs board transport packages | the resolver |
+| `manifests/component-<c>.pkgs` | `board` | per optional component | the resolver |
+| `kernel/{Image\|bzImage,config,kernel.release,modules.tar,<dtb>}` | `kernel` | UEFI boards: yes, one kernel with an empty `CONFIG_CMDLINE` | the kernel component |
+| `kernel/dev/`, `kernel/prod/` | `kernel` | `BOOT_BACKEND=uboot-fit` boards: both, and no top-level `kernel/` | the kernel component, which takes `kernel/<product profile>/` |
+| `firmware/*` (from `firmware.tar`), `component-copyright` | `firmware` | when `BOARD_FIRMWARE_FILES` is non-empty | the support image |
+| `uboot/*` (`uboot-package/` on s905x5m) | `uboot` | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
+| `trust/verity-signer.cert.pem` | `board` | yes | refused when it is not the assembly's |
+| `outputs.tsv` | `board` | yes | the check of the components and the board's packages |
 
 On a `uboot-fit` board each of `kernel/dev/` and `kernel/prod/` is a complete
 kernel directory (`Image`, the dtb, `config`, `System.map`, `kernel.release`,
@@ -129,16 +143,16 @@ The board list and each board's expected outputs are machine-readable
   `s905x5m arm64 uboot-fit`, `virt-arm64 arm64 systemd-boot`,
   `x64 amd64 systemd-boot`).
 - `mica-boards:boards/<board>/outputs.tsv`: line 1
-  `# mica-boards board outputs v1`, then rows `package <package>` (an archive
-  of `pool.<board>.<arch>.<release>`) and `bundle <path>` (a file of
-  `board.<board>.<release>`, its path under `usr/lib/mica/board/<board>/`,
-  `outputs.tsv` itself included), sorted by kind, then value. It is staged
-  into the bundle as `usr/lib/mica/board/<board>/outputs.tsv`, so every board
-  release carries its own expected outputs.
+  `# mica-boards board outputs v1`, then rows `package <name>` (an archive of
+  `pool.<board>.<arch>.<release>`) and `file <component> <path>` (a file of
+  that component artifact, at its assembled path in the table above, for
+  example `file firmware firmware/<file>`; `outputs.tsv` itself included),
+  sorted by kind, then value. It travels in the `board` component, so every
+  board release carries its own expected outputs.
 
 A consumer reads the board list from `boards/boards.tsv` and a board's
-expected outputs from its bundle's `outputs.tsv`; the assembly checks each
-pinned bundle and the board's packages against it.
+expected outputs from the `outputs.tsv` of its `board` component; the
+assembly checks each pinned component and the board's packages against it.
 
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there

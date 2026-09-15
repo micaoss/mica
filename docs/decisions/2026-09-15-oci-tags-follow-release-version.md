@@ -18,7 +18,9 @@ An OCI tag names the release that published it, never a hash or a commit
   hash (`inputs-<16>`).
 - Examples: `mica-build-env:base.20260915-0138` (an index),
   `mica-build-env:<image>.<arch>.<release>` (a per-architecture build push),
-  `<repository>:pool.<arch>.<release>`, `mica-boards:board.<board>.<release>`,
+  `<repository>:pool.<arch>.<release>`,
+  `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
+  `firmware`),
   `mica-boards:pool.<board>.<arch>.<release>`,
   `mica-system-base:rootfs.<release>`, `mica-build:root.<product>.<release>`,
   `<repository>:source.<release>`.

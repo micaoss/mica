@@ -86,7 +86,7 @@ it imports each one, pinned, from the repository that produces it.
 |---|---|
 | `mica-system-base` | `mica-system` (the system policy), `mica-busybox` (an emergency binary), `mica-ca-trust`, `mica-systemd-boot` (the unsigned boot loader, signed by `mica-build`; never installed into a root) |
 | `mica-core` | `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` (the early-boot and shutdown executable; never installed into a root) |
-| `mica-boards` | `mica-board-<board>` for each board, the radio packages `mica-wifi`, `mica-wifi-ap` and `mica-bluetooth`, and `mica-kernel-<board>` (the board's kernel bundle; never installed into a root) |
+| `mica-boards` | `mica-board-<board>` for each board, the radio packages `mica-wifi`, `mica-wifi-ap` and `mica-bluetooth`, and s905x5m's component packages; kernels, U-Boot and firmware are published as separate board component artifacts, not packages |
 | `mica-podman` | `mica-podman` (the Podman container engine) |
 
 Debian packages come from `mica-system-base` releases, which carry one

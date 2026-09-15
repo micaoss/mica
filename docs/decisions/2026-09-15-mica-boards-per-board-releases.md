@@ -13,12 +13,24 @@
 
 - The git tag and GitHub Release are `<board>/<YYYYMMDD-HHMM>`, and a release
   builds and publishes only that board.
-- OCI tags name the board: `board.<board>.<YYYYMMDD-HHMM>` and
-  `pool.<board>.<arch>.<YYYYMMDD-HHMM>` in `ghcr.io/micaoss/mica-boards`.
+- A board is published as separate component artifacts (2026-09-15, agreed
+  by `mica-boards` and `mica-build`): `kernel`, `uboot` (FIT boards),
+  `firmware` and `board`, tagged `<component>.<board>.<YYYYMMDD-HHMM>` with
+  `artifactType` `application/vnd.mica.board[.kernel|.uboot|.firmware]` and
+  the annotations `mica.component` and `mica.inputs=<sha256>`; the pool is
+  `pool.<board>.<arch>.<YYYYMMDD-HHMM>`, all in `ghcr.io/micaoss/mica-boards`.
+  A release reuses an unchanged component by digest: the same manifest bytes
+  under the new tag, never a re-pointed tag.
+- The `mica-kernel-<board>` packages are retired: the pools hold
+  `mica-board-<board>`, the radio packages and s905x5m's component packages,
+  and the assembly takes the kernel files from the `kernel` artifact.
 - A release carries exactly `mica-boards.lock` and `SHA256SUMS`; the lock's
-  release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`, and
-  the lock holds only that board: every `board` row names it and every pool
-  tag is `pool.<board>.<arch>.<...>` (refused otherwise as `scope-content`).
+  release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`. Each
+  component is a row `board <board> <component> <arch> <reference>` (key
+  board and component), two to four per lock, and the lock holds only that
+  board: every `board` row names it with a tag `<component>.<board>.<...>` and
+  every pool tag is `pool.<board>.<arch>.<...>` (refused otherwise as
+  `scope-content`).
 - A consumer keeps each board as its own input,
   `locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
   (`mica-pin v1` with `SCOPE=<board>`), so moving one board replaces exactly
@@ -27,11 +39,12 @@
   supported board and its expected outputs; its format is `mica-boards`' to
   define, and it defined it in `ce44907`: `mica-boards:boards/boards.tsv`
   (`# mica-boards boards v1`, rows `<board> <arch> <boot backend>`) and
-  `mica-boards:boards/<board>/outputs.tsv` (`# mica-boards board outputs v1`,
-  rows `package <package>` and `bundle <path>`), staged into each board's
-  bundle as `usr/lib/mica/board/<board>/outputs.tsv`. A consumer reads the
-  board list from `boards/boards.tsv` and a board's expected outputs from its
-  bundle (`docs/boards/contract.md` section 3).
+  `mica-boards:boards/<board>/outputs.tsv` (`# mica-boards board outputs v1`);
+  with the component artifacts its rows become `package <name>` and
+  `file <component> <path>` (assembled paths, such as `firmware/<file>`), and
+  it travels in the `board` component. A consumer reads the board list from
+  `boards/boards.tsv` and a board's expected outputs from its `board`
+  component (`docs/boards/contract.md` section 3).
 
 Scoped releases are allowed for `mica-boards` and `mica-build` only
 (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); the release-lock
@@ -41,6 +54,8 @@ checker refuses a scoped release of any other repository.
 
 - `mica-boards` releases covering every board at once
   (`20260914-1603` was one) and its `pool.<arch>.<YYYYMMDD-HHMM>` tags.
+- The single board bundle `board.<board>.<YYYYMMDD-HHMM>`, the four-column
+  `board` row and the `mica-kernel-<board>` packages.
 
 ## Rationale
 

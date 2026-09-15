@@ -23,7 +23,7 @@ class Refused(Exception):
     pass
 
 
-KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 4, "upstream": 7, "apt": 5}
+KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5}
 KIND_ORDER = list(KIND_COLUMNS)
 BASE_ONLY = {"upstream", "apt"}
 REPOSITORY = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -31,6 +31,7 @@ RELEASE = re.compile(r"^[0-9]{8}-[0-9]{4}$")
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SCOPED = {"mica-boards", "mica-build"}
+COMPONENT = {"board", "kernel", "uboot", "firmware"}
 SCOPE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 ARCH = {"amd64", "arm64"}
 PLATFORM = {"index", "amd64", "arm64", "386"}
@@ -132,11 +133,11 @@ def check_lock(path):
             field(NAME.match(row[1]) and row[2] in ARCH and VERSION.match(row[3]) and SHA256.match(row[4]))
             key = (row[1], row[2])
         elif kind == "board":
-            field(NAME.match(row[1]) and row[2] in ARCH)
-            reference(row[3])
-            if board_scope and row[1] != board_scope:
+            field(NAME.match(row[1]) and row[2] in COMPONENT and row[3] in ARCH)
+            tag = reference(row[4])
+            if board_scope and (row[1] != board_scope or not tag.startswith(row[2] + "." + row[1] + ".")):
                 raise Refused("scope-content")
-            key = (row[1],)
+            key = (row[1], row[2])
         elif kind == "upstream":
             roots = row[6].split(",")
             field(NAME.match(row[1]) and row[2] in ARCH and VERSION.match(row[3]) and SHA256.match(row[4])
