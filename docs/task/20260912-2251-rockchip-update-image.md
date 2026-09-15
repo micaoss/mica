@@ -44,3 +44,8 @@ Planning the Rockchip update.img artifact for CX3576.
   and 20260911-2003-split-package-repositories (build/ ownership).
 
 - unclaim: plan awaits approval; execution deferred by the user
+- 2026-09-15 (user): stays deferred, not resumed. M1-M4 map onto the split of
+  `docs/decisions/2026-09-15-board-image-kinds.md`: boards deliver the loader
+  and `idblock.img` in the `uboot` component and layout v4 in `board.env`;
+  `mica-build` implements the `rockchip-update` packer and verification. M0
+  bench measurement is still the blocker.

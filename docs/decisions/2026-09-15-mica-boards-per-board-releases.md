@@ -21,6 +21,10 @@
   `pool.<board>.<arch>.<YYYYMMDD-HHMM>`, all in `ghcr.io/micaoss/mica-boards`.
   A release reuses an unchanged component by digest: the same manifest bytes
   under the new tag, never a re-pointed tag.
+- Board-specific flashing formats: the `uboot` component carries the
+  board-level pieces, `outputs.tsv` lists them, and `board.env`
+  `IMAGE_KINDS` declares the image kinds the assembly packs
+  (`docs/decisions/2026-09-15-board-image-kinds.md`).
 - The `mica-kernel-<board>` packages are retired: the pools hold
   `mica-board-<board>`, the radio packages and s905x5m's component packages,
   and the assembly takes the kernel files from the `kernel` artifact.

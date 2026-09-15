@@ -27,7 +27,9 @@ rebuilt or republished (user: "比如我只编译x64 就可以只发布x64，不
 downloadable GitHub Release assets (user: "需要额外放镜像文件，不然无法下载"):
 
 - per product in the scope: the compressed factory image, the update archive
-  and, for a FIT board, the vendor flashing format;
+  and the whole-disk flashing format of each image kind its board declares
+  (`disk` today; `rockchip-update` and `amlogic-burn` reserved,
+  `docs/decisions/2026-09-15-board-image-kinds.md`);
 - `mica-build.lock` and `SHA256SUMS`, which lists only the lock.
 
 The OCI artifacts `image.<product>.<release>` and

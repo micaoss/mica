@@ -243,3 +243,12 @@ run stays marked not run.
   not required.
 - Open: path to the vendor factory update.img
   (`rk3576_linux6.1_20260727.171210.img`) and bench availability for M0.
+- 2026-09-15 (user): this plan stays deferred and is not resumed. Its
+  milestones map onto the board/assembly split of
+  `docs/decisions/2026-09-15-board-image-kinds.md`: `mica-boards` owns M1
+  (the Mica OS loader and `idblock.img` in the cx3576 `uboot` component,
+  listed in `outputs.tsv`) and the M2 layout v4 facts in `board.env`;
+  `mica-build` owns the M3 `rockchip-update` packer and the M4 verification,
+  behind the reserved `rockchip-update` image kind, which it refuses until
+  implemented. M0, the bench measurement, is still the blocker. No Amlogic
+  whole-disk burn plan exists.

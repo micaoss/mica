@@ -103,7 +103,9 @@ by it, and no second reading of it exists (`BOARD_RADIOS`,
 refuses them). `BOARD_HWINIT_CONFS` selects the board's hardware
 initialisation units. There is no family key: a board carries its own
 kernel and loader builds (`mica-boards:boards/README.md`); `IMAGE_KINDS` the image kinds
-the assembly may produce (`disk`, `rockchip-update`); `BOARD_PACKAGE_ENABLEMENT`
+the assembly may produce (`disk`; `rockchip-update` and `amlogic-burn` are
+reserved and refused until `mica-build` implements them,
+`docs/decisions/2026-09-15-board-image-kinds.md`); `BOARD_PACKAGE_ENABLEMENT`
 how many units the board package enables, which the package gate holds.
 
 ## The authenticated boot

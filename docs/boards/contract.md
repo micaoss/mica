@@ -58,7 +58,14 @@ producer is that package's.
 what the hardware has, from the vocabulary `wifi bluetooth display status-led
 can usb-gadget audio containers`; a product selects from it and the resolver
 refuses a feature the board does not declare. `IMAGE_KINDS` names the image
-kinds the assembly may produce for the board (`disk`, `rockchip-update`).
+kinds the assembly may produce for the board: `disk` (the raw whole-disk
+image, implemented), and the reserved `rockchip-update` and `amlogic-burn`,
+which the assembly refuses until it implements them. A board may declare an
+image kind only when `mica-build` implements a packer for it, and only with
+its board-level pieces (such as a Rockchip loader and `idblock.img`, or an
+Amlogic burn package and its packer tool) delivered in its `uboot` component
+and listed in `outputs.tsv`
+(`docs/decisions/2026-09-15-board-image-kinds.md`).
 Independent BSP or demo artifacts remain inside the BSP and are not image
 inputs unless a component producer names them.
 
@@ -87,7 +94,7 @@ unscoped release was `20260914-1603`). Each component is the OCI artifact
 | Component | `artifactType` | Content |
 |---|---|---|
 | `kernel` | `application/vnd.mica.board.kernel` | UEFI boards: `kernel/`; FIT boards: `kernel/dev/` and `kernel/prod/` with the DTB |
-| `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the host tools, kept x86-64 (`uboot-package/` on s905x5m) |
+| `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the host tools, kept x86-64 (`uboot-package/` on s905x5m), and the board-level pieces of the flashing formats its `IMAGE_KINDS` declares |
 | `firmware` | `application/vnd.mica.board.firmware` | `firmware.tar` and `component-copyright`, when the board carries firmware |
 | `board` | `application/vnd.mica.board` | `board.env`, `manifests/`, `outputs.tsv`, the trust certificate and `evidence.json` |
 

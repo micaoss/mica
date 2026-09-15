@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-15 06:20 [decision]
+
+Board image kinds (user): a board-specific whole-disk flashing format is
+split between the repositories. The board repository delivers the board-level
+pieces (a Rockchip loader and `idblock.img`, an Amlogic burn package and its
+packer tool, kept x86-64) in its `uboot` component, lists them in
+`outputs.tsv` and declares `IMAGE_KINDS` in `board.env`; `mica-build` builds
+each product's flashing format by image kind and publishes it as a release
+asset and OCI artifact. Only `disk` is implemented; `rockchip-update` and
+`amlogic-burn` are reserved and refused until implemented, and a board may
+declare a kind only once its packer exists. The Rockchip `update.img` plan
+`20260912-2253` stays deferred, its M1-M4 mapped onto this split, M0 still
+blocking; there is no Amlogic burn plan.
+`docs/decisions/2026-09-15-board-image-kinds.md`, `docs/boards/contract.md`,
+`docs/boards/board-env.md`, the per-board and `mica-build` release decisions.
+
 ## 2026-09-15 05:49 [decision]
 
 A `mica-boards` lock must name the `board` and `kernel` components (`uboot` and
