@@ -93,6 +93,22 @@ The user accepted these rules on 2026-09-15 ("全部按建议处理"):
 - **R8 `make offline`** builds with the declared versions; with no release
   to compare against, it only warns about the inputs guard.
 
+## Clarifications
+
+Confirmed by the coordinator on 2026-09-15 for all four repositories:
+
+- **D1 First release under the rules.** The previous-release comparison of
+  R5 (reuse, the inputs guard, the lower-version refusal) applies only to a
+  previous release made under these rules, whose pool layers carry
+  `mica.inputs`. The first release under the rules has none, so it builds
+  and publishes everything, even though the new declared versions sort below
+  the old `+git` or date-stamped ones. No Debian epoch (`1:`) is added:
+  devices never upgrade these packages in place with apt, and roots are
+  composed and pinned by sha256.
+- **R3 and upstream commits.** Copyright texts may cite upstream commits
+  pinned in `locks/upstream.lock`, which are release-independent; R3 forbids
+  only the publishing repository's own commit.
+
 ## Order
 
 This record and the release-lock change (R6) land first. The four

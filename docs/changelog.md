@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-15 10:33 [decision]
+
+Package-version rules clarified: the R5 comparison with the previous release
+applies only to a release made under the rules (pool layers with
+`mica.inputs`), so each repository's first release under them builds
+everything even though its declared versions sort below the old `+git` or
+date-stamped ones, with no Debian epoch; and copyright texts may keep citing
+upstream commits pinned in `locks/upstream.lock`.
+`docs/decisions/2026-09-15-package-versions.md`.
+
 ## 2026-09-15 10:31 [decision]
 
 The unified package-version rules are resolved (user, "全部按建议处理") and
