@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 11:08 [progress]
+
+`mica-system-base` `20260915-1102` at `3ae160d` is the first release with
+version-locked packages (trust hash
+`2e3ab8029c2b0c2896c2e99bcaf88a7c955e23f57880444d8df7e11eddb0d5a2`):
+`mica-busybox` `1.38.0-mica1`, `mica-ca-trust` `20250419-mica1`,
+`mica-system` `1.0.0-1` and `mica-systemd-boot` `257.13-mica1`, with no
+`Mica-Source-Commit`, pool manifests carrying only `mica.arch` and
+`mica.source-repo`, and layers carrying `mica.inputs`. It built everything,
+because `20260915-0209` predates version-locked packages (D1); the upstream
+rows are unchanged. `mica-build` pins it after its package-version adaptation,
+and `mica-podman` may move to it in its own.
+
 ## 2026-09-15 10:59 [decision]
 
 `system_info`'s `daemon` member loses `commit`, and `daemon.version` and

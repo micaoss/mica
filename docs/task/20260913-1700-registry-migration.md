@@ -173,6 +173,6 @@ and the artifacts already published for them stay.
 
 2026-09-15: the `mica-system-base` commit `c1b9441` cited here is pre-reset
 history (its history is squashed into the root `4d63430`, user); the current
-Base is `20260915-0209` at `4d63430`, whose release carries only
+Base is `20260915-1102` at `3ae160d`, whose release carries only
 `mica-system-base.lock` and `SHA256SUMS`
 (`docs/task/20260914-2042-release-lock-offline-build.md`).

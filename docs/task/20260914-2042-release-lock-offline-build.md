@@ -381,3 +381,27 @@ Moving the repositories to the release lock format
     `MICA-development-boot`); `MICA_UPDATES_PUBLIC_KEY` unchanged; the three
     release key secrets rewritten.
   - CI and the eight product builds are running; the scoped releases follow.
+- 2026-09-15: `mica-system-base` `20260915-1102` at `3ae160d` is released, the
+  first release with version-locked packages
+  (`docs/decisions/2026-09-15-package-versions.md`, R0-R8).
+  - Commit `3ae160dbca36afd50dd4ab38f007f8c7ff199d65`; ci run 34960768597 and
+    release run 34961099912 green; verified anonymously.
+  - `SHA256SUMS` sha256
+    `2e3ab8029c2b0c2896c2e99bcaf88a7c955e23f57880444d8df7e11eddb0d5a2`;
+    `mica-system-base.lock` sha256
+    `759a4a7c23231d508ee4ccc89aa84a785021b8d8b9eaa00b0468b9d0b834b2c5`.
+  - `rootfs.20260915-1102@sha256:547a8e04783c0dd238f672aeccff0e76bd5a8b342fbd2b6cb7100d25740b7fcd`;
+    `pool.amd64.20260915-1102@sha256:1ab6a2e381b6e92e93e1d693e74a39134f8cc882601ba83e1c061eb811c63a83`
+    and
+    `pool.arm64.20260915-1102@sha256:b88a8c1bc03c7f9989b6b7fc37be6b1fd9e49a928513020ca533d9c07c9b1c65`;
+    the pool manifests carry only `mica.arch` and `mica.source-repo`, and
+    their layers the title and `mica.inputs`.
+  - Packages: `mica-busybox` `1.38.0-mica1`, `mica-ca-trust`
+    `20250419-mica1` (all), `mica-system` `1.0.0-1` (all),
+    `mica-systemd-boot` `257.13-mica1`; no `Mica-Source-Commit`. The upstream
+    rows are unchanged from `20260915-0209` (snapshot `20260905T000000Z`).
+  - As the first release under the rules it built everything: the previous
+    release `20260915-0209` predates version-locked packages, so the R5
+    comparison did not apply (D1).
+  - `mica-build` pins it only after its package-version adaptation;
+    `mica-podman` may move its Base lock to it in its package-version change.

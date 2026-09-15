@@ -182,7 +182,7 @@ signed loader) stay in place. Nothing is published from a workstation.
 - 2026-09-15: the `mica-system-base` releases cited here are deleted with
   their tags and its history is squashed into one root commit (`4d63430`,
   user), so its commits cited here are pre-reset history and the three Base
-  files are gone; the current Base is `20260915-0209` at `4d63430`, whose
+  files are gone; the current Base is `20260915-1102` at `3ae160d`, whose
   release carries only `mica-system-base.lock` and `SHA256SUMS`
   (`docs/task/20260914-2042-release-lock-offline-build.md`).
 - 2026-09-15: the `mica-core` releases `20260914-0529` and `20260914-1212`
@@ -195,7 +195,7 @@ signed loader) stay in place. Nothing is published from a workstation.
   longer resolve (`mica-build-env` `20260914-0128`, `mica-core`
   `20260914-0529` and `20260914-1212`, `mica-system-base` `20260914-0654`,
   `mica-podman` `20260914-0158`). The releases to pin are `mica-build-env`
-  `20260915-0138`, `mica-system-base` `20260915-0209`, `mica-core`
+  `20260915-0138`, `mica-system-base` `20260915-1102`, `mica-core`
   `20260915-0728` and `mica-podman` `20260915-0245`, all in the `mica-lock v1`
   format (`docs/task/20260914-2042-release-lock-offline-build.md`);
   `mica-build` moves to them in stage 4.

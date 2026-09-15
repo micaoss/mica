@@ -132,7 +132,7 @@ per-board release: `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
 `mica-system-base` does the same:
 `pool.<arch>.<YYYYMMDD-HHMM>` and the multi-architecture root
 `ghcr.io/micaoss/mica-system-base:rootfs.<YYYYMMDD-HHMM>`, and a Base
-release (the current one `20260915-0209`) carries `mica-system-base.lock` with those
+release (the current one `20260915-1102`) carries `mica-system-base.lock` with those
 references by digest and its `SHA256SUMS`: a consumer verifies the lock and
 commits it unchanged as `locks/mica-system-base.lock` with its pin
 `locks/pins/mica-system-base.pin` (`docs/design/release-lock.md` sections 3

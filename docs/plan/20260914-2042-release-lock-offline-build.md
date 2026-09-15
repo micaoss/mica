@@ -249,3 +249,8 @@ owner, dispatched by the coordinator.
   `60a93a48` switched the development certificates to
   `MICA-development-<domain>`. CI and the eight product builds are running;
   the scoped releases follow.
+- 2026-09-15: `mica-system-base` `20260915-1102` (`3ae160d`, `SHA256SUMS`
+  sha256 `2e3ab8029c2b0c2896c2e99bcaf88a7c955e23f57880444d8df7e11eddb0d5a2`)
+  is the first release with version-locked packages; it built everything,
+  since `20260915-0209` predates them (D1). Consumers move to it after their
+  package-version adaptation.

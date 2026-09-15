@@ -67,9 +67,9 @@ Later releases:
 On 2026-09-15, on the user's instruction, every release above and its tag was
 deleted, and `mica-system-base` was reset to one root commit (now `4d63430`);
 the targets above are pre-reset history. Since `20260915-0059` (deleted too;
-the Base to pin is `20260915-0209`) the policy is published in the one
+the current Base is `20260915-1102`) the policy is published in the one
 release lock (`docs/design/release-lock.md` section 3): the pinned packages
-are its `upstream` rows with their roots (42 rows in `20260915-0209`), and
+are its `upstream` rows with their roots (42 rows in `20260915-0209` and, unchanged, in `20260915-1102`), and
 the Debian archive is its `apt` row.
 
 This supersedes the answer recorded earlier on 2026-09-14 to question Q2 of
