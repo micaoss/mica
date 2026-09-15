@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 10:18 [decision]
+
+The `mica-boards` package-reuse design is accepted (implementation in
+progress, not released): `tools/deb/package-inputs.sh` hashes each producer,
+the hash is the pool layer annotation `mica.inputs=<sha256>`, and a board
+release reuses an unchanged producer's archives from its previous
+`<board>/*` release only after rebuilding them with the recorded identity and
+proving byte-identical bytes; unchanged pools are re-tagged at the same
+digest, and the first release after it lands rebuilds everything once.
+`docs/design/release-lock.md` section 2 (lock rows unchanged),
+`docs/decisions/2026-09-15-package-reuse-by-inputs.md`.
+
 ## 2026-09-15 10:15 [decision]
 
 Packages are reused by inputs across releases, first in `mica-boards` (user):

@@ -228,8 +228,11 @@ package of the repository that publishes them.
   `mica-boards`): one OCI image manifest per architecture,
   `artifactType` `application/vnd.mica.pool`, an empty config, one layer per
   archive with `mediaType` `application/vnd.mica.deb` and
-  `org.opencontainers.image.title` the archive's file name with its real `+`.
-  An `all` archive is a layer of both pools. Manifest annotations:
+  `org.opencontainers.image.title` the archive's file name with its real `+`,
+  and optionally `mica.inputs=<sha256>`, the inputs hash of the producer that
+  built the archive (every package of one producer shares it;
+  `docs/decisions/2026-09-15-package-reuse-by-inputs.md`). The lock rows do
+  not change. An `all` archive is a layer of both pools. Manifest annotations:
   `org.opencontainers.image.revision`, `.created` (the commit time), `.source`,
   `.version`, `mica.source-repo`, `mica.source-commit`, `mica.arch`.
 - **Board components** `<component>.<board>.<release>` (`mica-boards`): a
