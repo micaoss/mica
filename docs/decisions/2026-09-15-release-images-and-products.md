@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner; the mica-boards owner for release targets
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); implemented on `mica-build` `main` `669b607` (the prod products, and every image kind gzip-compressed twice, compared and verified against the raw image; `release-test` 23/23), not released yet; the form of the OCI image layer confirmed by the user ("a": the layer is the `.gz` asset), so the next scoped releases wait only for the `mica-boards` kernel rebuild release and `mica-build`'s re-pin
+- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); the form of the OCI image layer confirmed by the user ("a": the layer is the `.gz` asset); released: the compressed `.img.gz` images and the prod products `x64-prod` and `cx3576-prod` in `mica-build` `x64/20260915-2042` and `cx3576/20260915-2042` (`a1f13280`)
 
 ## Decision
 

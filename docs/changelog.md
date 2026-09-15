@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 20:58 [progress]
+
+The second `mica-build` scoped releases, `x64/20260915-2042` and
+`cx3576/20260915-2042` at `a1f13280`, are published and verified anonymously
+on boards `<board>/20260915-1926`, core `20260915-1135`, Base `20260915-1102`,
+podman `20260915-1057` and build-env `20260915-0138`. They carry the dev and
+prod products, every disk image as a verified `.img.gz` (about 83 MB and 86
+MB) and no raw image. They also carry the first `kernel` update archives:
+`x64-dev` and `cx3576-dev` moved to generation 3 with unchanged rootfs
+identities and new kernels, so each publishes `full` plus a 16 MB `kernel`
+archive, while the new prod products publish `full` only. No `root` archive
+is published where the kernel changed.
+
 ## 2026-09-15 20:43 [progress]
 
 `mica-build` `a1f13280` (ci run 35019880080 green) pins `mica-boards`

@@ -815,3 +815,33 @@ Moving the repositories to the release lock format
   - The published `mica-build` releases `x64/20260915-1458` and
     `cx3576/20260915-1515` recorded boards `1128` as inputs; those inputs are
     no longer downloadable, while their own assets and bundles are unaffected.
+- 2026-09-15: the second `mica-build` scoped releases `x64/20260915-2042` and
+  `cx3576/20260915-2042` (dev and prod) are published and verified
+  anonymously; the first `kernel` update archives exist.
+  - Target `a1f132803c3a7944b6b9696d2fddc30219d6d924`; inputs boards
+    `<board>/20260915-1926`, core `20260915-1135`, Base `20260915-1102`,
+    podman `20260915-1057`, build-env `20260915-0138`.
+  - Runs: `x64` 35021224958 (plan 14s, `x64-dev` 5m57s, `x64-prod` 5m49s,
+    publish 35s); `cx3576` 35021226920 (plan 17s, `cx3576-dev` 10m39s,
+    `cx3576-prod` 11m22s, publish 36s).
+  - `SHA256SUMS` sha256: `x64/20260915-2042`
+    `f9d5102ae4b028e271e9984f1fa1a27e4a797c6389427e6e75103c49576fca8c` (lock
+    `eccf998f...`); `cx3576/20260915-2042`
+    `d55d83db27b1f113618faaf50ca8efb7f9e7e915578e676ba84f23f395ffc620` (lock
+    `a4713f72...`).
+  - Update kinds: `x64-dev` generation 3, `full` and `kernel` (rootfs
+    `02a3045d...` unchanged from `1458`, kernel `6e7ccf8b...` to
+    `2056c015...`; the reproducibility guard passed); `cx3576-dev`
+    generation 3, `full` and `kernel` (rootfs `8432f50d...` unchanged from
+    `1515`, kernel `6f8f9898...` to `620f60e6...`); `x64-prod` and
+    `cx3576-prod` generation 2, `full` only (their first release; their
+    rootfs differs from dev by `PROFILE=prod` in `product.conf`). There is no
+    `root` archive where the kernel changed, since it could apply to no
+    device, so it is absent from the assets, the lock rows and the update
+    bundle.
+  - Assets: `.img.gz` (`x64` about 82.9 MB from 1881145344 bytes; `cx3576`
+    about 86.5 MB from 1362100224), `full` `.micaupd` (about 81.4 MB on
+    `x64`, 85.0 MB on `cx3576`) and `kernel` `.micaupd` (16130564 bytes
+    `x64-dev`, 16111762 `cx3576-dev`); no raw `.img`. Gzip took 24 to 40 s
+    per image, and every `.img.gz` decompresses to its layer's
+    `mica.uncompressed-size` and `mica.uncompressed-sha256`.

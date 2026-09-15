@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); implemented; the first scoped release is `x64/20260915-1458` at `9fe2d18`, published and verified anonymously; the `mica-build.lock` rows are specified in `docs/design/release-lock.md` 1.2.2 (accepted with `docs/decisions/2026-09-15-update-packages.md`)
+- **status**: accepted (user, 2026-09-15); implemented; the first scoped releases are `x64/20260915-1458` and `cx3576/20260915-1515` (`9fe2d18`), the second `x64/20260915-2042` and `cx3576/20260915-2042` (`a1f13280`, dev and prod products, gzip images, the first `kernel` archives), all published and verified anonymously; the `mica-build.lock` rows are specified in `docs/design/release-lock.md` 1.2.2 (accepted with `docs/decisions/2026-09-15-update-packages.md`)
 
 ## Decision
 

@@ -36,7 +36,7 @@ the new format.
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
 | 3 | `mica-podman` (done: `20260915-0245`), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
-| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (both release-target boards released: `x64/20260915-1458` and `cx3576/20260915-1515`; K1 and K2 of the stable identities next) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
+| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (second scoped releases `x64/20260915-2042` and `cx3576/20260915-2042` with dev and prod products and the first `kernel` archives; first `x64/20260915-1458`, `cx3576/20260915-1515`) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
 the new format before `mica-build` switches.
@@ -399,3 +399,9 @@ owner, dispatched by the coordinator.
   deleted; ghcr holds exactly the 16 digests of the `1926` locks. The inputs
   that `x64/20260915-1458` and `cx3576/20260915-1515` recorded from `1128` are
   no longer downloadable.
+- 2026-09-15: the second `mica-build` scoped releases `x64/20260915-2042` and
+  `cx3576/20260915-2042` (`a1f13280`) carry the dev and prod products,
+  `.img.gz` images and the first `kernel` update archives (`x64-dev` and
+  `cx3576-dev`, whose rootfs identities were unchanged), on boards
+  `<board>/20260915-1926`, core `20260915-1135`, Base `20260915-1102`, podman
+  `20260915-1057` and build-env `20260915-0138`.
