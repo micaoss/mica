@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-15 10:59 [decision]
+
+`system_info`'s `daemon` member loses `commit`, and `daemon.version` and
+`micad --version` show the declared package version (such as `0.1.0-1`):
+`mica-core` removes `MICA_BUILD_COMMIT` under the package-version rules (R3).
+Decided, landing with `mica-core`'s package-version release.
+`docs/design/diagnostics.md`.
+
 ## 2026-09-15 10:57 [decision]
 
 Stable root and kernel component identities (user, "接受"). `mica-build`

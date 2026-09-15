@@ -67,7 +67,7 @@ is an object with `available`; the present shape is:
 | `kernel` | `release`, `version` | `/proc/sys/kernel/osrelease`, `/proc/sys/kernel/version` (what `uname -r` / `uname -v` print) |
 | `release` | `name`, `id`, `version`, `versionId`, `prettyName`, `buildId`, `imageId`, `imageVersion` (each only when the file carries it) | `/etc/os-release` |
 | `system` | `version`, `package`, `fileEpoch` | the manifest row of `mica-system`, else of `micad`; the manifest file's mtime |
-| `daemon` | `name`, `version`, `commit` (null when the build supplied none) | what `micad --version` prints, from the same embedded values |
+| `daemon` | `name`, `version` (the package version, such as `0.1.0-1`) | what `micad --version` prints, from the declared package version compiled in |
 | `packages` | `count`, `micaCount`, `malformedRows`, `truncated`, `entries[]` of `name`, `version`, `architecture`, `mica` | `/usr/share/mica/manifest.tsv` |
 | `deployment` | `id`, `version`, `generation`, `kernelId`, `kernelRelease`, `rootfsId`, `confirmed`, `contentVerified`, `secureBoot`, `backend`, `bootVerified` | Authenticated native boot receipt and deployment state |
 | `trust` | `grade` (`development`/`production`), and on a development image `developmentDomains` and `marker` | `/usr/share/mica/meta/`: the baked update configuration, and the `GENERATED` marker beside it |
@@ -89,6 +89,12 @@ There is no `system.gitStamp` and no `system.commitDate` (decided 2026-09-15,
 the root keeps its rootfs identity. The release identity of the running
 image is the `deployment` member (`version`, `generation`), read from the
 authenticated boot receipt.
+
+`daemon` has no `commit` either (decided 2026-09-15, landing with the same
+`mica-core` package-version release): `mica-core` removes `MICA_BUILD_COMMIT`
+(`docs/decisions/2026-09-15-package-versions.md` R3), so `daemon.version` and
+`micad --version` show the declared package version, such as `0.1.0-1`, and
+no commit is compiled into the binary.
 
 `system.fileEpoch` is the manifest file's mtime: the `SOURCE_DATE_EPOCH` that
 `rootfs/scripts/pack-squashfs.sh` pins every file time in the root to. It is
