@@ -1,5 +1,8 @@
 # Update and rollback
 
+Which archive applies to a device, and how to pick it from a release or the
+version index, is [update packages](update-packages.md).
+
 An Mica OS deployment selects an independently signed kernel/support component and
 an independently signed root filesystem. A release can change the root, the
 kernel, or both. The device stages verified objects while the current system

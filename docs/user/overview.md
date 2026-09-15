@@ -9,8 +9,9 @@ them, and where the files are.
 
 The system map is [architecture.md](../architecture.md), a new board is
 brought up with [porting](../boards/porting.md), and a maintainer cuts a
-release with [releasing](releasing.md). The build, flashing and update guides
-are linked here as they land.
+release with [releasing](releasing.md), and updates are chosen with
+[update packages](update-packages.md). The build and flashing guides are
+linked here as they land.
 
 ## 1. The seven repositories
 

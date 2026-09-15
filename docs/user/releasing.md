@@ -64,7 +64,7 @@ Packages are locked by their own declared version
 `mica-boards` reuses a `kernel` or `uboot` component whose inputs equal the
 board's latest release, in CI and at release, and `mica-build` publishes a
 `root` or `kernel` update archive only when the other component's identity is
-unchanged (`docs/decisions/2026-09-15-update-packages.md`).
+unchanged ([update packages](update-packages.md)).
 
 > status: shipped — evidence: `docs/decisions/2026-09-15-package-versions.md`, `docs/decisions/2026-09-15-board-kernel-builds.md`, `docs/decisions/2026-09-15-update-packages.md`
 

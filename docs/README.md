@@ -14,7 +14,7 @@ board status is in [support tiers](boards/support-tiers.md#current-boards).
 |---|---|
 | Understand the whole system quickly | [Overview](user/overview.md) |
 | Build and boot a device | [Quickstart](user/quickstart.md), [build guide](design/build.md), [installation](user/install.md) |
-| Understand upgrade and rollback | [Operator guide](user/update-rollback.md), [deployment lifecycle](design/updates.md), [trust](design/release-signing.md) |
+| Understand upgrade and rollback | [Operator guide](user/update-rollback.md), [update packages](user/update-packages.md), [deployment lifecycle](design/updates.md), [trust](design/release-signing.md) |
 | Understand disk layout and recovery | [Storage](design/storage.md), [immutable root](design/ro-root.md), [reset/recovery](design/recovery.md) |
 | Develop the API or UI | [API contract](design/api.md), [dashboard](design/dashboard.md), OpenAPI (`mica-core:apid/openapi.json`) |
 | Integrate an application | [Native applications](design/native-applications.md), [containers](design/containers.md), [bus](design/bus.md) |
@@ -134,6 +134,7 @@ work in progress lives in `plan/` and `task/`.
   - `release-notes.md` — how releases are identified and where release facts come from
   - `api.md` — the programmatic surface and its machine-readable contract
   - `support.md` — support tiers, lifecycle ownership, and what a support case needs
+  - `update-packages.md` — which update archive applies to a device, how it is taken, and how to pick it from the index
   - `releasing.md` — for maintainers: how a release is cut in each repository, what it carries, and what decides a rebuild
 - `website/` — micaos.dev content briefs, one per page
   - `contract.md` — the website content contract: page set, tone, claims policy
