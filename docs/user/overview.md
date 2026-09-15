@@ -7,12 +7,12 @@ A device runs one *product*: a board plus a profile plus the features that
 product selects. This page names the pieces, how a release is built from
 them, and where the files are.
 
-The system map is [architecture.md](../architecture.md), a new board is
-brought up with [porting](../boards/porting.md), and a maintainer cuts a
-release with [releasing](releasing.md), and updates are chosen with
-[update packages](update-packages.md), and a system is built from source with
-[build](build.md). The flashing guide is linked here as it lands; a new board
-is brought up with [porting](../boards/porting.md).
+The system map is [architecture.md](../architecture.md). A system is built
+from source with [build](build.md), an image reaches a board through
+[flashing](flashing.md), updates are chosen with
+[update packages](update-packages.md), a maintainer cuts a release with
+[releasing](releasing.md), and a new board is brought up with
+[porting](../boards/porting.md).
 
 ## 1. The seven repositories
 

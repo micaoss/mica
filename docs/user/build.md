@@ -55,6 +55,8 @@ make product-verify PRODUCT=x64-dev
 - Outputs land under `mica-build:_out/products/<name>/` (and the fetched
   board trees under `_out/boards/<board>/`). A product whose receipt is
   unchanged is not rebuilt.
+- Writing the image the build produced to a board is
+  [flashing](flashing.md).
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`
 
