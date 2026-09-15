@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-15 17:55 [progress]
+
+Plan `20260912-2043-unify-board-behavior` section 3 (zstd delivery) is marked
+superseded by `docs/decisions/2026-09-15-release-images-and-products.md`: the
+disk image is published as `.img.gz`, and update archives stay uncompressed
+`.micaupd`.
+
 ## 2026-09-15 17:54 [decision]
 
 User correction to the compressed images: a `mica-build` GitHub Release

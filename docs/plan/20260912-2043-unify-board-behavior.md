@@ -80,6 +80,11 @@ runtime memory savings from smaller files.
 
 ### 3. Make zstd delivery a common build result
 
+> Superseded (2026-09-15) by `docs/decisions/2026-09-15-release-images-and-products.md`:
+> a release publishes the disk image as a deterministic `.img.gz`, and update
+> archives stay uncompressed `.micaupd`; there is no `.img.zst` or
+> `.micaupd.zst` delivery.
+
 Move the already demonstrated wrapping operation into the existing release
 entry. Produce `.img.zst` and `.micaupd.zst` for every board, plus a compressed
 recovery image where the board requires one. Keep raw artifacts as composition
