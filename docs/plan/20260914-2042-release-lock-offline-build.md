@@ -267,3 +267,15 @@ owner, dispatched by the coordinator.
   digest from `<board>/20260915-0945`. `mica-build` pins them with
   `mica-podman` `20260915-1057` and `mica-system-base` `20260915-1102` before
   its first scoped release.
+- 2026-09-15 (user, "可以"): the releases from before the package-version
+  rules are cleaned up once `mica-build` no longer pins them, by the
+  coordinator with `gh`, verified anonymously afterwards; nothing is re-tagged
+  or re-cut meanwhile.
+  - After `mica-build` pins `mica-system-base` `20260915-1102`, `mica-podman`
+    `20260915-1057` and `mica-boards` `<board>/20260915-1128`: delete
+    `mica-system-base` `20260915-0209`, `mica-podman` `20260915-0245` and
+    `mica-boards` `<board>/20260915-0945` (releases and tags), and prune each
+    ghcr package to exactly the digests its current locks reference.
+  - After `mica-core`'s first release under the rules and `mica-build`'s pin
+    of it: delete `mica-core` `20260915-0235` and `20260915-0728` the same
+    way.

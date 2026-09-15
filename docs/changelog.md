@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 11:39 [decision]
+
+The releases from before the package-version rules are cleaned up once
+`mica-build` no longer pins them (user): after it pins `mica-system-base`
+`20260915-1102`, `mica-podman` `20260915-1057` and `mica-boards`
+`<board>/20260915-1128`, the coordinator deletes `mica-system-base`
+`20260915-0209`, `mica-podman` `20260915-0245` and `mica-boards`
+`<board>/20260915-0945` and prunes each ghcr package to its current locks;
+`mica-core` `20260915-0235` and `20260915-0728` follow after `mica-core`'s
+first release under the rules is pinned. Plan and task
+`20260914-2042-release-lock-offline-build`.
+
 ## 2026-09-15 11:38 [progress]
 
 The `mica-boards` `<board>/20260915-0824` releases were deleted on user
