@@ -332,3 +332,11 @@ owner, dispatched by the coordinator.
   zstd; the raw image is still built and verified, and its record is
   proposed by `mica-build`); `x64-prod` and `cx3576-prod` are added with
   development keys on the development channel.
+- 2026-09-15 (user, "删除这个构建"): the minimal products are removed
+  entirely (`docs/decisions/2026-09-15-no-minimal-products.md`). The products
+  become `<board>-dev` for all four boards plus `x64-prod` and `cx3576-prod`;
+  CI's release-product jobs run the prod product of each release-target
+  board; the featureless floor stays as a cheap composition test. The
+  published `x64/20260915-1458` and `cx3576/20260915-1515` keep their minimal
+  assets as history; the next scoped releases carry dev and prod only.
+  `mica-build` removes them in the prod-products round, after K1 and K2.

@@ -103,8 +103,11 @@ first, `x64/20260915-1458`, carries `mica-x64-dev-20260915-1458.img` and
 (`docs/decisions/2026-09-15-release-images-and-products.md`) later releases
 publish the disk image as a deterministic `.img.gz` (never the raw `.img`),
 verified by decompressing it and comparing it with the raw signed image,
-which is still built, gated and verified; the products include `x64-prod` and `cx3576-prod`, and `s905x5m`
-is not a release target.
+which is still built, gated and verified; the products are `<board>-dev` plus `x64-prod` and `cx3576-prod`,
+with no minimal products (the minimal assets of `x64/20260915-1458` and
+`cx3576/20260915-1515` stay as history,
+`docs/decisions/2026-09-15-no-minimal-products.md`), and `s905x5m` is not a
+release target.
 The output directory must not exist. A failed assembly must not be published.
 
 The current `GENERATED` marker has exactly one declaration:

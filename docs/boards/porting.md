@@ -166,10 +166,9 @@ publish`) that the assembly pins.
 Use the exact three-partition layout from `board.env`; there is no old-layout
 reader, frozen historical geometry or in-place migration requirement.
 
-In the assembly, `make board-add BOARD=<name>` pins the board's bundle
-artifact (`deps/boards/<name>.json`, the newest `mica-boards:board.<name>.<YYYYMMDD-HHMM>` on
-the registry; older pins may still name the historical immutable
-`mica-board:<name>.build-<commit12>`) and its packages, and writes `products/<name>-minimal/`; `make product PRODUCT=<name>-minimal` composes
+In the assembly, the board enters as an input, `locks/mica-boards.<name>.lock`
+with its pin (`docs/design/release-lock.md` section 4), and as the product
+`products/<name>-dev/`; `make product PRODUCT=<name>-dev` composes
 the root, signs the root, kernel and firmware, two deployment records, the
 image and the update archive, and `make product-verify` verifies the image.
 No source in the assembly changes for a new board: the engine dispatches on
@@ -182,7 +181,7 @@ space; DATA is last and is the only partition grown after assembly;
 firmware and SYSTEM ranges/identities must remain unchanged.
 
 **Exit criteria.** `make product` and `make product-verify` pass for the
-minimal product, then the complete image reaches actual firmware boot and
+board's dev product, then the complete image reaches actual firmware boot and
 clean shutdown. The DATA growth test validates the actual packed policy
 against a disposable disk.
 

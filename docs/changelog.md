@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 18:00 [decision]
+
+The minimal products are removed entirely (user, "删除这个构建"):
+`x64-minimal`, `virt-arm64-minimal`, `cx3576-minimal` and `s905x5m-minimal`
+go, with every rule, test, fixture and CI entry that requires a
+`<board>-minimal` product. The products are `<board>-dev` for all four boards
+plus `x64-prod` and `cx3576-prod`; CI runs the release path for the prod
+products; the featureless floor is kept as a composition test, not a hidden
+product. The published `x64/20260915-1458` and `cx3576/20260915-1515` keep
+their minimal assets as history. `docs/decisions/2026-09-15-no-minimal-products.md`,
+`docs/design/build.md`, `docs/design/release-artifacts.md`,
+`docs/boards/porting.md`.
+
 ## 2026-09-15 17:55 [progress]
 
 Plan `20260912-2043-unify-board-behavior` section 3 (zstd delivery) is marked
