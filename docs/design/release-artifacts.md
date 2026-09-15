@@ -101,9 +101,13 @@ scoped release publishes each product's image kinds and update archives as
 first, `x64/20260915-1458`, carries `mica-x64-dev-20260915-1458.img` and
 `.micaupd` and the same pair for `x64-minimal`. By user decision
 (`docs/decisions/2026-09-15-release-images-and-products.md`) later releases
-publish the disk image as a deterministic `.img.gz` (never the raw `.img`),
-verified by decompressing it and comparing it with the raw signed image,
-which is still built, gated and verified; releases carry `<board>-dev` and
+publish every image kind as a deterministic
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>.gz` (`gzip -n -9` in the pinned
+build-env base, compressed twice and compared, never a raw image), verified by
+decompressing it against the raw signed image's sha256 and size, which the
+OCI layer also records as `mica.uncompressed-sha256` and
+`mica.uncompressed-size`; update archives stay uncompressed, and the raw image
+is still built, gated and verified; releases carry `<board>-dev` and
 `<board>-prod` (`x64-prod`, `cx3576-prod`) and never the `<board>-minimal`
 products, which are built locally and in CI only (the minimal assets of
 `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are,

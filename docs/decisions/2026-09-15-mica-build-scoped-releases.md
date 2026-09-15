@@ -29,10 +29,9 @@ downloadable GitHub Release assets (user: "需要额外放镜像文件，不然�
 - per product in the scope: the update archive and one asset per image kind
   the product selects from its board's `images.tsv` (`disk` always),
   `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, packed by the board's packer and
-  verified against the signed `disk.img`; the `disk` image itself is
-  published as a deterministic `mica-<product>-<YYYYMMDD-HHMM>.img.gz`, never
-  as the raw `.img`, verified by decompressing it against the raw signed
-  image
+  verified against the signed `disk.img`; every image kind is published as
+  a deterministic `mica-<product>-<YYYYMMDD-HHMM>.<suffix>.gz`, never as a raw
+  image, verified by decompressing it against the raw signed image
   (`docs/decisions/2026-09-15-release-images-and-products.md`)
   (`docs/decisions/2026-09-15-board-image-packers.md`);
 - `mica-build.lock` and `SHA256SUMS`, which lists only the lock.

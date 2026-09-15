@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 18:50 [decision]
+
+`mica-build`'s compressed-image form B is accepted within the gzip decision:
+every image kind is published as `mica-<product>-<release>.<suffix>.gz`, made
+by `gzip -n -9` in the pinned `mica-build-env:base`, compressed twice and
+compared, and decompressed against the raw signed image's sha256 and size
+before any upload; no raw image is uploaded; the 2 GiB limit applies to the
+`.gz`; the image layer carries `mica.compression=gzip`,
+`mica.uncompressed-sha256` and `mica.uncompressed-size`; update kinds stay
+uncompressed; the lock rows are unchanged. `docs/design/release-lock.md`
+1.2.2 and section 2 (the valid `mica-build` vector names `.img.gz` assets),
+the release-images-and-products, scoped-release and packer decisions,
+`docs/design/release-artifacts.md`, `docs/boards/contract.md`.
+
 ## 2026-09-15 18:48 [progress]
 
 The stable root and kernel component identities are implemented. `mica-build`

@@ -55,8 +55,8 @@ declare is refused.
 2 GiB, fails that product's whole release.
 
 **Publishing** (per product, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`):
-one release asset `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` per kind (the
-`disk` image published gzip-compressed as `.img.gz`,
+one release asset per kind, gzip-compressed as
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>.gz`,
 `docs/decisions/2026-09-15-release-images-and-products.md`); one
 OCI manifest `image.<product>.<YYYYMMDD-HHMM>` with one layer per kind
 (title the file name, annotation `mica.image-kind`); `asset` rows per kind in

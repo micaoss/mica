@@ -137,12 +137,15 @@ A `mica-build` release lock (user, 2026-09-15,
   update kind, annotated `mica.update-kind`, `mica.deployment-id` and
   `mica.generation`);
 - `asset <product> image|update <kind> <file> <sha256>`: one release asset,
-  `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` (the `disk` image
-  as `.img.gz`, with the raw image's record proposed by `mica-build`,
-  `docs/decisions/2026-09-15-release-images-and-products.md`), whose sha256 equals the
-  digest of its layer in that bundle. Image kinds are those of the board's
-  `images.tsv`; update kinds are `full` (`micaupd`), `root` (`root.micaupd`)
-  and `kernel` (`kernel.micaupd`), with the suffix fixed by the kind.
+  whose sha256 equals the digest of its layer in that bundle. An image
+  kind's asset is `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>.gz`,
+  the image compressed with `gzip -n -9` by a pinned build-env image, whose
+  layer is annotated `mica.compression=gzip`, `mica.uncompressed-sha256` and
+  `mica.uncompressed-size`; image kinds are those of the board's
+  `images.tsv`. Update kinds are published uncompressed with the suffix fixed
+  by the kind: `full` (`micaupd`), `root` (`root.micaupd`) and `kernel`
+  (`kernel.micaupd`), `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`
+  (`docs/decisions/2026-09-15-release-images-and-products.md`).
 
 Every `bundle` and `asset` names a product with a `product` row
 (`bundle-without-product`), every `asset` a `bundle` of its type
@@ -278,8 +281,9 @@ package of the repository that publishes them.
   platform manifests; the lock names both (`image` rows with the repository as
   source, `index`, `amd64`, `arm64`). Third-party images are not published here (1.2.1).
 - **Product bundles** (`mica-build`): `image.<product>.<release>`, one OCI
-  manifest with one layer per image kind (title the file name, annotation
-  `mica.image-kind`), and `update.<product>.<release>`, one layer per update
+  manifest with one layer per image kind, the `.gz` file of 1.2.2 (title the
+  file name, annotations `mica.image-kind`, `mica.compression=gzip`,
+  `mica.uncompressed-sha256` and `mica.uncompressed-size`), and `update.<product>.<release>`, one layer per update
   kind (annotations `mica.update-kind`, `mica.deployment-id`,
   `mica.generation`); each layer is also a release asset (1.2.2).
 
