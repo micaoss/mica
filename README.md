@@ -2,10 +2,10 @@
 
 > English | [中文](README.zh-CN.md)
 
-**An embedded Linux operating system for devices that ship to the field.**
+**Build the product, not the OS.**
 
-Mica OS is for teams that build a product, not a distribution: you choose the
-board and own the application, and the operating system underneath is
+An embedded Linux operating system for devices that ship to the field. You
+choose the board and own the application; the operating system underneath is
 reproducible, updatable in the field, and recoverable when an update goes
 wrong.
 

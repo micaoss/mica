@@ -2735,3 +2735,15 @@ contract:
   reap a device networkd built.
 
 `make docs-verify` passes 8/8.
+
+## 2026-09-15 04:40 [progress]
+
+The README opened on the slogan the site dropped. micaos.dev leads with **"Build the
+product, not the OS." / "做产品，别做系统。"**; both READMEs still said "for teams that
+build a product, not a distribution" — the wording the site replaced, because "distribution"
+is jargon and nobody claims to be building one. Both now open on the site's line, with the
+product description as the sentence under it. `README.zh-CN.md` keeps its language switch.
+
+`docs/website/product.md` still describes the audience as "teams that ship a device, not a
+distribution". That is the content contract's *who it is for*, not the slogan, so it is left
+until the site's own copy is reviewed against it.
