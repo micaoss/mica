@@ -299,3 +299,7 @@ owner, dispatched by the coordinator.
   `<board>/20260915-0945` deleted with their tags, and each ghcr package
   pruned to exactly its current locks. Batch 2 (`mica-core` `20260915-0235`,
   `20260915-0728`) follows the core pin.
+- 2026-09-15: clean-up batch 2 done after `mica-build` `fe3ad07` pinned
+  `mica-core` `20260915-1135`: `mica-core` `20260915-0728` and `20260915-0235`
+  deleted with their tags and its ghcr package pruned to the `1135` lock. The
+  clean-up of the pre-rule releases is complete.

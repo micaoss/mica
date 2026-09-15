@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-15 12:44 [progress]
+
+Clean-up batch 2: after `mica-build` `fe3ad07` pinned `mica-core`
+`20260915-1135` (with Base `20260915-1102`, podman `20260915-1057` and boards
+`<board>/20260915-1128`), the coordinator deleted `mica-core` `20260915-0728`
+and `20260915-0235` with their tags and pruned `ghcr.io/micaoss/mica-core` to
+the two pool digests of the `1135` lock, readable anonymously. The clean-up
+of the releases from before the package-version rules is complete.
+
 ## 2026-09-15 12:05 [progress]
 
 Clean-up batch 1 of the pre-rule releases: after `mica-build` `10936ff` pinned

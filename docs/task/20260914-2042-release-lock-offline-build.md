@@ -550,3 +550,16 @@ Moving the repositories to the release lock format
     podman 2, boards 16), all readable anonymously.
   - Batch 2 (`mica-core` `20260915-0235` and `20260915-0728`) follows the
     `mica-build` pin commit for `mica-core` `20260915-1135`.
+- 2026-09-15: clean-up batch 2 executed by the coordinator (user, "可以");
+  the clean-up of the pre-rule releases is complete.
+  - Start: `mica-build` pin commit `fe3ad07ac0c100f08128f35e416c5551cb88488a`
+    (ci run 34969809761 green), pinning `mica-core` `20260915-1135`, Base
+    `20260915-1102`, podman `20260915-1057` and boards `<board>/20260915-1128`.
+  - Deleted with `gh`, release and tag: `mica-core` `20260915-0728` and
+    `20260915-0235`.
+  - ghcr `ghcr.io/micaoss/mica-core` pruned to the `20260915-1135` lock: 4
+    versions deleted (`pool.amd64`/`pool.arm64.20260915-0728` and
+    `pool.amd64`/`pool.arm64.20260915-0235`).
+  - Verified: the `mica-core` releases and remote tags are exactly
+    `20260915-1135`, and ghcr holds exactly the 2 pool digests of its lock,
+    both readable anonymously.
