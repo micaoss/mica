@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner; the mica-boards owner for release targets
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); implemented on `mica-build` `main` `669b607` (the prod products, and every image kind gzip-compressed twice, compared and verified against the raw image; `release-test` 23/23), not released: no release is cut until the user confirms the form of the OCI image layer
+- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); implemented on `mica-build` `main` `669b607` (the prod products, and every image kind gzip-compressed twice, compared and verified against the raw image; `release-test` 23/23), not released yet; the form of the OCI image layer confirmed by the user ("a": the layer is the `.gz` asset), so the next scoped releases wait only for the `mica-boards` kernel rebuild release and `mica-build`'s re-pin
 
 ## Decision
 
@@ -23,7 +23,8 @@ threshold.
 - Before any upload, the `.gz` is decompressed and must match the raw signed
   image's sha256 and size.
 - The 2 GiB asset limit applies to the `.gz`.
-- The OCI image bundle's layer is the same `.gz` file, annotated
+- The OCI image bundle's layer is the same `.gz` file (user, 2026-09-15,
+  "a": form A, confirmed after the layer form was reconsidered), annotated
   `mica.compression=gzip`, `mica.uncompressed-sha256` and
   `mica.uncompressed-size`; the lock rows are unchanged, and the `asset` row
   names the `.gz` with its sha256, the layer digest

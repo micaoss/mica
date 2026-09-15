@@ -372,3 +372,12 @@ owner, dispatched by the coordinator.
   published as a verified `.gz` (`x64-prod` 4.4% of the raw size in 41 s,
   `cx3576-prod` 6.3% in 24 s). No release is cut until the user confirms the
   form of the OCI image layer.
+- 2026-09-15 (user, "a"): the form of the OCI image layer is decided: the image
+  bundle layer is the same `.gz` file as the GitHub Release asset, annotated
+  `mica.compression=gzip`, `mica.uncompressed-sha256` and
+  `mica.uncompressed-size`, and the asset sha256 equals the layer digest
+  (form A, as `docs/design/release-lock.md` section 2 already states). The
+  notes above that call it pending or reconsidered are decided by this. The
+  hold is lifted: `mica-build` `669b607` stands, and the next scoped releases
+  (`x64` and `cx3576` with dev and prod) wait only for the `mica-boards`
+  kernel rebuild release and `mica-build`'s re-pin.

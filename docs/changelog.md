@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-15 19:34 [decision]
+
+The form of the OCI image layer is decided (user, "a"): the image bundle
+layer is the same `.gz` file as the GitHub Release asset, annotated
+`mica.compression=gzip`, `mica.uncompressed-sha256` and
+`mica.uncompressed-size`, with the asset sha256 equal to the layer digest, as
+`docs/design/release-lock.md` section 2 already states. The hold on releases
+is lifted; `mica-build`'s next scoped releases wait only for the
+`mica-boards` kernel rebuild release and the re-pin.
+`docs/decisions/2026-09-15-release-images-and-products.md`.
+
 ## 2026-09-15 19:31 [progress]
 
 `mica-build` `669b607` (ci run 35012585951 green) implements the prod products,
