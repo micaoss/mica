@@ -56,3 +56,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: website
+          # Bound to the Worker on every deploy, so the token the refresh
+          # endpoint checks is the one this repository holds.
+          secrets: |
+            REFRESH_TOKEN
+        env:
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}

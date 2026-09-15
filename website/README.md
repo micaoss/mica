@@ -82,9 +82,11 @@ request or two, and the cron keeps it so.
 
 Two secrets are optional and worth setting:
 
-- `wrangler secret put REFRESH_TOKEN` — the bearer token `POST /api/catalog/refresh`
-  requires. Without it the endpoint answers 401 to everyone, and refreshing waits for the
-  cron. A refresh anyone can trigger is a way to spend the upstream rate limit.
+- `REFRESH_TOKEN` — the bearer token `POST /api/catalog/refresh` requires. It is a GitHub
+  secret of this repository and the deploy workflow binds it to the Worker, so rotating it
+  is `gh secret set REFRESH_TOKEN` and a deploy. Without it the endpoint answers 401 to
+  everyone and refreshing waits for the cron; a refresh anyone can trigger is a way to spend
+  the upstream rate limit.
 - `wrangler secret put GITHUB_TOKEN` — a read-only token. The anonymous API allows 60 calls
   an hour per IP and the Worker's egress is shared.
 
