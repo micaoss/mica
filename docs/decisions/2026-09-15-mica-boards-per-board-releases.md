@@ -16,7 +16,9 @@
 - OCI tags name the board: `board.<board>.<YYYYMMDD-HHMM>` and
   `pool.<board>.<arch>.<YYYYMMDD-HHMM>` in `ghcr.io/micaoss/mica-boards`.
 - A release carries exactly `mica-boards.lock` and `SHA256SUMS`; the lock's
-  release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`.
+  release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`, and
+  the lock holds only that board: every `board` row names it and every pool
+  tag is `pool.<board>.<arch>.<...>` (refused otherwise as `scope-content`).
 - A consumer keeps each board as its own input,
   `locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
   (`mica-pin v1` with `SCOPE=<board>`), so moving one board replaces exactly

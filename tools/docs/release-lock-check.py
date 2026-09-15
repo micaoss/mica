@@ -103,6 +103,9 @@ def check_lock(path):
             raise Refused("reference-registry")
         if m.group("repository") != expected:
             raise Refused("reference-repository")
+        return m.group("tag") or ""
+
+    board_scope = scope if repository == "mica-boards" else ""
 
     keys, pools, sort_keys = set(), set(), []
     for row in rows[1:]:
@@ -120,7 +123,9 @@ def check_lock(path):
             key = (row[1], row[2], row[3])
         elif kind == "pool":
             field(row[1] in ARCH)
-            reference(row[2])
+            tag = reference(row[2])
+            if board_scope and not tag.startswith("pool." + board_scope + "." + row[1] + "."):
+                raise Refused("scope-content")
             key = (row[1],)
             pools.add(row[1])
         elif kind == "package":
@@ -129,6 +134,8 @@ def check_lock(path):
         elif kind == "board":
             field(NAME.match(row[1]) and row[2] in ARCH)
             reference(row[3])
+            if board_scope and row[1] != board_scope:
+                raise Refused("scope-content")
             key = (row[1],)
         elif kind == "upstream":
             roots = row[6].split(",")

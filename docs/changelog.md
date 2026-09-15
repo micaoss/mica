@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-15 03:45 [decision]
+
+A scoped `mica-boards` lock holds only its board: every `board` row names the
+scope's board and every pool tag is `pool.<scope>.<arch>.<...>`, refused
+otherwise as `scope-content` (`docs/design/release-lock.md` 1.0 and 1.5; the
+checker and two refused vectors, `scope-content-board.lock` and
+`scope-content-pool.lock`).
+
 ## 2026-09-15 03:43 [decision]
 
 `mica-boards` is not merged into `mica-build`; it releases per board (user):

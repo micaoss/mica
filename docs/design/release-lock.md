@@ -38,7 +38,10 @@ every other repository's release is unscoped:
   (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its `input` and
   `asset` rows are pending.
 
-`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). The lock's release
+`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). A scoped
+`mica-boards` lock holds only its board: every `board` row names the scope's
+board and every `pool` tag is `pool.<scope>.<arch>.<release>`
+(`scope-content`). The lock's release
 row carries the scoped tag (1.2), OCI tags carry the scope before the release
 (1.3), and a consumer keeps each scope as its own input (section 4).
 
@@ -154,6 +157,7 @@ the ones the vectors use:
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
 | `release-scope` | a scoped release (`<scope>/...`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
+| `scope-content` | in a scoped `mica-boards` lock, a `board` row naming another board than the scope, or a `pool` reference whose tag is not `pool.<scope>.<arch>.<...>` for its row's arch (an untagged pool reference included) |
 | `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, version, sha256, url, roots, apt) |
 | `reference-digest` | a reference without `@sha256:<digest>` |
 | `reference-registry` | a `pool`, `board` or repository image reference outside `ghcr.io/micaoss/` and `local/`, `local/` in a published lock, or `ghcr.io/micaoss/` in an offline lock |
@@ -422,7 +426,8 @@ The vectors are files every repository copies into its own tests:
   `upstream-image-republished.lock` (`reference-upstream`) and
   `upstream-image-without-digest.lock` (`reference-digest`); the scope
   refusals are `scoped-release-not-allowed.lock` and `unscoped-release.lock`
-  (`release-scope`).
+  (`release-scope`), and `scope-content-board.lock` and
+  `scope-content-pool.lock` (`scope-content`).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
   (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release` and
   `scoped` (two `mica-boards` boards beside `mica-build-env`, both checked in
