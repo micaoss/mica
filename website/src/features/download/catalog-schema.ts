@@ -1,4 +1,5 @@
-import type { Image, Profile } from './catalog'
+import type { Download, DownloadKind, Profile } from './catalog'
+import { DOWNLOAD_KINDS } from './catalog'
 
 /**
  * Reads a remote catalogue. The content contract forbids hand-written release
@@ -8,12 +9,20 @@ import type { Image, Profile } from './catalog'
 
 const PROFILES: Profile[] = ['dev', 'prod']
 
-function readImage(value: unknown): Image | null {
+function readDownload(value: unknown): Download | null {
   if (typeof value !== 'object' || value === null)
     return null
 
   const entry = value as Record<string, unknown>
-  const strings = ['board', 'version', 'deploymentId', 'releasedAt', 'digest', 'href'] as const
+  const strings = [
+    'board',
+    'version',
+    'deploymentId',
+    'releasedAt',
+    'digest',
+    'href',
+    'filename',
+  ] as const
   for (const key of strings) {
     if (typeof entry[key] !== 'string' || entry[key] === '')
       return null
@@ -22,16 +31,20 @@ function readImage(value: unknown): Image | null {
     return null
   if (!PROFILES.includes(entry.profile as Profile))
     return null
+  if (!DOWNLOAD_KINDS.includes(entry.kind as DownloadKind))
+    return null
 
   return {
     board: entry.board as string,
     profile: entry.profile as Profile,
+    kind: entry.kind as DownloadKind,
     version: entry.version as string,
     deploymentId: entry.deploymentId as string,
     releasedAt: entry.releasedAt as string,
     bytes: entry.bytes,
     digest: entry.digest as string,
     href: entry.href as string,
+    filename: entry.filename as string,
   }
 }
 
@@ -41,16 +54,16 @@ export function isSample(payload: unknown): boolean {
     && (payload as { sample?: unknown }).sample === true
 }
 
-/** Accepts `{ images: [...] }` or a bare array; anything else reads as empty. */
-export function parseCatalog(payload: unknown): Image[] {
+/** Accepts `{ downloads: [...] }` or a bare array; anything else reads as empty. */
+export function parseCatalog(payload: unknown): Download[] {
   const list = Array.isArray(payload)
     ? payload
     : typeof payload === 'object' && payload !== null
-      ? (payload as { images?: unknown }).images
+      ? (payload as { downloads?: unknown }).downloads
       : undefined
 
   if (!Array.isArray(list))
     return []
 
-  return list.map(readImage).filter((entry): entry is Image => entry !== null)
+  return list.map(readDownload).filter((entry): entry is Download => entry !== null)
 }

@@ -1,4 +1,4 @@
-import type { Image, Profile } from '../catalog'
+import type { Download, DownloadKind, Profile } from '../catalog'
 import type { Copy } from '@/shared/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
@@ -19,7 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table'
-import { filterImages, formatBytes, historyCount, IMAGES, selectVersions } from '../catalog'
+import {
+  DOWNLOAD_KINDS,
+  DOWNLOADS,
+  filterDownloads,
+  formatBytes,
+  historyCount,
+  selectVersions,
+} from '../catalog'
 import { isSample, parseCatalog } from '../catalog-schema'
 
 const PROFILES: Profile[] = ['dev', 'prod']
@@ -71,21 +78,24 @@ function Facet({ label, allLabel, value, options, onChange }: FacetProps) {
 
 export function DownloadExplorer({
   copy,
-  images,
+  board,
+  downloads,
 }: {
   copy: Copy
+  /** The board whose page this is; its rows are the only ones shown. */
+  board: string
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
-  images?: Image[]
+  downloads?: Download[]
 }) {
-  const [fetched, setFetched] = useState<Image[]>(IMAGES)
+  const [fetched, setFetched] = useState<Download[]>(DOWNLOADS)
   const [sample, setSample] = useState(false)
-  const [board, setBoard] = useState(ALL)
   const [profile, setProfile] = useState(ALL)
+  const [kind, setKind] = useState(ALL)
   const [query, setQuery] = useState('')
   const [history, setHistory] = useState(false)
 
   useEffect(() => {
-    if (images)
+    if (downloads)
       return
     const cancel = new AbortController()
     // A failed or unreadable catalogue leaves the empty state standing: the page
@@ -101,41 +111,39 @@ export function DownloadExplorer({
       .then(setFetched)
       .catch(() => {})
     return () => cancel.abort()
-  }, [images])
+  }, [downloads])
 
-  const catalogue = images ?? fetched
-
-  const boards = useMemo(
-    () => [...new Set(catalogue.map(image => image.board))].sort(),
-    [catalogue],
+  const catalogue = useMemo(
+    () => (downloads ?? fetched).filter(download => download.board === board),
+    [downloads, fetched, board],
   )
 
-  const matching = filterImages(catalogue, {
-    board: board === ALL ? undefined : board,
+  const matching = filterDownloads(catalogue, {
     profile: profile === ALL ? undefined : (profile as Profile),
+    kind: kind === ALL ? undefined : (kind as DownloadKind),
     query,
   })
   const rows = selectVersions(matching, history)
   const earlier = historyCount(matching)
 
-  const { filters, cols } = copy.download
+  const { filters, cols, kinds } = copy.download
 
   return (
     <div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-4">
-        <Facet
-          label={filters.board}
-          allLabel={filters.all}
-          value={board}
-          onChange={setBoard}
-          options={boards.map(value => ({ value, label: value }))}
-        />
         <Facet
           label={filters.profile}
           allLabel={filters.all}
           value={profile}
           onChange={setProfile}
           options={PROFILES.map(value => ({ value, label: value }))}
+        />
+        <Facet
+          label={cols.kind}
+          allLabel={filters.all}
+          value={kind}
+          onChange={setKind}
+          options={DOWNLOAD_KINDS.map(value => ({ value, label: kinds[value] }))}
         />
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
@@ -168,7 +176,7 @@ export function DownloadExplorer({
                   <Table className="min-w-[720px]">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="px-5">{cols.board}</TableHead>
+                        <TableHead className="px-5">{cols.kind}</TableHead>
                         <TableHead>{cols.profile}</TableHead>
                         <TableHead>{cols.version}</TableHead>
                         <TableHead>{cols.released}</TableHead>
@@ -178,22 +186,22 @@ export function DownloadExplorer({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {rows.map(image => (
-                        <TableRow key={`${image.deploymentId}-${image.version}`}>
-                          <TableCell className="px-5 font-mono text-[13px]">{image.board}</TableCell>
-                          <TableCell className="font-mono text-[13px]">{image.profile}</TableCell>
-                          <TableCell className="font-mono text-[13px]">{image.version}</TableCell>
+                      {rows.map(download => (
+                        <TableRow key={`${download.deploymentId}-${download.kind}-${download.version}`}>
+                          <TableCell className="px-5 text-[15px]">{kinds[download.kind]}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{download.profile}</TableCell>
+                          <TableCell className="font-mono text-[13px]">{download.version}</TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
-                            {image.releasedAt}
+                            {download.releasedAt}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
-                            {image.deploymentId}
+                            {download.deploymentId}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
-                            {formatBytes(image.bytes)}
+                            {formatBytes(download.bytes)}
                           </TableCell>
-                          <TableCell className="pr-5 text-[15px]">
-                            <a href={image.href}>disk.img</a>
+                          <TableCell className="pr-5 font-mono text-[13px]">
+                            <a href={download.href}>{download.filename}</a>
                           </TableCell>
                         </TableRow>
                       ))}

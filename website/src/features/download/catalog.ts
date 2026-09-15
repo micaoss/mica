@@ -1,9 +1,10 @@
 /**
- * The image catalogue the download page renders.
+ * The download catalogue.
  *
- * A row is a bootable image for one board and profile. Component packages —
- * kernel, root, firmware, `.micaupd` — are not downloads: they reach a device
- * through an update, not through this page.
+ * A row is something an integrator can obtain and put on a device: a system
+ * image, an update package, or a firmware package. The components inside a
+ * deployment — kernel, root, support — are not downloads; they arrive through an
+ * update.
  *
  * The content contract binds entries to published artifact metadata and forbids
  * hand-written release identities, so the shape is fixed here and the catalogue
@@ -12,51 +13,62 @@
 
 export type Profile = 'dev' | 'prod'
 
-export interface Image {
+/** What form the download takes. */
+export type DownloadKind = 'image' | 'update' | 'firmware'
+
+export const DOWNLOAD_KINDS: DownloadKind[] = ['image', 'update', 'firmware']
+
+export interface Download {
   /** Board identifier, as `mica-boards` names it. */
   board: string
   profile: Profile
+  kind: DownloadKind
   /** Release version or generation. */
   version: string
-  /** Signed deployment this image carries. */
+  /** Signed deployment this download carries. */
   deploymentId: string
   /** ISO 8601 date the release was published; orders the versions. */
   releasedAt: string
   bytes: number
   digest: string
   href: string
+  /** File name as published, so the row says what lands on disk. */
+  filename: string
 }
 
-export interface ImageQuery {
+export interface DownloadQuery {
   board?: string
   profile?: Profile
+  kind?: DownloadKind
   /** Matched against version and deployment ID. */
   query?: string
 }
 
 /** Empty until a release is published. */
-export const IMAGES: Image[] = []
+export const DOWNLOADS: Download[] = []
 
-export function filterImages(all: Image[], query: ImageQuery): Image[] {
+export function filterDownloads(all: Download[], query: DownloadQuery): Download[] {
   const text = query.query?.trim().toLowerCase()
 
-  return all.filter((image) => {
-    if (query.board && image.board !== query.board)
+  return all.filter((download) => {
+    if (query.board && download.board !== query.board)
       return false
-    if (query.profile && image.profile !== query.profile)
+    if (query.profile && download.profile !== query.profile)
+      return false
+    if (query.kind && download.kind !== query.kind)
       return false
     if (!text)
       return true
-    return `${image.version} ${image.deploymentId}`.toLowerCase().includes(text)
+    return `${download.version} ${download.deploymentId}`.toLowerCase().includes(text)
   })
 }
 
 /**
- * Newest first, and one row per board and profile unless `history` asks for the
- * rest. A board's older images stay reachable; they are not what the page opens
- * on.
+ * Newest first, and one row per board, profile and kind unless `history` asks
+ * for the rest: a board's update package has its own history, separate from its
+ * system image.
  */
-export function selectVersions(all: Image[], history: boolean): Image[] {
+export function selectVersions(all: Download[], history: boolean): Download[] {
   const ordered = [...all].sort((a, b) =>
     b.releasedAt.localeCompare(a.releasedAt) || b.version.localeCompare(a.version),
   )
@@ -64,8 +76,8 @@ export function selectVersions(all: Image[], history: boolean): Image[] {
     return ordered
 
   const seen = new Set<string>()
-  return ordered.filter((image) => {
-    const key = `${image.board}/${image.profile}`
+  return ordered.filter((download) => {
+    const key = `${download.board}/${download.profile}/${download.kind}`
     if (seen.has(key))
       return false
     seen.add(key)
@@ -74,7 +86,7 @@ export function selectVersions(all: Image[], history: boolean): Image[] {
 }
 
 /** How many rows `history` would add, so the control can say whether it is worth using. */
-export function historyCount(all: Image[]): number {
+export function historyCount(all: Download[]): number {
   return all.length - selectVersions(all, false).length
 }
 

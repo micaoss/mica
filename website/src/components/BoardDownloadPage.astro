@@ -1,0 +1,72 @@
+---
+import type { LocaleCode } from '@/shared/i18n'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { DownloadExplorer } from '@/features/download/components/download-explorer'
+import { SiteFooter } from '@/features/landing/components/site-footer'
+import { docsHref, downloadHref, homeHref } from '@/features/landing/links'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { copyFor, localePathsFromUrl } from '@/shared/i18n'
+
+interface Props {
+  locale: LocaleCode
+  board: string
+  hardware: string
+  status: string
+}
+
+const { locale, board, hardware, status } = Astro.props
+const copy = copyFor(locale)
+---
+
+<BaseLayout
+  copy={copy}
+  title={`${board} — ${copy.download.title} — Mica OS`}
+  description={copy.download.boardLead}
+>
+  <SiteHeader
+    copy={copy}
+    locale={locale}
+    paths={localePathsFromUrl(Astro.url.pathname)}
+    homeHref={homeHref(locale)}
+    docsHref={docsHref(locale)}
+  />
+  <div class="mx-auto max-w-[1200px] px-gutter">
+    <header class="border-b border-border pt-14 pb-10">
+      <a class="text-[13px] no-underline" href={downloadHref(locale)}>
+        ← {copy.download.backToBoards}
+      </a>
+      <h1
+        class="mt-4 mb-0 font-mono text-[clamp(28px,5vw,44px)] leading-[1.15] font-semibold tracking-tight"
+      >
+        {board}
+      </h1>
+      <p class="mt-3 mb-0 text-[15px] leading-7 text-muted-foreground">
+        {hardware} · {status}
+      </p>
+      <p class="mt-3 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.boardLead}
+      </p>
+    </header>
+
+    <section class="pt-10 pb-16">
+      <DownloadExplorer client:load copy={copy} board={board} />
+    </section>
+
+    <section class="border-t border-border py-14">
+      <h2 class="m-0 text-[clamp(22px,3vw,28px)] leading-[1.2] font-semibold tracking-tight">
+        {copy.download.verify.heading}
+      </h2>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.verify.body}
+      </p>
+      <pre
+        class="mt-6 overflow-x-auto rounded-xl border border-border bg-card px-5 py-4 font-mono text-[13px] leading-6"
+      >{copy.download.verify.command}</pre>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.verify.note}
+      </p>
+    </section>
+
+    <SiteFooter copy={copy} />
+  </div>
+</BaseLayout>

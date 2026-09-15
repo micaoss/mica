@@ -19,6 +19,11 @@ export function downloadHref(locale: LocaleCode): string {
   return locale === 'zh' ? '/download/' : `/${locale}/download/`
 }
 
+/** One board's downloads. */
+export function boardDownloadHref(locale: LocaleCode, board: string): string {
+  return `${downloadHref(locale)}${board}/`
+}
+
 /** A published documentation page, by its slug under `/docs/`. */
 export function docsPageHref(locale: LocaleCode, slug: string): string {
   return `${docsHref(locale)}${slug}/`

@@ -80,7 +80,16 @@ export const en: typeof zh = {
   },
   download: {
     title: 'Downloads',
-    lead: 'Pick an image by board and profile; the newest version of each is what you see. This repository publishes no public download list: images are built from source, or delivered by the integrator together with what is needed to verify them.',
+    lead: 'Start with a board; its page carries the system images, update packages and firmware packages. This repository publishes no public download list: images are built from source, or delivered by the integrator together with what is needed to verify them.',
+    boardsHeading: 'Choose a board',
+    boardHref: 'Downloads',
+    backToBoards: 'All boards',
+    boardLead: 'The system images, update packages and firmware packages for this board, newest of each form first.',
+    kinds: {
+      image: 'System image',
+      update: 'Update package',
+      firmware: 'Firmware package',
+    },
     filters: {
       board: 'Board',
       profile: 'Profile',
@@ -90,13 +99,14 @@ export const en: typeof zh = {
     cols: {
       board: 'Board',
       profile: 'Profile',
+      kind: 'Form',
       version: 'Version',
       released: 'Released',
       deployment: 'Deployment',
       size: 'Size',
       download: 'Download',
     },
-    empty: 'No image published yet. Build one from source, or ask your integrator for one.',
+    empty: 'Nothing published for this board yet. Build an image from source, or ask your integrator for one.',
     history: 'Show earlier versions',
     historyHide: 'Latest only',
     sample: 'The rows below are sample data shown to demonstrate filtering. They are not a release.',

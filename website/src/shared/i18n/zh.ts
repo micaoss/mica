@@ -90,7 +90,16 @@ export const zh = {
   },
   download: {
     title: '下载',
-    lead: '按板卡与 profile 挑出镜像，默认是每个组合的最新版本。本仓库不发布公开下载列表：镜像从源码构建，或由集成方连同校验材料一起交付。',
+    lead: '先选板卡，板卡页里是它的系统镜像、升级包与固件包。本仓库不发布公开下载列表：镜像从源码构建，或由集成方连同校验材料一起交付。',
+    boardsHeading: '选择板卡',
+    boardHref: '查看下载',
+    backToBoards: '全部板卡',
+    boardLead: '这块板卡的系统镜像、升级包与固件包，默认是每种形态的最新版本。',
+    kinds: {
+      image: '系统镜像',
+      update: '升级包',
+      firmware: '固件包',
+    },
     filters: {
       board: '板卡',
       profile: 'Profile',
@@ -100,13 +109,14 @@ export const zh = {
     cols: {
       board: '板卡',
       profile: 'Profile',
+      kind: '形态',
       version: '版本',
       released: '发布',
       deployment: '部署 ID',
       size: '大小',
       download: '下载',
     },
-    empty: '当前没有已发布的镜像。镜像从源码构建，或向集成方索取。',
+    empty: '这块板卡当前没有已发布的下载。镜像从源码构建，或向集成方索取。',
     history: '显示历史版本',
     historyHide: '只看最新版本',
     sample: '以下为示例数据，用于展示筛选，不是真实发布。',

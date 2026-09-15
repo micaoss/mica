@@ -2865,3 +2865,22 @@ The table reads board · profile · version · released · deployment · size ·
 payload key is `images`. The sample catalogue behind `CATALOG_DEMO=1` carries seven rows
 over four boards with two versions on three of them, so the history control has something to
 open.
+
+## 2026-09-15 06:30 [progress]
+
+The download section is two levels now. `/download/` lists the boards and nothing else; a
+board's page carries what can be obtained for it. Filtering lives inside a board, where it
+is a choice between forms and profiles rather than a way to find the board in the first
+place.
+
+The forms are back, corrected: **system image**, **update package**, **firmware package** —
+what an integrator can obtain and put on a device. Kernel and root components are not
+downloads; they arrive inside an update, which is why the earlier artifact-kind facet was
+wrong in both directions. Each form keeps its own version history, so a board's update
+package does not hide behind its system image.
+
+An entry now carries `filename` as published, and the download column shows it: a row says
+`disk.img` or `x64-2026.09-2.micaupd` rather than a generic label. The payload key is
+`downloads`.
+
+The site builds 44 pages, eight of them board pages (four boards × two locales).

@@ -1,0 +1,16 @@
+---
+import BoardDownloadPage from '@/components/BoardDownloadPage.astro'
+import { en } from '@/shared/i18n/en'
+
+export function getStaticPaths() {
+  return en.boards.rows.map(row => ({
+    params: { board: row.board },
+    props: { hardware: row.hw, status: row.status },
+  }))
+}
+
+const { board } = Astro.params
+const { hardware, status } = Astro.props
+---
+
+<BoardDownloadPage locale="en" board={board!} hardware={hardware} status={status} />

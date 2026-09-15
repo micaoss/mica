@@ -45,15 +45,16 @@ work, internal decisions and board dossiers that would mislead a visitor.
 
 ## The download catalogue
 
-The download page lists **images**, one bootable image per board and profile. Component
-packages — kernel, root, firmware, `.micaupd` — are not downloads: they reach a device
-through an update. The page opens on the newest version of each board and profile, and a
+`/download/` lists the boards; each board's page (`/download/<board>/`) carries what can be
+obtained for it, in three forms: **system image**, **update package**, **firmware package**.
+The components inside a deployment — kernel, root, support — are not downloads; they arrive
+through an update. A board page opens on the newest version of each form and profile, and a
 control loads the earlier ones.
 
-It reads `/api/catalog` at runtime. `website/worker/index.ts` answers it: with
-`CATALOG_SOURCE` set — a URL serving the same JSON — it passes that through; with nothing
-configured it answers an empty catalogue, which is the current state, because no repository
-publishes a product image yet.
+The board pages read `/api/catalog` at runtime and keep the rows whose `board` is theirs.
+`website/worker/index.ts` answers it: with `CATALOG_SOURCE` set — a URL serving the same
+JSON — it passes that through; with nothing configured it answers an empty catalogue, which
+is the current state, because no repository publishes a product image yet.
 
 Every entry is validated in the page (`src/features/download/catalog-schema.ts`) and dropped
 whole if a field is missing, so a malformed upstream degrades to the empty state rather than
@@ -62,23 +63,25 @@ var in `wrangler.jsonc` if it is not a secret.
 
 ```json
 {
-  "images": [
+  "downloads": [
     {
       "board": "x64",
       "profile": "dev",
+      "kind": "image",
       "version": "2026.09-2",
       "deploymentId": "dep-aa11",
       "releasedAt": "2026-09-12",
       "bytes": 1073741824,
       "digest": "sha256:…",
-      "href": "https://…/disk.img"
+      "href": "https://…/disk.img",
+      "filename": "disk.img"
     }
   ]
 }
 ```
 
-`profile` is `dev` or `prod`; `releasedAt` is what orders the versions, so an entry without
-it is dropped. A bare array is accepted too.
+`kind` is `image`, `update` or `firmware`; `profile` is `dev` or `prod`; `releasedAt` orders
+the versions, so an entry without it is dropped. A bare array is accepted too.
 
 Setting `CATALOG_DEMO=1` (and no source) serves a sample catalogue that answers
 `"sample": true`, which the page renders behind a banner saying so. It exists to exercise
