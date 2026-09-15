@@ -40,7 +40,11 @@ function json(body: unknown, seconds: number): Response {
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': `public, max-age=${seconds}`,
+      // The browser holds it briefly; the edge holds it for the same window the
+      // Worker's own cache uses. Without `cdn-cache-control` the zone's default
+      // browser TTL applies and a catalogue change takes hours to surface.
+      'cache-control': 'public, max-age=60',
+      'cdn-cache-control': `public, max-age=${seconds}`,
     },
   })
 }
