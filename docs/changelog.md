@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-15 23:16 [progress]
+
+`mica-build` `19e7c9ce` fixes the index plan's generation edge case: a product
+that is in neither the newest index nor a later scoped release is looked up
+across every earlier release and planned one generation above the highest it
+was ever released at, with the full scan built once per plan and only when
+such a product exists; a product never released still plans generation 2
+(`release-test` 48/48). Until the next index is cut, the CI re-verification of
+`mica/20260915-2242` runs the tools of its own commit and therefore without
+the later download retries.
+
 ## 2026-09-15 22:52 [progress]
 
 The first Mica version indexes are published and verified anonymously.

@@ -908,3 +908,14 @@ Moving the repositories to the release lock format
     transient GitHub download failure led to `59e4320d` (curl retries).
   - `105180b6`: the plan reads the newest index plus later scoped releases
     (`release-test` 46/46; about 3 s per scope).
+- 2026-09-15: `mica-build` `19e7c9ce` (ci run 35033936040 green) fixes the
+  plan's generation edge case: a product in neither the newest index nor any
+  scoped release after it is looked up across every earlier release, so it
+  plans one generation above the highest it was ever released at. The full
+  scan is built once per plan and only when such a product exists, and a
+  product never released still plans generation 2. `release-test` 48/48 with
+  two new cases; live read-only plans give `x64-dev` 5 and `x64-prod` 4 from
+  the index path, while `virt-arm64-dev` falls back and plans 2.
+  - `ci.yml`'s `release-index` job runs the tools of the index commit, so the
+    full re-verification of `mica/20260915-2242` (cut at `9c2f399e`) still
+    lacks the `59e4320d` download retries until the next index is cut.
