@@ -319,7 +319,7 @@ fault is a real failure mode on this hardware rather than a theoretical one.
 |---|---|---|
 | `HostnameReconciler` | `hostname` | systemd-hostnamed |
 | `NetworkReconciler` | `network` | networkd units in `/run/systemd/network` |
-| `SshdReconciler` | `access.ssh` **only** | sshd drop-in + one authorized-keys file per managed account + `ssh.service` |
+| `SshdReconciler` | `access.ssh` **only** | `/run/mica/dropbear.env` + one `~/.ssh/authorized_keys` per managed account + `dropbear.service` |
 | `WifiClientReconciler` | `wifi.client` | wpa_supplicant config + networkd + `wpa_supplicant@<if>.service` |
 | `WifiApReconciler` | `wifi.ap` (reads `wifi.client` for the conflict check) | hostapd config + networkd + `hostapd@<if>.service` |
 

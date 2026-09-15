@@ -35,7 +35,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
      _____________________________|_________________________
     |            |             |          |        |
   apid      reconcilers   Deployments    sshd    podman
-  HTTPS     wifi, sshd,   InstallUpdate OpenSSH  Quadlet
+  HTTPS     wifi, sshd,   InstallUpdate Dropbear Quadlet
   API +     hostname,     GetUpdateState driven   units,
   dashboard network,      Confirm/Reject     by micad   off
             mqtt, container                       by default
@@ -123,14 +123,18 @@ with one shell (`docs/design/access.md`). Three ways in exist today:
 
 1. **The API**, over HTTPS, authenticated by an argon2id password hash held in
    the settings tree, with persistent login-backoff counters and an audit ring.
-2. **SSH** — OpenSSH, with micad rendering the only file that configures it.
-   Shipped on both profiles, off by default on both; persistent access is by
-   public key and a root password is the transient exception.
+2. **SSH** — Dropbear, with micad rendering the only file that configures it
+   (`/run/mica/dropbear.env`, one `DROPBEAR_ARGS` line) and the authorized keys
+   of the two managed accounts. Shipped on both profiles, off by default on
+   both; persistent access is by public key and a root password is the
+   transient exception. OpenSSH is not in the image: the base root's gate
+   asserts `usr/sbin/sshd`, `usr/bin/ssh` and `usr/lib/openssh` are absent
+   (`mica-system-base:src/rootfs.ts`).
 3. **Physical recovery** — a whole-disk reflash through the board's loader path
    (RockUSB on cx3576), below the OS and reachable when nothing else is.
 
 Disablement is layered. One layer ships: the runtime switch, where
-`enabled: false` stops and disables `ssh.service`, and every image seeds it
+`enabled: false` stops and disables `dropbear.service`, and every image seeds it
 off. There is no image profile package or profile file
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`): development and
 production images differ by the kernel command line parameter

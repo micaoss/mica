@@ -2678,3 +2678,36 @@ Landed here:
 
 Still open: the five subsystem designs that exist in both `mica` and `mica-core` and have
 diverged, the per-repository moves, and the gate that would have caught the divergence.
+
+## 2026-09-15 04:05 [progress]
+
+First batch of the fact audit (task `20260915-0316`): **the documentation said the device
+runs OpenSSH; it runs Dropbear.**
+
+Checked against the code, not against another document:
+
+- `mica-system-base:packages.tsv` selects `dropbear-bin`, and its base-root gate
+  (`mica-system-base:src/rootfs.ts`) asserts that `usr/sbin/sshd`, `usr/bin/ssh` and
+  `usr/lib/openssh` are **absent** from the packed root.
+- `mica-core:crates/micad/src/reconciler/sshd.rs` renders `/run/mica/dropbear.env` as one
+  `DROPBEAR_ARGS` line and each managed account's `~/.ssh/authorized_keys`, and drives
+  `dropbear.service` — restarting it when the arguments change, because Dropbear reads them
+  once at start.
+- `mica-build` selects no SSH server of its own; it takes what the base root carries.
+
+Corrected here:
+
+- `architecture.md` §5 and its component diagram: Dropbear, with the absence of OpenSSH
+  stated as the gate that enforces it.
+- `design/access.md`: the opening note, the channel table, *One policy source*, and §3.1's
+  three system effects — which described `/etc/ssh/sshd_config.d/10-mica.conf`,
+  `/etc/ssh/authorized_keys.d/<account>` and `ssh.service`, none of which exist. The
+  reload-on-change paragraph became restart-on-change for the same reason.
+- `design/access.md` §3.4 was titled "*Dropbear replaces OpenSSH — decided, not shipped*"
+  and told the reader that the sections above described "the OpenSSH behaviour images carry
+  today". It is now *shipped, image acceptance pending*: the base and the packages are
+  published, and what is still missing is an assembled guest acceptance — key login, sftp
+  and the refusals exercised on a booted guest.
+- `design/micad.md`'s reconciler table.
+
+`make docs-verify` passes 8/8.

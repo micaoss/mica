@@ -2,9 +2,10 @@
 
 > Shell/SSH/console access for an immutable appliance — configuration-driven,
 > auditable, and disabled by default on every profile. **Not absent from
-> production images:** since the 2026-08-17 decision the prod image carries
-> OpenSSH and an emergency BusyBox binary, both off and unused until an
-> administrator turns SSH on (§5.3). Companion to architecture.md §5.
+> production images:** since the 2026-08-17 decision the prod image carries an
+> SSH server — Dropbear since 2026-09-13 (§3.4) — and an emergency BusyBox
+> binary, both off and unused until an administrator turns SSH on (§5.3).
+> Companion to architecture.md §5.
 >
 
 ## 0. How to read the status markers
@@ -58,17 +59,20 @@ preferences or history rather than a mechanism.
 | Channel | Capability | Auth | Availability |
 |---|---|---|---|
 | Network wizard (tty2 TUI; AP captive portal; HDMI local wizard via kiosk) | whitelisted network resources only; no secrets, no exec, no raw logs | per-device PIN | **not implemented** |
-| SSH (**OpenSSH**, driven by micad) | root (see §4.1: `mica` is not a lesser privilege level) | SSH public key, persistent; optionally a **transient** root password | **prod and dev** — **shipped**, and **off by default on both** |
+| SSH (**Dropbear**, driven by micad) | root (see §4.1: `mica` is not a lesser privilege level) | SSH public key, persistent; optionally a **transient** root password | **prod and dev** — **shipped**, and **off by default on both** |
 | Local HDMI console (tty2) | root | Transient root password set through the management API/UI; cleared at reboot | **cx3576, prod and dev** — Alt+F2 or Ctrl+Alt+F2 starts an authenticated getty. The logo VT stays idle until selected. See [display policy](display.md). |
 | Console shell (tty3) | root | same as SSH | **not implemented.** `access.console.shellEnabled` exists in the schema with **no reconciler consuming it**, so a managed tty3 shell is unsupported and setting the flag changes nothing on the device. Use SSH explicitly enabled with an enrolled key, or a boot-time provisioning document for initial setup |
 | Serial console (`serial-getty@ttyFIQ0`) | login prompt only | `/etc/shadow`, i.e. nothing by default | **present** — spawned by systemd's getty-generator from the kernel `console=` parameter on both profiles. It has no account that will accept a credential; see §9 |
 | Rescue (all-deployments-failed boot entry) | chroot repair environment | physical access (cmdline / boot failure) | **not implemented.** There is no rescue boot entry and no offline repair environment; the emergency BusyBox binary lives in the same root that would be damaged and is deliberately not one (`docs/design/recovery.md` §6.3). An unbootable device needs an external service host or a whole-disk reflash, which replaces its data and its identity |
 | Factory (rockusb / SoC loader mode) | full reflash | physical access | hardware-level; see §9.2 |
 
-**One policy source.** The image carries **OpenSSH**, and micad renders the only
-drop-in that configures it and drives `ssh.service` (§3). That ownership is what
-keeps sshd's policy in one place: there is no second, operator-edited
-`sshd_config` for the settings tree to drift against. Every profile ships one
+**One policy source.** The image carries **Dropbear**, and micad renders the only
+file that configures it — `/run/mica/dropbear.env`, one `DROPBEAR_ARGS` line —
+and drives `dropbear.service` (§3). That ownership is what keeps the SSH policy
+in one place: there is no second, operator-edited configuration file for the
+settings tree to drift against. OpenSSH is not installed; the base root's gate
+asserts `usr/sbin/sshd`, `usr/bin/ssh` and `usr/lib/openssh` are absent
+(`mica-system-base:src/rootfs.ts`). Every profile ships one
 `/usr/bin/busybox` as an emergency binary with no applet links, no PATH entry
 and nothing on the device depending on it (`docs/design/recovery.md` §6.3); it
 is not a rescue environment and not a login channel, and the debug profile's
@@ -124,22 +128,24 @@ created = 1700000000
 empty by default: a key baked into the signed rootfs would let whoever holds its
 private half into every device built from that image.
 
-Flow: settings subtree → **`SshdReconciler`** → three system effects:
+Flow: settings subtree → **`SshdReconciler`** → three system effects
+(`mica-core:crates/micad/src/reconciler/sshd.rs`):
 
 1. one authorized-keys file **per managed login account** is rendered from
-   `access.ssh.authorizedKeys` into `/etc/ssh/authorized_keys.d/<account>`,
-   0600, for each of `root` and `mica`;
-2. `/etc/ssh/sshd_config.d/10-mica.conf` is rendered from `access.ssh`;
-3. `ssh.service` is brought to the state `enabled` asks for.
+   `access.ssh.authorizedKeys` into that account's `~/.ssh/authorized_keys`,
+   0600 under a 0700 `~/.ssh`, for each of `root` and `mica`. The accounts'
+   uid, gid and home come from `/etc/passwd`, not from a path in the settings
+   tree;
+2. `/run/mica/dropbear.env` is rendered from `access.ssh` as a single
+   `DROPBEAR_ARGS` line;
+3. `dropbear.service` is brought to the state `enabled` asks for.
 
-`AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u` is **not** in that rendered
-drop-in. It is a static image file,
-`/etc/ssh/sshd_config.d/05-mica-authorized-keys.conf`, numbered 05 so it sorts
-before micad's `10-mica.conf`: sshd keeps the *first* value it obtains for a
-non-repeatable keyword, so no later drop-in can override it, and the image
-verifier can assert it byte-for-byte. Setting it also **replaces** sshd's
-defaults (`~/.ssh/authorized_keys`), which is the point — a key dropped into
-`/root/.ssh` by some other path does not silently grant access.
+Dropbear reads `~/.ssh/authorized_keys` and nothing else, so the key file is
+the whole key policy — there is no keyword that could point it elsewhere and no
+second file to sort against. The unit is required to have its environment file:
+`EnvironmentFile=/run/mica/dropbear.env` is mandatory, so a start with no
+rendered arguments fails rather than falling back to Dropbear's own defaults,
+which would listen on port 22 on every address (§3.4).
 
 **The reconciler does not write `/etc/shadow`.** It
 *reads* the shadow file's neighbourhood — through
@@ -156,12 +162,13 @@ a normal filesystem. micad reconciles the whole tree at every start, so the unit
 returns to its configured state on each boot without a persisted symlink.
 
 The reconciler re-renders, compares against what is on disk, and skips the write
-when the bytes match — the drop-in lives on DATA/state, so an unconditional rewrite
-would cost a flash write on every reconcile. One case is deliberately not a
-no-op: when the drop-in changed and sshd is already running, the unit is
-**reloaded**, because a rewritten configuration that nothing re-reads
-is a configuration that silently did not take effect. Adding or removing a key
-needs neither: sshd re-reads the authorized-keys file on every attempt.
+when the bytes match — the key files live on DATA/state, so an unconditional
+rewrite would cost a flash write on every reconcile. One case is deliberately
+not a no-op: when the arguments changed and the server is already running, the
+unit is **restarted**, because Dropbear reads its arguments once at start and a
+rewritten `DROPBEAR_ARGS` that nothing re-reads is a configuration that silently
+did not take effect. Adding or removing a key needs no restart: the
+authorized-keys file is read on every attempt.
 
 `access.webAdmin` (apid's own credential) is not part of this subtree.
 
@@ -221,7 +228,7 @@ bruteForce: { backoffBase: 1s, backoffMax: 300s, lockoutThreshold: 20 }
 lockdown: false                # one-way; see §5
 ```
 
-### 3.4 Dropbear replaces OpenSSH — **[decided]**, not shipped
+### 3.4 Dropbear replaced OpenSSH — **[shipped]**, image acceptance pending
 
 The user decided on 2026-09-13 that the device SSH server is Dropbear, with
 `procps` kept. File transfer is not part of the base: the base system carries
@@ -230,8 +237,12 @@ which use the SFTP protocol) comes from `mica-sftp-server`, `mica-core`'s
 package, which installs `/usr/lib/sftp-server` for Dropbear's sftp subsystem
 and is installed in every product by the product stage of `mica-build`, as
 part of its common selection (user, 2026-09-14); it is not a board component.
-Until the change ships end to end, §2, §3.1, §3.2 and §4.1 describe the
-OpenSSH behaviour images carry today.
+§2, §3.1, §3.2 and §4.1 describe the Dropbear behaviour images carry today:
+`mica-system-base` selects `dropbear-bin` and its base root gate asserts that
+`usr/sbin/sshd`, `usr/bin/ssh` and `usr/lib/openssh` are **absent**
+(`mica-system-base:packages.tsv`, `mica-system-base:src/rootfs.ts`), and micad's
+only SSH reconciler drives `dropbear.service`
+(`mica-core:crates/micad/src/reconciler/sshd.rs`).
 
 The system side is implemented in `mica-system` (`e0be7b6`, `7faafef`, and
 `13c1299`, which drops `mica-sftp-server` from its Depends; reviewed, not yet
@@ -304,10 +315,12 @@ sftp transfers and file operations, scp and `scp -r` in SFTP mode, `scp -O`
 refused, root refused under `-w`, key login as `mica`, key refused under a
 group-writable home). None of this is an image acceptance.
 
-Not done yet: adoption in the assembly (the board selections and the
-composition), publication of the packages, and an assembled guest
-acceptance. This section replaces the OpenSSH text above only after that
-acceptance passes.
+The base system and the packages are published, and the assembly takes them
+through the base root rather than selecting an SSH server of its own. What is
+still missing is an **assembled guest acceptance**: no image test has yet
+exercised key login, sftp and the refusals on a booted Mica OS guest. Until it
+does, the behaviour above is stated from the source and the package gate, not
+from an image run.
 
 ## 4. Authentication
 
@@ -737,7 +750,7 @@ root account stays locked until that password is set.
 **A sealed image is unsupported.** `sealed` — the fully shell-free build where
 "no shell" is part of the signed image identity — is **[not implemented]**, and
 it is an absence rather than a build waiting to be wired up: **only dev and prod
-exist, and both carry OpenSSH and the emergency BusyBox binary with SSH disabled
+exist, and both carry Dropbear and the emergency BusyBox binary with SSH disabled
 by default.** A deployment whose requirement is that a shell be *absent from the
 signed image* is one Mica OS should not be selected for; a deployment that needs the
 shell off in practice uses the runtime disablement of §5.1 and key-only
@@ -902,7 +915,7 @@ the two offline documents, the only path in is apid over an existing network.
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 | `access.ssh` / `access.console` / `access.device` subtrees + `SshdReconciler`; OpenSSH driven by micad; `dev` and `prod` images (no profile package since 2026-09-14, §5.3) | shipped; credential model per §4.2 |
+| 1 | `access.ssh` / `access.console` / `access.device` subtrees + `SshdReconciler`; Dropbear driven by micad; `dev` and `prod` images (no profile package since 2026-09-14, §5.3) | shipped; credential model per §4.2 |
 | 1 | key-based access (`authorizedKeys`), transient root password, SSH off and root passwordless on both profiles, `/home` and `/root` on DATA | shipped; on-device behaviour is part of board acceptance |
 | 1 | brute-force counters (persistent) + bounded audit trail | shipped — on DATA/state, not DATA/meta (§6 records the deviation) |
 | 1 | tty3 console shell; DATA/meta lockdown; hard lockout + physical presence; session/upload audit | **not implemented** (§5.2, §6) |
