@@ -65,7 +65,8 @@ directory against the fetched board bundle. The resolver selects the engine's
 manifests for the profile and the features and the board's own out of its
 bundle (`board.pkgs`, `radio-<r>.pkgs`, `component-<c>.pkgs`);
 `FEATURES=""` is the minimal image, and every board has a `<board>-minimal`
-product (built locally and in CI, never released) and a `<board>-dev`
+product (built locally and in CI, never released: `PUBLISH=0` in its
+`product.env`) and a `<board>-dev`
 product; the release-target boards `x64` and `cx3576` also have a
 `<board>-prod` product, and a scoped release carries only the dev and prod
 products (`docs/decisions/2026-09-15-minimal-products-not-released.md`). The root carries what it is: `/usr/lib/mica/product.conf`, five lines

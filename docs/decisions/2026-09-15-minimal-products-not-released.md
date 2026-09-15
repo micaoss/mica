@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "按推荐处理，minimal只是本地编译和ci用，不发布"); not implemented; `mica-build` implements it in the prod products round, after K1 and K2; supersedes `docs/decisions/2026-09-15-no-minimal-products.md`
+- **status**: accepted (user, 2026-09-15: "按推荐处理，minimal只是本地编译和ci用，不发布"); implemented in `mica-build` `669b607` (the property is `PUBLISH=0`; CI rehearses the release path on `x64-prod` and `cx3576-prod`); supersedes `docs/decisions/2026-09-15-no-minimal-products.md`
 
 ## Decision
 
@@ -16,14 +16,13 @@ correction, 2026-09-15, replacing their removal):
   featureless floor they cover.
 - A scoped release builds and publishes only the `<board>-dev` and
   `<board>-prod` products of its scope. The minimal products are excluded by
-  a declared product property, for example `product.env` `RELEASE=0`
-  (default `1`); `release.sh plan` and the release product matrix honour it,
-  a release scope that would contain only unpublished products is refused,
-  and a test covers both.
+  a declared product property, `product.env` `PUBLISH=0` (`0` or `1`,
+  default `1`; not `RELEASE`, which would overwrite the release name in
+  `tools/product-build.sh`), which every `<board>-minimal` declares;
+  `release.sh plan` and the release product matrix skip such products, a
+  release scope holding only them is refused, and a test covers both.
 - CI's release-products job, the rehearsal of the release path, publishes
-  nothing and may keep using the minimal products; if the release exclusion
-  makes that path differ, it rehearses on the prod products instead, and
-  `mica-build` says which.
+  nothing; it rehearses on the prod products `x64-prod` and `cx3576-prod`.
 - The published releases `x64/20260915-1458` and `cx3576/20260915-1515`
   stay as they are, with their minimal assets. The next scoped releases
   carry `<board>-dev` and `<board>-prod` only (`x64-dev`, `x64-prod`,

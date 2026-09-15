@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner; the mica-boards owner for release targets
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); not implemented (`mica-build`, in the round with the prod products and `RELEASE=0`)
+- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); implemented on `mica-build` `main` `669b607` (the prod products, and every image kind gzip-compressed twice, compared and verified against the raw image; `release-test` 23/23), not released: no release is cut until the user confirms the form of the OCI image layer
 
 ## Decision
 

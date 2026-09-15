@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 19:31 [progress]
+
+`mica-build` `669b607` (ci run 35012585951 green) implements the prod products,
+the never-released minimal products and the compressed images. It has ten
+products: `<board>-dev` and `<board>-minimal` for the four boards plus
+`x64-prod` and `cx3576-prod` (dev features, `PROFILE=prod`, development keys
+and channel). The minimal products declare `product.env` `PUBLISH=0`, which
+`release.sh plan` skips, refusing a scope holding only them; CI rehearses the
+release path on the prod products. Every image kind is gzipped twice with
+`gzip -n -9`, compared, and verified against the raw image before upload
+(`x64-prod` 1.88 GB to 83 MB in 41 s, `cx3576-prod` 1.36 GB to 86 MB in 24 s).
+No release is cut until the user confirms the form of the OCI image layer.
+
 ## 2026-09-15 18:51 [decision]
 
 No manually triggered release workflow (user): there is no `cut-release.yml`,

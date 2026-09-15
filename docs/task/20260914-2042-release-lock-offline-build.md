@@ -700,3 +700,32 @@ Moving the repositories to the release lock format
   reconsidered by the user, so `docs/design/release-lock.md` section 2 waits.
   User decision: no manually triggered release workflow (no
   `cut-release.yml`); releases stay `gh release create` only.
+- 2026-09-15: `mica-build` `main` `669b60713f406628f825e32fd378369359a00ef7`,
+  ci run 35012585951 green (19 jobs).
+  - Products (10): `x64-dev`, `x64-prod`, `x64-minimal`, `virt-arm64-dev`,
+    `virt-arm64-minimal`, `cx3576-dev`, `cx3576-prod`, `cx3576-minimal`,
+    `s905x5m-dev`, `s905x5m-minimal`. `x64-prod` and `cx3576-prod` carry the
+    dev features with `PROFILE=prod`, the dev `meta/`, the development keys
+    and the development channel.
+  - The never-released property is `product.env` `PUBLISH=0` (not
+    `RELEASE=0`, since a printed `RELEASE=` would overwrite the release name
+    in `tools/product-build.sh`): `0` or `1`, default `1`; `release.sh plan`
+    skips `PUBLISH=0` products and refuses a scope holding only such
+    products; every `<board>-minimal` declares `PUBLISH=0`.
+  - `ci.yml` release-products rehearses on `x64-prod` (6m22s) and
+    `cx3576-prod` (11m33s).
+  - Prod results (local): `x64-prod` smoke 12/12, verify 102, the
+    factory-root gate, negatives 3/3, repart, `lifecycle-uefi` pass, UKI
+    command line `mica.profile=prod`; `cx3576-prod` smoke 11 plus crun
+    (executor-limited), verify 124, the gate, negatives, repart. The kernel
+    component refuses a FIT kernel whose forced `CONFIG_CMDLINE` lacks
+    `mica.profile=prod`.
+  - Compressed images: `release.sh collect` gzips each image kind twice
+    (`gzip -n -9`, GNU gzip 1.13 in `mica-build-env:base`), compares them,
+    and decompresses to the raw sha256 and size before upload; the asset is
+    `mica-<product>-<release>.<suffix>.gz` and the raw `.img` is not
+    uploaded; `release-test` 23/23. Measured: `x64-prod` 1881145344 to
+    82907954 bytes (4.4%) in 41 s; `cx3576-prod` 1362100224 to 86480191
+    bytes (6.3%) in 24 s.
+  - The form of the OCI image layer is still pending the user (committed as
+    the `.gz`); no release is cut before it is confirmed.

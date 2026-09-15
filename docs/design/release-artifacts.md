@@ -106,8 +106,10 @@ publish every image kind as a deterministic
 build-env base, compressed twice and compared, never a raw image), verified by
 decompressing it against the raw signed image's sha256 and size, which the
 OCI layer also records as `mica.uncompressed-sha256` and
-`mica.uncompressed-size`; update archives stay uncompressed, and the raw image
-is still built, gated and verified; releases carry `<board>-dev` and
+`mica.uncompressed-size` (implemented on `mica-build` `main` `669b607`, not
+released yet; measured: `x64-prod` 1881145344 to 82907954 bytes in 41 s,
+`cx3576-prod` 1362100224 to 86480191 bytes in 24 s); update archives stay
+uncompressed, and the raw image is still built, gated and verified; releases carry `<board>-dev` and
 `<board>-prod` (`x64-prod`, `cx3576-prod`) and never the `<board>-minimal`
 products, which are built locally and in CI only (the minimal assets of
 `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are,

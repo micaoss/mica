@@ -366,3 +366,9 @@ owner, dispatched by the coordinator.
   reconsidered by the user, so `docs/design/release-lock.md` section 2 waits.
   User decision: no manually triggered release workflow (no
   `cut-release.yml`); releases stay `gh release create` only.
+- 2026-09-15: `mica-build` `669b607` (ci run 35012585951 green) has ten
+  products, among them `x64-prod` and `cx3576-prod`; the `<board>-minimal`
+  products declare `PUBLISH=0` and are never released; every image kind is
+  published as a verified `.gz` (`x64-prod` 4.4% of the raw size in 41 s,
+  `cx3576-prod` 6.3% in 24 s). No release is cut until the user confirms the
+  form of the OCI image layer.
