@@ -50,6 +50,9 @@ jobs:
       - name: Upload to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
+          # The action defaults to Wrangler 3, which demands an entry point.
+          # Serving assets without a Worker script needs Wrangler 4.
+          wranglerVersion: '4.131.2'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: website
