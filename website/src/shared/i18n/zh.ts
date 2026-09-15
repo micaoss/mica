@@ -120,6 +120,12 @@ export const zh = {
     history: '显示历史版本',
     historyHide: '只看最新版本',
     sample: '以下为示例数据，用于展示筛选，不是真实发布。',
+    boardDocs: {
+      heading: '这块板卡怎么用',
+      install: { title: '刷机指南', body: '把镜像写到板子上，直到第一次启动起来。', cta: '安装当前开发镜像' },
+      update: { title: '升级与回滚', body: '签名的 A/B 部署、健康确认，以及失败时退回上一份。', cta: '更新与回滚' },
+      trouble: { title: '出问题的时候', body: '怎么接进去、该读哪些证据、系统的拒绝信息怎么解读。', cta: '故障排查' },
+    },
     obtain: {
       heading: '怎么拿到镜像',
       build: {

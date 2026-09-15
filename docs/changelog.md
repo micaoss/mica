@@ -2914,3 +2914,11 @@ An entry now carries `filename` as published, and the download column shows it: 
 `downloads`.
 
 The site builds 44 pages, eight of them board pages (four boards × two locales).
+
+## 2026-09-15 06:47 [progress]
+
+A board page now carries the three documents someone acts on after taking a file from it:
+flashing (`user/install`), updates and rollback (`user/update-rollback`), and troubleshooting
+(`user/troubleshooting`). They sit between the download table and the verification block,
+which is the order the work happens in — obtain, write, update, diagnose. Both locales
+resolve to their own documentation.

@@ -110,6 +110,12 @@ export const en: typeof zh = {
     history: 'Show earlier versions',
     historyHide: 'Latest only',
     sample: 'The rows below are sample data shown to demonstrate filtering. They are not a release.',
+    boardDocs: {
+      heading: 'Working with this board',
+      install: { title: 'Flashing', body: 'Writing an image to the board, through to first boot.', cta: 'Install a current development image' },
+      update: { title: 'Updates and rollback', body: 'Signed A/B deployments, the health gate, and falling back when one fails.', cta: 'Updates and rollback' },
+      trouble: { title: 'When something goes wrong', body: 'How to get in, what evidence to read, and how to interpret a refusal.', cta: 'Troubleshooting' },
+    },
     obtain: {
       heading: 'How to get an image',
       build: {
