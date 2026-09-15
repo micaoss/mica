@@ -178,6 +178,11 @@ carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
 
 In an offline OCI layout the last part is `offline` (section 6).
 
+A pool manifest carries only release-independent annotations (section 2), so
+a pool whose packages did not change is byte-identical across releases: its
+new `pool.<...>.<release>` tag is a new tag on the same digest (user,
+2026-09-15, `docs/decisions/2026-09-15-package-versions.md`).
+
 ### 1.4 Order
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,
@@ -229,13 +234,16 @@ package of the repository that publishes them.
   `artifactType` `application/vnd.mica.pool`, an empty config, one layer per
   archive with `mediaType` `application/vnd.mica.deb` and
   `org.opencontainers.image.title` the archive's file name with its real `+`,
-  and optionally `mica.inputs=<sha256>`, the inputs hash of the producer that
-  built the archive (every package of one producer shares it), the guard
-  against inputs that changed without a version bump
-  (`docs/decisions/2026-09-15-package-versions.md`). The lock rows do
-  not change. An `all` archive is a layer of both pools. Manifest annotations:
-  `org.opencontainers.image.revision`, `.created` (the commit time), `.source`,
-  `.version`, `mica.source-repo`, `mica.source-commit`, `mica.arch`.
+  and `mica.inputs=<sha256>`, the inputs hash of the producer and architecture
+  that built the archive, the guard against inputs that changed without a
+  version bump (`docs/decisions/2026-09-15-package-versions.md` R4). An `all`
+  archive is a layer of both pools. The manifest carries only
+  release-independent annotations: `mica.source-repo` and `mica.arch`. There
+  is no `org.opencontainers.image.version`, `.revision`, `.created` or
+  `mica.source-commit` on a pool manifest, so a pool whose packages did not
+  change keeps its digest and a release only adds a tag to it. The `package`
+  rows are unchanged, and `mica.inputs` is not in the lock (user, 2026-09-15).
+  Board component manifests keep their own annotations (below).
 - **Board components** `<component>.<board>.<release>` (`mica-boards`): a
   board is published as separate component artifacts (2026-09-15, agreed by
   `mica-boards` and `mica-build`), each an OCI image manifest with an empty

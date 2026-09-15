@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-15 10:31 [decision]
+
+The unified package-version rules are resolved (user, "全部按建议处理") and
+adopted by `mica-boards`, `mica-system-base`, `mica-podman` and `mica-core`,
+with no compatibility: versions and `SOURCE_DATE_EPOCH` are declared next to
+each package or producer and bumped deliberately (R1, R2); no commit,
+date or release reaches a package or binary, and `Mica-Source-Commit` is
+dropped (R3); the per-producer inputs hash, excluding build-env digests, is
+only a guard recorded as `mica.inputs` (R4); CI and releases reuse an
+unchanged package by digest after proving a byte-identical rebuild, and refuse
+changed inputs without a bump (R5); pool manifests carry only
+`mica.source-repo`, `mica.arch` and per-layer title and `mica.inputs`, so an
+unchanged pool keeps its digest (R6); `mica-core` keeps exact `micad` pins
+(R7); `make offline` only warns (R8). `docs/design/release-lock.md` 1.3 and
+section 2, `docs/decisions/2026-09-15-package-versions.md`. The repositories
+implement next, each cutting one full release first.
+
 ## 2026-09-15 10:20 [decision]
 
 Packages are locked by their own version (user): a release never changes a
