@@ -42,7 +42,9 @@ every other repository's release is unscoped:
 `mica-boards` lock holds only its board: every `board` row names the scope's
 board with a reference tag `<component>.<scope>.<release>`, and every `pool`
 tag is `pool.<scope>.<arch>.<release>` (`scope-content`). A `mica-boards` lock
-has two to four `board` rows, one per component the board publishes. The lock's release
+has a `board` row for the `board` component and one for `kernel`, and one
+for `uboot` and `firmware` where the board publishes them, so two to four
+(`board-components`). The lock's release
 row carries the scoped tag (1.2), OCI tags carry the scope before the release
 (1.3), and a consumer keeps each scope as its own input (section 4).
 
@@ -168,6 +170,7 @@ the ones the vectors use:
 | `duplicate-key` | two rows of one kind with the same key (a second `apt` row included) |
 | `base-only-kind` | an `upstream` or `apt` row in a lock of any repository but `mica-system-base` |
 | `package-without-pool` | a `package` row whose arch has no `pool` row |
+| `board-components` | a `mica-boards` lock without a `board` row for the `board` component or one for `kernel` |
 | `sort-order` | rows out of the order of 1.4 |
 
 Registry checks come on top, when a lock is published or consumed: every
@@ -449,8 +452,9 @@ The vectors are files every repository copies into its own tests:
   refusals are `scoped-release-not-allowed.lock` and `unscoped-release.lock`
   (`release-scope`), `scope-content-board.lock`, `scope-content-pool.lock`
   and `scope-content-tag.lock` (`scope-content`); the component refusals are
-  `board-component.lock` (`field-value`) and `board-duplicate-component.lock`
-  (`duplicate-key`).
+  `board-component.lock` (`field-value`), `board-duplicate-component.lock`
+  (`duplicate-key`) and `board-components.lock` (`board-components`, no
+  `kernel` row).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
   (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release` and
   `scoped` (two `mica-boards` boards, one with all four components, beside

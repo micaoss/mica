@@ -27,7 +27,8 @@
 - A release carries exactly `mica-boards.lock` and `SHA256SUMS`; the lock's
   release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`. Each
   component is a row `board <board> <component> <arch> <reference>` (key
-  board and component), two to four per lock, and the lock holds only that
+  board and component), two to four per lock (`board` and `kernel` required,
+  `uboot` and `firmware` optional; refused otherwise as `board-components`), and the lock holds only that
   board: every `board` row names it with a tag `<component>.<board>.<...>` and
   every pool tag is `pool.<board>.<arch>.<...>` (refused otherwise as
   `scope-content`).

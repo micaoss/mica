@@ -156,6 +156,8 @@ def check_lock(path):
         raise Refused("base-only-kind")
     if any(r[0] == "package" and r[2] not in pools for r in rows):
         raise Refused("package-without-pool")
+    if repository == "mica-boards" and not {"board", "kernel"} <= {r[2] for r in rows if r[0] == "board"}:
+        raise Refused("board-components")
     if sort_keys != sorted(sort_keys):
         raise Refused("sort-order")
     return repository, scope, release

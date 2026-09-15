@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-15 05:49 [decision]
+
+A `mica-boards` lock must name the `board` and `kernel` components (`uboot` and
+`firmware` stay optional); the checker refuses one without either as
+`board-components`, with the refused vector `board-components.lock` (no
+`kernel` row). With the board-and-component key this gives two to four
+`board` rows (`docs/design/release-lock.md` 1.0 and 1.5).
+
 ## 2026-09-15 05:47 [decision]
 
 Agreed by `mica-boards` and `mica-build`: a board is published as separate
