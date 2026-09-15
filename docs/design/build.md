@@ -108,8 +108,8 @@ package pin.
 
 A board is an input like any other (`mica-build` `0094a097`): one
 `locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
-(`SCOPE=<board>`) per board, today the per-board releases
-`<board>/20260915-0824`; the former `deps/boards/` pins are removed. `make
+(`SCOPE=<board>`) per board, pinning the per-board releases (the current ones
+are `<board>/20260915-1128`); the former `deps/boards/` pins are removed. `make
 board-fetch BOARD=<board>` (`tools/board-pool.sh`) reads the board's component
 artifacts by the digests of its `board` rows into `_out/boards/<board>/`,
 checks them against the board's `outputs.tsv`, and refuses a component whose
