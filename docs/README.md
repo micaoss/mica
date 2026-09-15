@@ -89,6 +89,7 @@ work in progress lives in `plan/` and `task/`.
   - `recovery.md` — reset tiers, interrupted retry, credential and presence gates, shared-store recovery limits
   - `release-artifacts.md` — the release directory: manifest schema, SHA256SUMS, SBOM, provenance, licenses and customer verification
   - `release-lock.md` — the `mica-lock v1` release lock, the OCI layout, `locks/pins/<repository>.pin`, the `repos/` cache and the offline build, with test vectors
+  - `mica-index.md` — the Mica version index release `mica/<YYYYMMDD-HHMM>` and its `mica-index.json` (`mica/index/v1`)
   - `release-signing.md` — independent boot, content and metadata trust, rotation and firmware maintenance
   - `remote-management.md` — what reaches the device today, the NAT requirement, the designed fleet protocol and update control flow
   - `ro-root.md` — read-only root: squashfs and dm-verity packing and boot wiring

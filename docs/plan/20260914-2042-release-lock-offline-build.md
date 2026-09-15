@@ -405,3 +405,13 @@ owner, dispatched by the coordinator.
   `cx3576-dev`, whose rootfs identities were unchanged), on boards
   `<board>/20260915-1926`, core `20260915-1135`, Base `20260915-1102`, podman
   `20260915-1057` and build-env `20260915-0138`.
+- 2026-09-15 (user, "同意"): the Mica version index release
+  `mica/<YYYYMMDD-HHMM>` of `mica-build`
+  (`docs/decisions/2026-09-15-mica-version-index.md`). An automatic index job
+  after every successful scoped release cuts an immutable release naming the
+  newest scoped release of every `PUBLISH=1` product. Its lock adds the
+  `origin`, `built` and `index` rows beside the copied product rows
+  (`docs/design/release-lock.md` 1.2.3, with the checker and 8 new vectors),
+  and its assets are the lock, `mica-index.json` (`mica/index/v1`,
+  `docs/design/mica-index.md`) and `SHA256SUMS`. Index releases are the
+  GitHub latest; scoped releases use `--latest=false`.

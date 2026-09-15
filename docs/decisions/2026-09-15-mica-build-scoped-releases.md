@@ -68,6 +68,10 @@ archives are `full`, `root` and `kernel`
 - A release covers its scope only, not every product.
 - A release is still cut only with `gh release create`; there is no manually
   triggered release workflow such as a `cut-release.yml` (user, 2026-09-15).
+- Scoped releases are cut with `--latest=false`; after every fully
+  successful scoped release, `release.yml`'s index job cuts the Mica version
+  index release `mica/<YYYYMMDD-HHMM>`, which is the GitHub latest release
+  (`docs/decisions/2026-09-15-mica-version-index.md`).
 
 Every other repository keeps the uniform rules, except that `mica-boards`
 also releases by scope (per board) with the uniform assets.

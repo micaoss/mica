@@ -116,6 +116,12 @@ products, which are built locally and in CI only (the minimal assets of
 `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are,
 `docs/decisions/2026-09-15-minimal-products-not-released.md`), and `s905x5m`
 is not a release target.
+A Mica version is the index release `mica/<YYYYMMDD-HHMM>`, cut automatically
+after every successful scoped release: it carries only `mica-build.lock`,
+`mica-index.json` and `SHA256SUMS`, references the newest scoped release of
+every published product, and is the GitHub latest release, so the greatest
+`mica/*` tag is the newest version (`docs/decisions/2026-09-15-mica-version-index.md`,
+`docs/design/mica-index.md`).
 The output directory must not exist. A failed assembly must not be published.
 
 The current `GENERATED` marker has exactly one declaration:

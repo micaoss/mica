@@ -845,3 +845,13 @@ Moving the repositories to the release lock format
     `x64-dev`, 16111762 `cx3576-dev`); no raw `.img`. Gzip took 24 to 40 s
     per image, and every `.img.gz` decompresses to its layer's
     `mica.uncompressed-size` and `mica.uncompressed-sha256`.
+- 2026-09-15 (user, "同意"): the Mica version index release
+  `mica/<YYYYMMDD-HHMM>` of `mica-build`
+  (`docs/decisions/2026-09-15-mica-version-index.md`). An automatic index job
+  after every successful scoped release cuts an immutable release naming the
+  newest scoped release of every `PUBLISH=1` product. Its lock adds the
+  `origin`, `built` and `index` rows beside the copied product rows
+  (`docs/design/release-lock.md` 1.2.3, with the checker and 8 new vectors),
+  and its assets are the lock, `mica-index.json` (`mica/index/v1`,
+  `docs/design/mica-index.md`) and `SHA256SUMS`. Index releases are the
+  GitHub latest; scoped releases use `--latest=false`.

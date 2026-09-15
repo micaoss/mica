@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-15 21:11 [decision]
+
+The Mica version index release (user, "同意"): after every fully successful
+scoped release, `mica-build`'s `release.yml` cuts `mica/<YYYYMMDD-HHMM>`
+automatically, naming the newest scoped release of every published product;
+it is the GitHub latest release, scoped releases are not, and manual
+`mica/*` releases are refused. Its lock uses the scope `mica` with `input`
+rows for the referenced releases, new `origin`, `built` and `index` rows,
+and the indexed products' `product`, `bundle` and `asset` rows copied byte for
+byte; its assets are that lock, `mica-index.json` (`mica/index/v1`, the whole
+state for an external reader) and `SHA256SUMS`. The release-lock spec (1.2.3),
+the checker and 8 vectors add the rules `index-scope`, `index-only-inputs`,
+`index-input`, `index-product-source` and `index-built-form` (154 checks).
+`docs/decisions/2026-09-15-mica-version-index.md`, `docs/design/mica-index.md`.
+
 ## 2026-09-15 20:58 [progress]
 
 The second `mica-build` scoped releases, `x64/20260915-2042` and
