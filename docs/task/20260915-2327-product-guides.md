@@ -1,6 +1,6 @@
 # 20260915-2327-product-guides Complete the product documentation: overview, build, porting, flashing, updates and releasing
 
-- **status**: in_progress
+- **status**: completed
 - **priority**: P1
 - **owner**: olea2l5k
 - **createdAt**: 2026-09-15 23:27
@@ -47,3 +47,21 @@ Writing the product guides
   coverage rows with each page. `docs/architecture.md` and the existing design
   pages are left to task `20260915-0316-docs-multi-repo-ownership`, which is
   in progress in this repository.
+- 2026-09-15: written and pushed, each piece gated on `make docs-verify`:
+  `aa9e6a8` overview and this record, `c7780c1` releasing, `35c78b0`
+  update-packages, `b43ed6f` porting, `e34d561` build, `1906d17` flashing,
+  `6cc6e73` download, `534f170` quickstart, `5b8f5bd` install. `3fd60fa` fixes
+  a race in `tools/docs/verify-release-lock.sh` found while gating: a vector
+  near the head of the list could be reported as unlisted because `grep -q`
+  exits early and the writing `printf` dies of SIGPIPE under `pipefail`.
+- 2026-09-15: the facts came from the coordinator's handoff files for
+  `mica-build` (main `19e7c9ce`) and `mica-boards` (main `07e499a`). Only items
+  marked as run are published as commands; the unverified ones are flagged in
+  the text: no physical x64 write (the x64 path is qualified under QEMU only),
+  no cx3576 hardware flash or Maskrom entry sequence, no s905x5m boot0 install
+  path, and no vendor packers. `mica-core`'s device-side facts had not arrived,
+  so the first-boot and `mica-deploy` refusal detail of `flashing.md` and
+  `update-packages.md` stays at what the assembly guarantees.
+- 2026-09-15: the Chinese set keeps pace only where a translation already
+  existed (`download.md`, `quickstart.md`, `install.md`, retranslated with
+  their English pages). The five new pages carry `not-translated` rows.
