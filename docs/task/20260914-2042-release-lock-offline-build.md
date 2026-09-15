@@ -855,3 +855,14 @@ Moving the repositories to the release lock format
   and its assets are the lock, `mica-index.json` (`mica/index/v1`,
   `docs/design/mica-index.md`) and `SHA256SUMS`. Index releases are the
   GitHub latest; scoped releases use `--latest=false`.
+- 2026-09-15 (user): the Mica version index is amended for scale. Generation
+  is incremental (the previous index, checked against its `SHA256SUMS`, plus
+  the scoped release just published, with full cross-release checks only for
+  entering or replacing entries and a full first index), and `mica-build`'s
+  `ci.yml` re-verifies the newest index in full on pushes to `main`
+  (`tools/release.sh verify-index <tag> --full`). `mica-index.json` shares one
+  top-level inputs table referenced by id, reserves per-board sharding, and
+  uses booleans for `publish` and `releaseTarget`. The index is implemented
+  on `mica-build` `main` `da1d36a1` (index job live, CI dry run green, key
+  order aligned to `docs/design/mica-index.md`); the schema text is aligned
+  exactly once `mica-build` sends its emitted shape.

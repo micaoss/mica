@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 22:02 [decision]
+
+The Mica version index is amended for scale (user): a new index is the
+previous `mica/*` index, checked against its `SHA256SUMS`, plus the scoped
+release just published, and only entering or replacing entries get the full
+cross-release checks, while `mica-build`'s CI re-verifies the newest index in
+full on every push to `main`. `mica-index.json` gains one shared inputs table
+referenced by id, reserves per-board sharding, and makes the catalogue's
+`publish` and `releaseTarget` booleans; products no longer published move to
+the catalogue only. The index job is implemented on `mica-build` `da1d36a1`
+(CI dry run green); no `mica/*` release is cut yet.
+`docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`.
+
 ## 2026-09-15 21:11 [decision]
 
 The Mica version index release (user, "同意"): after every fully successful
