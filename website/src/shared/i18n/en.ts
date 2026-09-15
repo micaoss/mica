@@ -81,7 +81,7 @@ export const en: typeof zh = {
   },
   download: {
     title: 'Downloads',
-    lead: 'Pick a signed deployment by board, profile and artifact kind. This repository publishes no public download list: images are built from source, or delivered by the integrator together with what is needed to verify them.',
+    lead: 'Pick an image by board and profile; the newest version of each is what you see. This repository publishes no public download list: images are built from source, or delivered by the integrator together with what is needed to verify them.',
     filters: {
       board: 'Board',
       profile: 'Profile',

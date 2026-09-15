@@ -91,7 +91,7 @@ export const zh = {
   },
   download: {
     title: '下载',
-    lead: '按板卡、profile 与产物类型挑出签名部署。本仓库不发布公开下载列表：镜像从源码构建，或由集成方连同校验材料一起交付。',
+    lead: '按板卡与 profile 挑出镜像，默认是每个组合的最新版本。本仓库不发布公开下载列表：镜像从源码构建，或由集成方连同校验材料一起交付。',
     filters: {
       board: '板卡',
       profile: 'Profile',
