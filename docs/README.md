@@ -149,6 +149,7 @@ work in progress lives in `plan/` and `task/`.
 - `zh/` — Chinese user guides
 
 `make docs-verify` checks catalog membership in both directions, internal
-links, truth-status evidence, board dossiers, Chinese coverage, tracking
-records and stale terms. Add or remove a catalog row in the same change as its
-document.
+links, truth-status evidence, board dossiers, Chinese coverage and the
+release-lock vectors. Add or remove a catalog row in the same change as its
+document. `plan/` and `task/` are development records: nothing checks them and
+nothing publishes them.

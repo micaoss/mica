@@ -2747,3 +2747,24 @@ product description as the sentence under it. `README.zh-CN.md` keeps its langua
 `docs/website/product.md` still describes the audience as "teams that ship a device, not a
 distribution". That is the content contract's *who it is for*, not the slogan, so it is left
 until the site's own copy is reviewed against it.
+
+## 2026-09-15 05:00 [decision]
+
+`verify-tracking` and `verify-terms` are removed, with their self-tests, on the user's call:
+`plan/` and `task/` are development records, published nowhere, and their internal
+consistency does not need a gate.
+
+What goes with them:
+
+- **`verify-tracking`** (322 assertions): index markers against each record's `status`
+  field. Nothing now catches a record that says `completed` under a `[-]` row.
+- **`verify-terms`** (107 assertions): its subject was not the tracking tree but the
+  permanent documents — it refused the vocabulary of removed systems (RAUC, TUF, lode,
+  raw-slot, the STATE partition, boot credits, connd), refused numbered record IDs
+  (`PLAN-NNN`, `RFCT-NNN`, `UI-NNN`) in permanent prose, and required that a cited
+  `<timestamp>-<slug>` record still exist. A permanent document may now name a system that
+  no longer exists, or cite a record that was deleted, without failing the build.
+
+`make docs-verify` is six scripts and 1931 assertions: catalog both ways, internal links,
+truth-status evidence, board dossiers, Chinese coverage, release-lock vectors.
+`make docs-verify-test` is five.
