@@ -7,9 +7,21 @@
   "assets": {
     "directory": "./dist"
   },
-  // Temporary: serves the labelled sample catalogue so the download filters can
-  // be seen working. Remove it when CATALOG_SOURCE points at real metadata.
+  // The parsed catalogue lives in KV; the read path never calls GitHub. Create
+  // the namespace with `wrangler kv namespace create CATALOG`, paste the id, and
+  // uncomment both blocks — deploying with a namespace that does not exist fails.
+  // "kv_namespaces": [
+  //   { "binding": "CATALOG", "id": "..." }
+  // ],
+  // The cron rebuilds the stored catalogue; a manual refresh is
+  // POST /api/catalog/refresh with the REFRESH_TOKEN secret.
+  // "triggers": {
+  //   "crons": ["*/30 * * * *"]
+  // },
   "vars": {
+    "CATALOG_REPO": "micaoss/mica-build",
+    // Temporary: answers the labelled sample instead of KV. Remove once the
+    // namespace exists and a refresh has run.
     "CATALOG_DEMO": "1"
   },
   // Both hostnames resolve to this Worker; the zone has to be on the same

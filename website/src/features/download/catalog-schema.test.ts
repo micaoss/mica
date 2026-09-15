@@ -31,7 +31,18 @@ describe('parseCatalog', () => {
 
   it('drops a form this site does not publish', () => {
     expect(parseCatalog({ downloads: [{ ...VALID, kind: 'kernel' }] })).toEqual([])
-    expect(parseCatalog({ downloads: [{ ...VALID, profile: 'staging' }] })).toEqual([])
+  })
+
+  it('takes the product name as the source gives it', () => {
+    // dev, minimal, prod — the catalogue names the products, the page offers
+    // what it finds. A fixed list here would hide a product the build publishes.
+    expect(parseCatalog({ downloads: [{ ...VALID, profile: 'minimal' }] })[0].profile)
+      .toBe('minimal')
+  })
+
+  it('keeps an entry with no deployment id, since not every source names one', () => {
+    const { deploymentId: _id, ...withoutId } = VALID
+    expect(parseCatalog({ downloads: [withoutId] })).toHaveLength(1)
   })
 
   it('reads a bare array as well as the wrapped form', () => {

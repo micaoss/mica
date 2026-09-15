@@ -1,4 +1,4 @@
-import type { Download, DownloadKind, Profile } from '../catalog'
+import type { Download, DownloadKind } from '../catalog'
 import type { Copy } from '@/shared/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
@@ -28,8 +28,6 @@ import {
   selectVersions,
 } from '../catalog'
 import { isSample, parseCatalog } from '../catalog-schema'
-
-const PROFILES: Profile[] = ['dev', 'prod']
 
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
 const ALL = 'all'
@@ -118,8 +116,13 @@ export function DownloadExplorer({
     [downloads, fetched, board],
   )
 
+  const profiles = useMemo(
+    () => [...new Set(catalogue.map(download => download.profile))].sort(),
+    [catalogue],
+  )
+
   const matching = filterDownloads(catalogue, {
-    profile: profile === ALL ? undefined : (profile as Profile),
+    profile: profile === ALL ? undefined : profile,
     kind: kind === ALL ? undefined : (kind as DownloadKind),
     query,
   })
@@ -136,7 +139,7 @@ export function DownloadExplorer({
           allLabel={filters.all}
           value={profile}
           onChange={setProfile}
-          options={PROFILES.map(value => ({ value, label: value }))}
+          options={profiles.map(value => ({ value, label: value }))}
         />
         <Facet
           label={cols.kind}
@@ -195,7 +198,7 @@ export function DownloadExplorer({
                             {download.releasedAt}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
-                            {download.deploymentId}
+                            {download.deploymentId ?? '—'}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
                             {formatBytes(download.bytes)}

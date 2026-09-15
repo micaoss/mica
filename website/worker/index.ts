@@ -1,98 +1,148 @@
+import type { Download } from '../src/features/download/catalog'
+import type { GithubRelease } from '../src/features/download/github'
+import { downloadsFromReleases } from '../src/features/download/github'
+
 /**
- * The site is static; this Worker exists for one route.
+ * The site is static; this Worker exists for the download catalogue.
  *
- * `GET /api/catalog` answers the download page's artifact catalogue. It reads
- * `CATALOG_SOURCE` — a URL serving the same JSON — and passes it through, so the
- * page has one contract whatever ends up publishing the metadata. With no
- * source configured it answers an empty catalogue, which is the honest state
- * until a product image is published: `mica-build` cuts no release yet.
- *
- * Static assets are served by Cloudflare before this runs; only a request that
- * matches no asset reaches here.
+ * `GET /api/catalog` answers from KV and never calls GitHub: the read path is a
+ * key lookup. `POST /api/catalog/refresh` and the cron trigger are what rebuild
+ * the stored catalogue, so a rate limit or an outage upstream costs a stale
+ * answer rather than a broken page.
  */
 
 interface Env {
-  /** URL of the upstream catalogue. Unset until something publishes one. */
-  CATALOG_SOURCE?: string
-  /** `1` serves the sample catalogue below, marked as a sample in the answer. */
+  /** Stores the parsed catalogue. */
+  CATALOG: KVNamespace
+  /** `owner/repo` whose releases are parsed. */
+  CATALOG_REPO?: string
+  /** Read-only GitHub token; without one the API allows 60 calls an hour per IP. */
+  GITHUB_TOKEN?: string
+  /** Bearer token the manual refresh requires. */
+  REFRESH_TOKEN?: string
+  /** `1` answers the sample catalogue instead of reading KV. */
   CATALOG_DEMO?: string
 }
 
-/**
- * A sample, and labelled as one everywhere it surfaces. Nothing here is a
- * release: no repository publishes a product image yet, and the content
- * contract refuses hand-written release identities presented as real. Several
- * boards carry more than one version and more than one form, so a board page's
- * filters and history control have something to work on.
- */
-const SAMPLE = [
-  { board: 'x64', profile: 'dev', kind: 'image', version: '2026.09-2', deploymentId: 'sample-x64-dev-2', releasedAt: '2026-09-12', bytes: 1_073_741_824, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'x64', profile: 'dev', kind: 'image', version: '2026.09-1', deploymentId: 'sample-x64-dev-1', releasedAt: '2026-09-02', bytes: 1_070_000_000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'x64', profile: 'dev', kind: 'update', version: '2026.09-2', deploymentId: 'sample-x64-dev-2', releasedAt: '2026-09-12', bytes: 52_428_800, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/', filename: 'x64-2026.09-2.micaupd' },
-  { board: 'x64', profile: 'prod', kind: 'image', version: '2026.09-2', deploymentId: 'sample-x64-prod-2', releasedAt: '2026-09-12', bytes: 1_020_000_000, digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'virt-arm64', profile: 'dev', kind: 'image', version: '2026.09-1', deploymentId: 'sample-virt-dev-1', releasedAt: '2026-09-02', bytes: 998_000_000, digest: 'sha256:4444444444444444444444444444444444444444444444444444444444444444', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'cx3576', profile: 'prod', kind: 'image', version: '2026.08-3', deploymentId: 'sample-cx3576-3', releasedAt: '2026-08-20', bytes: 1_240_000_000, digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'cx3576', profile: 'prod', kind: 'image', version: '2026.08-1', deploymentId: 'sample-cx3576-1', releasedAt: '2026-08-04', bytes: 1_230_000_000, digest: 'sha256:6666666666666666666666666666666666666666666666666666666666666666', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-  { board: 'cx3576', profile: 'prod', kind: 'firmware', version: '2026.08-3', deploymentId: 'sample-cx3576-3', releasedAt: '2026-08-20', bytes: 4_194_304, digest: 'sha256:7777777777777777777777777777777777777777777777777777777777777777', href: 'https://micaos.dev/docs/user/download/', filename: 'cx3576-firmware.tar' },
-  { board: 's905x5m', profile: 'dev', kind: 'image', version: '2026.08-1', deploymentId: 'sample-s905x5m-1', releasedAt: '2026-08-04', bytes: 1_180_000_000, digest: 'sha256:8888888888888888888888888888888888888888888888888888888888888888', href: 'https://micaos.dev/docs/user/download/', filename: 'disk.img' },
-]
+interface StoredCatalogue {
+  downloads: Download[]
+  /** When the stored copy was built. */
+  refreshedAt: string
+  /** Newest `published_at` seen upstream, so a refresh can skip an unchanged set. */
+  latestRelease?: string
+}
 
 const CATALOG_PATH = '/api/catalog'
-/** Long enough to stay inside GitHub's rate limit, short enough to be current. */
+const REFRESH_PATH = '/api/catalog/refresh'
+const KEY = 'catalog'
+const DEFAULT_REPO = 'micaoss/mica-build'
+/** Long enough to stay cheap, short enough that a refresh surfaces quickly. */
 const CACHE_SECONDS = 300
+
+/**
+ * A sample, and labelled as one everywhere it surfaces. Nothing here is a
+ * release; it exists so the filters and the history control can be seen working
+ * where no catalogue is stored.
+ */
+const SAMPLE: Download[] = [
+  { board: 'x64', profile: 'dev', kind: 'image', version: '20260915-1458', deploymentId: 'sample-x64-dev', releasedAt: '2026-09-15', bytes: 1_881_145_344, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260915-1458.img' },
+  { board: 'x64', profile: 'dev', kind: 'update', version: '20260915-1458', deploymentId: 'sample-x64-dev', releasedAt: '2026-09-15', bytes: 81_425_461, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260915-1458.micaupd' },
+  { board: 'x64', profile: 'minimal', kind: 'image', version: '20260915-1458', deploymentId: 'sample-x64-minimal', releasedAt: '2026-09-15', bytes: 1_881_145_344, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-minimal-20260915-1458.img' },
+  { board: 'x64', profile: 'dev', kind: 'image', version: '20260901-1200', deploymentId: 'sample-x64-dev-old', releasedAt: '2026-09-01', bytes: 1_870_000_000, digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260901-1200.img' },
+  { board: 'cx3576', profile: 'dev', kind: 'image', version: '20260915-1515', deploymentId: 'sample-cx3576-dev', releasedAt: '2026-09-15', bytes: 1_362_100_224, digest: 'sha256:4444444444444444444444444444444444444444444444444444444444444444', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-cx3576-dev-20260915-1515.img' },
+  { board: 'cx3576', profile: 'dev', kind: 'update', version: '20260915-1515', deploymentId: 'sample-cx3576-dev', releasedAt: '2026-09-15', bytes: 84_986_579, digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-cx3576-dev-20260915-1515.micaupd' },
+]
 
 function json(body: unknown, seconds: number): Response {
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       // The browser holds it briefly; the edge holds it for the same window the
-      // Worker's own cache uses. Without `cdn-cache-control` the zone's default
-      // browser TTL applies and a catalogue change takes hours to surface.
+      // stored copy is refreshed in.
       'cache-control': 'public, max-age=60',
       'cdn-cache-control': `public, max-age=${seconds}`,
     },
   })
 }
 
-async function catalog(env: Env): Promise<Response> {
-  if (!env.CATALOG_SOURCE) {
-    return env.CATALOG_DEMO === '1'
-      ? json({ downloads: SAMPLE, sample: true }, CACHE_SECONDS)
-      : json({ downloads: [] }, CACHE_SECONDS)
+/** Reads every release of the configured repository and stores what parses. */
+async function refresh(env: Env): Promise<StoredCatalogue> {
+  const repo = env.CATALOG_REPO ?? DEFAULT_REPO
+  const headers: Record<string, string> = {
+    'accept': 'application/vnd.github+json',
+    'user-agent': 'micaos.dev',
   }
+  if (env.GITHUB_TOKEN)
+    headers.authorization = `Bearer ${env.GITHUB_TOKEN}`
+
+  const response = await fetch(`https://api.github.com/repos/${repo}/releases?per_page=100`, {
+    headers,
+  })
+  if (!response.ok)
+    throw new Error(`github answered ${response.status}`)
+
+  const releases = (await response.json()) as GithubRelease[]
+  const stored: StoredCatalogue = {
+    downloads: downloadsFromReleases(releases),
+    refreshedAt: new Date().toISOString(),
+    latestRelease: releases
+      .map(release => release.published_at ?? '')
+      .sort()
+      .at(-1) || undefined,
+  }
+
+  await env.CATALOG.put(KEY, JSON.stringify(stored))
+  return stored
+}
+
+async function catalogue(env: Env): Promise<Response> {
+  if (env.CATALOG_DEMO === '1')
+    return json({ downloads: SAMPLE, sample: true, refreshedAt: null }, CACHE_SECONDS)
+
+  const stored = await env.CATALOG.get<StoredCatalogue>(KEY, 'json')
+  if (!stored)
+    return json({ downloads: [], refreshedAt: null }, 60)
+
+  return json(stored, CACHE_SECONDS)
+}
+
+async function manualRefresh(request: Request, env: Env): Promise<Response> {
+  const expected = env.REFRESH_TOKEN
+  const given = request.headers.get('authorization')
+  // With no token configured the endpoint is closed, not open: a refresh that
+  // anyone can trigger is a way to spend the upstream rate limit.
+  if (!expected || given !== `Bearer ${expected}`)
+    return new Response('unauthorized', { status: 401 })
 
   try {
-    const upstream = await fetch(env.CATALOG_SOURCE, {
-      headers: { accept: 'application/json' },
-    })
-    if (!upstream.ok)
-      return json({ downloads: [] }, 60)
-
-    // Passed through unchanged: the page validates every entry and drops what it
-    // cannot read, so a malformed upstream degrades to an empty table rather
-    // than to invented rows.
-    return json(await upstream.json(), CACHE_SECONDS)
+    const stored = await refresh(env)
+    return json({ refreshedAt: stored.refreshedAt, downloads: stored.downloads.length }, 0)
   }
-  catch {
-    return json({ downloads: [] }, 60)
+  catch (error) {
+    return json({ error: (error as Error).message }, 0)
   }
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
+
+    if (url.pathname === REFRESH_PATH) {
+      return request.method === 'POST'
+        ? manualRefresh(request, env)
+        : new Response('method not allowed', { status: 405, headers: { allow: 'POST' } })
+    }
+
     if (url.pathname !== CATALOG_PATH)
       return new Response('not found', { status: 404 })
     if (request.method !== 'GET')
       return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } })
 
-    const cache = (caches as unknown as { default: Cache }).default
-    const hit = await cache.match(request)
-    if (hit)
-      return hit
+    return catalogue(env)
+  },
 
-    const response = await catalog(env)
-    await cache.put(request, response.clone())
-    return response
+  /** The cron trigger; a failure leaves the stored copy standing. */
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(refresh(env).catch(() => {}))
   },
 }

@@ -1,4 +1,4 @@
-import type { Download, DownloadKind, Profile } from './catalog'
+import type { Download, DownloadKind } from './catalog'
 import { DOWNLOAD_KINDS } from './catalog'
 
 /**
@@ -7,39 +7,29 @@ import { DOWNLOAD_KINDS } from './catalog'
  * than completed with a guess.
  */
 
-const PROFILES: Profile[] = ['dev', 'prod']
-
 function readDownload(value: unknown): Download | null {
   if (typeof value !== 'object' || value === null)
     return null
 
   const entry = value as Record<string, unknown>
-  const strings = [
-    'board',
-    'version',
-    'deploymentId',
-    'releasedAt',
-    'digest',
-    'href',
-    'filename',
-  ] as const
+  const strings = ['board', 'profile', 'version', 'releasedAt', 'digest', 'href', 'filename'] as const
   for (const key of strings) {
     if (typeof entry[key] !== 'string' || entry[key] === '')
       return null
   }
   if (typeof entry.bytes !== 'number' || !Number.isFinite(entry.bytes))
     return null
-  if (!PROFILES.includes(entry.profile as Profile))
-    return null
   if (!DOWNLOAD_KINDS.includes(entry.kind as DownloadKind))
     return null
 
   return {
     board: entry.board as string,
-    profile: entry.profile as Profile,
+    profile: entry.profile as string,
     kind: entry.kind as DownloadKind,
     version: entry.version as string,
-    deploymentId: entry.deploymentId as string,
+    ...(typeof entry.deploymentId === 'string' && entry.deploymentId !== ''
+      ? { deploymentId: entry.deploymentId }
+      : {}),
     releasedAt: entry.releasedAt as string,
     bytes: entry.bytes,
     digest: entry.digest as string,

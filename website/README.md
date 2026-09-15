@@ -48,44 +48,51 @@ work, internal decisions and board dossiers that would mislead a visitor.
 `/download/` lists the boards; each board's page (`/download/<board>/`) carries what can be
 obtained for it, in three forms: **system image**, **update package**, **firmware package**.
 The components inside a deployment — kernel, root, support — are not downloads; they arrive
-through an update. A board page opens on the newest version of each form and profile, and a
+through an update. A board page opens on the newest version of each form and product, and a
 control loads the earlier ones.
 
-The board pages read `/api/catalog` at runtime and keep the rows whose `board` is theirs.
-`website/worker/index.ts` answers it: with `CATALOG_SOURCE` set — a URL serving the same
-JSON — it passes that through; with nothing configured it answers an empty catalogue, which
-is the current state, because no repository publishes a product image yet.
+### Where the rows come from
 
-Every entry is validated in the page (`src/features/download/catalog-schema.ts`) and dropped
-whole if a field is missing, so a malformed upstream degrades to the empty state rather than
-to invented rows. Set the source with `wrangler secret put CATALOG_SOURCE`, or as a plain
-var in `wrangler.jsonc` if it is not a secret.
-
-```json
-{
-  "downloads": [
-    {
-      "board": "x64",
-      "profile": "dev",
-      "kind": "image",
-      "version": "2026.09-2",
-      "deploymentId": "dep-aa11",
-      "releasedAt": "2026-09-12",
-      "bytes": 1073741824,
-      "digest": "sha256:…",
-      "href": "https://…/disk.img",
-      "filename": "disk.img"
-    }
-  ]
-}
+```
+mica-build releases ──(parse)──> KV ──(read)──> GET /api/catalog ──> the board pages
+                         ▲
+              cron every 30 min, or POST /api/catalog/refresh
 ```
 
-`kind` is `image`, `update` or `firmware`; `profile` is `dev` or `prod`; `releasedAt` orders
-the versions, so an entry without it is dropped. A bare array is accepted too.
+The read path is a KV lookup and never calls GitHub, so an upstream rate limit or outage
+costs a stale answer rather than a broken page. `worker/index.ts` holds both paths;
+`src/features/download/github.ts` is the parser, unit-tested apart from the Worker.
 
-Setting `CATALOG_DEMO=1` (and no source) serves a sample catalogue that answers
-`"sample": true`, which the page renders behind a banner saying so. It exists to exercise
-the filters and the history control; it is not a release and must not be presented as one.
+A release of `mica-build` is scoped to a board — tag `<board>/<version>` — and its assets are
+named `mica-<board>-<product>-<version>.<ext>`. The parser reads the board and version from
+the tag, the product from the asset name, and the form from the extension (`.img`, and
+`.img.gz`/`.xz`/`.zst`, are images; `.micaupd` is an update package). **The product is not a
+fixed set**: `dev`, `minimal`, `prod` or anything else the build publishes becomes a value in
+the page's filter. Assets that are not downloads — the lock, the checksums — are skipped, as
+is any asset GitHub reports without a digest.
+
+Firmware has no rule yet: no release has carried a firmware asset, so its naming is unknown
+and a rule written now would be a guess.
+
+### Setting it up
+
+1. `wrangler kv namespace create CATALOG`, then paste the id into `wrangler.jsonc` and
+   uncomment the `kv_namespaces` and `triggers` blocks.
+2. `wrangler secret put REFRESH_TOKEN` — the bearer token the manual refresh requires. With
+   no token configured the endpoint answers 401 to everyone: a refresh anyone can trigger is
+   a way to spend the upstream rate limit.
+3. `wrangler secret put GITHUB_TOKEN` — a read-only token. Optional, but the anonymous API
+   allows 60 calls an hour per IP and the Worker's egress is shared.
+4. Remove `CATALOG_DEMO` from `vars` and deploy.
+5. Refresh once: `curl -X POST -H "Authorization: Bearer <token>" https://micaos.dev/api/catalog/refresh`.
+
+`CATALOG_REPO` selects the repository, defaulting to `micaoss/mica-build`.
+
+### The sample
+
+While `CATALOG_DEMO=1` the endpoint answers a sample catalogue that declares `"sample": true`,
+which the page renders behind a banner saying so. It exercises the filters and the history
+control; it is not a release and must not be presented as one.
 
 ## Adding a board
 

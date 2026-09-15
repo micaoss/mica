@@ -3343,3 +3343,37 @@ named in a line under the cards instead of being silently dropped.
 
 The board list itself stays where it was, in the dictionaries: it carries hardware and
 support status, which the catalogue does not, and it is what generates the routes.
+
+## 2026-09-15 19:10 [decision]
+
+`mica-build` started publishing: `x64/20260915-1458` and `cx3576/20260915-1515`, each with a
+`.img` and a `.micaupd` per product. The download catalogue is wired to read them, through a
+store rather than through GitHub on every request.
+
+**KV, not a database.** The catalogue is a few dozen rows read whole, with no query, no
+pagination and no history comparison, so a key holding the parsed result is the whole
+requirement; D1 would add an operational surface for nothing. `GET /api/catalog` is a KV
+lookup and never calls GitHub — an upstream rate limit or outage costs a stale answer, not a
+broken page. A cron every 30 minutes rebuilds the stored copy, and
+`POST /api/catalog/refresh` does it on demand behind a bearer token. With no token configured
+that endpoint answers 401 to everyone: a refresh anyone can trigger is a way to spend the
+upstream rate limit.
+
+**The product is no longer a fixed set.** It was `dev | prod` in the schema; the build
+publishes `dev` and `minimal`, and a fixed list would have silently dropped every `minimal`
+asset. `profile` is now whatever the source names, and the page's filter offers what the
+catalogue contains — the same way the board list is derived.
+
+The parser (`src/features/download/github.ts`, unit-tested apart from the Worker) reads the
+board and version from the scoped tag, the product from the asset name, and the form from the
+extension. It skips the lock and the checksums, and skips any asset GitHub reports without a
+digest rather than publishing something unverifiable. Firmware has no rule: no release has
+carried a firmware asset, so its naming is unknown, and the rule I would have written was a
+guess — the failing test that made that obvious was deleted rather than made to pass.
+
+`deploymentId` became optional for the same reason: GitHub's release metadata does not carry
+one, and the alternative was fetching and parsing `mica-build.lock` for a column the table
+can leave blank.
+
+Still to do, and it needs Cloudflare access I do not have: create the KV namespace, set the
+two secrets, drop `CATALOG_DEMO`. `website/README.md` has the five commands.

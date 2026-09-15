@@ -11,7 +11,11 @@
  * stays empty until something publishes one.
  */
 
-export type Profile = 'dev' | 'prod'
+/**
+ * The product a download was built for — `dev`, `minimal`, `prod`. Not a fixed
+ * set: the catalogue names the products, and the page offers what it finds.
+ */
+export type Profile = string
 
 /** What form the download takes. */
 export type DownloadKind = 'image' | 'update' | 'firmware'
@@ -25,8 +29,8 @@ export interface Download {
   kind: DownloadKind
   /** Release version or generation. */
   version: string
-  /** Signed deployment this download carries. */
-  deploymentId: string
+  /** Signed deployment this download carries, when the source names one. */
+  deploymentId?: string
   /** ISO 8601 date the release was published; orders the versions. */
   releasedAt: string
   bytes: number
@@ -59,7 +63,7 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
       return false
     if (!text)
       return true
-    return `${download.version} ${download.deploymentId}`.toLowerCase().includes(text)
+    return `${download.version} ${download.deploymentId ?? ''}`.toLowerCase().includes(text)
   })
 }
 
