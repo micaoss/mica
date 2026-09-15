@@ -455,8 +455,15 @@ Moving the repositories to the release lock format
     `firmware` components are reused by digest from `<board>/20260915-0945`,
     unchanged.
   - The `<board>/20260915-0945` releases stay until `mica-build` has re-pinned
-    and the user decides the clean-up; the `<board>/20260915-0824` releases
-    are no longer listed.
+    and the user decides the clean-up.
+  - The `<board>/20260915-0824` releases were deleted on user instruction
+    ("可以删除 现在还是开发阶段"), carried out by the coordinator with `gh`
+    after `mica-build` had pinned `<board>/20260915-0945`: the four releases
+    with their tags, and the eight ghcr versions
+    `board.<board>.20260915-0824` and `pool.<board>.<arch>.20260915-0824`
+    that no `0945` lock reached. The `kernel`, `uboot` and `firmware` digests
+    are shared with `0945` and stay. Verified afterwards: ghcr held exactly
+    the 16 digests of the `0945` locks, all readable anonymously.
   - `mica-build` pins the four boards with `mica-podman` `20260915-1057` and
     `mica-system-base` `20260915-1102` before its first scoped release.
     `mica-boards` next investigates kernel build speed, including pinning the

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-15 11:38 [progress]
+
+The `mica-boards` `<board>/20260915-0824` releases were deleted on user
+instruction ("可以删除 现在还是开发阶段") after `mica-build` had pinned
+`<board>/20260915-0945`: the four releases with their tags and the eight
+`board` and `pool` ghcr versions no `0945` lock reached, keeping the `kernel`,
+`uboot` and `firmware` digests shared with `0945`. ghcr then held exactly the
+16 digests of the `0945` locks, readable anonymously.
+
 ## 2026-09-15 11:37 [progress]
 
 `mica-boards` `<board>/20260915-1128` at `ebf93f7` are its first releases
