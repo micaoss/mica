@@ -23,9 +23,15 @@ class Refused(Exception):
     pass
 
 
-KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5}
+KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5,
+                "input": 4, "product": 8, "bundle": 4, "asset": 6}
 KIND_ORDER = list(KIND_COLUMNS)
 BASE_ONLY = {"upstream", "apt"}
+BUILD_ONLY = {"input", "product", "bundle", "asset"}
+PROFILE = {"dev", "prod"}
+GENERATION = re.compile(r"^[1-9][0-9]*$")
+BUNDLE = {"image", "update"}
+UPDATE_SUFFIX = {"full": "micaupd", "root": "root.micaupd", "kernel": "kernel.micaupd"}
 REPOSITORY = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 RELEASE = re.compile(r"^[0-9]{8}-[0-9]{4}$")
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
@@ -146,6 +152,26 @@ def check_lock(path):
         elif kind == "apt":
             field(row[1].startswith("https://") and row[2] and row[3] and row[4].startswith("/"))
             key = ()
+        elif kind == "input":
+            name, _, input_scope = row[1].partition(".")
+            field(REPOSITORY.match(name) and (input_scope == "" or SCOPE.match(input_scope))
+                  and (RELEASE.match(row[2]) or row[2] == "offline") and SHA256.match(row[3]))
+            if (input_scope != "") != (name in SCOPED):
+                raise Refused("release-scope")
+            key = (row[1],)
+        elif kind == "product":
+            field(SCOPE.match(row[1]) and SCOPE.match(row[2]) and row[3] in PROFILE and GENERATION.match(row[4])
+                  and all(SHA256.match(v) for v in row[5:8]))
+            key = (row[1],)
+        elif kind == "bundle":
+            field(SCOPE.match(row[1]) and row[2] in BUNDLE)
+            reference(row[3])
+            key = (row[1], row[2])
+        elif kind == "asset":
+            prefix = "mica-" + row[1] + "-" + release + "."
+            field(SCOPE.match(row[1]) and row[2] in BUNDLE and SHA256.match(row[5]) and row[4].startswith(prefix)
+                  and (NAME.match(row[3]) if row[2] == "image" else row[4] == prefix + UPDATE_SUFFIX.get(row[3], "\n")))
+            key = (row[1], row[2], row[3])
         else:
             raise Refused("release-row")
         if (kind,) + key in keys:
@@ -154,6 +180,17 @@ def check_lock(path):
         sort_keys.append((KIND_ORDER.index(kind),) + tuple(k.encode() for k in key))
     if repository != "mica-system-base" and any(r[0] in BASE_ONLY for r in rows):
         raise Refused("base-only-kind")
+    if repository != "mica-build" and any(r[0] in BUILD_ONLY for r in rows):
+        raise Refused("build-only-kind")
+    products = {r[1] for r in rows if r[0] == "product"}
+    bundles = {(r[1], r[2]) for r in rows if r[0] == "bundle"}
+    if any(r[0] in ("bundle", "asset") and r[1] not in products for r in rows):
+        raise Refused("bundle-without-product")
+    if any(r[0] == "asset" and (r[1], r[2]) not in bundles for r in rows):
+        raise Refused("asset-without-bundle")
+    if any(r[0] == "bundle" and r[2] == "update" and not any(a[0] == "asset" and a[1:4] == [r[1], "update", "full"] for a in rows)
+           for r in rows):
+        raise Refused("update-full")
     if any(r[0] == "package" and r[2] not in pools for r in rows):
         raise Refused("package-without-pool")
     if repository == "mica-boards" and not {"board", "kernel"} <= {r[2] for r in rows if r[0] == "board"}:

@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-boards owner (`images.tsv`, the `packer` component, the packers); the mica-build owner (the executor, product subsets, publication)
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed; `images.tsv` also declares update kinds, their exact row pending `mica-build`'s proposal
+- **status**: accepted (user, 2026-09-15); not implemented; supersedes `docs/decisions/2026-09-15-board-image-kinds.md` in its packer ownership, `IMAGE_KINDS` and reserved-kind parts; `mica-boards`' first four board releases are `disk` only and are not delayed; `images.tsv` also declares update kinds (`docs/decisions/2026-09-15-update-packages.md`)
 
 ## Decision
 
@@ -19,7 +19,7 @@ image kind, `image <kind> <packer> <runtime image> <suffix>`:
 - `<packer>`: `builtin` (`mica-build`'s own raw disk image, only for `disk`)
   or a path inside the board's `packer` component;
 - `<runtime image>`: an `image` row of `locks/mica-build-env.lock`, for
-  example `mica-build-env:base`;
+  example `mica-build-env:base`, or `-` for a `builtin` packer;
 - `<suffix>`: the suffix of the output file.
 
 `disk` is mandatory: it is the canonical image every other kind derives from.
@@ -62,29 +62,20 @@ OCI manifest `image.<product>.<YYYYMMDD-HHMM>` with one layer per kind
 
 **Update packages** (user, 2026-09-15: "可以复用images.tsv，因为我们可以独立升级内核和系统").
 `images.tsv` also declares what a board can be updated with, since the kernel
-and the system (root) are upgraded independently. The proposed row is
-`update <kind> <packer> <runtime image> <suffix>`; its exact columns are
-pending `mica-build`'s root/kernel update proposal, and `mica-boards` adds
-update rows only once that proposal fixes them:
-
-- kinds `root` (the system only), `kernel` (the kernel component only) and
-  `full` (root, kernel and firmware); a board declares the kinds it supports
-  and may later add others, such as `firmware`;
-- packer `builtin` for these: `mica-build` signs and packs the `MICAUPD1`
-  archives itself, since signing stays in `mica-build`;
-- a product selects subsets of both in `product.env`, `IMAGE_KINDS` and
-  `UPDATE_KINDS` (default: all);
-- per product release, each update kind is a release asset
-  `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and a layer of
-  `update.<product>.<YYYYMMDD-HHMM>`, with an `asset` row per kind;
-- a `kernel` package is produced only when the product's kernel component
-  changed (boards reuse components by digest), a `root` package only when the
-  root changed, and a `full` package every release.
+and the system (root) are upgraded independently. `mica-build`'s proposal is
+accepted (`docs/decisions/2026-09-15-update-packages.md`): the rows are
+`update <kind> builtin - <suffix>`, with `full` (mandatory, `micaupd`), `root`
+(`root.micaupd`) and `kernel` (`kernel.micaupd`); `-` is the runtime image of
+every `builtin` row, `image disk builtin - img` included. `mica-build` signs
+and packs the `MICAUPD1` archives itself; a product selects `IMAGE_KINDS`
+and `UPDATE_KINDS` in `product.env` (default all; `disk` and `full` always).
+A `root` or `kernel` archive is published only when the other part is
+unchanged, `full` every release; an update kind `firmware` is refused.
 
 ## Order
 
 `mica-boards`' first four board releases are not delayed: every board is
-`disk` only, and `images.tsv` with only `image disk builtin` may land with
+`disk` only, and `images.tsv` with only `image disk builtin - img` may land with
 them or right after. After the releases and their clean-up, `mica-boards`
 adds `images.tsv` to every board, the `packer` component, its `outputs.tsv`,
 input and publishing support, removes `IMAGE_KINDS`, and adds a

@@ -35,8 +35,8 @@ every other repository's release is unscoped:
 - `mica-build`, which nothing consumes, releases per board (all its products)
   or per product: the tag is `<scope>/<YYYYMMDD-HHMM>`, and it also carries
   image files beside `mica-build.lock` and `SHA256SUMS`
-  (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its `input` and
-  `asset` rows are pending.
+  (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its lock rows
+  are those of 1.2.2.
 
 `<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). A scoped
 `mica-boards` lock holds only its board: every `board` row names the scope's
@@ -69,6 +69,10 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 | `board` | `board <board> <component> <arch> <reference>` | board, component | one component artifact of a board (`mica-boards`); `<component>` is `board`, `kernel`, `uboot`, `firmware` or `packer` (section 2) |
 | `upstream` | `upstream <name> <arch> <version> <sha256> <url> <roots>` | name, arch | a third-party archive pinned for later stages; `<url>` is https; `<roots>` is the comma-separated, sorted, duplicate-free list of `upstream.pkgs` roots it is pinned for (*fixed here*, as Base publishes today); `mica-system-base` only |
 | `apt` | `apt <uri> <suite> <components> <signed-by>` | at most one | the one apt source; `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
+| `input` | `input <repository>[.<scope>] <release> <sha256>` | input | one release `mica-build` composed from (1.2.2); `mica-build` only |
+| `product` | `product <product> <board> <profile> <generation> <deployment id> <kernel id> <rootfs id>` | product | one product of the release and its signed deployment (1.2.2); `mica-build` only |
+| `bundle` | `bundle <product> image\|update <reference>` | product, type | the product's OCI image or update bundle (1.2.2); `mica-build` only |
+| `asset` | `asset <product> image\|update <kind> <file> <sha256>` | product, type, kind | one GitHub Release asset and its bundle layer (1.2.2); `mica-build` only |
 
 Values *(fixed here)*: `<arch>` is `amd64` or `arm64`; names are
 `[a-z0-9][a-z0-9.+-]*`, except an `upstream` image name (1.2.1); versions
@@ -111,6 +115,36 @@ The user unified the versions (2026-09-14): `registry:3.1.1`,
 `alpine:3.24.1` and `debian:trixie-slim` are listed, and `registry:2`,
 `alpine:3.21` and `debian:bookworm-slim` are not.
 
+#### 1.2.2 The `mica-build` rows
+
+A `mica-build` release lock (user, 2026-09-15,
+`docs/decisions/2026-09-15-update-packages.md`) is
+`release mica-build <scope>/<YYYYMMDD-HHMM> <commit>` followed by:
+
+- `input <repository>[.<scope>] <release> <sha256>`: each input release, named
+  as its consumer files are (`mica-boards.x64`, `mica-system-base`), with the
+  input's `<YYYYMMDD-HHMM>` and the sha256 of its `SHA256SUMS`; a scope is
+  present exactly for `mica-boards` and `mica-build` (`release-scope`);
+- `product <product> <board> <profile> <generation> <deployment id> <kernel id>
+  <rootfs id>`: `<profile>` is `dev` or `prod`, `<generation>` a positive
+  decimal, and the three identities are the 64-hex identities of the signed
+  deployment, its kernel and its rootfs;
+- `bundle <product> image|update <reference>`: the OCI manifests
+  `mica-build:image.<product>.<release>` (a layer per image kind, annotated
+  `mica.image-kind`) and `mica-build:update.<product>.<release>` (a layer per
+  update kind, annotated `mica.update-kind`, `mica.deployment-id` and
+  `mica.generation`);
+- `asset <product> image|update <kind> <file> <sha256>`: one release asset,
+  `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, whose sha256 equals the
+  digest of its layer in that bundle. Image kinds are those of the board's
+  `images.tsv`; update kinds are `full` (`micaupd`), `root` (`root.micaupd`)
+  and `kernel` (`kernel.micaupd`), with the suffix fixed by the kind.
+
+Every `bundle` and `asset` names a product with a `product` row
+(`bundle-without-product`), every `asset` a `bundle` of its type
+(`asset-without-bundle`), and every update bundle has a `full` asset
+(`update-full`).
+
 ### 1.3 References
 
 A reference of a `pool`, a `board` or a repository's image is
@@ -136,7 +170,8 @@ carries a commit (`build-<commit12>`) or a hash (`inputs-<16>`):
 - `mica-boards:<component>.<board>.<release>` (`board`, `kernel`, `uboot`,
   `firmware`, `packer`);
 - `mica-system-base:rootfs.<release>`;
-- `mica-build:root.<product>.<release>`;
+- `mica-build:root.<product>.<release>`, `mica-build:image.<product>.<release>`
+  and `mica-build:update.<product>.<release>`;
 - `<repository>:source.<release>`.
 
 In an offline OCI layout the last part is `offline` (section 6).
@@ -144,7 +179,8 @@ In an offline OCI layout the last part is `offline` (section 6).
 ### 1.4 Order
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,
-`package`, `board`, `upstream`, `apt`), then by key, compared as bytes. The
+`package`, `board`, `upstream`, `apt`, `input`, `product`, `bundle`,
+`asset`), then by key, compared as bytes. The
 same inputs therefore give the same bytes.
 
 ### 1.5 Refusal rules
@@ -156,13 +192,13 @@ the ones the vectors use:
 |---|---|
 | `header` | line 1 is not `# mica-lock v1` |
 | `encoding` | not UTF-8, CR, missing final LF, empty line, leading space, trailing tab |
-| `kind-unknown` | the first column is not one of the seven kinds |
+| `kind-unknown` | the first column is not one of the eleven kinds |
 | `image-source` | an `image` row whose source is neither `upstream` nor a repository name, or a repository other than the release row's |
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
 | `release-scope` | a scoped release (`<scope>/...`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
 | `scope-content` | in a scoped `mica-boards` lock, a `board` row naming another board than the scope or whose reference tag is not `<component>.<scope>.<...>` for its row's component, or a `pool` reference whose tag is not `pool.<scope>.<arch>.<...>` for its row's arch (an untagged reference included) |
-| `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, component, version, sha256, url, roots, apt) |
+| `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, component, version, sha256, url, roots, apt, profile, generation, identity, bundle type, update kind, asset file name) |
 | `reference-digest` | a reference without `@sha256:<digest>` |
 | `reference-registry` | a `pool`, `board` or repository image reference outside `ghcr.io/micaoss/` and `local/`, `local/` in a published lock, or `ghcr.io/micaoss/` in an offline lock |
 | `reference-repository` | a `pool` or `board` reference to another repository than the release row's, or a repository image reference to another repository than its source |
@@ -170,6 +206,10 @@ the ones the vectors use:
 | `duplicate-key` | two rows of one kind with the same key (a second `apt` row included) |
 | `base-only-kind` | an `upstream` or `apt` row in a lock of any repository but `mica-system-base` |
 | `package-without-pool` | a `package` row whose arch has no `pool` row |
+| `build-only-kind` | an `input`, `product`, `bundle` or `asset` row in a lock of any repository but `mica-build` |
+| `bundle-without-product` | a `bundle` or `asset` row whose product has no `product` row |
+| `asset-without-bundle` | an `asset` row without a `bundle` row of its product and type |
+| `update-full` | an update `bundle` without the product's `full` update asset |
 | `board-components` | a `mica-boards` lock without a `board` row for the `board` component or one for `kernel` |
 | `sort-order` | rows out of the order of 1.4 |
 
@@ -218,6 +258,11 @@ package of the repository that publishes them.
 - **Images** (build-env images, the Base rootfs): an OCI index and its
   platform manifests; the lock names both (`image` rows with the repository as
   source, `index`, `amd64`, `arm64`). Third-party images are not published here (1.2.1).
+- **Product bundles** (`mica-build`): `image.<product>.<release>`, one OCI
+  manifest with one layer per image kind (title the file name, annotation
+  `mica.image-kind`), and `update.<product>.<release>`, one layer per update
+  kind (annotations `mica.update-kind`, `mica.deployment-id`,
+  `mica.generation`); each layer is also a release asset (1.2.2).
 
 Publishing: a tag that already holds another digest is refused, never
 re-pointed. An artifact unchanged since an earlier release is reused by
@@ -444,7 +489,8 @@ The vectors are files every repository copies into its own tests:
   package),
   `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, `apt`, a
   comment), `offline-mica-core.lock` (an offline lock with `local/`
-  references).
+  references), `mica-build.x64.lock` (a scoped `mica-build` lock: `input`,
+  `product`, `bundle`, `asset` rows, a `root` update beside `full`).
 - `lock/refused/`: one lock per refusal rule of 1.5, each a minimal edit of a
   valid lock; the image refusals are `image-source.lock` (a repository source
   other than the release row's), `image-source-reference.lock`
@@ -457,7 +503,9 @@ The vectors are files every repository copies into its own tests:
   and `scope-content-tag.lock` (`scope-content`); the component refusals are
   `board-component.lock` (`field-value`), `board-duplicate-component.lock`
   (`duplicate-key`) and `board-components.lock` (`board-components`, no
-  `kernel` row).
+  `kernel` row); the `mica-build` refusals are `build-only-kind.lock`,
+  `bundle-without-product.lock`, `asset-without-bundle.lock`, `update-full.lock`
+  and `update-kind.lock` (`field-value`, a `firmware` update).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
   (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release` and
   `scoped` (two `mica-boards` boards, one with all four components, beside

@@ -11,7 +11,7 @@ mappings. No earlier update format or mutable command-line trust input is read.
 |---|---|---|
 | UKI/FIT | Kernel, initramfs, fixed policy, and DTB where applicable | UEFI or the required-signature U-Boot control FDT |
 | Root/support image | PKCS#7 signature over the root hash; signed metadata binds full geometry, hash, length and signature bytes | Kernel dm-verity and native metadata verifier |
-| Deployment | `mica/deployment/v1`, board/arch/generation/version and complete kernel/root identities | Factory assembler, early init and installer |
+| Deployment | `mica/deployment/v1`, board/arch/generation/version and complete kernel/root identities; decided 2026-09-15, not implemented yet: a signed `product` field (a schema bump), refused on a device of another product | Factory assembler, early init and installer |
 | Catalog | `mica/catalog/v1`, revision, validity interval and deployment associations | Acquisition client |
 | Firmware | `mica/firmware/v1`, board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
 
@@ -26,7 +26,11 @@ Offline archives (extension `.micaupd`) start with the eight-byte magic
 `MICAUPD1`, then the descriptor length (u32, big-endian), the signed
 descriptor, the object count, and for each object its digest, size and bytes;
 they reuse the deployment signature and carry only bounded
-digest/length-addressed objects.
+digest/length-addressed objects. Decided 2026-09-15, implementation pending
+in `mica-core` (`docs/decisions/2026-09-15-update-packages.md`): an archive
+may carry a subset of the descriptor's objects, every missing object already
+in the store, so one signed deployment ships as `full`, `root` and `kernel`
+archives with the same descriptor.
 
 Metadata trust resides in authenticated kernel policy. Public factory update
 settings select a source/channel and policy; they cannot replace anchors.

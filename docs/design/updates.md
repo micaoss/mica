@@ -40,6 +40,13 @@ The workspace probe checks mount identity, writability, free space and bounded
 contents. HTTP ranges resume partial objects; complete bytes and lengths must
 match authenticated metadata. `MICAUPD1` offline imports carry the same signed
 deployment and at most five unique objects, with no archive paths or links.
+Decided 2026-09-15, implementation pending
+(`docs/decisions/2026-09-15-update-packages.md`): an import may carry only a
+subset of the descriptor's objects (a `root` or `kernel` archive), and every
+missing object must already be in the store; the descriptor's signed
+`product` field must name the device's product, and catalog heads and the
+update-server are keyed by board, product and channel. There is no minimum
+running release rule.
 
 Installation requires the authenticated running deployment A to be confirmed
 healthy. It verifies every new or reused object and checks destination capacity,

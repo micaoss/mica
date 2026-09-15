@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-15 06:59 [decision]
+
+`mica-build`'s update-package proposal is accepted (user, "接受"). Each product
+release has one signed deployment, published as `MICAUPD1` archives with the
+same descriptor: `full` (`<name>.micaupd`, always), `root`
+(`<name>.root.micaupd`, only when the kernel identity is unchanged) and
+`kernel` (`<name>.kernel.micaupd`, only when the rootfs identity is
+unchanged), decided against the previous `mica-build.lock`. Modules stay in
+the support image; there is no firmware-only package yet; a kernel package is
+refused across a verity trust change. `mica-core` gains partial import and a
+signed `product` field; the update-server is keyed by product and imports from
+the `full` archive or the OCI layer; there is no generic root. `images.tsv`
+rows are `update <kind> builtin - <suffix>` with `full` mandatory, `-` the
+runtime image of every builtin row. The release-lock spec gains the
+`mica-build` rows `input`, `product`, `bundle` and `asset` with the rules
+`build-only-kind`, `bundle-without-product`, `asset-without-bundle` and
+`update-full`; checker and vectors follow (138 checks). Order: `mica-core`,
+`mica-build`, `mica-boards`. `docs/decisions/2026-09-15-update-packages.md`,
+`docs/design/release-lock.md` 1.2.2, `docs/boards/contract.md` 3.1,
+`docs/design/release-signing.md`, `docs/design/updates.md`, the scoped-release
+and packer decisions.
+
 ## 2026-09-15 06:39 [decision]
 
 Update packages reuse `images.tsv` (user): the kernel and the system are

@@ -145,8 +145,8 @@ hardware as `BOARD_FEATURES` and lists (`BOARD_FIRMWARE_FILES`,
 `BOARD_HWINIT_CONFS`) where empty is a statement, the authenticated boot
 (`FIRMWARE_FORMAT`, the `FIT_*` facts, the exact `BOARD_CMDLINE_ARGS`), and
 declare the flashing formats in `<name>/images.tsv`, at least
-`image disk builtin <runtime image> <suffix>` ([contract.md](contract.md)
-section 3.1). `manifests/board.pkgs` names the board package; a radio's
+`image disk builtin - img` and `update full builtin - micaupd`
+([contract.md](contract.md) section 3.1). `manifests/board.pkgs` names the board package; a radio's
 transport packages and optional components go beside it. `make check` in
 `mica-boards` holds the directory to the contract
 (`tests/board-contract-test.sh`).

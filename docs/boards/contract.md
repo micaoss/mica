@@ -171,7 +171,9 @@ assembly checks each pinned component and the board's packages against it.
 `amlogic-burn`; `<packer>` is `builtin` (the assembly's own raw disk image,
 only for `disk`) or a path inside the `packer` component; `<runtime image>`
 is an `image` row of `locks/mica-build-env.lock` (such as
-`mica-build-env:base`); `<suffix>` is the output file's suffix. Rules, held by
+`mica-build-env:base`), or `-` for a `builtin` packer (`image disk builtin -
+img`); `<suffix>` is the output file's suffix. `mica-boards` still ships
+`mica-build-env:base` on its `disk` row until its next board release. Rules, held by
 `mica-boards`' board contract test:
 
 - `disk` is present: it is the canonical image every other kind derives from;
@@ -204,13 +206,16 @@ name, annotation `mica.image-kind`) of the OCI manifest
 `image.<product>.<YYYYMMDD-HHMM>`.
 
 `images.tsv` also declares the update packages a board supports, because the
-kernel and the system are upgraded independently (user, 2026-09-15): proposed
-rows `update <kind> <packer> <runtime image> <suffix>` with the kinds `root`,
-`kernel` and `full` and the `builtin` packer (`mica-build` signs and packs the
-`MICAUPD1` archives), selected per product by `product.env` `UPDATE_KINDS`
-and published as layers of `update.<product>.<YYYYMMDD-HHMM>`. The exact row
-is pending `mica-build`'s update proposal; boards add update rows only after
-it (`docs/decisions/2026-09-15-board-image-packers.md`).
+kernel and the system are upgraded independently (user, 2026-09-15;
+`docs/decisions/2026-09-15-update-packages.md`): rows
+`update <kind> builtin - <suffix>`, with the kinds `full` (mandatory, suffix
+`micaupd`), `root` (`root.micaupd`) and `kernel` (`kernel.micaupd`);
+`mica-build` signs and packs these `MICAUPD1` archives itself, and a
+`firmware` update kind is refused. A product selects them in
+`mica-build:products/<product>/product.env` `UPDATE_KINDS` (default all,
+`full` always); they are published as release assets and as layers of
+`update.<product>.<YYYYMMDD-HHMM>`. `mica-boards` adds the update rows after
+`mica-core` and `mica-build` implement them.
 
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there

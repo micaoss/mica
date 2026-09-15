@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); not implemented; the `mica-build.lock` row kinds are pending (proposed by `mica-build`, added to `docs/design/release-lock.md` when its first scoped release lands)
+- **status**: accepted (user, 2026-09-15); not implemented; the `mica-build.lock` rows are specified in `docs/design/release-lock.md` 1.2.2 (accepted with `docs/decisions/2026-09-15-update-packages.md`)
 
 ## Decision
 
@@ -48,10 +48,14 @@ scope). Its release row is `release mica-build <scope>/<YYYYMMDD-HHMM>
 `locks/mica-boards.<board>.lock` (`docs/design/release-lock.md` 1.0 and
 section 4).
 
-**Pending.** The exact row kinds of `mica-build.lock` (an input row and an
-asset row) are proposed by `mica-build`. They are added to
-`docs/design/release-lock.md` when its first scoped release lands; until then
-this record fixes only what the lock must state, not its row shapes.
+**Lock rows.** `mica-build.lock` is specified in
+`docs/design/release-lock.md` 1.2.2 (user, 2026-09-15): `input` rows for the
+input releases with their `SHA256SUMS` hashes, a `product` row per product
+with its signed deployment, kernel and rootfs identities, `bundle` rows for
+`image.<product>.<release>` and `update.<product>.<release>`, and `asset`
+rows whose sha256 equals the layer digest in that bundle. The update
+archives are `full`, `root` and `kernel`
+(`docs/decisions/2026-09-15-update-packages.md`).
 
 ## What this changes for mica-build
 
