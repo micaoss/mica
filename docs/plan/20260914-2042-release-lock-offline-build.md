@@ -35,7 +35,7 @@ the new format.
 |---|---|---|---|---|
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
-| 3 | `mica-podman` (done: `20260915-0138`), `mica-core` (in progress) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
+| 3 | `mica-podman` (released `20260915-0138`; clean release pending), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
 | 4 | `mica-boards`, `mica-build` | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
@@ -195,3 +195,10 @@ owner, dispatched by the coordinator.
   `19672ed41506466679d2a93d18d7ba5ecf5ef30817bc0219e859ac80db918ab3`), the
   Base to pin; `20260915-0059` is deleted. `mica-podman` and `mica-core`
   follow.
+- 2026-09-15: stage 3, `mica-core` part, done under the clean-release
+  instruction: root `239e423`, release `20260915-0235` (`SHA256SUMS` sha256
+  `fb2eb30600f49b5c4b016063f7304bc3106cf9782662331e1cfdc0151ce2db21`),
+  consuming only `locks/mica-build-env.lock` (`20260915-0138`); its releases
+  `20260915-0145`, `20260914-1212` and `20260914-0529` are deleted. The
+  `mica-podman` clean release is pending (its squash awaits the user's
+  authorization).

@@ -6,8 +6,8 @@ without reading a published release. The decision is
 `docs/decisions/2026-09-14-release-lock-and-offline-build.md`; the migration
 is `docs/plan/20260914-2042-release-lock-offline-build.md`. `mica-build-env`
 implements the release lock and `locks/upstream.lock` (release to pin
-`20260915-0138`), `mica-system-base` (release to pin `20260915-0209`) and `mica-podman`
-(`20260915-0138`); the other repositories adopt it in the plan's order, with their own scripts, and prove
+`20260915-0138`), `mica-system-base` (release to pin `20260915-0209`), `mica-podman`
+(`20260915-0138`) and `mica-core` (`20260915-0235`); the other repositories adopt it in the plan's order, with their own scripts, and prove
 them with the test vectors of section 9.
 
 Where the decision left a detail open, this specification fixes it; those

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 02:52 [progress]
+
+Release-lock migration stage 3, `mica-core` part, done under the user's
+clean-release instruction: root `239e423`, the releases `20260915-0145`,
+`20260914-1212` and `20260914-0529` and all 16 earlier Actions runs deleted,
+and the new release `20260915-0235` (trust hash
+`fb2eb30600f49b5c4b016063f7304bc3106cf9782662331e1cfdc0151ce2db21`) carrying
+only `mica-core.lock` and `SHA256SUMS`: pools `pool.<arch>.20260915-0235` in
+the new public package and the seven packages at `0.1.0+git239e42340795-1`
+per architecture. It consumes only `locks/mica-build-env.lock`
+(`20260915-0138`); the signed update contract is unchanged. The earlier core
+pins no longer resolve, and the records citing them or pre-reset core commits
+say so. `mica-podman`'s clean release awaits the user's authorization.
+
 ## 2026-09-15 02:16 [progress]
 
 User instruction for `mica-system-base`, `mica-podman` and `mica-core`: once

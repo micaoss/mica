@@ -755,3 +755,7 @@ the Debian base.
   user); the current Base is `20260915-0209` at `4d63430`, whose release
   carries only `mica-system-base.lock` and `SHA256SUMS`
   (`docs/task/20260914-2042-release-lock-offline-build.md`).
+- 2026-09-15: the `mica-core` commit `758ba0f` cited here is pre-reset history
+  (its history is squashed into the root `239e423`, user); the current
+  `mica-core` is release `20260915-0235` at its root `239e423`
+  (`docs/task/20260914-2042-release-lock-offline-build.md`).

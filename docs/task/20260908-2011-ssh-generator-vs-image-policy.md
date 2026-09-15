@@ -51,3 +51,7 @@ Accepting the implemented fix on a current image.
   The system side (mica-system `e0be7b6`, `7faafef`) is recorded in
   `docs/design/access.md` §3.4, as is the core side (mica-core `ae513fb`,
   `790a067`); assembly adoption and guest acceptance are open.
+- 2026-09-15: the `mica-core` commits cited here (`ae513fb`, `790a067`) are
+  pre-reset history (its history is squashed into the root `239e423`, user);
+  the current `mica-core` is release `20260915-0235` at its root `239e423`
+  (`docs/task/20260914-2042-release-lock-offline-build.md`).

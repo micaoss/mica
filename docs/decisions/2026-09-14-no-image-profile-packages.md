@@ -13,7 +13,7 @@
 neither), and no package ships
 `/usr/lib/mica/profile.conf`. `micad` no longer reads that file, and
 `micad.control` no longer depends on a profile package (`mica-core`
-`758ba0f`).
+`758ba0f`, pre-reset history; its root `239e423` has none).
 
 ### The dev/prod carrier (user, 2026-09-14)
 

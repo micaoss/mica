@@ -264,8 +264,9 @@ a start refused without the environment file, and a key login.
 
 The micad side and the SFTP server are implemented in `mica-core`, first as
 `ae513fb`, `790a067` and `3164bf1`, now rebased as `2753040`, `6547e0f` and
-`84dce9f`, with `3affb58` describing SFTP as a board feature (reviewed, not
-yet published):
+`84dce9f`, with `3affb58` describing SFTP as a board feature; all of these
+are pre-reset history, and `mica-core` is now the root `239e423` (release
+`20260915-0235`):
 
 - The `access.ssh` reconciler (still named `sshd`, and still the live-state
   key) renders `/run/mica/dropbear.env` as one `DROPBEAR_ARGS` line: one
@@ -670,8 +671,9 @@ and that pair is complete rather than half of a third.
 2026-09-14, `docs/decisions/2026-09-14-no-image-profile-packages.md`).
 `mica-system-base` removed `mica-profile-dev` and `mica-profile-prod`
 (`f0d555f`, pre-reset history; its root `4d63430` has neither), so no package
-ships `/usr/lib/mica/profile.conf`; `micad` reads no such file, and `micad.control` depends on no profile package (`mica-core`
-`758ba0f`). First-boot provisioning seeds `access.ssh.enabled = false` on every
+ships `/usr/lib/mica/profile.conf`; `micad` reads no such file, and
+`micad.control` depends on no profile package (`mica-core` `758ba0f`,
+pre-reset history; its root `239e423` has none). First-boot provisioning seeds `access.ssh.enabled = false` on every
 image, and neither image ships the SSH unit enabled, so nothing about SSH
 differs between dev and prod.
 

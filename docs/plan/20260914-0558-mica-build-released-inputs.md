@@ -185,3 +185,9 @@ signed loader) stay in place. Nothing is published from a workstation.
   files are gone; the current Base is `20260915-0209` at `4d63430`, whose
   release carries only `mica-system-base.lock` and `SHA256SUMS`
   (`docs/task/20260914-2042-release-lock-offline-build.md`).
+- 2026-09-15: the `mica-core` releases `20260914-0529` and `20260914-1212`
+  cited here are deleted with their tags and no longer resolve, and its
+  commits cited here (`b21f3b7`, `f5f53dfd484f`) are pre-reset history (user);
+  the current `mica-core` is release `20260915-0235` at its root `239e423`
+  (`docs/task/20260914-2042-release-lock-offline-build.md`), in the `mica-lock
+  v1` format.

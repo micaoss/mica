@@ -102,7 +102,7 @@ Moving the repositories to the release lock format
   the release to pin, deleted since (see the `20260915-0138` note below)
   (`SHA256SUMS` sha256
   `02b712ffbe3cd289a242e63af68e1f81a1cbe7f50bf466d36d34e50122a6dcff`), in the
-  image row format of `mica` `ffbea5d`.
+  source-column image row format (spec 1.2.1).
   - `mica-build-env` rows: base, c, go and rust on
     `ghcr.io/micaoss/mica-build-env`. `upstream` rows: taken unchanged from
     `locks/upstream.lock`, with original `docker.io` references
@@ -222,3 +222,28 @@ Moving the repositories to the release lock format
   - The Base release to pin is `20260915-0209`; `20260915-0059` is deleted.
     `mica-podman` (released on `0059`) and `mica-core` move to it and follow
     the same instruction.
+- 2026-09-15: stage 3, `mica-core` part, done under the user's clean-release
+  instruction.
+  - Root `239e423` (tree `07a2d984`), force-pushed; `ci.yml` gained
+    `workflow_dispatch`, since a force-push of rewritten history starts no
+    push run; `.gitignore` adds `/repos/`.
+  - Deleted: the releases `20260915-0145`, `20260914-1212` and
+    `20260914-0529` with their tags, and all 16 earlier Actions runs.
+  - New release `20260915-0235` at `239e423` (ci run 34920808928 by
+    dispatch, release run 34921735102): assets `mica-core.lock` (sha256
+    `0d92a2f62c8fa81bf5cc9d29ca96b6697a3f1a2897aef3b3fa4ea59f99557790`) and
+    `SHA256SUMS` (sha256
+    `fb2eb30600f49b5c4b016063f7304bc3106cf9782662331e1cfdc0151ce2db21`, the
+    trust hash). Rows: `release`; `pool` `amd64` and `arm64` at
+    `ghcr.io/micaoss/mica-core:pool.<arch>.20260915-0235` (the package
+    created public); `package` `micad`, `mica-apid`, `mica-mqttd`,
+    `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy` and
+    `mica-lifecycle` at `0.1.0+git239e42340795-1` per architecture. The spec
+    checker accepts the lock; verified anonymously.
+  - The signed update contract is unchanged (`mica/*/v1`, `MICAUPD1`,
+    `.micaupd`; fixture hashes unchanged).
+  - `mica-core` consumes only `locks/mica-build-env.lock` (`20260915-0138`).
+    The earlier core pins (`20260914-0529`, `20260914-1212`) no longer
+    resolve.
+  - Stage 3: `mica-core` done; `mica-podman` pending, its squash awaiting the
+    user's authorization in its issue.
