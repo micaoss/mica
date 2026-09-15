@@ -381,3 +381,10 @@ owner, dispatched by the coordinator.
   hold is lifted: `mica-build` `669b607` stands, and the next scoped releases
   (`x64` and `cx3576` with dev and prod) wait only for the `mica-boards`
   kernel rebuild release and `mica-build`'s re-pin.
+- 2026-09-15: `mica-boards` `<board>/20260915-1926` (`12564a3`) are the
+  planned release of all four boards with a once-compiled FIT kernel, kernel
+  and U-Boot toolchains pinned to an Ubuntu snapshot, and a `virt-arm64`
+  kernel trimmed to 71 modules (build times: `cx3576` 1132 to 628 s,
+  `s905x5m` 1732 to 944 s, `virt-arm64` 1123 to 330 s). `mica-build` re-pins
+  them before its `x64` and `cx3576` dev and prod releases; `1128` is deleted
+  after that pin.

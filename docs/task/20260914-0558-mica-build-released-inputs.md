@@ -234,6 +234,6 @@ Moving mica-build onto the released inputs
 - 2026-09-15: the first per-board `mica-boards` releases are
   `x64/20260915-0824`, `virt-arm64/20260915-0824`, `cx3576/20260915-0824` and
   `s905x5m/20260915-0824` at `0f8e313`; `20260914-1603` is deleted. The current releases
-  are `<board>/20260915-1128` at `ebf93f7`.
+  are `<board>/20260915-1926` at `12564a3`.
   `mica-build` reads them as `locks/mica-boards.<board>.lock` in its per-board
   switch (`docs/task/20260914-2042-release-lock-offline-build.md`).

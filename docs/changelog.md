@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 19:50 [progress]
+
+`mica-boards` `<board>/20260915-1926` at `12564a3` are released and verified
+anonymously: FIT kernels compiled once with prod relinked and proven
+byte-identical, kernel and U-Boot builders pinned to the Ubuntu snapshot
+`20260915T000000Z` through `locks/upstream.lock`, `virt-arm64` trimmed to 71
+modules (from 1273) against `mica-build`'s 83 required symbols, and a
+reproducible `s905x5m` kernel. Board build times fell from 1132 to 628 s on
+`cx3576`, 1732 to 944 s on `s905x5m` and 1123 to 330 s on `virt-arm64`.
+Kernels and U-Boots are new; board, firmware and pools are reused, except
+four `s905x5m` packages at `0.1.0-2`. The kernel-build decision's steps (1),
+(5) and the `virt-arm64` trim are done; CI reuse (2) is next. `mica-build`
+re-pins, then cuts `x64` and `cx3576` with dev and prod products.
+
 ## 2026-09-15 19:34 [decision]
 
 The form of the OCI image layer is decided (user, "a"): the image bundle

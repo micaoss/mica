@@ -738,3 +738,37 @@ Moving the repositories to the release lock format
   hold is lifted: `mica-build` `669b607` stands, and the next scoped releases
   (`x64` and `cx3576` with dev and prod) wait only for the `mica-boards`
   kernel rebuild release and `mica-build`'s re-pin.
+- 2026-09-15: `mica-boards` `<board>/20260915-1926` are released and verified
+  anonymously (commit `12564a3`), the planned release of all four boards of
+  `docs/decisions/2026-09-15-board-kernel-builds.md`.
+  - FIT kernels are compiled once, with prod relinked after dev and proven
+    byte-identical; the kernel and U-Boot builders are pinned to
+    `snapshot.ubuntu.com` `20260915T000000Z` through `locks/upstream.lock`
+    `source` rows; `virt-arm64` is trimmed to 71 modules, with
+    `kernel/config/virt-arm64.required` holding `mica-build`'s 83 symbols;
+    the `s905x5m` kernel is made reproducible by patch 0018.
+  - Build times: `cx3576` 1132 to 628 s, `s905x5m` 1732 to 944 s,
+    `virt-arm64` 1123 to 330 s; `virt-arm64` modules 1273 to 71.
+  - `SHA256SUMS` sha256: `x64`
+    `c73a53012bf15773cb7e0d4c30ca961f65f4654a25be5195046e33ce5add9ec8`;
+    `virt-arm64`
+    `6f7c44daaa43af64ed60c41c005bdd49424f59df5c114f8cda079711b587e7d8`;
+    `cx3576`
+    `af2ba8ebc8db82d430c1d5dcaad233affbecc836f5bca8ccc4fb3e4eb5d9f9e9`;
+    `s905x5m`
+    `19e70e93c2a57176b60786f8f11b178d3daa4baa567038f01a7cc1ad37db133f`.
+  - Kernels and U-Boots changed (new digests); the board, firmware and pool
+    components are reused, except the `s905x5m` pool: `mica-s905x5m-bluetooth`,
+    `mica-s905x5m-wireless`, `mica-s905x5m-wifi` and `mica-bm201-front-panel`
+    moved to `0.1.0-2`, since their control templates pin other producers by
+    literal version.
+  - `virt-arm64` keeps ACPI with `ACPI_BUTTON` and `GPIO_PL061`, so a host
+    powerdown reaches the guest (accepted unless `mica-build`'s suites
+    object).
+  - The `x64` publish job was rerun after a `GH_TOKEN`/`GITHUB_TOKEN` 403,
+    fixed in `260e55a`.
+  - Next: `mica-build` re-pins the four boards and runs its `virt-arm64`
+    acceptance and CI on all ten products, then cuts `x64` and `cx3576`
+    (dev and prod); the coordinator then deletes `<board>/20260915-1128` and
+    prunes ghcr. Step (2), CI reuse of unchanged kernel and U-Boot
+    components, is next in `mica-boards`.
