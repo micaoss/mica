@@ -1,52 +1,95 @@
-# 获取并识别镜像
+# 获取发布版：发布了什么，以及如何校验
 
-从源码构建当前系统，或向集成商获取完整镜像。本仓库没有公开托管的下载服务。
+Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名获取：
+不需要 token，也不需要登录镜像仓库。对读者有意义的发布有两类。
 
-## 1. 选择目标
+| 发布 | 标签 | 携带 |
+|---|---|---|
+| 版本索引 | `mica/<YYYYMMDD-HHMM>` | `mica-index.json`、`mica-build.lock`、`SHA256SUMS` |
+| 作用域产品发布 | `<scope>/<YYYYMMDD-HHMM>` | `mica-build.lock`、各产品的 `mica-<product>-<release>.img.gz`、其 `.micaupd` 归档、`SHA256SUMS` |
 
-当前系统镜像目标为 `x64`、`virt-arm64`、`cx3576`。产物绑定确切板卡和架构，
-用户态 profile（`dev` 或 `prod`）记录在已验证根中。所有验收都刷完整最新版工厂
-镜像，不支持旧布局安装或迁移。
+被 GitHub 标记为 *latest* 的是索引发布，它在一次作用域发布之后由自动化切出；
+作用域是一块板（它全部已发布的产品）或单个产品。索引是入口：它列出当前每个
+产品、它的文件、大小和哈希，读者不必自己遍历发布列表。
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/virt-arm64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `docs/design/mica-index.md`, `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
-## 2. 保留完整产物集合
+## 1. 有哪些东西可下载
 
-| 产物 | 用途 |
-|---|---|
-| `disk.img` | 带两个已认证部署记录的完整工厂镜像 |
-| 签名部署信封 | 绑定板卡、代次及 kernel/root 组合 |
-| kernel 包 | 签名 UKI/FIT 和匹配的 verity support 数据 |
-| root 组件 | 用户态映像、verity 参数和独立根哈希签名 |
-| 固件包 | 独立签名、独立维护的启动固件 |
-| `.micaupd` | 有边界的离线部署更新，携带所需对象 |
+只有发布目标板的产品才有镜像和更新归档——今天是 `x64` 和 `cx3576`。
+`virt-arm64` 是验收目标，`s905x5m` 尚未合格，两者都不发布；`-minimal` 产品只用于
+本地和 CI，从不发布（[不发布 minimal 产品](../../decisions/2026-09-15-minimal-products-not-released.md)）。
 
-开发验收刷完整镜像。组件更新用于已经运行当前系统的设备，只改变指定组件；
-普通系统更新操作不会安装引导固件。
+每个产品的发布携带：
 
-> status: shipped — evidence: `mica-build:build/src/component-cli.ts`, `mica-build:build/src/file-image.ts`, `mica-build:build/src/component-archive.ts`
+- `mica-<product>-<release>.img.gz` —— gzip 压缩的工厂磁盘镜像。不上传裸 `.img`。
+- `mica-<product>-<release>.micaupd` —— 完整更新归档，始终存在。
+- `.root.micaupd` 和 `.kernel.micaupd` —— 部分归档，仅当它不携带的那个组件相对
+  上一个发布未变化时才发布（[更新包](../../user/update-packages.md)）。
 
-## 3. 构建和验证
+> status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/boards/support-tiers.md`
 
-按[快速上手](quickstart.md)及[构建指南](../../design/build.md)操作。元数据公钥必须
-来自独立的可信交付渠道，不能只相信与下载文件放在一起的密钥或校验和。
+## 2. 从索引里挑文件
 
 ```sh
-bash verify/run.sh --verify --board x64 \
-  --image /path/to/image/disk.img --public-key /path/to/metadata-public.key
+REL=https://github.com/micaoss/mica-build/releases/download
+curl -fsSL "$REL/mica/<index release>/mica-index.json" -o mica-index.json
+
+jq -r '.products[] | select(.product=="x64-dev")
+       | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
 ```
 
-离线验证认证签名记录并检查内容、几何、固件回执和根策略。启动验收另外证明选定
-启动锚下的 UEFI/FIT 强制验证行为。
+一个文件回答全部问题：每个被索引的产品及其板卡、profile、代次、deployment、
+kernel 和 rootfs 标识，它的发布、它的 OCI bundle，它的镜像与更新文件的 URL、
+sha256 和大小，以及每块板和每个产品的目录。`previous` 指向上一个索引。
 
-> status: shipped — evidence: `mica-build:verify/src/file-image.ts`, `mica-build:verify/run.sh`, `docs/design/release-signing.md`
+> status: shipped — evidence: `docs/design/mica-index.md`
 
-## 4. 发布和证据
+## 3. 下载并校验
 
-更新服务器接收独立组件对象和签名元数据，验证发布条件并提供选定渠道；固件维护
-产物单独发布。服务器及其目录由操作者管理，工具存在不意味着公共托管已提供。
-交付镜像时保留软件包清单、BSP 标识、组件摘要、源码提交、发布说明和确切测试日志。
-实机能力必须附对应硬件证据，见[发布标识](release-notes.md)及
-[发布产物](../../design/release-artifacts.md)。
+```sh
+curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
+curl -fsSLO "$REL/x64/<release>/mica-build.lock"
+curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
+```
 
-> status: shipped — evidence: `mica-build:update-server/src`, `docs/design/updates.md`
+`SHA256SUMS` 列出该发布的 lock 以及全部镜像和更新归档；`sha256sum SHA256SUMS`
+是这个发布的信任哈希，也是消费方记录在 pin 里的值。
+
+压缩镜像同时携带它解压后的身份，因此在写入任何介质之前就能校验裸镜像：
+
+```sh
+gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
+```
+
+把这个值与 `mica-index.json` 中该文件的 `uncompressedSha256` 比较。镜像的 OCI
+层携带同样的值，记作 `mica.uncompressed-sha256` 和 `mica.uncompressed-size`。
+
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+
+## 4. 用源头证明一个发布
+
+lock 是 `mica-lock v1` 文件，记录发布的提交以及进入它的每一项输入——包、池、
+板卡、上游镜像，作用域发布还包括镜像和归档本身。在索引所指提交上的干净
+`mica-build` 检出中，可以从已发布的 release 重建索引并逐字节比较：
+
+```sh
+bash tools/release.sh verify-index mica/<index release>
+bash tools/release.sh verify-index mica/<index release> --full
+```
+
+文件旁边的校验和只能证明文件完整到达。让镜像值得信任的是它内部的签名链
+（[发布签名](../../design/release-signing.md)）以及平台信任那个签名者；上面的
+哈希是完整性的一半，不是真实性的一半。
+
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
+
+## 5. 下一步
+
+- 把镜像写入板卡：[刷写](../../user/flashing.md)。
+- 改为升级在运行的设备：[更新包](../../user/update-packages.md)。
+- 自己构建同样的产物：[构建指南](../../user/build.md)。
+- 一个发布如何切出、什么决定重建：[发布](../../user/releasing.md)。
+
+> status: shipped — evidence: `docs/user/flashing.md`, `docs/user/update-packages.md`, `docs/user/build.md`, `docs/user/releasing.md`
