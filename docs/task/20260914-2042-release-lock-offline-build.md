@@ -530,3 +530,23 @@ Moving the repositories to the release lock format
     four contract fixtures, `mica/rootfs/v2` and the removal of
     `release-identity.env`; K1 and K2 may follow. The clean-up of the
     pre-rule releases starts from that pin commit.
+- 2026-09-15: clean-up batch 1 executed by the coordinator (user, "可以").
+  - Start: `mica-build` pin commit `10936ff873d6c55eabcaddd2b182667cc8d0531d`
+    (ci run 34965915849 green), pinning `mica-system-base` `20260915-1102`,
+    `mica-podman` `20260915-1057` and `mica-boards` `<board>/20260915-1128`;
+    `mica-podman` `main` also pins Base `20260915-1102`.
+  - Deleted with `gh`, release and tag: `mica-system-base` `20260915-0209`;
+    `mica-podman` `20260915-0245`; `mica-boards` `x64`, `virt-arm64`,
+    `cx3576` and `s905x5m` `/20260915-0945`.
+  - ghcr pruned to the current locks: `mica-system-base` 5 versions
+    (`rootfs.20260915-0209`, its index and two untagged per-architecture
+    manifests, and `pool.amd64`/`pool.arm64.20260915-0209`); `mica-podman` 2
+    (`pool.amd64`/`pool.arm64.20260915-0245`); `mica-boards` 4
+    (`pool.<board>.<arch>.20260915-0945`; the `board`, `kernel`, `uboot` and
+    `firmware` digests are shared with `20260915-1128` and stay).
+  - Verified: the releases and remote tags are exactly Base `20260915-1102`,
+    podman `20260915-1057` and boards `<board>/20260915-1128`; each ghcr
+    package holds exactly the digests its current locks reference (Base 5,
+    podman 2, boards 16), all readable anonymously.
+  - Batch 2 (`mica-core` `20260915-0235` and `20260915-0728`) follows the
+    `mica-build` pin commit for `mica-core` `20260915-1135`.

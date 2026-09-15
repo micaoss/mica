@@ -293,3 +293,9 @@ owner, dispatched by the coordinator.
   no release identity in `system_info`. All four package repositories now
   have a release under the rules; `mica-build` pins the four in one round
   before its first scoped release.
+- 2026-09-15: clean-up batch 1 done after `mica-build` `10936ff` pinned Base
+  `20260915-1102`, podman `20260915-1057` and boards `<board>/20260915-1128`:
+  Base `20260915-0209`, podman `20260915-0245` and boards
+  `<board>/20260915-0945` deleted with their tags, and each ghcr package
+  pruned to exactly its current locks. Batch 2 (`mica-core` `20260915-0235`,
+  `20260915-0728`) follows the core pin.

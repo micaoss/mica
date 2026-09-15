@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-15 12:05 [progress]
+
+Clean-up batch 1 of the pre-rule releases: after `mica-build` `10936ff` pinned
+`mica-system-base` `20260915-1102`, `mica-podman` `20260915-1057` and
+`mica-boards` `<board>/20260915-1128`, the coordinator deleted Base
+`20260915-0209`, podman `20260915-0245` and boards `<board>/20260915-0945`
+with their tags and pruned each ghcr package to the digests its current locks
+reference (Base 5, podman 2, boards 16, all readable anonymously). `mica-core`
+`20260915-0235` and `20260915-0728` follow once `mica-build` pins
+`20260915-1135`.
+
 ## 2026-09-15 11:55 [progress]
 
 `mica-core` `20260915-1135` at `610782c` is its first release under the
