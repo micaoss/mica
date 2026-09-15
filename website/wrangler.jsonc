@@ -1,0 +1,15 @@
+{
+  // A static site: no `main`, so Cloudflare serves the build output directly
+  // and no Worker code runs. `bun run build` produces ./dist.
+  "name": "micaos-dev",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "./dist"
+  },
+  // Both hostnames resolve to this Worker; the zone has to be on the same
+  // Cloudflare account.
+  "routes": [
+    { "pattern": "micaos.dev", "custom_domain": true },
+    { "pattern": "www.micaos.dev", "custom_domain": true }
+  ]
+}

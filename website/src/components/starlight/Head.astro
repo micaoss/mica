@@ -1,0 +1,10 @@
+---
+// Starlight renders its own <head>, so the preloads are appended here.
+import Default from '@astrojs/starlight/components/Head.astro'
+import FontPreload from '@/components/FontPreload.astro'
+---
+
+<Default><slot /></Default>
+<FontPreload />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />

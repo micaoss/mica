@@ -1,0 +1,221 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Self-hosted Latin face. Chinese glyphs come from the system stack — see
+   docs/decisions/2026-09-14-web-stack-divergences.md. */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* Starlight signals the colour scheme with data-theme; ThemeProvider matches it. */
+/* ---------------------------------------------------------------------------
+   Metric-matched fallback.
+
+   Geist averages 0.515em per character against roughly 0.528em for the
+   Arial-class face a browser falls back to. Without this the line reflows when
+   the webfont arrives. `unicode-range` keeps the adjustment off CJK, which comes
+   from the system stack and must not be rescaled.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Geist Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Segoe UI"), local("Liberation Sans");
+  size-adjust: 97.5%;
+  ascent-override: 103.0%;
+  descent-override: 30.2%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-024F, U+2000-206F, U+20A0-20BF, U+2190-21BB, U+2212;
+}
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------
+   Palette — the Fumadocs visual language.
+
+   Neutral greys with no hue, translucent borders, and a `primary` that is
+   near-black rather than a brand colour. See
+   docs/decisions/2026-09-14-fumadocs-visual-language.md.
+
+   The Mica blue survives as `brand`: links, focus rings, small accents. It is
+   no longer the interface colour.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --background: hsl(0 0% 96%);
+  --foreground: hsl(0 0% 3.9%);
+  --muted: hsl(0 0% 96.1%);
+  --muted-foreground: hsl(0 0% 45.1%);
+  --popover: hsl(0 0% 98%);
+  --popover-foreground: hsl(0 0% 15.1%);
+  --card: hsl(0 0% 94.7%);
+  --card-foreground: hsl(0 0% 3.9%);
+  --border: hsl(0 0% 80% / 50%);
+  --primary: hsl(0 0% 9%);
+  --primary-foreground: hsl(0 0% 98%);
+  --secondary: hsl(0 0% 93.1%);
+  --secondary-foreground: hsl(0 0% 9%);
+  --accent: hsl(0 0% 82% / 50%);
+  --accent-foreground: hsl(0 0% 9%);
+  --ring: hsl(0 0% 63.9%);
+  --input: hsl(0 0% 80% / 50%);
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Retained brand accents. */
+  --brand: #0e86b8;
+  --brand-strong: #0a5e82;
+
+  --surface: var(--card);
+  --divider: var(--border);
+
+  --radius: 0.5rem;
+}
+
+[data-theme='dark'] {
+  --background: hsl(0 0% 7.04%);
+  --foreground: hsl(0 0% 92%);
+  --muted: hsl(0 0% 12.9%);
+  --muted-foreground: hsl(0 0% 70% / 80%);
+  --popover: hsl(0 0% 11.6%);
+  --popover-foreground: hsl(0 0% 86.9%);
+  --card: hsl(0 0% 9.8%);
+  --card-foreground: hsl(0 0% 98%);
+  --border: hsl(0 0% 40% / 20%);
+  --primary: hsl(0 0% 98%);
+  --primary-foreground: hsl(0 0% 9%);
+  --secondary: hsl(0 0% 12.9%);
+  --secondary-foreground: hsl(0 0% 92%);
+  --accent: hsl(0 0% 40.9% / 30%);
+  --accent-foreground: hsl(0 0% 90%);
+  --ring: hsl(0 0% 54.9%);
+  --input: hsl(0 0% 40% / 20%);
+  --destructive: oklch(0.704 0.191 22.216);
+
+  --brand: #38bdf8;
+  --brand-strong: #7dd3fc;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--card);
+  --color-divider: var(--border);
+  --color-accent: var(--accent);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: "Geist Variable", "Geist Fallback", "Noto Sans SC", "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* The page is measured to 1200px. Section content uses the plain gutter; the
+   header bleeds full width but keeps its content on the same optical column. */
+@utility px-gutter {
+  padding-inline: clamp(20px, 5vw, 72px);
+}
+
+@utility px-nav-gutter {
+  padding-inline: max(
+    clamp(20px, 5vw, 72px),
+    calc((100% - 1200px) / 2 + clamp(20px, 5vw, 72px))
+  );
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-size: 15px;
+    line-height: 1.55;
+    text-wrap: pretty;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-kerning: normal;
+    font-variant-ligatures: common-ligatures;
+  }
+
+  a {
+    color: var(--brand-strong);
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    color: var(--brand);
+    text-decoration: underline;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 25%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Starlight. Stock components, stock greys, stock code blocks; the brand accent
+   is the only intervention.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Starlight paints `accent-low` as text on an `accent-high` fill, so it has to
+     stay opaque and follow the scheme. */
+  --sl-color-accent-low: color-mix(in srgb, var(--brand) 15%, var(--background));
+  --sl-color-accent: var(--brand);
+  --sl-color-accent-high: var(--brand-strong);
+
+  /* Starlight's default stack has no Chinese face; the fallback breaks CJK
+     spacing and splits digits. */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+
+  /* One height for a 26px logo: the slot, which the header fills. */
+  --sl-nav-height: 3rem;
+  --sl-nav-pad-y: 0;
+}
+
+/* Starlight also bolds the current entry, which re-wraps the longer ones. The
+   fill is marker enough. */
+.sidebar-content a[aria-current='page'] {
+  font-weight: inherit;
+}

@@ -1,0 +1,40 @@
+---
+import type { LocaleCode } from '@/shared/i18n'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { ArchitectureSection } from '@/features/landing/components/architecture-section'
+import { BoardsSection } from '@/features/landing/components/boards-section'
+import { FlowSection } from '@/features/landing/components/flow-section'
+import { HeroSection } from '@/features/landing/components/hero-section'
+import { SiteFooter } from '@/features/landing/components/site-footer'
+import { StartSection } from '@/features/landing/components/start-section'
+import { docsHref, downloadHref, homeHref } from '@/features/landing/links'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { copyFor, localePaths } from '@/shared/i18n'
+
+interface Props {
+  locale: LocaleCode
+}
+
+const { locale } = Astro.props
+const copy = copyFor(locale)
+const docs = docsHref(locale)
+const download = downloadHref(locale)
+---
+
+<BaseLayout copy={copy} description={copy.hero.sub}>
+  <SiteHeader
+    copy={copy}
+    locale={locale}
+    paths={localePaths('')}
+    homeHref={homeHref(locale)}
+    docsHref={docs}
+  />
+  <div class="mx-auto max-w-[1200px] px-gutter">
+    <HeroSection copy={copy} docsHref={docs} downloadHref={download} />
+    <ArchitectureSection copy={copy} />
+    <BoardsSection copy={copy} />
+    <FlowSection copy={copy} />
+    <StartSection copy={copy} docsHref={docs} />
+    <SiteFooter copy={copy} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,82 @@
+---
+import type { LocaleCode } from '@/shared/i18n'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { DownloadExplorer } from '@/features/download/components/download-explorer'
+import { SiteFooter } from '@/features/landing/components/site-footer'
+import { docsHref, docsPageHref, homeHref } from '@/features/landing/links'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { copyFor, localePathsFromUrl } from '@/shared/i18n'
+import { Card, CardContent } from '@/shared/components/ui/card'
+
+interface Props {
+  locale: LocaleCode
+}
+
+const { locale } = Astro.props
+const copy = copyFor(locale)
+const quickstart = docsPageHref(locale, 'user/quickstart')
+const identify = docsPageHref(locale, 'user/download')
+---
+
+<BaseLayout copy={copy} title={`${copy.download.title} — Mica OS`} description={copy.download.lead}>
+  <SiteHeader
+    copy={copy}
+    locale={locale}
+    paths={localePathsFromUrl(Astro.url.pathname)}
+    homeHref={homeHref(locale)}
+    docsHref={docsHref(locale)}
+  />
+  <div class="mx-auto max-w-[1200px] px-gutter">
+    <header class="border-b border-border pt-14 pb-10">
+      <h1 class="m-0 text-[clamp(28px,5vw,44px)] leading-[1.15] font-semibold tracking-tight">
+        {copy.download.title}
+      </h1>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.lead}
+      </p>
+    </header>
+
+    <section class="pt-10 pb-16">
+      <DownloadExplorer client:load copy={copy} />
+    </section>
+
+    <section class="border-t border-border py-14">
+      <h2 class="m-0 text-[clamp(22px,3vw,28px)] leading-[1.2] font-semibold tracking-tight">
+        {copy.download.obtain.heading}
+      </h2>
+      <div class="mt-8 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+        {
+          [
+            { ...copy.download.obtain.build, href: quickstart },
+            { ...copy.download.obtain.integrator, href: identify },
+          ].map(item => (
+            <Card className="h-full gap-0 p-6">
+              <CardContent className="p-0">
+                <h3 class="m-0 text-lg leading-6 font-semibold tracking-tight">{item.title}</h3>
+                <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">{item.body}</p>
+                <a class="mt-4 inline-block text-[15px]" href={item.href}>{item.cta}</a>
+              </CardContent>
+            </Card>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="border-t border-border py-14">
+      <h2 class="m-0 text-[clamp(22px,3vw,28px)] leading-[1.2] font-semibold tracking-tight">
+        {copy.download.verify.heading}
+      </h2>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.verify.body}
+      </p>
+      <pre
+        class="mt-6 overflow-x-auto rounded-xl border border-border bg-card px-5 py-4 font-mono text-[13px] leading-6"
+      >{copy.download.verify.command}</pre>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.verify.note}
+      </p>
+    </section>
+
+    <SiteFooter copy={copy} />
+  </div>
+</BaseLayout>

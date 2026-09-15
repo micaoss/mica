@@ -1,0 +1,269 @@
+#!/usr/bin/env python3
+"""Reference checker for docs/design/release-lock.md.
+
+It checks the file rules of `mica-lock v1`, `mica-pin v1` and the offline
+side of the `repos/` cache, and prints `valid` or `refused <rule>`. It exists
+to prove the test vectors under docs/design/release-lock/vectors/ against
+their expected results; each repository implements the same rules in its own
+tools. Registry checks (digests read back, package sha256 = pool layer) are
+out of its scope.
+
+    release-lock-check.py lock <file>
+    release-lock-check.py upstream <file>              (locks/upstream.lock)
+    release-lock-check.py pins <locks-dir> ci|local    (<locks-dir> holds *.lock and pins/*.pin)
+    release-lock-check.py repos <dir> offline
+"""
+import hashlib
+import os
+import re
+import sys
+
+
+class Refused(Exception):
+    pass
+
+
+KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 4, "upstream": 7, "apt": 5}
+KIND_ORDER = list(KIND_COLUMNS)
+BASE_ONLY = {"upstream", "apt"}
+REPOSITORY = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+RELEASE = re.compile(r"^[0-9]{8}-[0-9]{4}$")
+COMMIT = re.compile(r"^[0-9a-f]{40}$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
+ARCH = {"amd64", "arm64"}
+PLATFORM = {"index", "amd64", "arm64", "386"}
+NAME = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
+UPSTREAM_NAME = re.compile(r"^[a-z0-9][a-z0-9._/-]*(?::[A-Za-z0-9._-]+)?$")
+UPSTREAM_REFERENCE = re.compile(r"^[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::[0-9]+)?/[a-z0-9._/-]+(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$")
+VERSION = re.compile(r"^[A-Za-z0-9.+~:-]+$")
+REFERENCE = re.compile(r"^(?P<registry>ghcr\.io/micaoss|local)/(?P<repository>[a-z0-9][a-z0-9-]*)(?::(?P<tag>[A-Za-z0-9._-]+))?@sha256:(?P<digest>[0-9a-f]{64})$")
+
+
+def lines_of(path, header):
+    data = open(path, "rb").read()
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise Refused("encoding")
+    if not text.endswith("\n") or "\r" in text:
+        raise Refused("encoding")
+    lines = text[:-1].split("\n")
+    if lines[0] != header:
+        raise Refused("header")
+    rows = []
+    for line in lines[1:]:
+        if line == "" or line.endswith("\t") or line.startswith(" "):
+            raise Refused("encoding")
+        if line.startswith("#"):
+            continue
+        rows.append(line.split("\t"))
+    return rows
+
+
+def field(ok):
+    if not ok:
+        raise Refused("field-value")
+
+
+def check_upstream_image(row):
+    field(UPSTREAM_NAME.match(row[2]) and row[3] in PLATFORM)
+    if "@sha256:" not in row[4]:
+        raise Refused("reference-digest")
+    if row[4].startswith(("ghcr.io/micaoss/", "local/")):
+        raise Refused("reference-upstream")
+    field(UPSTREAM_REFERENCE.match(row[4]))
+
+
+def check_lock(path):
+    rows = lines_of(path, "# mica-lock v1")
+    for row in rows:
+        if row[0] not in KIND_COLUMNS:
+            raise Refused("kind-unknown")
+        if len(row) != KIND_COLUMNS[row[0]]:
+            raise Refused("column-count")
+    if not rows or rows[0][0] != "release" or sum(r[0] == "release" for r in rows) != 1:
+        raise Refused("release-row")
+    _, repository, release, commit = rows[0]
+    field(REPOSITORY.match(repository) and (RELEASE.match(release) or release == "offline") and COMMIT.match(commit))
+    registry = "local" if release == "offline" else "ghcr.io/micaoss"
+
+    def reference(value, expected=repository):
+        if "@sha256:" not in value:
+            raise Refused("reference-digest")
+        m = REFERENCE.match(value)
+        if not m:
+            raise Refused("field-value" if value.startswith(("ghcr.io/micaoss/", "local/")) else "reference-registry")
+        if m.group("registry") != registry:
+            raise Refused("reference-registry")
+        if m.group("repository") != expected:
+            raise Refused("reference-repository")
+
+    keys, pools, sort_keys = set(), set(), []
+    for row in rows[1:]:
+        kind = row[0]
+        if kind == "image":
+            if row[1] == "upstream":
+                check_upstream_image(row)
+            elif REPOSITORY.match(row[1]):
+                field(NAME.match(row[2]) and row[3] in PLATFORM)
+                reference(row[4], row[1])
+                if row[1] != repository:
+                    raise Refused("image-source")
+            else:
+                raise Refused("image-source")
+            key = (row[1], row[2], row[3])
+        elif kind == "pool":
+            field(row[1] in ARCH)
+            reference(row[2])
+            key = (row[1],)
+            pools.add(row[1])
+        elif kind == "package":
+            field(NAME.match(row[1]) and row[2] in ARCH and VERSION.match(row[3]) and SHA256.match(row[4]))
+            key = (row[1], row[2])
+        elif kind == "board":
+            field(NAME.match(row[1]) and row[2] in ARCH)
+            reference(row[3])
+            key = (row[1],)
+        elif kind == "upstream":
+            roots = row[6].split(",")
+            field(NAME.match(row[1]) and row[2] in ARCH and VERSION.match(row[3]) and SHA256.match(row[4])
+                  and row[5].startswith("https://") and all(NAME.match(r) for r in roots) and roots == sorted(set(roots)))
+            key = (row[1], row[2])
+        elif kind == "apt":
+            field(row[1].startswith("https://") and row[2] and row[3] and row[4].startswith("/"))
+            key = ()
+        else:
+            raise Refused("release-row")
+        if (kind,) + key in keys:
+            raise Refused("duplicate-key")
+        keys.add((kind,) + key)
+        sort_keys.append((KIND_ORDER.index(kind),) + tuple(k.encode() for k in key))
+    if repository != "mica-system-base" and any(r[0] in BASE_ONLY for r in rows):
+        raise Refused("base-only-kind")
+    if any(r[0] == "package" and r[2] not in pools for r in rows):
+        raise Refused("package-without-pool")
+    if sort_keys != sorted(sort_keys):
+        raise Refused("sort-order")
+    return repository, release
+
+
+UPSTREAM_COLUMNS = {"image": 5, "source": 6, "git": 5}
+
+
+def check_upstream(path):
+    rows = lines_of(path, "# mica-lock v1")
+    for row in rows:
+        if row[0] == "release":
+            raise Refused("upstream-release-row")
+        if row[0] not in UPSTREAM_COLUMNS:
+            raise Refused("kind-unknown")
+        if len(row) != UPSTREAM_COLUMNS[row[0]]:
+            raise Refused("column-count")
+    keys, sort_keys = set(), []
+    order = list(UPSTREAM_COLUMNS)
+    for row in rows:
+        kind = row[0]
+        if kind == "image":
+            if row[1] != "upstream":
+                raise Refused("image-source")
+            check_upstream_image(row)
+            key = (row[1], row[2], row[3])
+        elif kind == "source":
+            field(NAME.match(row[1]) and row[2] in ARCH | {"all"} and VERSION.match(row[3])
+                  and SHA256.match(row[4]) and row[5].startswith("https://"))
+            key = (row[1], row[2])
+        else:
+            field(NAME.match(row[1]) and row[2].startswith("https://") and row[3] and COMMIT.match(row[4]))
+            key = (row[1],)
+        if (kind,) + key in keys:
+            raise Refused("duplicate-key")
+        keys.add((kind,) + key)
+        sort_keys.append((order.index(kind),) + tuple(k.encode() for k in key))
+    if sort_keys != sorted(sort_keys):
+        raise Refused("sort-order")
+
+
+def read_pin(path):
+    data = open(path, "rb").read()
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise Refused("encoding")
+    if not text.endswith("\n") or "\r" in text:
+        raise Refused("encoding")
+    lines = text[:-1].split("\n")
+    if lines[0] != "# mica-pin v1":
+        raise Refused("header")
+    pairs = [line.split("=", 1) if "=" in line else [line, None] for line in lines[1:]]
+    keys = [k for k, _ in pairs]
+    values = dict(pairs)
+    offline = values.get("RELEASE") == "offline"
+    if keys != (["REPOSITORY", "RELEASE", "SHA256SUMS"] + (["CHECKOUT"] if offline else [])):
+        raise Refused("pin-format")
+    field(REPOSITORY.match(values["REPOSITORY"]) and SHA256.match(values["SHA256SUMS"])
+          and (offline or RELEASE.match(values["RELEASE"])))
+    if offline:
+        field(os.path.isabs(values["CHECKOUT"]))
+    return values
+
+
+def check_pins(directory, mode):
+    pins_dir = os.path.join(directory, "pins")
+    pins = sorted(f[:-4] for f in os.listdir(pins_dir) if f.endswith(".pin"))
+    locks = sorted(f[:-5] for f in os.listdir(directory) if f.endswith(".lock") and f != "upstream.lock")
+    records = {}
+    for repository in pins:
+        values = read_pin(os.path.join(pins_dir, repository + ".pin"))
+        if values["REPOSITORY"] != repository:
+            raise Refused("name-mismatch")
+        records[repository] = values
+    for repository in pins:
+        if repository not in locks:
+            raise Refused("pin-without-lock")
+    for repository in locks:
+        if repository not in pins:
+            raise Refused("lock-without-pin")
+    for repository, values in records.items():
+        try:
+            lock_repository, lock_release = check_lock(os.path.join(directory, repository + ".lock"))
+        except Refused:
+            raise Refused("lock-invalid")
+        if lock_repository != repository:
+            raise Refused("lock-invalid")
+        if lock_release != values["RELEASE"]:
+            raise Refused("release-mismatch")
+        if "CHECKOUT" in values and mode == "ci":
+            raise Refused("checkout-in-ci")
+
+
+def check_repos(directory, mode):
+    (digest, _url), = [line.split("\t") for line in open(os.path.join(directory, "request")).read().splitlines()]
+    path = os.path.join(directory, "repos", "sha256", digest)
+    if not os.path.exists(path):
+        if mode == "offline":
+            raise Refused("offline-miss")
+        raise Refused("fetch-required")
+    if hashlib.sha256(open(path, "rb").read()).hexdigest() != digest:
+        raise Refused("cache-corrupt")
+
+
+def main(argv):
+    try:
+        if argv[1] == "lock":
+            check_lock(argv[2])
+        elif argv[1] == "upstream":
+            check_upstream(argv[2])
+        elif argv[1] == "pins":
+            check_pins(argv[2], argv[3])
+        elif argv[1] == "repos":
+            check_repos(argv[2], argv[3])
+        else:
+            raise SystemExit(__doc__)
+    except Refused as refusal:
+        print("refused", refusal)
+        return
+    print("valid")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

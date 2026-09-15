@@ -1,0 +1,14 @@
+---
+// The supported way to customise the scheme: one storage key, three modes,
+// shared with the standalone pages.
+import ThemeScript from '@/components/ThemeScript.astro'
+---
+
+<ThemeScript />
+
+<script is:inline>
+  // Starlight's own components call window.StarlightThemeProvider.updatePickers().
+  // This override replaces its picker with the site header's toggle, so the
+  // global has to exist as a no-op or those call sites throw.
+  window.StarlightThemeProvider = { updatePickers() {} }
+</script>

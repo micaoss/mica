@@ -1,0 +1,19 @@
+---
+// Resolves the stored scheme before first paint, for every page, from one key.
+---
+
+<script is:inline>
+  ;(function () {
+    var mode = 'auto'
+    try {
+      var stored = localStorage.getItem('mica-site-theme')
+      if (stored === 'light' || stored === 'dark' || stored === 'auto') mode = stored
+    } catch {}
+    var dark
+      = mode === 'auto'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        : mode === 'dark'
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+  })()
+</script>
