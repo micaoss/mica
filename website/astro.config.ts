@@ -43,7 +43,12 @@ export default defineConfig({
       disable404Route: true,
     }),
   ],
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Stamped into the catalogue request so a deploy invalidates the edge's
+    // copy; without it a cached answer outlives the deploy that changed it.
+    define: { __BUILD_ID__: JSON.stringify(Date.now().toString(36)) },
+  },
   server: {
     host: true,
     // nsl fronts the dev server on both *.localhost and a public dev domain, and

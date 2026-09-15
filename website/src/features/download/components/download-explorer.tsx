@@ -61,8 +61,13 @@ function Facet({ label, allLabel, value, options, onChange }: FacetProps) {
   )
 }
 
-/** Where the Worker answers the catalogue. Static pages fetch it at runtime. */
-const CATALOG_ENDPOINT = '/api/catalog'
+declare const __BUILD_ID__: string | undefined
+
+/**
+ * Where the Worker answers the catalogue. The build stamp is the cache key: a
+ * deploy asks for a fresh answer, and within one deploy the edge serves one.
+ */
+const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
 
 export function DownloadExplorer({
   copy,

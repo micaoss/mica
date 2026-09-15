@@ -92,7 +92,7 @@ describe('the catalogue endpoint', () => {
     render(<DownloadExplorer copy={zh} />)
 
     expect(await screen.findByText('dep-aa11')).toBeInTheDocument()
-    expect(fetchMock).toHaveBeenCalledWith('/api/catalog', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/api/catalog'), expect.anything())
     vi.unstubAllGlobals()
   })
 
