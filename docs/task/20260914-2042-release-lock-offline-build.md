@@ -265,3 +265,16 @@ Moving the repositories to the release lock format
     lock; verified anonymously; ghcr pruned to the two `20260915-0245` pools.
 - 2026-09-15: stage 4 (`mica-boards`, then `mica-build` and the final image
   assembly) started.
+- 2026-09-15 (user), stage 4: `mica-build` releases are scoped and carry
+  image files (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
+  - Scope: a board (all its products) or a single product; tag and GitHub
+    Release `<scope>/<YYYYMMDD-HHMM>` (for example `x64/20260915-0300`);
+    only the products in the scope are built, verified and published.
+  - Assets: per product the compressed factory image, the update archive
+    and, for FIT boards, the vendor flashing format; plus `mica-build.lock`
+    and `SHA256SUMS` (listing only the lock). The OCI artifacts
+    `image.<product>.<release>` and `update.<product>.<release>` in
+    `ghcr.io/micaoss/mica-build` are the canonical copies; the lock ties
+    each asset to its OCI digest and records the five input releases.
+  - Pending: the `mica-build.lock` row kinds (input, asset), proposed by
+    `mica-build`, enter the spec with its first scoped release.

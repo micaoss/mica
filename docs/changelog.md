@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-15 03:19 [decision]
+
+Two user decisions for `mica-build`, the last exit of the system, which
+nothing consumes: it follows its own release logic, an exception to the
+uniform release rules for `mica-build` only. A release is scoped to a board
+(all its products) or one product, tagged `<scope>/<YYYYMMDD-HHMM>` (for
+example `x64/20260915-0300`), and only that scope is built, verified and
+published. A release also carries the images as downloadable assets (per
+product the compressed factory image, the update archive and, for FIT boards,
+the vendor flashing format) beside `mica-build.lock` and `SHA256SUMS`; the
+OCI artifacts `image.<product>.<release>` and `update.<product>.<release>` are
+the canonical copies, and the lock ties each asset to its digest and records
+the five input releases. Its lock row kinds are pending.
+`docs/decisions/2026-09-15-mica-build-scoped-releases.md`, spec section 1,
+plan and task `20260914-2042-release-lock-offline-build`.
+
 ## 2026-09-15 03:00 [progress]
 
 Release-lock migration stage 3 complete: `mica-podman`'s clean release. Its

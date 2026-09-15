@@ -208,3 +208,14 @@ owner, dispatched by the coordinator.
   build-env `20260915-0138` and Base `20260915-0209`; `20260915-0138` and
   `20260914-0158` deleted. Stage 4 (`mica-boards`, then `mica-build` and the
   final image assembly) has started.
+- 2026-09-15 (user), stage 4: `mica-build` is the last exit and nothing
+  consumes it, so it follows its own release logic
+  (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`). A release is
+  scoped to a board (all its products) or one product, tagged
+  `<scope>/<YYYYMMDD-HHMM>`, and builds, verifies and publishes only that
+  scope. It carries per product the compressed factory image, the update
+  archive and, for FIT boards, the vendor flashing format as release assets,
+  plus `mica-build.lock` and `SHA256SUMS`; `image.<product>.<release>` and
+  `update.<product>.<release>` in `ghcr.io/micaoss/mica-build` are the
+  canonical copies. The lock row kinds (input, asset) are pending, proposed
+  by `mica-build`.

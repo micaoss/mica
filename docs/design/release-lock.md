@@ -23,6 +23,12 @@ This holds from a repository's first release in this format on: there is no
 transition period and no release carries old assets beside the lock (user,
 2026-09-14).
 
+`mica-build`, which nothing consumes, is the one exception: its releases are
+scoped to a board or a product, tagged `<scope>/<YYYYMMDD-HHMM>`, and carry
+image files beside `mica-build.lock` and `SHA256SUMS`
+(`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its lock rows
+are pending.
+
 ### 1.1 File rules
 
 - UTF-8, LF line ends, a final LF, no CR.
