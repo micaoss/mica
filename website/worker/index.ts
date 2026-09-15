@@ -13,7 +13,7 @@ import { downloadsFromReleases } from '../src/features/download/github'
 
 interface Env {
   /** Stores the parsed catalogue. */
-  CATALOG: KVNamespace
+  KV: KVNamespace
   /** `owner/repo` whose releases are parsed. */
   CATALOG_REPO?: string
   /** Read-only GitHub token; without one the API allows 60 calls an hour per IP. */
@@ -91,7 +91,7 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
       .at(-1) || undefined,
   }
 
-  await env.CATALOG.put(KEY, JSON.stringify(stored))
+  await env.KV.put(KEY, JSON.stringify(stored))
   return stored
 }
 
@@ -99,7 +99,7 @@ async function catalogue(env: Env, ctx: ExecutionContext): Promise<Response> {
   if (env.CATALOG_DEMO === '1')
     return json({ downloads: SAMPLE, sample: true, refreshedAt: null }, CACHE_SECONDS)
 
-  const stored = await env.CATALOG.get<StoredCatalogue>(KEY, 'json')
+  const stored = await env.KV.get<StoredCatalogue>(KEY, 'json')
   if (!stored) {
     // Nothing stored yet — a fresh deployment, before the first cron. Fill it in
     // the background rather than making this request wait on GitHub, and hold

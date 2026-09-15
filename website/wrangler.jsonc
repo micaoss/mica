@@ -9,7 +9,7 @@
   },
   // The parsed catalogue lives in KV; the read path never calls GitHub.
   "kv_namespaces": [
-    { "binding": "CATALOG", "id": "c55809c8a72a4d1b9ac52c2484cc9c29" }
+    { "binding": "KV", "id": "c55809c8a72a4d1b9ac52c2484cc9c29" }
   ],
   // Rebuilds the stored catalogue. A manual refresh is POST /api/catalog/refresh
   // with the REFRESH_TOKEN secret.
