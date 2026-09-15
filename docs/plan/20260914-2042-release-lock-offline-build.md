@@ -332,7 +332,8 @@ owner, dispatched by the coordinator.
   zstd; the raw image is still built and verified, and its record is
   proposed by `mica-build`); `x64-prod` and `cx3576-prod` are added with
   development keys on the development channel.
-- 2026-09-15 (user, "删除这个构建"): the minimal products are removed
+- 2026-09-15 (user, "删除这个构建"; replaced the same day by the correction
+  below): the minimal products are removed
   entirely (`docs/decisions/2026-09-15-no-minimal-products.md`). The products
   become `<board>-dev` for all four boards plus `x64-prod` and `cx3576-prod`;
   CI's release-product jobs run the prod product of each release-target
@@ -340,3 +341,14 @@ owner, dispatched by the coordinator.
   published `x64/20260915-1458` and `cx3576/20260915-1515` keep their minimal
   assets as history; the next scoped releases carry dev and prod only.
   `mica-build` removes them in the prod-products round, after K1 and K2.
+- 2026-09-15 (user correction, "按推荐处理，minimal只是本地编译和ci用，不发布",
+  replacing the removal): the `<board>-minimal` products stay for local builds
+  and CI, with their gates, negatives and floor coverage, and are never
+  released (`docs/decisions/2026-09-15-minimal-products-not-released.md`). A
+  scoped release builds and publishes only `<board>-dev` and `<board>-prod`,
+  excluding minimal by a declared product property (such as `product.env`
+  `RELEASE=0`), refusing a scope with only unpublished products, with a test.
+  CI's release-products rehearsal may keep the minimal products or move to
+  the prod products if the exclusion makes the path differ. `x64/20260915-1458`
+  and `cx3576/20260915-1515` stay as they are. `mica-build` implements it in
+  the prod products round, after K1 and K2.

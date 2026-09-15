@@ -60,10 +60,11 @@ is the composer's one input; `tools/product.sh` reads and validates the
 directory against the fetched board bundle. The resolver selects the engine's
 manifests for the profile and the features and the board's own out of its
 bundle (`board.pkgs`, `radio-<r>.pkgs`, `component-<c>.pkgs`);
-every board has a `<board>-dev` product, and the release-target boards
-`x64` and `cx3576` also a `<board>-prod` product; there is no minimal product
-(`docs/decisions/2026-09-15-no-minimal-products.md`), and the floor without
-features is a composition test, not an image. The root carries what it is: `/usr/lib/mica/product.conf`, five lines
+`FEATURES=""` is the minimal image, and every board has a `<board>-minimal`
+product (built locally and in CI, never released) and a `<board>-dev`
+product; the release-target boards `x64` and `cx3576` also have a
+`<board>-prod` product, and a scoped release carries only the dev and prod
+products (`docs/decisions/2026-09-15-minimal-products-not-released.md`). The root carries what it is: `/usr/lib/mica/product.conf`, five lines
 `PRODUCT=`, `BOARD=`, `PROFILE=`, and the quoted `FEATURES=` and
 `COMPONENTS=`; the device reads its product from the single unquoted
 `PRODUCT=` line (`docs/design/updates.md`; there is no
@@ -203,8 +204,8 @@ names and the update archive, and records a receipt of every input it read
 the public certificates, the tree's commit); a product whose receipt is
 unchanged is not rebuilt. `make product-verify PRODUCT=<name>` verifies the
 image, and `make products` builds every product on a release-target board; a
-new board enters through its `locks/mica-boards.<board>.lock` pin and a
-`<board>-dev` product. The signing inputs are the workspace `MICA_SIGNING_OUTPUT`
+new board enters through its `locks/mica-boards.<board>.lock` pin and its
+`<board>-minimal` and `<board>-dev` products. The signing inputs are the workspace `MICA_SIGNING_OUTPUT`
 (default `meta/`): verity and boot key pairs, the update signer and its
 public key.
 

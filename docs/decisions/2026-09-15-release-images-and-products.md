@@ -28,10 +28,11 @@ image gzip-compressed as `mica-<product>-<YYYYMMDD-HHMM>.img.gz`.
   row or a change to `docs/design/release-lock.md`, the exact form is
   reported first.
 
-**Prod products.** `x64-prod` and `cx3576-prod` are added, and the minimal
-products are removed (`docs/decisions/2026-09-15-no-minimal-products.md`), so
-the products are `<board>-dev` for all four boards plus these two: the dev
-features with `PROFILE=prod`, still signed with the development keys and published on
+**Prod products.** `x64-prod` and `cx3576-prod` are added, so releases carry
+`<board>-dev` and `<board>-prod`; the `<board>-minimal` products stay for
+local builds and CI and are never released
+(`docs/decisions/2026-09-15-minimal-products-not-released.md`). The prod
+products are the dev features with `PROFILE=prod`, still signed with the development keys and published on
 the development channel
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`,
 `docs/design/release-artifacts.md` channels).

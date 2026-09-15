@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "删除这个构建"); not implemented; `mica-build` removes them in the same round as the prod products, after K1 and K2
+- **status**: superseded the same day, before implementation, by `docs/decisions/2026-09-15-minimal-products-not-released.md` (user correction: the minimal products stay for local builds and CI and are never released); this record keeps the replaced removal
 
 ## Decision
 

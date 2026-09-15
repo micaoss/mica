@@ -31,4 +31,5 @@ Kinds:
 | [Stable root and kernel component identities](2026-09-15-stable-component-ids.md) | engineering decision | 2027-03-15 |
 | [Board kernel builds: incremental prod, pinned toolchains, then reuse](2026-09-15-board-kernel-builds.md) | engineering decision | 2027-03-15 |
 | [Release images, prod products and release targets](2026-09-15-release-images-and-products.md) | engineering decision | 2027-03-15 |
-| [There are no minimal products](2026-09-15-no-minimal-products.md) | engineering decision | 2027-03-15 |
+| [There are no minimal products](2026-09-15-no-minimal-products.md) (superseded) | engineering decision | 2027-03-15 |
+| [Minimal products are built locally and in CI, never released](2026-09-15-minimal-products-not-released.md) | engineering decision | 2027-03-15 |

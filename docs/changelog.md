@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 18:01 [decision]
+
+User correction, replacing the removal of the minimal products ("按推荐处理，minimal只是本地编译和ci用，不发布"):
+the `<board>-minimal` products stay for local builds and CI, with their
+gates, negatives and floor coverage, and are never released. A scoped release
+builds and publishes only `<board>-dev` and `<board>-prod`, excluding minimal
+products by a declared product property (such as `RELEASE=0`) and refusing a
+scope with only unpublished products. `x64/20260915-1458` and
+`cx3576/20260915-1515` stay as they are.
+`docs/decisions/2026-09-15-minimal-products-not-released.md` supersedes
+`2026-09-15-no-minimal-products`; `docs/design/build.md`,
+`docs/design/release-artifacts.md` and `docs/boards/porting.md` name the
+minimal products again.
+
 ## 2026-09-15 18:00 [decision]
 
 The minimal products are removed entirely (user, "删除这个构建"):
