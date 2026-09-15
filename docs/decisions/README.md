@@ -29,3 +29,5 @@ Kinds:
 | [Packages are reused by inputs across releases, first in mica-boards](2026-09-15-package-reuse-by-inputs.md) | engineering decision | 2027-03-15 |
 | [Packages are locked by their own version; a release never changes it](2026-09-15-package-versions.md) | engineering decision | 2027-03-15 |
 | [Stable root and kernel component identities](2026-09-15-stable-component-ids.md) | engineering decision | 2027-03-15 |
+| [Board kernel builds: incremental prod, pinned toolchains, then reuse](2026-09-15-board-kernel-builds.md) | engineering decision | 2027-03-15 |
+| [Release images, prod products and release targets](2026-09-15-release-images-and-products.md) | engineering decision | 2027-03-15 |

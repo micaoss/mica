@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-15 17:53 [decision]
+
+User decisions after the first scoped releases. `mica-boards` kernel builds:
+FIT boards build prod incrementally after dev (proven byte-identical by a
+kept test) with pinned kernel and U-Boot toolchains, followed by one release
+of all four boards; CI reuses unchanged kernel and U-Boot components only
+after that; `mica-build` evaluates a `virt-arm64` config trim first; no
+ccache. Releases and products: `s905x5m` stays out of the release targets;
+`mica-build` publishes the disk image as a deterministic
+`mica-<product>-<release>.img.zst`, verified against the raw signed image,
+which is still built and gated; `x64-prod` and `cx3576-prod` are added with
+`PROFILE=prod`, development keys and the development channel.
+`docs/decisions/2026-09-15-board-kernel-builds.md`,
+`docs/decisions/2026-09-15-release-images-and-products.md`.
+
 ## 2026-09-15 15:32 [progress]
 
 `mica-build` `cx3576/20260915-1515` at `9fe2d18` is published and verified

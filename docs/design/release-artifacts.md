@@ -99,7 +99,12 @@ scoped release publishes each product's image kinds and update archives as
 `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, beside `mica-build.lock` and
 `SHA256SUMS` (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`). The
 first, `x64/20260915-1458`, carries `mica-x64-dev-20260915-1458.img` and
-`.micaupd` and the same pair for `x64-minimal`.
+`.micaupd` and the same pair for `x64-minimal`. By user decision
+(`docs/decisions/2026-09-15-release-images-and-products.md`) later releases
+publish the disk image as a deterministic `.img.zst`, verified by
+decompressing it to the raw signed image, which is still built, gated and
+verified; the products include `x64-prod` and `cx3576-prod`, and `s905x5m`
+is not a release target.
 The output directory must not exist. A failed assembly must not be published.
 
 The current `GENERATED` marker has exactly one declaration:

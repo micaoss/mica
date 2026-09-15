@@ -629,3 +629,15 @@ Moving the repositories to the release lock format
     yet (pending a user decision).
   - Next in `mica-build`: K1 and K2 of
     `docs/decisions/2026-09-15-stable-component-ids.md`.
+- 2026-09-15 (user): stage 4 follow-ups. `mica-boards` kernel builds
+  (`docs/decisions/2026-09-15-board-kernel-builds.md`): an incremental prod
+  kernel after dev on FIT boards with a byte-identical test, together with
+  pinned kernel and U-Boot toolchains, followed by one planned release of all
+  four boards; CI reuse of unchanged kernel and U-Boot components only after
+  that; a `virt-arm64` config trim evaluated by `mica-build` first; no ccache.
+  Release images and products
+  (`docs/decisions/2026-09-15-release-images-and-products.md`): `s905x5m`
+  stays out of the release targets; `mica-build` publishes disk images as
+  deterministic `.img.zst` (raw image still built and verified; its record
+  proposed by `mica-build`); `x64-prod` and `cx3576-prod` are added with
+  development keys on the development channel.

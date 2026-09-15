@@ -206,7 +206,8 @@ A product selects a subset in `mica-build:products/<product>/product.env`
 included; an undeclared kind is refused). A failed pack, verify or
 determinism check, or an asset over 2 GiB, fails that product's whole
 release. Each kind is published as the release asset
-`mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and as one layer (title the file
+`mica-<product>-<YYYYMMDD-HHMM>.<suffix>` (`disk` compressed, `.img.zst`,
+`docs/decisions/2026-09-15-release-images-and-products.md`) and as one layer (title the file
 name, annotation `mica.image-kind`) of the OCI manifest
 `image.<product>.<YYYYMMDD-HHMM>`.
 

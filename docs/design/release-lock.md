@@ -137,7 +137,9 @@ A `mica-build` release lock (user, 2026-09-15,
   update kind, annotated `mica.update-kind`, `mica.deployment-id` and
   `mica.generation`);
 - `asset <product> image|update <kind> <file> <sha256>`: one release asset,
-  `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>`, whose sha256 equals the
+  `<file>` = `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` (the `disk` image
+  as `.img.zst`, with the raw image's record proposed by `mica-build`,
+  `docs/decisions/2026-09-15-release-images-and-products.md`), whose sha256 equals the
   digest of its layer in that bundle. Image kinds are those of the board's
   `images.tsv`; update kinds are `full` (`micaupd`), `root` (`root.micaupd`)
   and `kernel` (`kernel.micaupd`), with the suffix fixed by the kind.
