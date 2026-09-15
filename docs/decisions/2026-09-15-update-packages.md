@@ -64,6 +64,12 @@ the runtime image of every builtin row, including `image disk builtin - img`
 `mica.deployment-id`, `mica.generation`), recorded by `bundle` and `asset`
 rows of `mica-build.lock` (`docs/design/release-lock.md` 1.2.2).
 
+**Unchanged roots.** A `root` or `kernel` archive needs the other part's
+identity to stay unchanged across releases; packages whose inputs did not
+change are therefore reused with their published bytes instead of being
+repacked with a new commit version, first in `mica-boards`
+(`docs/decisions/2026-09-15-package-reuse-by-inputs.md`).
+
 ## Order
 
 `mica-core` first (partial import, the signed `product` field), then

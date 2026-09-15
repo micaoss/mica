@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-15 10:15 [decision]
+
+Packages are reused by inputs across releases, first in `mica-boards` (user):
+a package whose inputs hash is unchanged since the previous release of the
+same scope is not rebuilt; its published `.deb` (same bytes, same version) is
+verified and placed in the new pool, only changed packages get the new commit
+version, and an unchanged pool is reused by digest. CI and the package gate
+still prove byte-identical rebuilds from source, and caches never decide
+reuse. Without it every board release changed the product root and no
+`kernel` update package could be produced. `mica-build` checks its root for
+release-varying content; the other package repositories are undecided.
+`docs/decisions/2026-09-15-package-reuse-by-inputs.md`, linked from the
+update-packages decision.
+
 ## 2026-09-15 09:13 [progress]
 
 `mica-build` `main` `0094a097` has switched to the per-board `mica-boards`
