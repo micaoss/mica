@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-15 22:52 [progress]
+
+The first Mica version indexes are published and verified anonymously.
+`mica-build` cut the scoped releases `x64/20260915-2230` and
+`cx3576/20260915-2230` (`9c2f399e`, not latest), in which every product ships
+`full`, `root` and `kernel` update archives because both component identities
+held across commits: the first `root` archives. The `x64` index job then built
+`mica/20260915-2240` in full, and the `cx3576` job cut `mica/20260915-2242`
+(the GitHub latest) incrementally from it, with a 12.7 KB `mica-index.json`
+over six shared inputs and a catalogue of four boards and ten products. Both
+re-verify byte-identically, incrementally and in full, from a fresh clone,
+and every asset URL answers with its recorded size.
+
 ## 2026-09-15 22:20 [progress]
 
 `docs/design/mica-index.md` now states exactly the `mica-index.json` shape

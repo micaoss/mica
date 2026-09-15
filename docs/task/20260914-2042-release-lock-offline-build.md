@@ -876,3 +876,35 @@ Moving the repositories to the release lock format
   index and skipped when nothing enters or drops; `verify-index <tag>` checks
   incrementally and `--full` rebuilds every entry, run by `ci.yml`'s
   `release-index` job.
+- 2026-09-15: the first Mica version indexes are published and verified
+  anonymously (`docs/decisions/2026-09-15-mica-version-index.md`).
+  - Scoped releases `x64/20260915-2230` (trust `93d320c27938...`) and
+    `cx3576/20260915-2230` (trust `cd9d16304d4f...`) at `mica-build`
+    `9c2f399e`, cut with `--latest=false`: every product shipped `full`,
+    `root` and `kernel` archives (`x64-dev` generation 4, `x64-prod` 3,
+    `cx3576-dev` 4, `cx3576-prod` 3). The rootfs and kernel identities are
+    unchanged from `2042` across `a1f13280` to `9c2f399e`, so both partial
+    archives apply: K1 and K2 held on the release path, and these are the
+    first `root` archives.
+  - `mica/20260915-2240`: the first index, built in full by the `x64` index
+    job; `SHA256SUMS` sha256
+    `e8f8ecc9f8b2902ee31834eda5e1deda81779a474c0359d0a13c767bf423434d`; lock
+    rows release 1, input 2 (`x64/20260915-2230`, `cx3576/20260915-2042`),
+    origin 2, built 10, index 4, product 4, bundle 8, asset 13; JSON 11408
+    bytes; job 45 s.
+  - `mica/20260915-2242` (GitHub latest): incremental from `2240`, with
+    `cx3576` entering from `cx3576/20260915-2230` and `x64` carried unread;
+    `SHA256SUMS` sha256
+    `4eb26e12e23aa5ada0a76b0be283acfd70f4e40fb9d5f45dec6815997a8d1cc9`; asset
+    rows 16; JSON 12728 bytes with `previous` `mica/20260915-2240`
+    (`e8f8ecc9...`); 6 shared inputs (boards `cx3576` and `x64` `1926`,
+    build-env `0138`, core `1135`, podman `1057`, Base `1102`); catalogue:
+    `cx3576` and `x64` release targets, `s905x5m` and `virt-arm64` not;
+    `s905x5m-dev` and `virt-arm64-dev` publish true, indexed false; the
+    minimal products publish false; job 35 s.
+  - Verified anonymously from a fresh clone: `verify-index` incremental and
+    `--full` byte-identical for both; `SHA256SUMS`, the lock sha256 and
+    `previous.trust`; every URL answers with the size in the JSON. One
+    transient GitHub download failure led to `59e4320d` (curl retries).
+  - `105180b6`: the plan reads the newest index plus later scoped releases
+    (`release-test` 46/46; about 3 s per scope).

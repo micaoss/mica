@@ -36,7 +36,7 @@ the new format.
 | 1 | `mica-build-env` (done: `20260915-0138`) | its owner issue | its own pins only | `mica-build-env.lock`: `mica-build-env` `image` rows for base, c, go, rust, and `upstream` `image` rows for every approved third-party image (spec 1.2.1) |
 | 2 | `mica-system-base` (done: `20260915-0209`) | issue `5jfipe3b` | `mica-build-env` | `mica-system-base.lock` (spec section 3) |
 | 3 | `mica-podman` (done: `20260915-0245`), `mica-core` (done: `20260915-0235`) | its owner issue; issue `vtv87o8e` | `mica-build-env`, `mica-system-base` | `mica-podman.lock` (its pool plan adopts this shape); `mica-core.lock`, pools split per architecture |
-| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (second scoped releases `x64/20260915-2042` and `cx3576/20260915-2042` with dev and prod products and the first `kernel` archives; first `x64/20260915-1458`, `cx3576/20260915-1515`) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
+| 4 | `mica-boards` (done: `<board>/20260915-0824`; current `<board>/20260915-1128`), `mica-build` (scoped releases `x64` and `cx3576` `20260915-2230` with `full`, `root` and `kernel` archives, and the Mica version indexes `mica/20260915-2240` and `mica/20260915-2242`; earlier `1458`/`1515` and `2042`) | issue `tdpnmgkr`; issue `lppm7hfw` | `mica-build-env`, `mica-system-base`; `mica-build` also `mica-core`, `mica-podman`, `mica-boards` | `mica-boards.lock` with `pool`, `package` and `board` rows; `mica-build`'s package pins become the lock rows |
 
 Within stage 4, `mica-build` reads `mica-boards`, so `mica-boards` releases in
 the new format before `mica-build` switches.
@@ -436,3 +436,8 @@ owner, dispatched by the coordinator.
   index and skipped when nothing enters or drops; `verify-index <tag>` checks
   incrementally and `--full` rebuilds every entry, run by `ci.yml`'s
   `release-index` job.
+- 2026-09-15: the first Mica version indexes are published: `mica/20260915-2240`
+  (built in full) and `mica/20260915-2242` (incremental, the GitHub latest),
+  over the scoped releases `x64/20260915-2230` and `cx3576/20260915-2230`,
+  whose products all carry `full`, `root` and `kernel` archives. Both indexes
+  re-verify byte-identically, incrementally and in full, from a fresh clone.
