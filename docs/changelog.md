@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 11:20 [progress]
+
+`mica-podman` `20260915-1057` at `d47ffbc` is its first release under the
+package-version rules (trust hash
+`d347fdf5a59ffa39509d9f621113a9a51a252a632b8338ce0e6f6edc839b7426`):
+`mica-podman` `5.8.6-1` with a declared `SOURCE_DATE_EPOCH` and no
+`Mica-Source-Commit`, pools annotated only `mica.source-repo` and `mica.arch`,
+and layers with `mica.inputs`. Moving its Base pin to `20260915-1102`
+(`0ed321e`) left the inputs and bytes unchanged on both architectures, so no
+new release was needed: the first proven reuse. `mica-build` pins it with
+Base `20260915-1102` before its first scoped release.
+
 ## 2026-09-15 11:08 [progress]
 
 `mica-system-base` `20260915-1102` at `3ae160d` is the first release with

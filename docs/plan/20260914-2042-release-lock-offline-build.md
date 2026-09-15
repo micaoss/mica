@@ -254,3 +254,9 @@ owner, dispatched by the coordinator.
   is the first release with version-locked packages; it built everything,
   since `20260915-0209` predates them (D1). Consumers move to it after their
   package-version adaptation.
+- 2026-09-15: `mica-podman` `20260915-1057` (`d47ffbc`, `SHA256SUMS` sha256
+  `d347fdf5a59ffa39509d9f621113a9a51a252a632b8338ce0e6f6edc839b7426`) is its
+  first release under the package-version rules (`mica-podman` `5.8.6-1`).
+  Its Base move to `20260915-1102` (`0ed321e`) kept the same inputs and bytes,
+  proving reuse without a new release. `mica-build` pins `20260915-1057` and
+  Base `20260915-1102` before its first scoped release.

@@ -405,3 +405,26 @@ Moving the repositories to the release lock format
     comparison did not apply (D1).
   - `mica-build` pins it only after its package-version adaptation;
     `mica-podman` may move its Base lock to it in its package-version change.
+- 2026-09-15: `mica-podman` `20260915-1057` at `d47ffbc` is its first release
+  under the package-version rules
+  (`docs/decisions/2026-09-15-package-versions.md`).
+  - Commit `d47ffbc8e67b4f45ab44a263725c3912d21a1491`; ci run 34959620045
+    and release run 34960701595 green; verified anonymously.
+  - `SHA256SUMS` sha256
+    `d347fdf5a59ffa39509d9f621113a9a51a252a632b8338ce0e6f6edc839b7426`.
+  - Pools
+    `pool.amd64.20260915-1057@sha256:4163f573fd8570e12a89d22e75bd7ae5c355a89e66c4a1be62197e238ed4f043`
+    and
+    `pool.arm64.20260915-1057@sha256:0560c1f092417e38feef8e936f84e5548af935e53b97952d09c2616f96d9d360`,
+    annotated only `mica.source-repo` and `mica.arch`; each layer carries
+    its title and `mica.inputs` (amd64 `53593e2a...`, arm64 `7b404172...`).
+  - Package `mica-podman` `5.8.6-1`: amd64
+    `5b2505b1d42248c39a3c9b22b4c2f4a7e97132234a0b4bdf1f08571da1fee3df`, arm64
+    `d9eb2513f6b5bede3f48283acf8a1ca8be6079779dd191c9e513360b283bf30e`; no
+    `Mica-Source-Commit`; `SOURCE_DATE_EPOCH` `1786640584` declared.
+  - `0ed321e` then moved its Base pin to `mica-system-base` `20260915-1102`
+    (ci run 34961748584 green). The reuse check found the same inputs and
+    bytes as `20260915-1057` on both architectures, so no new release was
+    needed: the first proof of reuse under the rules.
+  - `mica-build` (adaptation on `main` `c44dc645`) pins it together with
+    `mica-system-base` `20260915-1102` before its first scoped release.
