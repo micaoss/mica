@@ -121,7 +121,7 @@ work in progress lives in `plan/` and `task/`.
   - `doc-contract.md` — the contract behind this set: audience, page ownership, truth-status taxonomy, evidence rules
   - `quickstart.md` — the shortest honest path to a running Mica OS system
   - `download.md` — release selection and obtaining an image
-  - `install.md` — writing an image to a board and reaching first boot
+  - `install.md` — the order of operations for an installation, from choosing an image to first boot
   - `first-run.md` — first boot, the offline provisioning document, and claiming the device
   - `manufacturing.md` — putting Mica OS on units at volume: identity, first credential, factory record and quarantine
   - `configuration.md` — the configuration model and every supported way to change settings

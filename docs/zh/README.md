@@ -11,7 +11,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 - `user/` — 用户文档（覆盖全部 16 篇，含文档契约本身）
   - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 x64 基线
   - [`download.md`](user/download.md) — 发布版组成与镜像获取
-  - [`install.md`](user/install.md) — 把镜像写到板卡并到达首次启动
+  - [`install.md`](user/install.md) — 安装的操作顺序：从选镜像到首次启动
   - [`first-run.md`](user/first-run.md) — 首次启动、离线配置文档、认领设备
   - [`manufacturing.md`](user/manufacturing.md) — 批量装机：谁生成身份与首个凭据、工厂记录、失败与重复配置的隔离
   - [`configuration.md`](user/configuration.md) — 配置模型与所有受支持的修改方式
@@ -56,7 +56,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../user/doc-contract.md` | 00a5147d | current |
 | `../user/download.md` | 1906d17d | current |
 | `../user/first-run.md` | bb4864ef | current |
-| `../user/install.md` | e62e569b | current |
+| `../user/install.md` | 534f170e | current |
 | `../user/manufacturing.md` | 00a5147d | current |
 | `../user/quickstart.md` | 6cc6e739 | current |
 | `../user/recovery.md` | 88db4ae9 | current |

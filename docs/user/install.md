@@ -1,87 +1,70 @@
-# Install a current development image
+# Installing Mica OS on a device
 
-Installation uses a complete freshly built Mica OS system image. The supported image
-targets are x64, virt-arm64 and cx3576. There is no conversion or upgrade path
-from an earlier partition layout. A full write replaces the target system and
-data inside the written image extent; keep any files you need elsewhere first.
+Installation is a whole-image write: a complete factory image replaces the
+target medium. There is no conversion or upgrade path from an earlier
+partition layout, and nothing inside the written extent survives. A device
+already running Mica OS moves forward with an update archive instead
+([update packages](update-packages.md)).
 
-> status: shipped — evidence: `mica-build:build/src/file-image.ts`, `mica-boards:boards/x64/board.env`, `mica-boards:boards/virt-arm64/board.env`, `mica-boards:boards/cx3576/board.env`
+This page is the order of operations. The per-board write procedure — and
+which boards have one — is [flashing](flashing.md).
 
-## Prepare and identify
+> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/user/flashing.md`, `docs/design/storage.md`
 
-Factory image names use `mica-BOARD-YYYYMMDD-HHmmss.img`, with UTC build time
-to the second distinguishing builds. Use the actual delivered filename in the
-commands below.
+## 1. Choose and verify the image
 
-Use the exact board's image and obtain its metadata public key from the build's
-trusted handover. Run the image verifier with explicit inputs:
+An image is published per product as `mica-<product>-<release>.img.gz` and is
+bound to one board and architecture; the profile (`dev` or `prod`) is fixed in
+the signed kernel command line of that product. Take the file from a release,
+check it against `SHA256SUMS`, and check the decompressed image against
+`uncompressedSha256` in the version index: [download](download.md). For an
+image you built yourself, `make product-verify PRODUCT=<name>` is the
+equivalent gate.
 
-```sh
-bash verify/run.sh --verify --board x64 \
-  --image /path/to/image/mica-x64-20260909-164233.img --public-key /path/to/metadata-public.key
-```
+A checksum proves the file arrived intact. It says nothing about who signed
+it: obtain the release's public boot certificate through the handover it
+belongs to ([key delivery](../design/key-delivery.md)), not from beside the
+download.
 
-Substitute `virt-arm64` or `cx3576` only for that board's own image. Verification
-checks signed objects and layout; it does not enroll platform boot keys. The
-boot signer must be accepted by the corresponding UEFI platform or signed-policy
-U-Boot build. Development key generation does not establish production trust.
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:make product-verify`, `docs/design/key-delivery.md`
 
-> status: shipped — evidence: `mica-build:verify/src/file-image.ts`, `docs/design/key-delivery.md`
+## 2. Make the board trust the signer
 
-## x64 and virt-arm64
+The image's kernel and support components are signed, and verification at
+install time does not enroll anything. A UEFI board must already carry the
+release's boot certificate in its platform keys — or run with Secure Boot off,
+which is not an installation Mica OS treats as trusted — and a FIT board's
+U-Boot accepts only a kernel signed by the certificate built into it.
+Development releases are signed with development certificates and establish no
+production trust.
 
-Write the complete image to the explicitly identified disposable target medium
-using the platform's disk-writing workflow, flush it and compare readback before
-booting. Boot through UEFI from its removable-media EFI entry. The disk contains
-ESP/SYSTEM/DATA; only DATA grows when the physical medium is larger.
+> status: shipped — evidence: `docs/design/release-signing.md`, `mica-boards:common/trust/stage.sh`, `docs/boards/assurance.md`
 
-For virtual acceptance, the repository harness uses a fresh disk copy and
-explicit public boot certificate:
+## 3. Write the image
 
-```sh
-MICA_PRODUCT=x64-dev bash mica-build:tests/apid-api/run.sh
-```
+| Board | How | State |
+|---|---|---|
+| `x64` | the whole image to the medium; boots through UEFI | qualified under QEMU only |
+| `virt-arm64` | a QEMU guest with enrolled secure-boot variables | the acceptance path |
+| `cx3576` | `rkdeveloptool` over USB from `mica-boards`, with readback | not verified on hardware |
+| `s905x5m` | no supported path: the loader lives in eMMC boot0 | bring-up work |
 
-The product names the board, the image and the boot signer; a copied release
-image and its certificate are given as `MICA_QEMU_IMAGE` and
-`MICA_QEMU_BOOT_CERT`. The ARM64 variant is `MICA_PRODUCT=virt-arm64-dev`.
-Physical PC/platform enrollment is owned by that platform's operator.
+Each case, with its commands, its refusals and what is not verified, is in
+[flashing](flashing.md).
 
-> status: board-dependent — evidence: `mica-core:tests/apid-api/src/qemu.ts`, `docs/design/release-signing.md`
+> status: board-dependent — evidence: `docs/user/flashing.md`, `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/s905x5m/board.env`
 
-## cx3576
+## 4. First boot
 
-Use the local bench board's RockUSB loader/maskrom interface and identify the
-attached device before writing. The board BSP in `mica-boards` provides complete-image flashing:
+A healthy first boot authenticates the selected deployment, mounts the
+matching signed root and support, establishes the device identity on DATA,
+grows DATA to the medium and starts the management services. Health
+confirmation keeps the other deployment as a fallback. What to expect and what
+to do next is [first run](first-run.md).
 
-```sh
-make cx3576-flash-mica MICA_IMAGE=/path/to/image/mica-cx3576-20260909-164233.img
-```
+Missing or corrupt shared storage, or exhausted boot records, needs explicit
+recovery: there is no unsigned retry, no old-layout fallback, no regenerated
+credential and no silent refill of the trial counter. See
+[recovery](recovery.md) and [storage](storage.md).
 
-Without `MICA_IMAGE`, the BSP selects the newest timestamped cx3576 image in
-`_out/cx3576/image/`. Set `MICA_IMAGE` explicitly to flash a particular build.
-
-Preflight checks the current GPT and loader placement before issuing a device
-write. The flashing path reads back and compares every image byte before reset;
-a mismatch leaves the board in the recovery interface. Firmware starts at LBA
-64, and its reserved partition includes both trial-record copies.
-
-Physical loader/maskrom entry, full flashing, successful boot, watchdog behavior
-and power-cut recovery remain bench qualification items. Host stub tests prove
-preflight/readback control flow, not that a particular board has been flashed.
-Do not treat software evidence as a completed physical installation.
-
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/cx3576/flash/scripts/verify-flash.sh`, `mica-boards:boards/cx3576/flash/scripts/verify-flash.py`
-
-## First boot and recovery
-
-Healthy boot authenticates the selected deployment, mounts matching signed
-root/support, establishes persistent identity on DATA, grows DATA and starts
-management services. Health confirmation retains a usable fallback. Use the
-[update page](update-rollback.md) for subsequent component updates.
-
-Missing/corrupt shared storage or exhausted boot records requires explicit
-recovery. No unsigned retry, old layout, regenerated credentials or silent trial
-refill is used. See [recovery](recovery.md) and [storage](storage.md).
-
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-system:overlay/usr/lib/mica/mica-health`
+> status: shipped — evidence: `mica-core:crates/mica-deploy`, `mica-system-base:debs/mica-system`, `docs/design/recovery.md`
