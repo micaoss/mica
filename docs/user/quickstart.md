@@ -1,67 +1,84 @@
 # Quickstart
 
-Start with x64 under QEMU. It boots the complete current system through UEFI
-Secure Boot, systemd-boot and a signed kernel package. virt-arm64 uses the same
-flow with ARM64 artifacts. Physical cx3576 qualification is a separate step.
+The shortest honest path to a running Mica OS system is a published `x64-dev`
+image under QEMU. That is also the only path that is qualified today: no
+physical machine has been booted from a release image
+([flashing](flashing.md)).
 
-## 1. Prerequisites
+## 1. What you need
 
-Use Docker with buildx, Bash, Make and git. Compilers, signing tools and filesystem
-makers run in the pinned build containers. The Bun orchestration drivers also
-support a pinned container. There is no hosted public image download.
+To run a published image: `curl`, `jq`, `sha256sum`, `gzip` and
+`qemu-system-x86_64` with OVMF secure-boot firmware. To build one instead:
+docker with a working daemon, plus bash, make, git and python3 — every
+compiler, filesystem maker and signing tool runs inside the pinned build-env
+images.
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-build:build-env-image.lock`
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
 
-## 2. Build the complete image
-
-Follow [the component build sequence](../design/build.md): build the package pool
-and BSP kernel, compile native init, compose root, package kernel/support and
-firmware, sign two deployment records, and assemble a new factory image.
-Supply separate boot/content/metadata signing inputs explicitly. Public factory
-defaults are a separate root-composition input. Missing inputs fail; builds do
-not generate keys or convert an existing system implicitly.
+## 2. Take a published image
 
 ```sh
-MICA_BUILD_PLATFORM=linux/amd64 bash mica-build-env:build.sh
-make os-deb-preflight
-# See the build guide for the component inputs and architecture-specific steps.
-bash build/run.sh --components --help
+REL=https://github.com/micaoss/mica-build/releases/download
+curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
+curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+sha256sum -c SHA256SUMS
+gzip -dc mica-x64-dev-<release>.img.gz > disk.img
 ```
 
-The resulting `disk.img` has ESP, SYSTEM and DATA. Keep its signed deployment
-records, public metadata keys, public boot certificate and component directories
-with the test evidence. Every test starts from a complete current image.
+Which release, and how to check the decompressed image against the version
+index, is [download](download.md). The image is a whole GPT disk — ESP,
+SYSTEM and DATA — carrying two signed deployment records.
 
-> status: shipped — evidence: `mica-build:build/src/component-cli.ts`, `docs/design/build.md`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:build/src/file-layout.ts`
 
-## 3. Run the QEMU API acceptance suite
+## 3. Boot it under QEMU
+
+The guest must trust the release's boot certificate: the acceptance suites
+enroll it into throwaway secure-boot variables (`vars.fd` from `OVMF_VARS.fd`,
+`AAVMF_VARS.fd` on ARM64) and boot the image as a virtio disk. The reference
+command lines are in [flashing](flashing.md#4-qemu-x64-and-virt-arm64).
+
+From a `mica-build` checkout the whole thing is one target:
 
 ```sh
-MICA_PRODUCT=x64-dev bash mica-build:tests/apid-api/run.sh
+make lifecycle-uefi PRODUCT=x64-dev
 ```
 
-The harness copies the image, seeds its DATA test service units and enrolls
-throwaway Secure Boot variables. It boots through firmware and exercises the
-HTTPS API. It requires explicit image and certificate paths. Use `--dry-run`
-with the same inputs to check prerequisites without starting the guest.
+It boots the product and exercises runtime, updates, faults, reset and
+shutdown.
 
-For isolated offline DATA fixtures, `tools/qemu-seed-data.ts` accepts bounded
-regular files below `/state` and explicitly enabled seeded service units. Run it
-only on a disposable image before boot; its CLI prints the accepted arguments.
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
 
-> status: shipped — evidence: `mica-core:tests/apid-api/run.sh`, `mica-build:tools/qemu-seed-data.ts`
+## 4. Or build the image first
 
-## 4. First contact
+```sh
+make locks-verify
+make os-pool
+make product PRODUCT=x64-dev
+make product-verify PRODUCT=x64-dev
+```
 
-The first boot creates a machine identity on DATA before services start. micad
-initializes its device identity and configuration, wired interfaces use DHCP,
-and apid serves HTTPS. The UI at `/_ui/` guides administrator setup. SSH is off
-by default. See [first run](first-run.md) and [configuration](configuration.md).
+The result lands in `mica-build:_out/products/x64-dev/`. A build never invents
+keys or inputs: signing material is explicit (`make os-devkeys` writes a
+development set) and every input comes from `locks/`. The full path, online
+and offline, is the [build guide](build.md).
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/design/provisioning.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`, `docs/user/build.md`
 
-## 5. Next steps
+## 5. First contact
 
-- [Installation](install.md) covers complete images and physical boards.
-- [Update and rollback](update-rollback.md) describes signed deployments.
-- [Applications](applications.md) covers workloads and persistent data.
+The first boot establishes a machine identity on DATA before services start,
+grows DATA to the medium, and brings up micad and apid; wired interfaces use
+DHCP, the dashboard is at `/_ui/` over HTTPS, and SSH is off by default. See
+[first run](first-run.md) and [configuration](configuration.md).
+
+> status: shipped — evidence: `mica-core:crates/micad`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
+
+## 6. Next steps
+
+- [Flashing](flashing.md) — writing an image to a board, per board.
+- [Update and rollback](update-rollback.md) and
+  [update packages](update-packages.md) — moving a running device forward.
+- [Applications](applications.md) — workloads and persistent data.
+
+> status: shipped — evidence: `docs/user/flashing.md`, `docs/user/update-packages.md`, `docs/user/applications.md`

@@ -1,55 +1,78 @@
 # 快速上手
 
-先用 QEMU 验证 x64。完整的当前系统通过 UEFI Secure Boot、systemd-boot 和签名
-内核包启动。virt-arm64 使用同一流程及 ARM64 产物；cx3576 实机验收单独进行。
+到一个运行中的 Mica OS 系统，最短且诚实的路径是：在 QEMU 里跑一个已发布的
+`x64-dev` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
+启动过（[刷写](../../user/flashing.md)）。
 
-## 1. 准备环境
+## 1. 需要什么
 
-需要 Docker/buildx、Bash、Make 和 git。编译器、签名工具及文件系统工具运行在
-固定版本的构建容器里；Bun 驱动也支持固定容器。当前没有公开镜像下载服务。
+跑已发布镜像：`curl`、`jq`、`sha256sum`、`gzip`，以及带 OVMF secure-boot 固件的
+`qemu-system-x86_64`。改为自己构建：可用的 docker daemon，加上 bash、make、git
+和 python3——每一个编译器、文件系统工具和签名工具都运行在固定版本的 build-env
+镜像里。
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-build:build-env-image.lock`
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
 
-## 2. 构建完整镜像
-
-按[构建指南](../../design/build.md)依次准备软件包池、BSP 内核、原生 init、用户态根、
-kernel/support 包、固件包以及两个签名部署记录，再组装全新工厂镜像。
-启动、内容、元数据三个签名域分别提供显式输入；公开出厂默认值独立传入根构建。
-缺少输入会失败，构建不会隐式生成密钥或转换已有系统。
+## 2. 取一个已发布的镜像
 
 ```sh
-MICA_BUILD_PLATFORM=linux/amd64 bash mica-build-env:build.sh
-make os-deb-preflight
-bash build/run.sh --components --help
+REL=https://github.com/micaoss/mica-build/releases/download
+curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
+curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+sha256sum -c SHA256SUMS
+gzip -dc mica-x64-dev-<release>.img.gz > disk.img
 ```
 
-`disk.img` 包含 ESP、SYSTEM、DATA。保留签名部署记录、元数据公钥、启动公钥证书
-和组件目录，供验证及追溯使用。每次验收从完整最新版镜像开始。
+选哪个发布、以及如何用版本索引校验解压后的镜像，见[获取发布版](download.md)。
+镜像是一整块 GPT 磁盘——ESP、SYSTEM、DATA——并携带两条签名部署记录。
 
-> status: shipped — evidence: `mica-build:build/src/component-cli.ts`, `docs/design/build.md`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:build/src/file-layout.ts`
 
-## 3. 执行 QEMU API 验收
+## 3. 在 QEMU 里启动它
+
+guest 必须信任该发布的启动证书：验收套件把它注册进一次性的 secure-boot 变量
+（由 `OVMF_VARS.fd`、ARM64 上由 `AAVMF_VARS.fd` 生成的 `vars.fd`），再把镜像作为
+virtio 磁盘启动。参考命令行见
+[刷写](../../user/flashing.md#4-qemu-x64-and-virt-arm64)。
+
+在 `mica-build` 检出里，这一整套是一个 target：
 
 ```sh
-MICA_PRODUCT=x64-dev bash mica-build:tests/apid-api/run.sh
+make lifecycle-uefi PRODUCT=x64-dev
 ```
 
-测试复制完整镜像，在 DATA 中准备测试服务，并注册一次性的 Secure Boot 变量，
-随后经固件启动并验证 HTTPS API。产品名决定板卡、镜像和公钥证书；发布镜像的副本用 `MICA_QEMU_IMAGE` 和
-`MICA_QEMU_BOOT_CERT` 显式指定。用相同输入加 `--dry-run` 可检查前置条件。ARM64
-使用 `MICA_PRODUCT=virt-arm64-dev`。
+它启动产品并依次验证运行时、更新、故障、重置和关机。
 
-`tools/qemu-seed-data.ts` 只为尚未启动的一次性镜像准备受限 `/state` 普通文件，
-需要启用服务时显式指定 unit。它不是运行中设备的配置接口。
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
 
-> status: shipped — evidence: `mica-core:tests/apid-api/run.sh`, `mica-build:tools/qemu-seed-data.ts`
+## 4. 或者先自己构建镜像
 
-## 4. 首次访问
+```sh
+make locks-verify
+make os-pool
+make product PRODUCT=x64-dev
+make product-verify PRODUCT=x64-dev
+```
 
-服务启动前，原生 init 在 DATA 上建立机器身份。micad 初始化设备身份和配置，
-有线网络使用 DHCP，apid 提供 HTTPS；`/_ui/` 引导管理员设置。SSH 默认关闭。
+产物落在 `mica-build:_out/products/x64-dev/`。构建不会凭空造出密钥或输入：签名
+材料是显式的（`make os-devkeys` 写出一套开发密钥），每一项输入都来自 `locks/`。
+在线与离线的完整路径见[构建指南](../../user/build.md)。
+
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`, `docs/user/build.md`
+
+## 5. 首次访问
+
+首次启动会在服务起来之前于 DATA 上建立机器身份，把 DATA 扩展到介质大小，并拉起
+micad 和 apid；有线网络使用 DHCP，控制台在 HTTPS 的 `/_ui/`，SSH 默认关闭。
 见[首次启动](first-run.md)和[配置](configuration.md)。
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/design/provisioning.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/micad`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
 
-继续阅读[安装](install.md)、[更新与回滚](update-rollback.md)及[应用](applications.md)。
+## 6. 继续
+
+- [刷写](../../user/flashing.md)——按板卡把镜像写进设备。
+- [更新与回滚](update-rollback.md)和[更新包](../../user/update-packages.md)——让
+  运行中的设备前进。
+- [应用](applications.md)——负载与持久数据。
+
+> status: shipped — evidence: `docs/user/flashing.md`, `docs/user/update-packages.md`, `docs/user/applications.md`

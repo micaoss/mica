@@ -58,7 +58,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../user/first-run.md` | bb4864ef | current |
 | `../user/install.md` | e62e569b | current |
 | `../user/manufacturing.md` | 00a5147d | current |
-| `../user/quickstart.md` | db66fc02 | current |
+| `../user/quickstart.md` | 6cc6e739 | current |
 | `../user/recovery.md` | 88db4ae9 | current |
 | `../user/release-notes.md` | 00a5147d | current |
 | `../user/security.md` | d4ca7946 | current |
