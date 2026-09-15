@@ -30,7 +30,7 @@ private key directories are never added to source control.
 | Root | Resolved userspace packages and public factory defaults | `rootfs-verity.img`, exact geometry, manifest/debug/license evidence |
 | Kernel/support | BSP kernel/modules/firmware, native init, public policy and explicit signing inputs | Signed UKI/FIT plus signed support image and component metadata |
 | Firmware | Patched systemd-boot or cx3576 loader and metadata signer | Independent signed firmware package |
-| Deployment | Exact kernel/root descriptors and metadata signer | Signed `mica/deployment/v1` envelope |
+| Deployment | Exact kernel/root descriptors, the product and the metadata signer | Signed `mica/deployment/v2` envelope (v1 until `mica-core` lands v2) |
 | Factory disk | Two deployments, all referenced components and authenticated firmware | Current three-partition full image |
 | Offline update | Signed deployment and its exact objects | `.micaupd` archive |
 
@@ -49,8 +49,10 @@ directory against the fetched board bundle. The resolver selects the engine's
 manifests for the profile and the features and the board's own out of its
 bundle (`board.pkgs`, `radio-<r>.pkgs`, `component-<c>.pkgs`);
 `FEATURES=""` is the minimal image, and every board has a `<board>-minimal`
-product. The root carries what it is: `/usr/lib/mica/product.conf` (the
-product, board, profile, features and components; there is no
+product. The root carries what it is: `/usr/lib/mica/product.conf`, five lines
+`PRODUCT=`, `BOARD=`, `PROFILE=`, and the quoted `FEATURES=` and
+`COMPONENTS=`; the device reads its product from the single unquoted
+`PRODUCT=` line (`docs/design/updates.md`; there is no
 `profile.conf`, `docs/decisions/2026-09-14-no-image-profile-packages.md`),
 and the verifier and the smoke runner scope their registers to it -- a
 check for a feature the product did not select is not run, and says so.

@@ -31,8 +31,9 @@ content from untrusted root metadata or an editable version label.
 ## Acquisition and installation
 
 The catalog source is an explicit `/v1/manifest.json` URL. Its signed
-`mica/catalog/v1` envelope binds deployment associations and origin/digest object
-URLs. The client enforces validity intervals, revisions and content consistency;
+`mica/catalog/v2` envelope binds deployment associations, origin/digest object
+URLs and channel heads `{board, product, channel, releaseId, generation}`,
+keyed by board, product and channel. The client enforces validity intervals, revisions and content consistency;
 clock uncertainty can defer acquisition without blocking installed offline boot.
 
 Files live under `/mica/updates/{staging,downloads,verified}` on physical DATA.
@@ -40,12 +41,14 @@ The workspace probe checks mount identity, writability, free space and bounded
 contents. HTTP ranges resume partial objects; complete bytes and lengths must
 match authenticated metadata. `MICAUPD1` offline imports carry the same signed
 deployment and at most five unique objects, with no archive paths or links.
-Decided 2026-09-15, implementation pending
-(`docs/decisions/2026-09-15-update-packages.md`): an import may carry only a
-subset of the descriptor's objects (a `root` or `kernel` archive), and every
-missing object must already be in the store; the descriptor's signed
-`product` field must name the device's product, and catalog heads and the
-update-server are keyed by board, product and channel. There is no minimum
+Decided 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`), and
+being implemented in `mica-core` (`mica-core:docs/task/20260915-0657-update-packages.md`): an import may carry from 0 to the
+descriptor's object count (a `root` or `kernel` archive), and every missing
+object must already be in the store. The `mica/deployment/v2` descriptor's
+required signed `product` field must equal the device's product: the single
+unquoted `PRODUCT=<name>` line of `/usr/lib/mica/product.conf`, a five-line
+file (`PRODUCT`, `BOARD`, `PROFILE`, and the quoted `FEATURES` and
+`COMPONENTS`). The update-server is keyed by product. There is no minimum
 running release rule.
 
 Installation requires the authenticated running deployment A to be confirmed

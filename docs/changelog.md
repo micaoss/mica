@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-15 07:01 [progress]
+
+The update-package records use `mica-core`'s names (implementation in
+progress, `mica-core:docs/task/20260915-0657-update-packages.md`): `mica/deployment/v2` replaces v1 with a required signed
+`product` field; the device's product is the single unquoted `PRODUCT=` line
+of the five-line `/usr/lib/mica/product.conf`; `mica/catalog/v2` carries
+channel heads keyed by board, product and channel; `MICAUPD1` keeps its
+layout with an object count from 0 to the descriptor's, missing objects
+present in the store; `mica/kernel/v1` and `mica/rootfs/v1` are unchanged.
+`docs/design/release-signing.md`, `docs/design/updates.md`,
+`docs/design/build.md`, `docs/decisions/2026-09-15-update-packages.md`.
+
 ## 2026-09-15 06:59 [decision]
 
 `mica-build`'s update-package proposal is accepted (user, "接受"). Each product

@@ -11,12 +11,15 @@ mappings. No earlier update format or mutable command-line trust input is read.
 |---|---|---|
 | UKI/FIT | Kernel, initramfs, fixed policy, and DTB where applicable | UEFI or the required-signature U-Boot control FDT |
 | Root/support image | PKCS#7 signature over the root hash; signed metadata binds full geometry, hash, length and signature bytes | Kernel dm-verity and native metadata verifier |
-| Deployment | `mica/deployment/v1`, board/arch/generation/version and complete kernel/root identities; decided 2026-09-15, not implemented yet: a signed `product` field (a schema bump), refused on a device of another product | Factory assembler, early init and installer |
-| Catalog | `mica/catalog/v1`, revision, validity interval and deployment associations | Acquisition client |
+| Deployment | `mica/deployment/v2` (replaces v1), product/board/arch/generation/version and complete kernel/root identities; the signed `product` field (such as `x64-dev`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
+| Catalog | `mica/catalog/v2` (replaces v1), revision, validity interval, deployment associations and channel heads `{board, product, channel, releaseId, generation}` keyed by board, product and channel | Acquisition client |
 | Firmware | `mica/firmware/v1`, board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
 
-The components themselves are `mica/kernel/v1` and `mica/rootfs/v1`, and a
-published update travels in a `mica/update-envelope/v1` envelope.
+The components themselves are `mica/kernel/v1` and `mica/rootfs/v1` (unchanged
+by v2), and a published update travels in a `mica/update-envelope/v1`
+envelope. `mica/deployment/v2` and `mica/catalog/v2` were decided on
+2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`); `mica-core` is
+implementing them (`mica-core:docs/task/20260915-0657-update-packages.md`).
 
 The Ed25519 envelope format is shared by Rust and Bun: its keys are ordered
 `schema`, `keyId`, `payload`, `signature`, and `keyId` is the hex SHA-256 of
@@ -26,11 +29,12 @@ Offline archives (extension `.micaupd`) start with the eight-byte magic
 `MICAUPD1`, then the descriptor length (u32, big-endian), the signed
 descriptor, the object count, and for each object its digest, size and bytes;
 they reuse the deployment signature and carry only bounded
-digest/length-addressed objects. Decided 2026-09-15, implementation pending
-in `mica-core` (`docs/decisions/2026-09-15-update-packages.md`): an archive
-may carry a subset of the descriptor's objects, every missing object already
-in the store, so one signed deployment ships as `full`, `root` and `kernel`
-archives with the same descriptor.
+digest/length-addressed objects. The layout is unchanged by the 2026-09-15
+decision, but the object count may be anything from 0 to the descriptor's
+object count: every object the archive omits must already be present in the
+store, and an archive is no longer refused for an object count that differs
+from the descriptor's. One signed deployment therefore ships as `full`,
+`root` and `kernel` archives with the same descriptor.
 
 Metadata trust resides in authenticated kernel policy. Public factory update
 settings select a source/channel and policy; they cannot replace anchors.
