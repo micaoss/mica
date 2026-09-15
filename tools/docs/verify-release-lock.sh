@@ -41,9 +41,20 @@ done < "$V/expected.tsv"
 [ "${#listed[@]}" -gt 0 ] || fail "$V/expected.tsv lists no vectors"
 
 # Every vector on disk is listed: a lock or upstream lock file, a pins case directory (locks and pins/), a repos case directory.
+# The membership test is a shell loop, not `printf | grep -qxF`: under
+# `pipefail`, `grep -q` exits on the first match and the still-writing printf
+# dies of SIGPIPE, so a match early in the list reports the pipeline as failed.
+is_listed() {
+    local candidate
+    for candidate in "${listed[@]}"; do
+        [ "$candidate" = "$1" ] && return 0
+    done
+    return 1
+}
+
 while IFS= read -r vector; do
     CHECKS=$((CHECKS + 1))
-    printf '%s\n' "${listed[@]}" | grep -qxF "$vector" || fail "$vector is not listed in expected.tsv"
+    is_listed "$vector" || fail "$vector is not listed in expected.tsv"
 done < <(cd "$V" && { find lock upstream -name '*.lock'; find pins -mindepth 2 -maxdepth 2 -type d; find repos -mindepth 1 -maxdepth 1 -type d; } | sort)
 
 if [ "$FAIL" -gt 0 ]; then
