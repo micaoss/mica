@@ -22,7 +22,7 @@ export function BoardsSection({ copy }: { copy: Copy }) {
       <Card className="mt-12 gap-0 p-0">
         {/* A spec sheet scrolls rather than reflows; `min-w-0` keeps the
             scroller from being widened by its content. */}
-        <div className="w-full min-w-0 overflow-x-auto rounded-t-xl">
+        <div className="w-full min-w-0 overflow-x-auto rounded-xl">
           <Table className="min-w-[560px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -44,9 +44,6 @@ export function BoardsSection({ copy }: { copy: Copy }) {
             </TableBody>
           </Table>
         </div>
-        <p className="m-0 border-t border-border px-5 py-3 text-[13px] leading-6 text-muted-foreground">
-          {copy.boards.note}
-        </p>
       </Card>
 
       <div className="mt-6 flex flex-wrap gap-3">

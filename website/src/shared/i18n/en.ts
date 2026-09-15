@@ -75,7 +75,6 @@ export const en: typeof zh = {
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'Bring-up, image builds, physical tests pending' },
       { board: 's905x5m', hw: 'Amlogic S7D (BM201)', status: 'Bring-up, image builds, physical tests pending' },
     ],
-    note: 'No board is qualified yet. docs/boards/support-tiers.md is the authoritative, up-to-date table.',
     more: 'All boards and support tiers',
     request: 'Request a new board',
   },

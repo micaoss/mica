@@ -85,7 +85,6 @@ export const zh = {
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'bring-up，镜像可构建，实机测试待做' },
       { board: 's905x5m', hw: 'Amlogic S7D（BM201）', status: 'bring-up，镜像可构建，实机测试待做' },
     ],
-    note: '尚无板卡完成认证。docs/boards/support-tiers.md 是权威且最新的支持等级表。',
     more: '全部板卡与支持等级',
     request: '请求支持新板卡',
   },
