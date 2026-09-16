@@ -101,7 +101,6 @@ export const en: typeof zh = {
       root: 'root only',
       kernel: 'kernel only',
     },
-    uncompressed: 'unpacked',
     cols: {
       board: 'Board',
       profile: 'Profile',

@@ -111,7 +111,6 @@ export const zh = {
       root: '仅 root',
       kernel: '仅 kernel',
     },
-    uncompressed: '解压后',
     cols: {
       board: '板卡',
       profile: 'Profile',

@@ -223,15 +223,6 @@ export function DownloadExplorer({
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
                             {formatBytes(download.bytes)}
-                            {/* An image is gzip-compressed: the download is a
-                                fraction of what it writes to a disk. */}
-                            {download.uncompressedBytes !== undefined && (
-                              <span className="block text-[12px]">
-                                {copy.download.uncompressed}
-                                {' '}
-                                {formatBytes(download.uncompressedBytes)}
-                              </span>
-                            )}
                           </TableCell>
                           <TableCell className="pr-5 font-mono text-[13px]">
                             <a href={download.href}>{download.filename}</a>
