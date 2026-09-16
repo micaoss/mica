@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-16 08:30 [decision]
+
+The pause is lifted (user, 2026-09-16), with an order, because the held work
+now depends on itself: `mica-build` goes first and everything else's first
+step waits on it — the scoped releases for `uefi-x64`, `uefi-arm64` and
+`cx3576`, with `MICA_RELEASE_GENERATIONS` for `cx3576` only (`cx3576-dev` 5,
+`cx3576-prod` 4; the renamed products start at 2), then the index job's first
+`mica.<stamp>`. After it: `mica-boards` cuts its four board releases, the
+first carrying the `bsp` toolchain, which is where the open question is
+answered — whether the kernels, U-Boots and components come out byte-identical
+to what `20260916-0744` and `20260916-0558` published — and then its i386
+packer round; in parallel `mica-podman` cuts `5.8.6-2` with its pinned build
+closure, `mica-core` moves to build-env `20260916-0735` and cuts
+`mica-apid` `0.1.0-2`, and `mica-system-base` moves and reports whether its
+four packages still rebuild byte-identically. `mica-boards` then adds the
+fetch-time mirror hook, which tries `<mirror>/blob/<sha256[0:2]>/<sha256>`
+before a row's URL and falls back on 404 without ever rewriting a lock URL,
+since the URL is in the inputs hash. `mica-res` starts phase 2 once the index
+exists. `mica-build` closes the round by re-pinning each producer as its
+release lands.
+
+Still in force, and not lifted: nothing is pruned in any `ghcr` package and no
+workflow run is deleted anywhere until the collector's snapshots are in the
+bucket and a retention policy is agreed; `mica-build-env` `20260915-0138`
+stays alive until every consumer has moved off it.
+
 ## 2026-09-16 08:10 [decision]
 
 Work that is not the cache and mirror design is paused (user, 2026-09-16), so

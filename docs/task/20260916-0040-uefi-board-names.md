@@ -83,3 +83,9 @@ Renaming the generic systems in the records
   stays open for that round's result — the renamed products and their first
   scoped releases — and for nothing else; the `bsp` switch and the pinned
   build closure are held and are not part of it.
+- 2026-09-16: the pause is lifted and `mica-build` cuts the round's releases
+  first. Two places in this repository go stale the moment they exist and are
+  corrected in one commit then: the state paragraph of `user/overview.md` with
+  its Chinese twin, which still names the 2026-09-15 product releases, and the
+  three pages saying `uefi-arm64` images appear from the next `mica-build`
+  round (`user/download.md`, `user/overview.md` and their Chinese versions).
