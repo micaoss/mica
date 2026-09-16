@@ -204,8 +204,15 @@ export function DownloadExplorer({
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
                             {download.releasedAt}
                           </TableCell>
-                          <TableCell className="font-mono text-[13px] text-muted-foreground">
-                            {download.deploymentId ?? '—'}
+                          {/* A deployment identity is 64 hex characters; in full it
+                              pushes the download link out of the viewport. The row
+                              shows enough to recognise it and carries the whole
+                              value for anyone who needs to compare it. */}
+                          <TableCell
+                            className="font-mono text-[13px] text-muted-foreground"
+                            title={download.deploymentId}
+                          >
+                            {download.deploymentId ? `${download.deploymentId.slice(0, 12)}…` : '—'}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
                             {formatBytes(download.bytes)}
