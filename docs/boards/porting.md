@@ -329,7 +329,7 @@ is not done until they pass with its directory in the tree;
 ## The first release, and what the assembly needs
 
 1. `mica-boards` cuts the board's first release on GitHub,
-   `<board>/<YYYYMMDD-HHMM>`, which builds that board alone and publishes its
+   `<board>.<YYYYMMDD-HHMM>`, which builds that board alone and publishes its
    components and pool; the release carries `mica-boards.lock` and
    `SHA256SUMS` ([releasing](../user/releasing.md)).
 2. `mica-build` pins it as `locks/mica-boards.<board>.lock` with

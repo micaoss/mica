@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-16 00:20 [decision]
+
+Scoped release tags separate the scope with a dot: `x64.20260915-2230` instead
+of `x64/20260915-2230`, `mica.20260915-2242` instead of `mica/20260915-2242`
+(user, 2026-09-16, `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`). A
+scope is `[a-z0-9][a-z0-9-]*` and a stamp carries no dot, so everything before
+the first dot is the scope; the form matches the OCI tags already in use and
+removes the git ref-directory limit that kept a tag named exactly `x64` from
+existing beside `x64/...`. `docs/design/release-lock.md` states the form in
+1.0, the release row of 1.2, 1.2.2, 1.2.3, the `release-scope` rule and the
+offline `<scope>.offline` lock; the reference checker splits the release row on
+the last dot, so a slash is refused as `field-value`, proven by the new vector
+`lock/refused/release-slash.lock` (156/156). `docs/design/mica-index.md` moves
+the asset URL to `.../download/<scope>.<stamp>/<file>` and fixes that the
+`inputs[].id` keeps its slash, `<built name>/<release>`, because it joins a
+name to a release rather than naming a git tag. The decisions and user pages
+that quote tag forms follow; releases published before today keep their slash
+tags and are not rewritten. There is no compatibility form: nothing reads the
+old form after this change.
+
 ## 2026-09-15 23:16 [progress]
 
 `mica-build` `19e7c9ce` fixes the index plan's generation edge case: a product

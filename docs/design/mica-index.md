@@ -1,6 +1,6 @@
 # The Mica version index: `mica-index.json` (`mica/index/v1`)
 
-A Mica version is one immutable `mica-build` release, `mica/<YYYYMMDD-HHMM>`,
+A Mica version is one immutable `mica-build` release, `mica.<YYYYMMDD-HHMM>`,
 that names the scoped product releases forming it
 (`docs/decisions/2026-09-15-mica-version-index.md`). It carries no image or
 update archive of its own. Its lock is the index lock of
@@ -36,7 +36,7 @@ digests are lowercase hex.
   version: "<YYYYMMDD-HHMM>",
   commit: "<40 hex>",
   lock: { file: "mica-build.lock", sha256 },
-  previous?: { release: "mica/<YYYYMMDD-HHMM>", trust },
+  previous?: { release: "mica.<YYYYMMDD-HHMM>", trust },
   inputs: [ { id, repository, scope?, release, trust } ],
   releases: [ { release, trust, commit, inputs: [ id ] } ],
   products: [
@@ -63,7 +63,11 @@ digests are lowercase hex.
 - `inputs` has one entry per distinct `built` row of the lock, with
   `id` = `<built name>/<release>` (for example `mica-boards.x64/20260915-1926`
   or `mica-core/20260915-1135`), the repository, the scope where the name has
-  one, the release and its `trust`. One `id` with two trust hashes is
+  one, the release and its `trust`. **The id keeps its slash** *(fixed here,
+  2026-09-16)*: it joins a built name to a release rather than naming a git
+  tag, and the name already separates repository from scope with a dot, so
+  `mica-boards.x64/20260915-1926` stays readable while the release tag it
+  refers to is `x64.20260915-1926`. One `id` with two trust hashes is
   refused. The lock itself keeps every `built` row verbatim per release.
 - `releases` has one entry per `input` row: the scoped release, its `trust`,
   its `commit` (the `origin` row) and its inputs as `id`s.
@@ -71,7 +75,8 @@ digests are lowercase hex.
   `product` row, the scoped `release` it comes from, the `bundles`
   references, and its `images` and `updates` from the copied `asset` rows.
   `url` is
-  `https://github.com/micaoss/mica-build/releases/download/<scope>/<stamp>/<file>`.
+  `https://github.com/micaoss/mica-build/releases/download/<scope>.<stamp>/<file>`,
+  the scoped release tag of `docs/design/release-lock.md` 1.0.
   `size`, and for images `compression`, `uncompressedSha256` and
   `uncompressedSize`, come from the referenced OCI layers.
   `requires.generationBelow` is the archive's generation; a `root` archive

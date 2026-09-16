@@ -11,7 +11,9 @@
 `mica-boards` stays its own repository; it is not merged into `mica-build`
 (user, 2026-09-15). It releases per board:
 
-- The git tag and GitHub Release are `<board>/<YYYYMMDD-HHMM>`, and a release
+- The git tag and GitHub Release are `<board>.<YYYYMMDD-HHMM>` (a dot since
+  2026-09-16, `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`; the
+  releases cut before that date carry the slash form), and a release
   builds and publishes only that board.
 - A board is published as separate component artifacts (2026-09-15, agreed
   by `mica-boards` and `mica-build`): `kernel`, `uboot` (FIT boards),
@@ -29,7 +31,7 @@
   `mica-board-<board>`, the radio packages and s905x5m's component packages,
   and the assembly takes the kernel files from the `kernel` artifact.
 - A release carries exactly `mica-boards.lock` and `SHA256SUMS`; the lock's
-  release row is `release mica-boards <board>/<YYYYMMDD-HHMM> <commit>`. Each
+  release row is `release mica-boards <board>.<YYYYMMDD-HHMM> <commit>`. Each
   component is a row `board <board> <component> <arch> <reference>` (key
   board and component), two to five per lock (`board` and `kernel` required,
   `uboot`, `firmware` and `packer` optional; refused otherwise as `board-components`), and the lock holds only that

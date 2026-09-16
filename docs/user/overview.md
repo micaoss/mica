@@ -37,7 +37,7 @@ builds on as a lock plus a pin record, never a branch
 ```text
 mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
                └─▶ mica-core ─────────────────────┤
-               └─▶ mica-boards (per board) ───────┴─▶ mica-build ─▶ mica/<stamp>
+               └─▶ mica-boards (per board) ───────┴─▶ mica-build ─▶ mica.<stamp>
 ```
 
 - `mica-build-env` is the floor: every other repository builds inside its
@@ -45,15 +45,18 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 - `mica-system-base` publishes the base root and the package pools that
   products install.
 - `mica-core` and `mica-podman` publish their packages into their own pools.
-- `mica-boards` releases **per board**, `<board>/<YYYYMMDD-HHMM>`, and
+- `mica-boards` releases **per board**, `<board>.<YYYYMMDD-HHMM>`, and
   publishes the board's components and pool.
-- `mica-build` releases **per scope**, `<board>/<YYYYMMDD-HHMM>` today, and
+- `mica-build` releases **per scope**, `<board>.<YYYYMMDD-HHMM>` today, and
   publishes each product of that scope: a compressed disk image and the
   update archives.
 - After every successful scoped release, `mica-build` cuts the **version
-  index** `mica/<YYYYMMDD-HHMM>`, which names the newest release of every
+  index** `mica.<YYYYMMDD-HHMM>`, which names the newest release of every
   published product. The index is the GitHub latest release, so the greatest
-  `mica/*` tag is the newest Mica version.
+  `mica.*` tag is the newest Mica version.
+- A scoped tag separates its scope with a dot since 2026-09-16
+  ([decision](../decisions/2026-09-16-scoped-tags-use-a-dot.md)); the tags
+  listed below were cut before that date and keep their slash.
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
@@ -81,8 +84,8 @@ a token.
 
 | I want | Where |
 |---|---|
-| the newest Mica version | the greatest `mica/*` release of `micaoss/mica-build` (the GitHub latest), whose `mica-index.json` names every product's newest release, asset URLs, sizes and digests |
-| an image for one product | the scoped release `<board>/<YYYYMMDD-HHMM>`: `mica-<product>-<stamp>.<suffix>.gz` |
+| the newest Mica version | the greatest `mica.*` release of `micaoss/mica-build` (the GitHub latest), whose `mica-index.json` names every product's newest release, asset URLs, sizes and digests |
+| an image for one product | the scoped release `<board>.<YYYYMMDD-HHMM>`: `mica-<product>-<stamp>.<suffix>.gz` |
 | an update archive | the same release: `mica-<product>-<stamp>.micaupd`, and `.root.micaupd` or `.kernel.micaupd` when that release published them |
 | what a release is made of | `mica-build.lock` in the release, and `SHA256SUMS` beside it |
 | the same bytes as an OCI artifact | `ghcr.io/micaoss/mica-build:image.<product>.<stamp>` and `update.<product>.<stamp>` |

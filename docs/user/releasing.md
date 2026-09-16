@@ -18,12 +18,14 @@ the assets. `ci.yml` publishes nothing.
 | Repository | Tag |
 |---|---|
 | `mica-build-env`, `mica-system-base`, `mica-core`, `mica-podman` | `<YYYYMMDD-HHMM>` |
-| `mica-boards` | `<board>/<YYYYMMDD-HHMM>`, one board per release |
-| `mica-build` | `<scope>/<YYYYMMDD-HHMM>`, a board or one product, cut with `--latest=false` |
-| `mica-build` version index | `mica/<YYYYMMDD-HHMM>`, cut by the index job, never by hand |
+| `mica-boards` | `<board>.<YYYYMMDD-HHMM>`, one board per release |
+| `mica-build` | `<scope>.<YYYYMMDD-HHMM>`, a board or one product, cut with `--latest=false` |
+| `mica-build` version index | `mica.<YYYYMMDD-HHMM>`, cut by the index job, never by hand |
 
 The stamp is the UTC time of the release, with no `v` prefix, no semver and
-no commit suffix. Deleting or re-cutting a published release happens only on
+no commit suffix. A scoped tag separates its scope with a **dot** since
+2026-09-16; the releases cut before that date carry the older
+`<scope>/<stamp>` form and are not rewritten. Deleting or re-cutting a published release happens only on
 the user's explicit instruction.
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
@@ -71,11 +73,11 @@ unchanged ([update packages](update-packages.md)).
 ## 4. The version index
 
 After every fully successful `mica-build` scoped release, the index job cuts
-`mica/<YYYYMMDD-HHMM>`: it takes the newest scoped release of every published
+`mica.<YYYYMMDD-HHMM>`: it takes the newest scoped release of every published
 product, checks the entering entries against their sources, and publishes the
 index lock and `mica-index.json`. It is incremental over the previous index,
 is skipped when nothing enters or drops, and is the GitHub latest release.
-A manual `mica/*` release is refused.
+A manual `mica.*` release is refused.
 
 > status: shipped — evidence: `docs/decisions/2026-09-15-mica-version-index.md`, `docs/design/mica-index.md`
 

@@ -6,10 +6,13 @@ reader here.
 
 | Release | Tag | Carries |
 |---|---|---|
-| The version index | `mica/<YYYYMMDD-HHMM>` | `mica-index.json`, `mica-build.lock`, `SHA256SUMS` |
-| A scoped product release | `<scope>/<YYYYMMDD-HHMM>` | `mica-build.lock`, each product's `mica-<product>-<release>.img.gz`, its `.micaupd` archives, `SHA256SUMS` |
+| The version index | `mica.<YYYYMMDD-HHMM>` | `mica-index.json`, `mica-build.lock`, `SHA256SUMS` |
+| A scoped product release | `<scope>.<YYYYMMDD-HHMM>` | `mica-build.lock`, each product's `mica-<product>-<release>.img.gz`, its `.micaupd` archives, `SHA256SUMS` |
 
-The index release is the one GitHub marks *latest*, and it is cut
+A scoped tag separates its scope from the stamp with a dot since 2026-09-16
+([decision](../decisions/2026-09-16-scoped-tags-use-a-dot.md)); releases
+published before that date carry the older `<scope>/<stamp>` form in their own
+URLs. The index release is the one GitHub marks *latest*, and it is cut
 automatically after a scoped release; a scope is a board (all of its published
 products) or a single product. The index is the entry point: it names every
 current product, its files, their sizes and their hashes, so a reader does not
@@ -40,7 +43,7 @@ Per product a release carries:
 
 ```sh
 REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSL "$REL/mica/<index release>/mica-index.json" -o mica-index.json
+curl -fsSL "$REL/mica.<index release>/mica-index.json" -o mica-index.json
 
 jq -r '.products[] | select(.product=="x64-dev")
        | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
@@ -56,9 +59,9 @@ catalogue of every board and product. `previous` names the index before it.
 ## 3. Download and verify
 
 ```sh
-curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64/<release>/mica-build.lock"
-curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/x64.<release>/SHA256SUMS"
+curl -fsSLO "$REL/x64.<release>/mica-build.lock"
+curl -fsSLO "$REL/x64.<release>/mica-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # lists the lock and every asset
 ```
 
@@ -116,8 +119,8 @@ scoped release, the images and archives themselves. From a clean checkout of
 published releases and compared byte for byte:
 
 ```sh
-bash tools/release.sh verify-index mica/<index release>
-bash tools/release.sh verify-index mica/<index release> --full
+bash tools/release.sh verify-index mica.<index release>
+bash tools/release.sh verify-index mica.<index release> --full
 ```
 
 A checksum next to a file proves only that the file arrived intact. What makes

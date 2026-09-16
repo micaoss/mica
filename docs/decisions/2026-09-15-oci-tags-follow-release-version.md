@@ -25,7 +25,7 @@ An OCI tag names the release that published it, never a hash or a commit
   `mica-system-base:rootfs.<release>`, `mica-build:image.<product>.<release>`,
   `mica-build:update.<product>.<release>`,
   `<repository>:source.<release>`.
-- For a scoped release (`<scope>/<YYYYMMDD-HHMM>`, `mica-boards` and
+- For a scoped release (`<scope>.<YYYYMMDD-HHMM>`, `mica-boards` and
   `mica-build` only) the tag's last part is the `<YYYYMMDD-HHMM>` part, and
   the scope is named earlier in the tag.
 - A tag that already holds another digest is refused, never re-pointed.

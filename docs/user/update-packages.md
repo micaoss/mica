@@ -214,7 +214,7 @@ jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.
 
 ## 9. Picking a file from the index
 
-The version index `mica/<YYYYMMDD-HHMM>` of `micaoss/mica-build` is the one
+The version index `mica.<YYYYMMDD-HHMM>` of `micaoss/mica-build` is the one
 place that names every published product's newest artifacts. In
 `mica-index.json`, each product carries:
 

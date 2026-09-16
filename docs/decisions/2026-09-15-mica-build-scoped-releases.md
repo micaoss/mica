@@ -19,7 +19,9 @@ assets and product scopes are `mica-build`'s alone.
 
 **Scoped releases.** A release is scoped to a board, meaning all of that
 board's products, or to a single product. Its git tag and GitHub Release are
-`<scope>/<YYYYMMDD-HHMM>`, for example `x64/20260915-0300`. Only the products
+`<scope>.<YYYYMMDD-HHMM>`, for example `x64.20260915-0300` (a dot since
+2026-09-16, `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`; the releases
+cut before that date carry the slash form). Only the products
 in the scope are built, verified and published; other products are not
 rebuilt or republished (user: "比如我只编译x64 就可以只发布x64，不需要严格按照规则去发布所有其他的版本").
 
@@ -46,7 +48,7 @@ the product's whole release. `mica-build.lock` ties each asset (an `asset`
 row per kind) to its OCI digest and records the five
 input releases (`mica-build-env`, `mica-system-base`, `mica-core`,
 `mica-podman`, and the per-board `mica-boards` release of each board in the
-scope). Its release row is `release mica-build <scope>/<YYYYMMDD-HHMM>
+scope). Its release row is `release mica-build <scope>.<YYYYMMDD-HHMM>
 <commit>`, and its inputs are read from `locks/` like any consumer, a board as
 `locks/mica-boards.<board>.lock` (`docs/design/release-lock.md` 1.0 and
 section 4).
@@ -62,7 +64,7 @@ archives are `full`, `root` and `kernel`
 
 ## What this changes for mica-build
 
-- The release tag is `<scope>/<YYYYMMDD-HHMM>` instead of `<YYYYMMDD-HHMM>`.
+- The release tag is `<scope>.<YYYYMMDD-HHMM>` instead of `<YYYYMMDD-HHMM>`.
 - A release carries image assets beside `mica-build.lock` and `SHA256SUMS`,
   instead of exactly the lock and `SHA256SUMS`.
 - A release covers its scope only, not every product.
@@ -70,7 +72,7 @@ archives are `full`, `root` and `kernel`
   triggered release workflow such as a `cut-release.yml` (user, 2026-09-15).
 - Scoped releases are cut with `--latest=false`; after every fully
   successful scoped release, `release.yml`'s index job cuts the Mica version
-  index release `mica/<YYYYMMDD-HHMM>`, which is the GitHub latest release
+  index release `mica.<YYYYMMDD-HHMM>`, which is the GitHub latest release
   (`docs/decisions/2026-09-15-mica-version-index.md`).
 
 Every other repository keeps the uniform rules, except that `mica-boards`

@@ -5,10 +5,13 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 
 | 发布 | 标签 | 携带 |
 |---|---|---|
-| 版本索引 | `mica/<YYYYMMDD-HHMM>` | `mica-index.json`、`mica-build.lock`、`SHA256SUMS` |
-| 作用域产品发布 | `<scope>/<YYYYMMDD-HHMM>` | `mica-build.lock`、各产品的 `mica-<product>-<release>.img.gz`、其 `.micaupd` 归档、`SHA256SUMS` |
+| 版本索引 | `mica.<YYYYMMDD-HHMM>` | `mica-index.json`、`mica-build.lock`、`SHA256SUMS` |
+| 作用域产品发布 | `<scope>.<YYYYMMDD-HHMM>` | `mica-build.lock`、各产品的 `mica-<product>-<release>.img.gz`、其 `.micaupd` 归档、`SHA256SUMS` |
 
-被 GitHub 标记为 *latest* 的是索引发布，它在一次作用域发布之后由自动化切出；
+自 2026-09-16 起，作用域标签用点号把作用域与时间戳分开
+（[决策](../../decisions/2026-09-16-scoped-tags-use-a-dot.md)）；在那之前发布的
+release，其 URL 里仍是旧的 `<scope>/<stamp>` 形式。被 GitHub 标记为 *latest* 的是
+索引发布，它在一次作用域发布之后由自动化切出；
 作用域是一块板（它全部已发布的产品）或单个产品。索引是入口：它列出当前每个
 产品、它的文件、大小和哈希，读者不必自己遍历发布列表。
 
@@ -33,7 +36,7 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 
 ```sh
 REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSL "$REL/mica/<index release>/mica-index.json" -o mica-index.json
+curl -fsSL "$REL/mica.<index release>/mica-index.json" -o mica-index.json
 
 jq -r '.products[] | select(.product=="x64-dev")
        | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
@@ -48,9 +51,9 @@ sha256 和大小，以及每块板和每个产品的目录。`previous` 指向�
 ## 3. 下载并校验
 
 ```sh
-curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64/<release>/mica-build.lock"
-curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/x64.<release>/SHA256SUMS"
+curl -fsSLO "$REL/x64.<release>/mica-build.lock"
+curl -fsSLO "$REL/x64.<release>/mica-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
 ```
 
@@ -100,8 +103,8 @@ lock 是 `mica-lock v1` 文件，记录发布的提交以及进入它的每一�
 `mica-build` 检出中，可以从已发布的 release 重建索引并逐字节比较：
 
 ```sh
-bash tools/release.sh verify-index mica/<index release>
-bash tools/release.sh verify-index mica/<index release> --full
+bash tools/release.sh verify-index mica.<index release>
+bash tools/release.sh verify-index mica.<index release> --full
 ```
 
 文件旁边的校验和只能证明文件完整到达。让镜像值得信任的是它内部的签名链
