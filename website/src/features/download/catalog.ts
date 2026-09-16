@@ -80,9 +80,12 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
 }
 
 /**
- * Newest first, and one row per board, profile and kind unless `history` asks
- * for the rest: a board's update package has its own history, separate from its
- * system image.
+ * Newest first, and one row per file unless `history` asks for the rest.
+ *
+ * A file is identified by board, profile, form **and variant**: the three update
+ * archives of one deployment — `full`, `root`, `kernel` — are different files
+ * with different uses, not versions of each other. Leaving the variant out of
+ * the key hid two of the three behind the history control.
  */
 export function selectVersions(all: Download[], history: boolean): Download[] {
   const ordered = [...all].sort((a, b) =>
@@ -93,7 +96,7 @@ export function selectVersions(all: Download[], history: boolean): Download[] {
 
   const seen = new Set<string>()
   return ordered.filter((download) => {
-    const key = `${download.board}/${download.profile}/${download.kind}`
+    const key = `${download.board}/${download.profile}/${download.kind}/${download.variant ?? ''}`
     if (seen.has(key))
       return false
     seen.add(key)

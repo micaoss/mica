@@ -38,6 +38,18 @@ describe('filterDownloads', () => {
 })
 
 describe('selectVersions', () => {
+  it('keeps every archive of one deployment: they are files, not versions', () => {
+    const deployment = [
+      download({ kind: 'update', variant: 'full', deploymentId: 'dep-1' }),
+      download({ kind: 'update', variant: 'kernel', deploymentId: 'dep-1' }),
+      download({ kind: 'update', variant: 'root', deploymentId: 'dep-1' }),
+      download({ kind: 'image', deploymentId: 'dep-1' }),
+    ]
+
+    expect(selectVersions(deployment, false)).toHaveLength(4)
+    expect(historyCount(deployment)).toBe(0)
+  })
+
   it('opens on the newest of each board, profile and form', () => {
     expect(selectVersions(SAMPLE, false)).toEqual([NEWEST, UPDATE, OTHER_BOARD])
   })
