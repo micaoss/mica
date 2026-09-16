@@ -20,7 +20,12 @@ A board name says what the system is, not which instruction set it runs:
 So the taxonomy is two kinds of board: **generic systems**, named for their
 firmware class, which run on any machine whose firmware matches and are
 qualified by class rather than by model; and **hardware boards**, named for
-the product, which are qualified on that hardware.
+the product, which are qualified on that hardware. This record is the rename
+itself; the general rules it is the first instance of — what makes a variant a
+board, a product or an image kind, and the name grammar that follows — are
+`docs/decisions/2026-09-16-board-and-product-naming.md` and
+`docs/boards/contract.md` 1.1, so a later variant reads one page instead of
+reconstructing the rule from this one.
 
 Consequences:
 
