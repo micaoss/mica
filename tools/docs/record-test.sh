@@ -14,6 +14,14 @@
 #   - the happy path commits exactly the named paths and pushes once.
 set -euo pipefail
 
+# Neutralise the ambient git configuration, because the class of bug this test
+# already met twice is "passes on a workstation because of configuration that
+# is present there and absent on a runner". The identity failure of 2026-09-16
+# was exactly that: a global user.email everyone here has, and no runner does.
+# With these two set, a workstation run is the runner's run.
+export GIT_CONFIG_GLOBAL=/dev/null
+export GIT_CONFIG_SYSTEM=/dev/null
+
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
