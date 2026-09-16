@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-16 18:50 [spec]
+
+Two corrections, both to text written today.
+
+**The protected set takes a hop, and the hop is now part of the rule**
+(`docs/design/release-lock.md` 2.1, from `mica-res` implementing the query). A
+consumer release lock carries no `image` rows at all, only its products, so
+"walk the published locks and collect image references" read literally yields
+**nothing** — an empty protected set and the conclusion that everything is
+prunable, which is a silent wrong answer in the one direction that destroys
+data. The rule now says what to do: for each published release take the commit
+its lock names, read `locks/mica-build-env.lock` at that commit, and collect
+the image references there; `mica-build-env`'s own lock is the exception that
+carries `image` rows directly. With the numbers, so the rule is checkable:
+`20260915-0138` is named by 17 published locks and `20260916-0735` by 19, both
+failing the first clause, and the derivation re-runs on every sync rather than
+being kept as a list, so the set moves when a lock moves.
+
+**The mirror reachability finding was mis-scoped, by the coordinator and then
+by me.** `res.micaos.dev` serves CI and the developer machine normally. What
+was measured unreachable on 2026-09-16 is the agent containers on one host:
+from inside a container `188.114.96.5`, `188.114.97.5` and `172.67.0.1` time
+out while `104.16.123.96` and `1.1.1.1` open instantly, with no proxy
+variables and a plain docker bridge route — container egress, almost certainly
+host-side routing that does not cover the bridge. `docs/design/mica-index.md`
+3.1 now says that, and says that nobody has measured a fetch through the
+mirror hook, so no page claims one either way. It was never a property of the
+mirror or of the development network, and a caveat with the wrong scope is
+worse than none: it would have had someone chasing a design problem that does
+not exist.
+
 ## 2026-09-16 18:20 [spec]
 
 Two rules from `mica-build-env`'s practice, neither of them written down

@@ -104,14 +104,17 @@ digests are lowercase hex.
   entry equal to `url`, which is not a mirror but the source the reader
   already has; and an entry that `verify-index` cannot re-derive from the
   base, scope, stamp and file name.
-- **Reachability is a fact about a network, not about the design.**
-  `res.micaos.dev` is proven to serve GitHub runners, and on 2026-09-16 it was
-  measured **unreachable from this workstation's network** — IPv4 times out,
-  IPv6 has no route, while `www.cloudflare.com` answers in 0.14 s from the
-  same host. So no page here may say that a local or offline build fetches
-  from the mirror until that is measured again. It is a routing question that
-  is with the user; `url` is unaffected, which is the point of `mirrors` being
-  advice.
+- **Reachability is measured per environment, and the scope of a measurement
+  is part of it.** `res.micaos.dev` serves CI and the developer machine
+  normally. What was measured unreachable on 2026-09-16 is **the agent
+  containers on one host**: from inside a container `188.114.96.5`,
+  `188.114.97.5` and `172.67.0.1` time out while `104.16.123.96` and
+  `1.1.1.1` open instantly, with no proxy variables and a plain docker bridge
+  route — container egress, almost certainly host-side routing that does not
+  cover the bridge. It is neither a property of the mirror nor of the
+  development network. Nobody has yet measured a fetch through the mirror
+  hook, so no page claims one either way; `url` is unaffected regardless,
+  which is the point of `mirrors` being advice.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,

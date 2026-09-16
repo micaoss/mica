@@ -378,17 +378,32 @@ it is available precisely because the first question usually has a clean
 answer. `mica-build-env` asked it, got one, and then accepted that it had
 answered a different question than the one it was about to act on.
 
-The protected set is **computable, not a judgement**: walk the published
-locks, collect every image reference, and that is the set. So a retention
-policy can be stated objectively when it is written — *an image release is
-prunable only if no published lock names it and it is mirrored.*
+The protected set is **computable, not a judgement** — but computing it takes
+one hop, and the hop is part of the rule, not a footnote to it *(fixed here,
+2026-09-16, from `mica-res` implementing the query)*:
 
-Today that set is exactly `mica-build-env` `20260915-0138` and
-`20260916-0735`. Nothing builds against `0138` any more, every consumer having
-moved, but `mica-core` `20260915-1135`, `mica-system-base` `20260915-1102`,
-`mica-podman` `20260915-1057` and the `mica-build` releases cut before
-2026-09-16 name its images in their immutable locks: deleting them would make
-those releases unreproducible.
+> For each published release, take the **commit its lock names**, read
+> `locks/mica-build-env.lock` **at that commit**, and collect the image
+> references there. `mica-build-env`'s own release lock is the exception: it
+> carries `image` rows directly.
+
+**A consumer release lock carries no `image` rows at all** — only its
+products. Someone implementing "walk the published locks and collect image
+references" literally would find none, derive an **empty** protected set, and
+conclude that everything is prunable: a silent wrong answer in the one
+direction that destroys data. That is why the hop is written into the rule.
+
+With the hop, a retention policy can be stated objectively when it is written
+— *an image release is prunable only if no published lock names it and it is
+mirrored* — and the derivation is re-run on every sync rather than kept as a
+list, so the protected set moves when a lock moves.
+
+Today it is exactly `mica-build-env` `20260915-0138`, named by 17 published
+locks (`mica-boards` ten, `mica-build` three pre-rename, `mica-build-env`'s
+own, `mica-core` `20260915-1135`, `mica-podman` `20260915-1057`,
+`mica-system-base` `20260915-1102`), and `20260916-0735`, named by 19. Both
+fail the first clause, so neither is prunable. Nothing builds against `0138`
+any more, every consumer having moved — which is the other question.
 
 **The collector does not protect images.** It snapshots Actions runs and jobs,
 not `ghcr` package versions. A pruning pause lifted on the strength of the
