@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-16 12:05 [spec]
+
+`mica/index/v1` gains an optional `mirrors` member on every `images` and
+`updates` entry (`mica-res`' proposal, accepted as the spec's owner with three
+additions; `docs/design/mica-index.md` 3.1, the sort-order paragraph and
+section 5).
+
+What it is: an array of absolute `https` URLs emitted immediately after `url`
+and omitted entirely when absent. A reader may try them in order and fall back
+to `url`, and a mirror that does not answer is the next URL rather than an
+error. `url` keeps its meaning as the release's own URL, and `sha256` and
+`size` stay the only proof — **a mirror is a source, never a trust anchor** —
+so a pruned mirror costs a reader nothing the release still has. The entries
+are derived, never looked up: `<base>/d/mica/<scope>/<stamp>/<file>`. The
+member is unsorted, which the sort-order paragraph now states as an explicit
+exception, because every other list in that document is sorted and the next
+reader would sort a preference list whose order is its content.
+
+Three additions of mine, each protecting the property that made the proposal
+acceptable in the first place — the index must rebuild identically from a
+clean checkout:
+
+- the base is a **committed value in `mica-build`**, not an environment
+  variable; an emitter with no committed base omits the member. A member that
+  depended on a runner's configuration would make the rebuild environment-
+  dependent, which is the thing this index is not allowed to become.
+- `verify-index` **re-derives every entry** and refuses one it cannot
+  re-derive. Without it, `mirrors` would be the one part of the index an
+  emitter could put anything into and still verify.
+- an entry equal to `url` is refused as well as a duplicate: it is not a
+  mirror, it is the source the reader already has.
+
+No transition: published indexes have no `mirrors` member and nothing rewrites
+them; it appears from the first index that emits it. `mica-build` implements
+the emitter and the re-derivation when it is dispatched — not in this change,
+and not in its name.
+
 ## 2026-09-16 11:40 [finding]
 
 Two more measurements close the arm64 byte question, and one of them corrects

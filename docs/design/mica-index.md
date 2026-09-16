@@ -43,9 +43,9 @@ digests are lowercase hex.
     { product, board, profile, generation, deployment, kernel, rootfs,
       release,
       bundles: { image, update },
-      images: [ { kind, file, url, sha256, size,
+      images: [ { kind, file, url, mirrors?, sha256, size,
                   compression, uncompressedSha256, uncompressedSize } ],
-      updates: [ { kind, file, url, sha256, size,
+      updates: [ { kind, file, url, mirrors?, sha256, size,
                    requires: { generationBelow, kernel?, rootfs? } } ] } ],
   catalogue: {
     boards: [ { board, arch, releaseTarget,
@@ -82,6 +82,28 @@ digests are lowercase hex.
   `requires.generationBelow` is the archive's generation; a `root` archive
   also requires `kernel` and a `kernel` archive `rootfs`, the identity of the
   component the archive does not carry.
+- `mirrors` is an optional array of absolute `https` URLs, emitted immediately
+  after `url` and **omitted entirely when absent** *(fixed here, 2026-09-16,
+  on `mica-res`' proposal)*. A reader may try its entries in order and fall
+  back to `url`; a mirror URL that does not answer is not an error, it is the
+  next URL. **A mirror is a source, never a trust anchor**: `sha256` and
+  `size` beside `url` stay the only proof, and a reader that takes bytes from
+  a mirror verifies them exactly as it would from `url`. `url` keeps its form
+  and meaning — the release's own URL — so a pruned or unreachable mirror
+  costs a reader nothing that the release still has.
+- Each entry is **derived, never looked up**: `<base>/d/mica/<scope>/<stamp>/<file>`,
+  with the scope and stamp of the release the asset belongs to and the file
+  name unchanged (today `https://res.micaos.dev` is the base). The base is a
+  **committed value in `mica-build`**, not an environment variable *(fixed
+  here)*: an index that had to ask a mirror what it holds, or whose member
+  depended on a runner's configuration, would stop rebuilding identically from
+  a clean checkout, and that property is not negotiable. An emitter with no
+  committed base omits the member.
+- Refused: an entry that is not an absolute `https` URL; an empty `mirrors`
+  array, which is omitted instead; a duplicate entry within one array; an
+  entry equal to `url`, which is not a mirror but the source the reader
+  already has; and an entry that `verify-index` cannot re-derive from the
+  base, scope, stamp and file name.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,
@@ -97,6 +119,12 @@ digests are lowercase hex.
 Sort orders: `inputs` by `id` bytes; `releases` by `release`, each with its
 `inputs` sorted; `products` by `product`; `images` and `updates` by `kind`;
 `catalogue.boards` by `board` and `catalogue.products` by `product`.
+
+**`mirrors` is the one list that is not sorted**, and a reader must not sort
+it: it is a preference list, its order is the emitter's and the order is the
+content. Every other list in this document is sorted, so this exception is
+stated here rather than left to be discovered by the next person who sees a
+sortable-looking array.
 
 ### 3.2 Reserved: per-board shards
 
@@ -136,3 +164,7 @@ rules; the checks across releases are done at the cut and by the verifier:
 - `mica-build`'s `ci.yml` job `release-index` runs `--full` against the
   newest `mica.*` index on pushes to `main`, and `index --dry-run` before the
   first index exists.
+- `verify-index` re-derives every `mirrors` entry from the committed base and
+  the asset's own scope, stamp and file name, and refuses one it cannot
+  re-derive. Without that check a `mirrors` member would be the one part of
+  the index that an emitter could put anything into and still verify.
