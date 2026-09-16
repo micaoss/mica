@@ -22,7 +22,8 @@
 #   3. EVERY named path actually changed, so a message can no longer claim an
 #      edit that did not happen; a path that is unchanged is the defect the
 #      two bad commits had;
-#   4. `make docs-verify` passes over the edited tree;
+#   4. `make docs-verify` passes over the edited tree, and `make
+#      docs-verify-test` as well when a named path is under tools/;
 #   5. only the named paths are staged (never `git add -A`: other sessions
 #      share this checkout);
 #   6. the commit message file is non-empty and carries no attribution line.
@@ -73,8 +74,20 @@ for p in "${PATHS[@]}"; do
         || die "'$p' did not change; the commit would claim an edit that never landed"
 done
 
-# 4. the gates
+# 4. the gates. A change under tools/ also runs the gate tests, because such a
+# change can break the gate that proves every other commit -- on 2026-09-16 a
+# tools/ change left CI red for two and a half hours while every commit in the
+# window was individually gated and fine. A records change that touches no
+# tooling cannot cause that, and does not pay the twenty seconds.
 make docs-verify
+for p in "${PATHS[@]}"; do
+    case "$p" in
+        tools|tools/*)
+            echo "record.sh: tools/ touched, running the gate tests as well" >&2
+            make docs-verify-test
+            break ;;
+    esac
+done
 
 # 5. stage exactly what was named
 git add -- "${PATHS[@]}"
