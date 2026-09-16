@@ -81,8 +81,9 @@ machine of that class; or a **hardware board**, named for the hardware
 another image kind is
 [the naming rules](../decisions/2026-09-16-board-and-product-naming.md).
 
-`uefi-x64` and `cx3576` are release targets; `uefi-arm64` and `s905x5m` are
-built and tested but not released. The product set is `uefi-x64-dev`,
+`uefi-x64`, `uefi-arm64` and `cx3576` are release targets; `s905x5m` is built
+and tested but not released. `uefi-arm64` became one on 2026-09-16 and carries
+generic hardware drivers, while its qualification stays QEMU-only. The product set is `uefi-x64-dev`,
 `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`, `cx3576-dev`,
 `cx3576-prod` and `s905x5m-dev`: a `dev` product for every board and a `prod`
 product where the board has one. There are no minimal products
@@ -115,7 +116,8 @@ checked before and after decompressing.
 - Board-specific flashing formats (a Rockchip `update.img`, an Amlogic burn
   image) are designed but not implemented: every board declares only the
   `disk` image kind today.
-- `s905x5m` is not a release target, and `uefi-arm64` is an acceptance
-  target, so neither publishes images.
+- `s905x5m` is not a release target, so it publishes no images.
+- `uefi-arm64` became a release target on 2026-09-16; its product images
+  appear from the next `mica-build` round on.
 
 > status: unsupported

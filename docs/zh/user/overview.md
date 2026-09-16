@@ -68,7 +68,9 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 是新板卡、新产品，还是仅仅另一种镜像类型，见
 [命名规则](../../decisions/2026-09-16-board-and-product-naming.md)。
 
-`uefi-x64` 和 `cx3576` 是发布目标；`uefi-arm64` 和 `s905x5m` 有构建有测试，但不发布。
+`uefi-x64`、`uefi-arm64` 和 `cx3576` 是发布目标；`s905x5m` 有构建有测试，但不发布。
+`uefi-arm64` 自 2026-09-16 起成为发布目标并携带通用硬件驱动，而它的合格范围仍只有
+QEMU。
 产品集合是 `uefi-x64-dev`、`uefi-x64-prod`、`uefi-arm64-dev`、`uefi-arm64-prod`、
 `cx3576-dev`、`cx3576-prod` 和 `s905x5m-dev`：每块板一个 `dev` 产品，有 `prod` 的板再
 加一个。没有 minimal 产品（[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。
@@ -97,6 +99,8 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 
 - 板卡专用的刷写格式（Rockchip 的 `update.img`、Amlogic 的烧录镜像）有设计但未实现：
   今天每块板只声明 `disk` 一种镜像类型。
-- `s905x5m` 不是发布目标，`uefi-arm64` 是验收目标，所以两者都不发布镜像。
+- `s905x5m` 不是发布目标，因此不发布镜像。
+- `uefi-arm64` 自 2026-09-16 起成为发布目标；它的产品镜像从 `mica-build` 的下一轮
+  开始出现。
 
 > status: unsupported

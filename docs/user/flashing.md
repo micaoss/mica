@@ -64,12 +64,13 @@ packer is implemented. What differs is where the bootloader lives.
 | Board | Firmware format | Does the raw image boot a blank board? | State |
 |---|---|---|---|
 | `uefi-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
-| `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, as a QEMU guest | the acceptance path; not a release target yet |
+| `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, where UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` | a release target since 2026-09-16; qualified under QEMU only |
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
-Only `uefi-x64` and `cx3576` are release targets, so only their images exist as
-release assets. There is no A/B partition pair to choose between and no
+`uefi-x64`, `uefi-arm64` and `cx3576` are release targets; `uefi-arm64`
+became one on 2026-09-16, so its product images appear from the next
+`mica-build` round on. `s905x5m` is not. There is no A/B partition pair to choose between and no
 conversion from an older layout: a write is a full write.
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
@@ -145,10 +146,12 @@ Boot governs who may load the kernel, not whether the root is verified.
 
 ## 4. QEMU: uefi-x64 and uefi-arm64
 
-This is the path that is actually run. All of `uefi-arm64`'s evidence is
-QEMU, and it is not a release target yet: making it the generic arm64 system,
-with a driver set beyond virtio, is
-`docs/task/20260916-0040-uefi-board-names.md`.
+This is the path that is actually run, and for `uefi-arm64` it is the only
+path with evidence behind it. Since 2026-09-16 that board is a release target
+and its kernel carries generic hardware drivers — AHCI, NVMe, USB storage over
+xHCI and EHCI, and the common NICs as modules — but **carrying a driver is not
+evidence that a machine boots**: the qualification is QEMU `virt` only, as it
+is for `uefi-x64` ([dossier](../boards/uefi-arm64.md)).
 
 Firmware files, as the acceptance lab uses them:
 
@@ -184,12 +187,15 @@ uefi-x64 is the same line with `qemu-system-x86_64 -machine q35` and the OVMF
 files. Append `,readonly=on` to the `-drive if=none,id=disk0,…` value to boot
 the image read-only. The guest writes to `disk.img`, so copy it first.
 
-The devices are not free choices on `uefi-arm64`: after the kernel trim the
-guest has no SCSI, SATA, NVMe, MMC, USB or virtio-scsi driver at all, so the
-disk must be `virtio-blk-pci` and the network `virtio-net-pci`; the console is
-PL011 (`console=ttyAMA0,115200n8`), the watchdog the built-in i6300esb, the
-RTC PL031, and ACPI button is on so a host-requested graceful powerdown
-reaches the guest.
+What the guest must provide on `uefi-arm64`: the console is PL011
+(`console=ttyAMA0,115200n8`) and there is no other, the watchdog is the
+built-in i6300esb, the RTC is PL031 or EFI, and ACPI button is on so a
+host-requested graceful powerdown reaches the guest. `virtio-blk-pci` and
+`virtio-net-pci` are what the suite uses; since 2026-09-16 the kernel also
+drives AHCI, NVMe, USB storage and the common NICs, so another disk or network
+model boots in principle — untested, like every non-virtio path here. There is
+no MMC driver at all, on purpose: a machine that boots from a platform MMC
+controller is a hardware board of its own.
 
 An offline update medium is handed in over 9p:
 

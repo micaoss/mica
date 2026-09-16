@@ -53,11 +53,12 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 | 板卡 | 固件形态 | 裸镜像能启动一块空板吗？ | 状态 |
 |---|---|---|---|
 | `uefi-x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI` | 仅在 QEMU 下合格 |
-| `uefi-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，作为 QEMU guest | 验收路径；暂未成为发布目标 |
+| `uefi-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，只要带 ACPI 的 UEFI 启动 `EFI/BOOT/BOOTAA64.EFI` | 自 2026-09-16 起是发布目标；仅在 QEMU 下合格 |
 | `cx3576` | `rockchip-loader` | 能——U-Boot 就写在镜像的第 64 扇区 | 未在实机上验证 |
 | `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在镜像之外 | 没有受支持的路径 |
 
-只有 `uefi-x64` 和 `cx3576` 是发布目标，所以只有它们的镜像作为发布资产存在。没有可选的
+`uefi-x64`、`uefi-arm64` 和 `cx3576` 是发布目标；`uefi-arm64` 自 2026-09-16 起成为
+发布目标，它的产品镜像从 `mica-build` 的下一轮开始出现。`s905x5m` 不是。没有可选的
 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
@@ -127,9 +128,11 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 
 ## 4. QEMU：uefi-x64 与 uefi-arm64
 
-这是真正跑起来的那条路。`uefi-arm64` 目前的全部证据都来自 QEMU，它还不是发布目标；
-把它做成带 virtio 之外驱动集的通用 arm64 系统，是
-`docs/task/20260916-0040-uefi-board-names.md` 的工作。
+这是真正跑起来的那条路；对 `uefi-arm64` 而言，它也是唯一有证据支撑的路径。自
+2026-09-16 起该板卡是发布目标，其内核携带通用硬件驱动——AHCI、NVMe、经 xHCI 与 EHCI
+的 USB 存储，以及作为模块的常见网卡——但**携带驱动不等于有证据证明某台机器能启动**：
+它的合格范围仍只有 QEMU `virt`，与 `uefi-x64` 相同
+（[板卡档案](../../boards/uefi-arm64.md)）。
 
 验收实验室使用的固件文件：
 
@@ -164,10 +167,12 @@ uefi-x64 是同一条命令行，换成 `qemu-system-x86_64 -machine q35` 和 OV
 `-drive if=none,id=disk0,…` 的值后面加 `,readonly=on` 可以只读启动镜像。guest 会
 写 `disk.img`，所以先复制一份。
 
-在 `uefi-arm64` 上这些设备不是可以随便换的：内核裁剪之后 guest 里根本没有 SCSI、
-SATA、NVMe、MMC、USB 或 virtio-scsi 驱动，所以磁盘必须是 `virtio-blk-pci`、网卡必须
-是 `virtio-net-pci`；控制台是 PL011（`console=ttyAMA0,115200n8`），看门狗是内建的
-i6300esb，RTC 是 PL031，ACPI button 是开的，所以宿主请求的优雅关机能传到 guest。
+`uefi-arm64` 的 guest 必须提供什么：控制台是 PL011（`console=ttyAMA0,115200n8`）
+且没有第二个，看门狗是内建的 i6300esb，RTC 是 PL031 或 EFI，ACPI button 是开的，
+所以宿主请求的优雅关机能传到 guest。套件用的是 `virtio-blk-pci` 和 `virtio-net-pci`；
+自 2026-09-16 起内核还驱动 AHCI、NVMe、USB 存储和常见网卡，所以原则上换别的磁盘或
+网卡型号也能起来——未经测试，和这里每一条非 virtio 路径一样。完全没有 MMC 驱动，
+这是有意的：从平台 MMC 控制器启动的机器属于另一块硬件板，而不是这个镜像。
 
 离线更新介质通过 9p 递进去：
 
