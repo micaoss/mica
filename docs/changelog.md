@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-16 02:40 [progress]
+
+A shell lint, after `mica-podman` reported the wider shape of the pipefail
+defect this repository hit this morning (its `6c63a7a`, three `| head -n1`
+readers; ours was `printf | grep -qxF` in `verify-release-lock.sh`, fixed by
+`3fd60fa`). `tools/docs/shell-lint.sh` holds every script under `tools/` to
+two rules: it sets `set -euo pipefail`, and it has no early-exiting reader on
+the right of a pipe (`head`, `grep -q`, `grep -m`, `sed -n <n>q`, `read`),
+because such a reader lets the still-writing producer die of SIGPIPE and the
+pipeline then fails on good input. `shell-lint-test.sh` proves each refusal
+and that a quoted example is not a finding; both run in `make docs-verify-test`.
+The audit found nothing left to fix: 15 scripts, 30/30, the only earlier
+instance being the one already repaired this morning.
+
 ## 2026-09-16 02:10 [decision]
 
 `PUBLISH` goes with the minimal products (coordinator, accepting `mica-build`'s
