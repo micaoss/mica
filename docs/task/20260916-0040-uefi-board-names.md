@@ -59,3 +59,11 @@ Renaming the generic systems in the records
   spec, `user/overview.md` and `user/releasing.md` and their Chinese versions.
   Open with `mica-build`: whether `PUBLISH=0` still has a user once the
   minimal products are gone.
+- 2026-09-16: process item closed. Records changes now run as one gated
+  sequence, `tools/docs/record.sh` (`2af92fb`, fixture fix `f2154c5`): under
+  `set -euo pipefail` it applies the edit, refuses a named path that did not
+  change, runs `make docs-verify`, stages only the named paths, refuses an
+  attributed message, commits and pushes, rebasing once when another session
+  pushed first. `tools/docs/record-test.sh` proves each refusal in a
+  throw-away clone and runs in `make docs-verify-test` (6/6). There is no
+  hand-assembled chain left to forget.
