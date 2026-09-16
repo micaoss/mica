@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-16 19:05 [spec]
+
+Answered ahead of the question, because it is the spec's to answer: **what
+happens when the committed mirror base changes between two indexes**
+(`docs/design/mica-index.md` section 4). If it changed since the previous
+index, the cut is a **full rebuild**. `mirrors` is derived at the index's own
+commit, so carrying an entry would leave a member derived from the old base
+sitting beside entering entries derived from the new one — the file would
+disagree with itself, and `verify-index --full`, which re-derives every entry
+from the base at that commit, would not reproduce the incremental cut. One
+rule survives instead: every `mirrors` member in an index is derived from the
+base committed at that index's commit. The first index that emits the member
+at all is a full rebuild for the same reason.
+
+The cost is a rebuild on the rare cut where the list moves, which is the
+cheaper half of the trade: the alternative is an index that verifies only if
+the verifier knows which entries were carried and which entered, and that is
+exactly the state the byte-identical rebuild exists to avoid.
+
 ## 2026-09-16 18:50 [spec]
 
 Two corrections, both to text written today.

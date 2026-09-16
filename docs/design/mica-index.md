@@ -157,6 +157,17 @@ measured 1.9 KB per product. Both the member and the threshold are proposals.
   equal a render of that lock.
 - Carried entries are copied without being read again; entering entries are
   fully checked.
+- **If the committed mirror base changed since the previous index, the cut is
+  a full rebuild** *(fixed here, 2026-09-16)*. `mirrors` is derived at the
+  index's commit, so carrying an entry would keep a member derived from the
+  old base beside entering entries derived from the new one: the file would
+  disagree with itself, and `verify-index --full`, which re-derives every
+  entry from the base at that commit, would not reproduce the incremental
+  cut. Rebuilding in full keeps one rule — every `mirrors` member in an index
+  is derived from the base committed at that index's own commit — and costs a
+  rebuild on the rare cut where the list moves. The same holds for the first
+  index that emits the member at all, which is a full rebuild by the same
+  reasoning.
 - A cut is refused for a generation that goes down, conflicting trust for
   one input, two releases of one scope, or a stamp that is not later.
 - Products whose board is not a release target are dropped from `products`
