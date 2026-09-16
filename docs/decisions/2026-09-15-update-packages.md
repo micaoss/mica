@@ -36,7 +36,7 @@ deployment for another product, and catalog heads and the update-server are
 keyed by board, product and channel. There is no minimum running release
 rule. Names, as `mica-core` implements them (`mica-core:docs/task/20260915-0657-update-packages.md`):
 `mica/deployment/v2` replaces v1 with a required `product` (such as
-`x64-dev`); the device's product is the single unquoted `PRODUCT=<name>` line
+`uefi-x64-dev`); the device's product is the single unquoted `PRODUCT=<name>` line
 of the five-line `/usr/lib/mica/product.conf`; `mica/catalog/v2` carries
 channel heads `{board, product, channel, releaseId, generation}`; the
 `MICAUPD1` layout is unchanged, with an object count from 0 to the

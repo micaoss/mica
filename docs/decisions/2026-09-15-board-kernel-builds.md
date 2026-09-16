@@ -6,6 +6,10 @@
 - **review sunset**: 2027-03-15
 - **status**: accepted (user, 2026-09-15); (1) and (5) implemented and released in `mica-boards` `<board>/20260915-1926` (`12564a3`); (3) done (`virt-arm64` trimmed to 71 modules, with `kernel/config/virt-arm64.required` holding `mica-build`'s 83 symbols); (2) enabled at `mica-boards` `94e1dc4`; (4) not now
 
+> Board names: `x64` and `virt-arm64` became `uefi-x64` and `uefi-arm64` on
+> 2026-09-16 (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).
+> This record keeps the names it was written with.
+
 ## Decision
 
 `mica-boards`' kernel and U-Boot builds are made faster in this order (user,

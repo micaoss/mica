@@ -9,7 +9,9 @@
 ## Decision
 
 **s905x5m is not a release target** for now: `BOARD_RELEASE_TARGET=0` stays
-in `mica-boards`. The release-target boards are `x64` and `cx3576`.
+in `mica-boards`. The release-target boards are `uefi-x64` and `cx3576`
+(named `x64` until 2026-09-16,
+`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).
 
 **Compressed images** (user correction, 2026-09-15: "git不要发布img
 发布gzip压缩版"; gzip replaces the zstd first decided; `mica-build`'s form B
@@ -33,7 +35,7 @@ threshold.
   `.kernel.micaupd`).
 - The raw signed image is still built, gated and verified.
 
-**Prod products.** `x64-prod` and `cx3576-prod` are added, so releases carry
+**Prod products.** `uefi-x64-prod` and `cx3576-prod` are added, so releases carry
 `<board>-dev` and `<board>-prod`; the `<board>-minimal` products stay for
 local builds and CI and are never released
 (`docs/decisions/2026-09-15-minimal-products-not-released.md`). The prod

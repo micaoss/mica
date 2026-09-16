@@ -6,6 +6,10 @@
 - **review sunset**: 2027-03-15
 - **status**: accepted (user, 2026-09-15: "接受"); implemented: R1 and R2 in `mica-core` `20260915-1135` (`610782c`) and `mica-build` `fe3ad07`, K1, K2 and the release guard in `mica-build` `7d18da6`; builds at two commits and after rebuilt tool images give identical root and kernel ids, so `root`-only and `kernel`-only update archives are published from the next scoped releases on
 
+> Board names: `x64` and `virt-arm64` became `uefi-x64` and `uefi-arm64` on
+> 2026-09-16 (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).
+> This record keeps the names it was written with.
+
 ## Findings
 
 Measured by `mica-build`: `x64-minimal` roots are reproducible across

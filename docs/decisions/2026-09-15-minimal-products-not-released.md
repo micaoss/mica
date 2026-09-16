@@ -22,10 +22,10 @@ correction, 2026-09-15, replacing their removal):
   `release.sh plan` and the release product matrix skip such products, a
   release scope holding only them is refused, and a test covers both.
 - CI's release-products job, the rehearsal of the release path, publishes
-  nothing; it rehearses on the prod products `x64-prod` and `cx3576-prod`.
+  nothing; it rehearses on the prod products `uefi-x64-prod` and `cx3576-prod`.
 - The published releases `x64/20260915-1458` and `cx3576/20260915-1515`
   stay as they are, with their minimal assets. The next scoped releases
-  carry `<board>-dev` and `<board>-prod` only (`x64-dev`, `x64-prod`,
+  carry `<board>-dev` and `<board>-prod` only (`uefi-x64-dev`, `uefi-x64-prod`,
   `cx3576-dev`, `cx3576-prod`), and the new prod products start at
   generation 2.
 

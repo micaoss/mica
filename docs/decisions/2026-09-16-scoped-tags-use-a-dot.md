@@ -26,8 +26,12 @@ than a git tag and keeps its slash (`docs/design/mica-index.md` 3.1).
 
 ## Rationale
 
-- Git accepts the dot form: `git check-ref-format` passes `x64.`, `virt-arm64.`,
-  `x64-dev.` and `mica.` prefixed tag names.
+- Git accepts the dot form: `git check-ref-format` passes `x64.`,
+  `virt-arm64.`, `x64-dev.` and `mica.` prefixed tag names — the names checked
+  on the morning of 2026-09-16, before the boards were renamed to `uefi-x64`
+  and `uefi-arm64` the same day
+  (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`); the form
+  is the same for the new names.
 - A board or product name is `^[a-z0-9][a-z0-9-]*$` in both repositories, so it
   never contains a dot: "everything before the first dot is the scope" is
   unambiguous, and the release stamp carries no dot either.

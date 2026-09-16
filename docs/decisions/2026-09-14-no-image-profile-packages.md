@@ -6,6 +6,10 @@
 - **review sunset**: 2027-03-14
 - **status**: accepted (user, 2026-09-14); packages and reader removed; the `mica.profile` carrier decided, its writer implemented on `mica-build` branch `released-inputs` (`edafed96`, not merged), no reader yet; the allowed effects decided (user, 2026-09-14), none implemented yet
 
+> Board names: `x64` and `virt-arm64` became `uefi-x64` and `uefi-arm64` on
+> 2026-09-16 (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).
+> This record keeps the names it was written with.
+
 ## Decision
 
 `mica-profile-dev` and `mica-profile-prod` are removed from

@@ -10,7 +10,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 - [板卡状态表](../boards/support-tiers.md#current-boards) — 各板卡的构建、验收与支持层级
 - `user/` — 用户文档（覆盖全部 21 篇，含文档契约本身）
   - [`overview.md`](user/overview.md) — 一页读懂：七个仓库、发布链、产品与文件位置
-  - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 x64 基线
+  - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 uefi-x64 基线
   - [`download.md`](user/download.md) — 发布版组成与镜像获取
   - [`install.md`](user/install.md) — 安装的操作顺序：从选镜像到首次启动
   - [`build.md`](user/build.md) — 从源码构建：在线按固定 release，离线按并排检出

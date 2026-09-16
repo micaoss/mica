@@ -6,6 +6,10 @@
 - **review sunset**: 2027-03-15
 - **status**: superseded the same day, before implementation, by `docs/decisions/2026-09-15-minimal-products-not-released.md` (user correction: the minimal products stay for local builds and CI and are never released); this record keeps the replaced removal
 
+> Board names: `x64` and `virt-arm64` became `uefi-x64` and `uefi-arm64` on
+> 2026-09-16 (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).
+> This record keeps the names it was written with.
+
 ## Decision
 
 The minimal products are removed entirely, with no compatibility (user,
