@@ -158,6 +158,10 @@ work in progress lives in `plan/` and `task/`.
 
 `make docs-verify` checks catalog membership in both directions, internal
 links, truth-status evidence, board dossiers, Chinese coverage and the
-release-lock vectors. Add or remove a catalog row in the same change as its
+release-lock vectors. A records change runs as one gated sequence,
+`bash tools/docs/record.sh --edit <script> --message <file> -- <path>...`:
+it applies the edit, refuses a named path that did not change, runs the gate,
+stages only the named paths, commits and pushes, so a commit can neither
+skip the gate nor claim an edit that did not land. Add or remove a catalog row in the same change as its
 document. `plan/` and `task/` are development records: nothing checks them and
 nothing publishes them.
