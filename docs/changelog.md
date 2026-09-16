@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-16 00:45 [decision]
+
+The generic systems are named by their firmware class: `x64` becomes
+`uefi-x64` and `virt-arm64` becomes `uefi-arm64`; the hardware boards keep
+their names (user, 2026-09-16,
+`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`,
+`docs/task/20260916-0040-uefi-board-names.md`). The rename is folded into the
+dot tag cut-over, so `mica-boards` cuts `uefi-x64.<stamp>`,
+`uefi-arm64.<stamp>`, `cx3576.<stamp>` and `s905x5m.<stamp>` in one cycle and
+`mica-build` renames its products, re-pins and cuts its scoped releases with
+the final names. Board directories, packages, pins, scopes and image file
+names follow; every identity (partition GUIDs, ESP volume ids, disk GUIDs)
+stays, so these are the same boards under new names. `uefi-arm64` also becomes
+the generic UEFI/ACPI arm64 system and a release target with a driver set
+beyond virtio, which `mica-boards` proposes and has not implemented yet. The
+renamed products are new products and start at generation 2. Tags, products
+and image files published before today keep their old names as history.
+
 ## 2026-09-16 00:20 [decision]
 
 Scoped release tags separate the scope with a dot: `x64.20260915-2230` instead
