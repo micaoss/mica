@@ -1,0 +1,6 @@
+# The generic systems were renamed by firmware class on 2026-09-16
+# (mica: docs/decisions/2026-09-16-generic-systems-named-by-firmware.md).
+/download/x64/          /download/uefi-x64/          301
+/download/virt-arm64/   /download/uefi-arm64/        301
+/en/download/x64/       /en/download/uefi-x64/       301
+/en/download/virt-arm64/ /en/download/uefi-arm64/    301

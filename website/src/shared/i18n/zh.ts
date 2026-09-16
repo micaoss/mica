@@ -80,8 +80,8 @@ export const zh = {
     heading: '支持的板卡',
     cols: { board: '板卡', hw: '硬件', status: '状态' },
     rows: [
-      { board: 'x64', hw: '通用 x86_64，UEFI', status: 'bring-up，已在 QEMU 验证' },
-      { board: 'virt-arm64', hw: 'QEMU ARM64，UEFI', status: 'bring-up，QEMU 参考' },
+      { board: 'uefi-x64', hw: '通用 amd64 系统，UEFI', status: 'bring-up，QEMU 基线' },
+      { board: 'uefi-arm64', hw: '通用 arm64 系统，UEFI', status: 'bring-up，QEMU 参考' },
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'bring-up，镜像可构建，实机测试待做' },
       { board: 's905x5m', hw: 'Amlogic S7D（BM201）', status: 'bring-up，镜像可构建，实机测试待做' },
     ],

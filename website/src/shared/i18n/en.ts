@@ -70,8 +70,8 @@ export const en: typeof zh = {
     heading: 'Supported boards',
     cols: { board: 'Board', hw: 'Hardware', status: 'Status' },
     rows: [
-      { board: 'x64', hw: 'Generic x86_64, UEFI', status: 'Bring-up, validated in QEMU' },
-      { board: 'virt-arm64', hw: 'QEMU ARM64, UEFI', status: 'Bring-up, QEMU reference' },
+      { board: 'uefi-x64', hw: 'Generic amd64 system, UEFI', status: 'Bring-up, QEMU baseline' },
+      { board: 'uefi-arm64', hw: 'Generic arm64 system, UEFI', status: 'Bring-up, QEMU reference' },
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'Bring-up, image builds, physical tests pending' },
       { board: 's905x5m', hw: 'Amlogic S7D (BM201)', status: 'Bring-up, image builds, physical tests pending' },
     ],

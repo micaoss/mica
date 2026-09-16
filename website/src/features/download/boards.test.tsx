@@ -9,9 +9,9 @@ describe('per-board guides', () => {
   })
 
   it('resolves a documentation slug against the locale', () => {
-    const [first] = boardGuides(zh, 'zh', 'x64')
+    const [first] = boardGuides(zh, 'zh', 'uefi-x64')
     expect(first.href).toBe('/docs/user/install/')
-    expect(boardGuides(en, 'en', 'x64')[0].href).toBe('/en/docs/user/install/')
+    expect(boardGuides(en, 'en', 'uefi-x64')[0].href).toBe('/en/docs/user/install/')
   })
 
   it('keeps an external target as given', () => {

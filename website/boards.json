@@ -2,7 +2,7 @@
   "$comment": "Per-board configuration for the download pages. `guides` is the list of documents a board's page links to, in order. `id` selects the wording from `download.guides` in the dictionaries; `doc` is a published documentation slug under /docs/, and `url` is an external target for records this site does not publish. A board here must exist in `boards.rows` of both dictionaries.",
   "boards": [
     {
-      "board": "x64",
+      "board": "uefi-x64",
       "guides": [
         { "id": "install", "doc": "user/install" },
         { "id": "flashing", "doc": "user/flashing" },
@@ -12,13 +12,13 @@
       ]
     },
     {
-      "board": "virt-arm64",
+      "board": "uefi-arm64",
       "guides": [
         { "id": "quickstart", "doc": "user/quickstart" },
         { "id": "install", "doc": "user/install" },
         { "id": "flashing", "doc": "user/flashing" },
         { "id": "update", "doc": "user/update-rollback" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/virt-arm64.md" }
+        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/uefi-arm64.md" }
       ]
     },
     {

@@ -3806,3 +3806,33 @@ Five user pages stay unpublished, and the reason differs:
 `docs/user/doc-contract.md` §2's information architecture does not list any of the five
 either, so the contract is behind the document set it governs. That is worth reconciling
 upstream before the site decides anything.
+
+## 2026-09-16 09:05 [progress]
+
+A careful pass over the download section, prompted by two stale-list bugs, found a third
+that was minutes from shipping an empty catalogue.
+
+**The release stamp moved form under the parser.** `mica-build`'s scoped tags became
+`uefi-x64.20260916-0845` (`2026-09-16-scoped-tags-use-a-dot`), and `stamp()` split on the
+slash of the earlier `cx3576/20260915-2230`. Every product of the new index parsed to no date
+and was dropped: probed against `mica.20260916-0854`, the parser returned zero rows. The live
+catalogue still held the 08:30 copy; the 09:00 cron would have overwritten it with nothing.
+The fix deployed at 08:59:30. The stamp is now matched as a trailing `YYYYMMDD-HHMM`, which
+reads both forms.
+
+Two guards came with it. A refresh that parses to nothing while a non-empty catalogue is
+stored keeps what is stored and fails, since an index that names products and yields no rows
+is the parser's fault, not a mass unpublish. And a failed manual refresh answers 502; it
+answered 200 with an error body, which a caller would read as success.
+
+**The generic systems were renamed** (`2026-09-16-generic-systems-named-by-firmware`, accepted):
+`x64` is `uefi-x64` and `virt-arm64` is `uefi-arm64`, and `uefi-arm64` is now a release
+target. The site's board list, `boards.json` and the dossier link follow `support-tiers.md`;
+`/download/x64/` and `/download/virt-arm64/` redirect permanently, in both locales, because
+those URLs were already in use.
+
+**Two more identity collisions.** The table keys rows on their href since the last fix, but
+the Worker's sample rows all shared one href and so did the test fixtures — the sample would
+have reproduced the stale-list bug the moment `CATALOG_DEMO` was set, and most rendering tests
+had been running under duplicate keys. Each now carries its own, and the sample's update rows
+say which archive they are.
