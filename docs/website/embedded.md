@@ -65,7 +65,7 @@ component objects; DATA holds state, configuration, applications and a bounded
 variable-data tier. Only DATA grows to fill the medium, and the OS never
 assumes it can grow SYSTEM or firmware.
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/cx3576/board.env`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `docs/design/storage.md`
 
 ### Field recovery
 
@@ -91,8 +91,8 @@ an operator can perform; the two named below are not.**
 **Two rungs of that ladder cannot be climbed on any board that exists.**
 Credential recovery and the full factory reset are gated on a physical-presence
 assertion. The OS side that produces one from a board-declared physical action
-ships; **no board declares such an action** — not cx3576, not x64, not
-virt-arm64 — so a fielded device refuses both, and an operator who has lost the
+ships; **no board declares such an action** — not cx3576, not uefi-x64, not
+uefi-arm64 — so a fielded device refuses both, and an operator who has lost the
 administrator credential still pays the device's identity for a reflash. Secure
 wipe is not implemented at all, and no reset or reflash sanitizes the medium:
 disposal under an unrecoverability requirement means destroying it. There is

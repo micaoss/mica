@@ -128,7 +128,7 @@ qualification is implied by reset or by complete-image flashing.
 
 ## 8. Acceptance evidence
 
-x64 and virt-arm64 QEMU cover signed startup, health confirmation, exhausted
+uefi-x64 and uefi-arm64 QEMU cover signed startup, health confirmation, exhausted
 trials, panic/watchdog fallback and complete shutdown. Interrupted-reset tests
 kill the real reset applier after a successful deletion, then verify retry,
 scope preservation and a further idempotent boot for each tier.

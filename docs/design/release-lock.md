@@ -71,7 +71,7 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 
 | Kind | Columns | Key | Meaning |
 |---|---|---|---|
-| `release` | `release <repository> <release> <commit>` | -- | exactly once, the first row; `<release>` is `<YYYYMMDD-HHMM>`, or `<scope>.<YYYYMMDD-HHMM>` for `mica-boards` and `mica-build` only (1.0), for example `release mica-boards x64.20260915-0300 <commit>`; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` in place of `<YYYYMMDD-HHMM>` (`<scope>.offline` for a scoped repository, *fixed here*) |
+| `release` | `release <repository> <release> <commit>` | -- | exactly once, the first row; `<release>` is `<YYYYMMDD-HHMM>`, or `<scope>.<YYYYMMDD-HHMM>` for `mica-boards` and `mica-build` only (1.0), for example `release mica-boards uefi-x64.20260915-0300 <commit>`; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` in place of `<YYYYMMDD-HHMM>` (`<scope>.offline` for a scoped repository, *fixed here*) |
 | `image` | `image <source> <name> <platform> <reference>` | source, name, platform | `<source>` is the producing repository or `upstream` (1.2.1); `<platform>` is `index`, `amd64`, `arm64` or `386` |
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
@@ -134,7 +134,7 @@ A `mica-build` release lock (user, 2026-09-15,
 `release mica-build <scope>.<YYYYMMDD-HHMM> <commit>` followed by:
 
 - `input <repository>[.<scope>] <release> <sha256>`: each input release, named
-  as its consumer files are (`mica-boards.x64`, `mica-system-base`), with the
+  as its consumer files are (`mica-boards.uefi-x64`, `mica-system-base`), with the
   input's `<YYYYMMDD-HHMM>` and the sha256 of its `SHA256SUMS`; a scope is
   present exactly for `mica-boards` and `mica-build` (`release-scope`);
 - `product <product> <board> <profile> <generation> <deployment id> <kernel id>
@@ -160,7 +160,8 @@ A `mica-build` release lock (user, 2026-09-15,
 A reader checks an asset's `<file>` only for the
 `mica-<product>-<YYYYMMDD-HHMM>.` prefix, not for the `.gz` suffix *(fixed
 here)*: `mica-build` reads the earlier scoped release locks
-`x64.20260915-1458` and `cx3576.20260915-1515`, whose image assets are raw
+`x64/20260915-1458` and `cx3576/20260915-1515` — published under the slash form
+and the old board name, and kept as they are — whose image assets are raw
 `.img`, to compute generations and the `root` and `kernel` conditions.
 
 Every `bundle` and `asset` names a product with a `product` row
@@ -376,8 +377,8 @@ repository it reads (user, 2026-09-14), and per scope for a scoped repository
   are the user's;
 - for a scoped input, `locks/<repository>.<scope>.lock` and
   `locks/pins/<repository>.<scope>.pin`, one pair per board or product the
-  consumer reads (`locks/mica-boards.x64.lock`,
-  `locks/pins/mica-boards.x64.pin`).
+  consumer reads (`locks/mica-boards.uefi-x64.lock`,
+  `locks/pins/mica-boards.uefi-x64.pin`).
 
 A pin file is, in this order and nothing else:
 
@@ -394,7 +395,7 @@ A scoped pin has one more line after `REPOSITORY`, `SCOPE=<scope>`, and its
 ```text
 # mica-pin v1
 REPOSITORY=mica-boards
-SCOPE=x64
+SCOPE=uefi-x64
 RELEASE=20260915-0300
 SHA256SUMS=<sha256 of that release's SHA256SUMS>
 ```
@@ -560,12 +561,12 @@ The vectors are files every repository copies into its own tests:
   `upstream` rows with the original names and index-digest references and a
   `386` row), `mica-core.lock`
   (`pool`, `package`),
-  `mica-boards.x64.lock` (a scoped release row, `pool.<board>.<arch>` tags,
+  `mica-boards.uefi-x64.lock` (a scoped release row, `pool.<board>.<arch>` tags,
   `board` rows for the `board`, `firmware` and `kernel` components, an `all`
   package),
   `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, `apt`, a
   comment), `offline-mica-core.lock` (an offline lock with `local/`
-  references), `mica-build.x64.lock` (a scoped `mica-build` lock: `input`,
+  references), `mica-build.uefi-x64.lock` (a scoped `mica-build` lock: `input`,
   `product`, `bundle`, `asset` rows, a `root` update beside `full`),
   `mica-build.mica.lock` (an index lock over two scoped releases).
 - `lock/refused/`: one lock per refusal rule of 1.5, each a minimal edit of a

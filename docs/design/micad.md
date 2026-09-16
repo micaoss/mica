@@ -363,7 +363,7 @@ What this document owns is the boundary:
 ### 2.5 Verification status
 
 Rust workspace checks cover the settings store, reconcilers and bus surface.
-Complete-image tests on x64 and virt-arm64 cover the native deployment service,
+Complete-image tests on uefi-x64 and uefi-arm64 cover the native deployment service,
 component updates, quota enforcement, health confirmation and fallback, and
 the API suite runs against the QEMU guest. Physical-board acceptance is tracked
 per board in [support tiers](../boards/support-tiers.md#current-boards).

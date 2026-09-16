@@ -66,7 +66,7 @@ direct `docker run --platform linux/arm64` can execute on the daemon host.
 BuildKit's emulator and host binfmt registration are separate facilities.
 
 Use the native pinned Rust builder's `aarch64-linux-gnu-gcc` for cross C test
-helpers on an x64 host. The C-only builder is native-only. Use QEMU full-system
+helpers on an x86-64 host. The C-only builder is native-only. Use QEMU full-system
 acceptance for the target kernel and service behavior. A qemu-user smoke
 limitation, such as crun execution, is reported explicitly and does not become
 a skipped full-system requirement.
@@ -132,8 +132,8 @@ Each acceptance round uses one immutable candidate image:
    update/fallback, reset, storage, services and authenticated API behaviour.
    Bind each verdict to its source and artifact; keep the original image.
 
-Generic development iterates on x64. An ARM-specific source change requires a
-targeted ARM check; a consolidated ARM round follows a stable x64 baseline.
+Generic development iterates on x86-64. An ARM-specific source change requires a
+targeted ARM check; a consolidated ARM round follows a stable x86-64 baseline.
 
 ### Changes and invalidation
 

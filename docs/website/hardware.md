@@ -49,19 +49,19 @@ regenerates from the dossiers per the [content contract](contract.md).
 | Board | Architecture | Level | Evidence dossier |
 |-------|--------------|-------|------------------|
 | CX3576-Z (Rockchip RK3576) | arm64 | bring-up | [../boards/cx3576.md](../boards/cx3576.md) |
-| Generic UEFI x86_64 | x86_64 | bring-up (QEMU/CI baseline) | `boards/x64/board.env` |
+| Generic UEFI x86_64 | x86_64 | bring-up (QEMU/CI baseline) | `boards/uefi-x64/board.env` |
 
 The CX3576-Z has a full in-repository BSP — vendor kernel tree with recorded
 provenance, mainline U-Boot, Wi-Fi and Bluetooth — and is the board the
-U-Boot A/B boot-order handshake is built for. The x64 board is the QEMU and
+U-Boot A/B boot-order handshake is built for. The uefi-x64 board is the QEMU and
 CI baseline: firmware boots it, so it has no BSP build.
 
 > status: shipped — evidence: `mica-boards:boards/cx3576/board.env`, `docs/boards/cx3576-bsp-sync.md`
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`
 
 Neither board carries a completed field-reliability qualification matrix — the
 cx3576 dossier holds the matrix with every row at `not tested`, and the
-x64 baseline has no dossier at all — so neither is presented as mica-qualified.
+uefi-x64 baseline has no dossier at all — so neither is presented as mica-qualified.
 
 > status: board-dependent — evidence: `docs/boards/cx3576.md`
 

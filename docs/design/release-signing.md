@@ -11,7 +11,7 @@ mappings. No earlier update format or mutable command-line trust input is read.
 |---|---|---|
 | UKI/FIT | Kernel, initramfs, fixed policy, and DTB where applicable | UEFI or the required-signature U-Boot control FDT |
 | Root/support image | PKCS#7 signature over the root hash; signed metadata binds full geometry, hash, length and signature bytes | Kernel dm-verity and native metadata verifier |
-| Deployment | `mica/deployment/v2` (replaces v1), product/board/arch/generation/version and complete kernel/root identities; the signed `product` field (such as `x64-dev`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
+| Deployment | `mica/deployment/v2` (replaces v1), product/board/arch/generation/version and complete kernel/root identities; the signed `product` field (such as `uefi-x64-dev`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
 | Catalog | `mica/catalog/v2` (replaces v1), revision, validity interval, deployment associations and channel heads `{board, product, channel, releaseId, generation}` keyed by board, product and channel | Acquisition client |
 | Firmware | `mica/firmware/v1`, board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
 

@@ -706,7 +706,7 @@ differs between dev and prod.
   means prod. The result is logged and never refuses boot. It is not a
   setting, is never persisted or seeded, and is shown read-only in
   `system_info`.
-- The command line is enforced on x64 and virt-arm64 only with UEFI Secure
+- The command line is enforced on uefi-x64 and uefi-arm64 only with UEFI Secure
   Boot on and the boot certificate enrolled (the QEMU lab boards run without
   it). On cx3576 and s905x5m it is enforced on the boot path (a required
   signed FIT configuration, no legacy images or `booti`, a kernel that forces
@@ -965,7 +965,7 @@ path instead.
 board.** The gate is one seam keyed by the board capability
 `recovery.presence`, and the system side that writes the assertion ships too —
 micad maps a board-declared physical action into one at boot. What is missing is
-the board half: **cx3576, x64 and virt-arm64 all declare
+the board half: **cx3576, uefi-x64 and uefi-arm64 all declare
 `BOARD_RECOVERY_ACTIONS` empty**, so no fielded device can produce an assertion
 and **field credential recovery is unsupported** —
 `docs/design/recovery.md` section 4 names that missing half and section 8

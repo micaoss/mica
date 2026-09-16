@@ -192,7 +192,7 @@ cannot be tested against is a claim nobody has verified.
 Every list is capped at 32 entries. A negative `bootstatus` (a driver error)
 is not a bitmask and is reported absent.
 
-**Open validation item.** What these adapters report on the cx3576 and x64
+**Open validation item.** What these adapters report on the cx3576 and uefi-x64
 boards has not been validated on hardware by this subtask; the fixture tests
 prove the parsing and the absence rules, not the boards. The record of that
 validation belongs to section 10.
@@ -433,7 +433,7 @@ retention values shown by the listing and the system-information read; preserve
 the failing device state for a support-directed next step.
 
 Reset reason, temperature and watchdog data are hardware-dependent. Fixture
-tests validate parsing and absence semantics, but the cx3576 and x64 physical
+tests validate parsing and absence semantics, but the cx3576 and uefi-x64 physical
 boards have not been validated. An unavailable or implausible
 `boot.reset`, `telemetry.thermal` or `telemetry.watchdog` result must therefore
 be escalated with the board identity and snapshot; it must not be marked

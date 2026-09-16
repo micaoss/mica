@@ -78,7 +78,7 @@ flow, outside ordinary OS updates.
 Automatic policy uses the device's configured schedule, maintenance window and
 reboot policy. Reboot gating prevents an unrelated reboot from discarding an
 unsettled update; override is explicit and audited. Native contract, policy and
-API tests exist, with x64 and virt-arm64 guest evidence; physical board
+API tests exist, with uefi-x64 and uefi-arm64 guest evidence; physical board
 evidence is tracked in [support tiers](../boards/support-tiers.md#current-boards).
 See [updates](updates.md) for exact routes and failure semantics.
 

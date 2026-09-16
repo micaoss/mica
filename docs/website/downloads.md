@@ -2,7 +2,7 @@
 
 The downloads page selects an exact board, profile and signed deployment, then
 shows the complete factory image and its independent component/update artifacts.
-The current targets are x64, virt-arm64 and cx3576. No public download list is
+The current targets are uefi-x64, uefi-arm64 and cx3576. No public download list is
 published by this repository; source builds remain the documented route.
 
 ## Artifact facts

@@ -74,7 +74,7 @@ development provenance, not measured firmware enforcement. See
 
 ## 4. Boundary (c): boot-chain authenticity — board-specific evidence
 
-On x64 and virt-arm64, the signed systemd-boot manager chooses counted entries
+On uefi-x64 and uefi-arm64, the signed systemd-boot manager chooses counted entries
 and firmware authenticates UKIs under enrolled Secure Boot anchors. Failure to
 persist an attempt refuses launch. On cx3576, fixed C firmware policy requires
 signed FIT configurations, disables persistent command import, arms its watchdog

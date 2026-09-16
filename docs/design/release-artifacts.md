@@ -26,7 +26,7 @@ Keep the reviewed source snapshot with any such development artifact.
 
 The current repository provides development signing inputs and virtual/software
 evidence. Passing the directory gate does not promote a board's qualification.
-Only boards with `BOARD_RELEASE_TARGET=1` have a publication command. `virt-arm64`
+Only boards with `BOARD_RELEASE_TARGET=1` have a publication command. `uefi-arm64`
 remains an architecture acceptance target; its complete test images use the same
 component/image producers without claiming a product release.
 
@@ -77,7 +77,7 @@ of the component build records are required alongside this gate.
 
 ```bash
 bash build/run.sh --release assemble \
-  --board x64 --version 1.0.0-dev --channel development --profile dev \
+  --board uefi-x64 --version 1.0.0-dev --channel development --profile dev \
   --image /absolute/build/image/mica-x64-20260909-164233.img \
   --update /absolute/build/update.micaupd \
   --firmware /absolute/build/firmware \
@@ -110,8 +110,8 @@ OCI layer also records as `mica.uncompressed-sha256` and
 `cx3576/20260915-2042`: about 82.9 MB from 1881145344 bytes on `x64`, 86.5 MB
 from 1362100224 on `cx3576`); update archives stay uncompressed (those
 releases carry `full` archives for every product and `kernel` archives for
-`x64-dev` and `cx3576-dev`), and the raw image is still built, gated and verified; releases carry `<board>-dev` and
-`<board>-prod` (`x64-prod`, `cx3576-prod`) and never the `<board>-minimal`
+`x64-dev` and `cx3576-dev`, the product names of that release), and the raw image is still built, gated and verified; releases carry `<board>-dev` and
+`<board>-prod` (`uefi-x64-prod`, `cx3576-prod`) and never the `<board>-minimal`
 products, which are built locally and in CI only (the minimal assets of
 `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are,
 `docs/decisions/2026-09-15-minimal-products-not-released.md`), and `s905x5m`
@@ -190,7 +190,7 @@ and prose; the authenticated update/firmware checks do not authenticate arbitrar
 image bytes or notes. Use the independent current image verifier before flashing:
 
 ```bash
-bash verify/run.sh --verify --board x64 \
+bash verify/run.sh --verify --board uefi-x64 \
   --image /absolute/new-release-directory/mica-x64-20260909-164233.img \
   --public-key /absolute/metadata.pub
 ```

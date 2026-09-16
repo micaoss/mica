@@ -32,7 +32,7 @@ library, `bindgen`, `libdevmapper`, or a workspace-wide lint waiver.
 
 - Each unsafe block documents the Linux ABI, initialization, borrowing and
   lifetime, and what the kernel writes.
-- x64 and aarch64 request-number and layout assertions, plus harmless errno and
+- x86-64 and aarch64 request-number and layout assertions, plus harmless errno and
   descriptor tests, are required.
 - Buffers are initialized and aligned; UAPI version, size, flag, count and
   offset checks, NUL termination and bounded response growth are mandatory.

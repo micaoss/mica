@@ -86,7 +86,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
 
 ## 3. Storage and boot
 
-Current images contain ESP/SYSTEM/DATA on x64 and virt-arm64, or
+Current images contain ESP/SYSTEM/DATA on uefi-x64 and uefi-arm64, or
 FIRMWARE/SYSTEM/DATA on cx3576. SYSTEM owns immutable root/support objects and
 signed deployment records. DATA owns persistent state, metadata, applications,
 user data and bounded disposable namespaces. Only DATA grows.
@@ -178,7 +178,7 @@ Product documentation lives here, module documentation lives with the module
 
 ## 7. Boards
 
-The current boards are `x64` and `virt-arm64` (UEFI, signed UKI) and `cx3576`
+The current boards are `uefi-x64` and `uefi-arm64` (UEFI, signed UKI) and `cx3576`
 and `s905x5m` (U-Boot, signed FIT). Their build, acceptance and support tier
 are kept in one table: [support tiers](boards/support-tiers.md#current-boards).
 

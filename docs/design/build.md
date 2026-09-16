@@ -67,7 +67,7 @@ bundle (`board.pkgs`, `radio-<r>.pkgs`, `component-<c>.pkgs`);
 `FEATURES=""` is the minimal image, and every board has a `<board>-minimal`
 product (built locally and in CI, never released: `PUBLISH=0` in its
 `product.env`) and a `<board>-dev`
-product; the release-target boards `x64` and `cx3576` also have a
+product; the release-target boards `uefi-x64` and `cx3576` also have a
 `<board>-prod` product, and a scoped release carries only the dev and prod
 products (`docs/decisions/2026-09-15-minimal-products-not-released.md`). The root carries what it is: `/usr/lib/mica/product.conf`, five lines
 `PRODUCT=`, `BOARD=`, `PROFILE=`, and the quoted `FEATURES=` and
@@ -235,12 +235,12 @@ writes `SHA256SUMS` beside it, and prints the full image path. Use that actual
 filename in verification and release commands; the timestamps below are examples.
 
 ```sh
-bash build/run.sh --components image --board x64 \
+bash build/run.sh --components image --board uefi-x64 \
   --records /path/to/factory-records.json \
   --public-key BASE64_ED25519_PUBLIC_KEY \
   --firmware /path/to/firmware-package --out /path/to/new-image
 
-bash verify/run.sh --verify --board x64 \
+bash verify/run.sh --verify --board uefi-x64 \
   --image /path/to/new-image/mica-x64-20260909-164233.img --public-key /path/to/public.key
 ```
 
@@ -250,7 +250,7 @@ always uses the current layout; there is no update-from-old-layout path.
 
 ## 4. Architectures
 
-x64 and virt-arm64 share the UEFI component contract. Their architecture changes
+uefi-x64 and uefi-arm64 share the UEFI component contract. Their architecture changes
 the BSP kernel, native executable, UKI stub and firmware binary. cx3576 uses the
 same root/deployment contracts with a signed FIT and a protected raw firmware
 partition. Its BSP firmware blobs and regulatory database belong to support.
@@ -282,7 +282,7 @@ UEFI/FIT key enforcement; boot tests establish that separately.
 QEMU API acceptance requires a full factory image and the public boot signer:
 
 ```sh
-MICA_PRODUCT=x64-dev bash mica-build:tests/apid-api/run.sh
+MICA_PRODUCT=uefi-x64-dev bash mica-build:tests/apid-api/run.sh
 ```
 
 The product names the board, the image (`_out/products/<name>/image/`) and
