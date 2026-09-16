@@ -80,6 +80,19 @@ A product absent from `products` is absent on purpose: the catalogue lists it wi
 `publish: false`, which is how the `-minimal` products stay off the site. An archive kind the
 parser does not know is skipped rather than shown as a plain update.
 
+### Checking the live index
+
+`bun run check:index` reads the live `mica-index.json` and fails if a published product
+parses to no downloads, or if a board that is a release target upstream is missing from the
+site's board list. The website workflow runs it hourly and on every push, because
+`mica-build` publishes on its own schedule and nothing there triggers a build here.
+
+It exists because both faults have happened and both passed every unit test: the fixtures
+were written in the shape the parser expected, so they could not notice the release stamp
+changing separator (every product dropped) or `x64` becoming `uefi-x64` (its board page went
+empty). The logic is `src/features/download/index-check.ts`, unit-tested; the script is the
+fetch around it.
+
 ### Setting it up
 
 The KV namespace and the cron are configured. Nothing else is required: a request that finds

@@ -3836,3 +3836,24 @@ the Worker's sample rows all shared one href and so did the test fixtures — th
 have reproduced the stale-list bug the moment `CATALOG_DEMO` was set, and most rendering tests
 had been running under duplicate keys. Each now carries its own, and the sample's update rows
 say which archive they are.
+
+## 2026-09-16 09:20 [progress]
+
+Two follow-ups to the download pass, both agreed with the user.
+
+**The form filter offers only what the board publishes.** It listed image, update and
+firmware for every board, and no release has ever carried firmware, so choosing it could only
+answer an empty table. The options are now derived from the board's rows, in the fixed order.
+
+**The live index is checked, not only the parser.** The three faults of this morning — every
+product dropped when the release stamp changed separator, and two board pages empty after
+the rename — all passed every unit test, because fixtures are written in the shape the parser
+expects and cannot see upstream move. `bun run check:index` reads the live `mica-index.json`
+and fails if any published product parses to no downloads, naming the product, or if a
+release-target board upstream is missing from the site's board list. Reverting the board list
+to `x64` makes it fail with `uefi-x64 is a release target upstream but the site lists no such
+board`, which is the check this morning's rename needed.
+
+It runs in the website workflow on push and on an hourly schedule, because `mica-build`
+publishes on its own clock and nothing there triggers a build in this repository. The full
+lint/test/build job is skipped on the schedule; it has nothing new to check.

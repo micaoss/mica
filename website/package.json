@@ -20,7 +20,8 @@
     "test:coverage": "vitest run --coverage",
     "docs:prepare": "bun run scripts/prepare-docs.ts",
     "dev:stop": "astro dev stop",
-    "dev:logs": "astro dev logs --follow"
+    "dev:logs": "astro dev logs --follow",
+    "check:index": "bun run scripts/check-index.ts"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.1",

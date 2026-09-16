@@ -128,6 +128,13 @@ export function DownloadExplorer({
     [catalogue],
   )
 
+  // Only the forms this board actually publishes: offering "firmware" where no
+  // firmware exists is a filter that can only answer an empty table.
+  const forms = useMemo(
+    () => DOWNLOAD_KINDS.filter(value => catalogue.some(download => download.kind === value)),
+    [catalogue],
+  )
+
   const matching = filterDownloads(catalogue, {
     profile: profile === ALL ? undefined : profile,
     kind: kind === ALL ? undefined : (kind as DownloadKind),
@@ -153,7 +160,7 @@ export function DownloadExplorer({
           allLabel={filters.all}
           value={kind}
           onChange={setKind}
-          options={DOWNLOAD_KINDS.map(value => ({ value, label: kinds[value] }))}
+          options={forms.map(value => ({ value, label: kinds[value] }))}
         />
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">

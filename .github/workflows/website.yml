@@ -13,9 +13,14 @@ on:
       - '.github/workflows/website.yml'
   # Publishing is deliberately manual: run this workflow from the Actions tab.
   workflow_dispatch:
+  # mica-build publishes on its own schedule and a change there triggers nothing
+  # here, so the live index is checked on a clock too.
+  schedule:
+    - cron: '17 * * * *'
 
 jobs:
   checks:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -32,6 +37,27 @@ jobs:
       - run: bun run test
       # The build reads ../docs, so a documentation change rebuilds the site.
       - run: bun run build
+
+  # Reads mica-build's live mica-index.json and fails if the site cannot parse a
+  # published product or does not list a release-target board. Both have
+  # happened, and both passed every unit test because the fixtures predated the
+  # change upstream.
+  index:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run check:index
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     if: github.event_name == 'workflow_dispatch'

@@ -122,6 +122,17 @@ describe('downloadExplorer', () => {
     expect(new Set(first).size).toBe(4)
   })
 
+  it('offers only the forms the board publishes', async () => {
+    const { container } = render(
+      <DownloadExplorer copy={zh} board="x64" downloads={[NEWEST, UPDATE]} />,
+    )
+    const trigger = container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[1]
+    trigger.click()
+
+    const options = (await screen.findAllByRole('option')).map(option => option.textContent)
+    expect(options).toEqual([zh.download.filters.all, zh.download.kinds.image, zh.download.kinds.update])
+  })
+
   it('explains an empty catalogue instead of showing an empty table', () => {
     render(<DownloadExplorer copy={zh} board="x64" downloads={[]} />)
 
