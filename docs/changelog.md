@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-16 07:35 [release]
+
+`mica-build-env` `20260916-0735` at `bf347e2` (`SHA256SUMS` sha256
+`7df0af68761a63c6517b37a739a57ce947da53fbe558aba2646368e53724bf0a`) adds
+`bsp`, the fifth build-env image: Ubuntu 24.04 with gcc 13.3, the aarch64
+cross toolchain on amd64, and the kernel, U-Boot and packer dependencies of
+`mica-boards` (the union of its lists, without `python3-pip`). The Ubuntu
+archive snapshot moves here as the `ubuntu-<suite>` rows of
+`locks/upstream.lock`, read only while `bsp` is built (`bsp/apt-install.sh`
+checks each signed `InRelease` against its pinned sha256), so no consumer
+build reaches an archive; this removes the failure that the
+`snapshot.ubuntu.com` outage of 2026-09-16 caused in `mica-boards`. Compressed
+in the package: `bsp` 516 MB of 2912 MB for the five images. The same release
+fixes 24 early-exiting pipe consumers under `pipefail` (`lib/common.sh` line 1)
+and makes the tests refuse that shape. `mica-boards` pins the image by digest
+and drops `apt-install.sh`, `tools/apt-snapshot.sh` and its `ubuntu-<suite>`
+rows.
+
+It is a breaking update for every consumer — every image moved, because the
+pipefail fix touched inputs shared by `base`, `c`, `go` and `rust`. Consumers
+move in sequence: `mica-boards` with its `uefi` rename round, `mica-podman`
+before it resolves its pinned build closure, then `mica-core`,
+`mica-system-base` and `mica-build`. Both `20260915-0138` and `20260916-0735`
+exist in the package until the consumers have moved. The direction is recorded
+as `docs/decisions/2026-09-16-toolchains-live-in-build-env.md`: with
+`mica-podman`'s pinned build closure, this removes the last consumer-time
+`apt` from the workspace.
+
 ## 2026-09-16 02:40 [progress]
 
 A shell lint, after `mica-podman` reported the wider shape of the pipefail
