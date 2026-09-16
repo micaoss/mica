@@ -66,9 +66,12 @@ direct `docker run --platform linux/arm64` can execute on the daemon host.
 BuildKit's emulator and host binfmt registration are separate facilities.
 
 Nor does it establish the released bytes. An arm64 artefact built under
-emulation on an amd64 station differs from the same artefact built natively on
-an arm64 runner, with every pinned input equal; a local reuse or version guard
-therefore validates the amd64 half only. Before treating an arm64 difference
+emulation on an amd64 station *may* differ from the same artefact built
+natively on an arm64 runner with every pinned input equal — measured on
+2026-09-16, `mica-core`'s Rust pool differs six of six while
+`mica-system-base`'s eight archives and `mica-podman`'s offline build
+reproduce — so a local reuse or version guard is authoritative for the amd64
+half only, whatever the arm64 half shows. Before treating an arm64 difference
 as a changed input, run the control: the same station, the same emulation, the
 previous lock. Two locks giving the same bytes, both unlike the release, is
 emulation (`docs/task/20260916-0900-emulated-arm64-bytes.md`).

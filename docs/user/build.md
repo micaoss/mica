@@ -93,11 +93,12 @@ It builds the repositories in dependency order in throw-away clones of each
 checkout and composes the products from those builds. It is long and needs
 docker.
 
-On an amd64 workstation the arm64 halves are built under emulation, so an
-offline build produces a **working** arm64 root, not the same bytes as the
-published one; the amd64 half does reproduce the release exactly. Only CI,
-which builds each architecture natively, answers whether an arm64 artefact
-still matches its release.
+On an amd64 workstation the arm64 halves are built under emulation. That
+usually reproduces the published bytes — measured for the base packages and
+for the container engine — but not always: `mica-core`'s Rust packages differ
+under emulation while their amd64 builds match exactly. An offline build is a
+**working** system either way; only CI, which builds each architecture
+natively, answers whether an arm64 artefact still matches its release.
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
 

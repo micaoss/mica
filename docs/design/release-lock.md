@@ -508,14 +508,19 @@ keeping its own copy:
   and nothing is fetched.
 
 The cache never adds an input: only a pinned sha256, commit or tree enters a
-build, and an offline build's output is byte-identical to the online one **on
-the same architecture natively**. An arm64 half built under emulation on an
-amd64 station is a working root but not the published bytes (2026-09-16,
-measured by `mica-core`: its amd64 pool reproduced release `20260915-1135`
-six of six, its emulated arm64 pool differed six of six, and the control on
-the previous build-env lock produced the same emulated bytes — so the
-difference is the executor, not an input). Only CI answers the arm64 half,
-because its gate runs the guard over natively built artefacts.
+build, and an offline build's output is byte-identical to the online one.
+Emulation does not by itself break that: on the amd64 station,
+`mica-system-base` reproduced all eight archives of `20260915-1102` on both
+architectures with arm64 built under QEMU, and `mica-podman` compared a local
+emulated `make offline` against its CI artefacts of the same commit and found
+both architectures identical. One pool does differ — `mica-core`'s six Rust
+packages, six of six, with its amd64 half reproducing exactly and the control
+on the previous build-env lock giving the same emulated bytes — so something
+in that build is sensitive to the emulated environment
+(`docs/task/20260916-0900-emulated-arm64-bytes.md`). Either way, CI is the
+authority for an architecture's half, because its gate runs the guard over
+natively built artefacts; a local rebuild is evidence only after the control
+of `docs/design/build-harness.md` section 4 has been run.
 Language dependencies keep their own hashes (`Cargo.lock`, `bun.lock`,
 `go.sum`) and are vendored into `repos/`. Base images by digest stay in the
 local image store; offline, a missing one is refused.

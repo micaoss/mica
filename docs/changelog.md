@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-16 10:10 [finding]
+
+The emulation finding of 09:00 is narrower than it was first stated, and two
+independent controls say so. `mica-system-base` on build-env `20260916-0735`
+reproduced all eight of its archives byte-identically to `20260915-1102` on
+both architectures — in CI over natively built artefacts and locally on the
+amd64 station with arm64 under QEMU — for BusyBox and systemd-boot (C, make,
+meson, ninja) and two data packages. `mica-podman` compared a local emulated
+`make offline` at `09ccebe` against the CI artefacts of the same commit and
+found both architectures identical across the `.deb`, `Packages` and
+`SHA256SUMS`; its re-check against the natively published arm64 archive of
+`20260916-0846` is pending, so that one is a strong prior rather than settled.
+
+So the correct statement is not "emulated arm64 does not reproduce native
+arm64". On this station emulation reproduces for C, make, meson, ninja and
+data packaging, and does not reproduce for `mica-core`'s Rust pool, six
+packages of six. Something in that build is sensitive to the emulated
+environment; the investigation is
+`docs/task/20260916-0900-emulated-arm64-bytes.md`, now assigned to `mica-core`
+at P2, since it is the only repository showing the difference and has both
+halves measured on one machine.
+
+What does not change: a local arm64 rebuild is not authoritative for an arm64
+half, CI is, and a difference between a local build and a release is not
+evidence of a change until the control has been run — the control that
+produced this refinement, unchanged in `docs/design/build-harness.md` section
+4. `docs/design/release-lock.md` section 5, `docs/design/build.md` and
+`docs/user/build.md` with its Chinese page now name which repositories are
+measured on which side, so no reader takes this as a workspace-wide property.
+
 ## 2026-09-16 09:00 [finding]
 
 Emulated arm64 does not reproduce natively built arm64 bytes, which bounds
