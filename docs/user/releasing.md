@@ -25,8 +25,8 @@ the assets. `ci.yml` publishes nothing.
 The stamp is the UTC time of the release, with no `v` prefix, no semver and
 no commit suffix. A scoped tag separates its scope with a **dot** since
 2026-09-16; the releases cut before that date carry the older
-`<scope>/<stamp>` form and are not rewritten. Deleting or re-cutting a published release happens only on
-the user's explicit instruction.
+`<scope>/<stamp>` form and are not rewritten. Deleting or re-cutting a
+published release happens only on the user's explicit instruction.
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
 
