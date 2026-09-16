@@ -99,6 +99,29 @@ describe('downloadExplorer', () => {
     expect(await screen.findByText('dep-old')).toBeInTheDocument()
   })
 
+  it('gives each row its own identity, so a rerender does not reuse the wrong one', () => {
+    // A deployment's three archives share deployment id, form and version; only
+    // the file differs. Keying on the first three collapsed them for React.
+    const deployment = [
+      download({ kind: 'image', href: 'https://example.invalid/disk.img.gz' }),
+      download({ kind: 'update', variant: 'full', href: 'https://example.invalid/a.micaupd' }),
+      download({ kind: 'update', variant: 'kernel', href: 'https://example.invalid/a.kernel.micaupd' }),
+      download({ kind: 'update', variant: 'root', href: 'https://example.invalid/a.root.micaupd' }),
+    ]
+
+    const { rerender, container } = render(
+      <DownloadExplorer copy={zh} board="x64" downloads={deployment} />,
+    )
+    const links = () => [...container.querySelectorAll('tbody a')].map(a => a.getAttribute('href'))
+    const first = links()
+
+    rerender(<DownloadExplorer copy={zh} board="x64" downloads={deployment.slice(0, 2)} />)
+    rerender(<DownloadExplorer copy={zh} board="x64" downloads={deployment} />)
+
+    expect(links()).toEqual(first)
+    expect(new Set(first).size).toBe(4)
+  })
+
   it('explains an empty catalogue instead of showing an empty table', () => {
     render(<DownloadExplorer copy={zh} board="x64" downloads={[]} />)
 

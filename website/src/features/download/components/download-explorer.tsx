@@ -196,8 +196,12 @@ export function DownloadExplorer({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
+                      {/* The URL is the identity: a deployment's three update
+                          archives share its id, its form and its version, so
+                          keying on those gave three rows one key and React
+                          reused the wrong nodes when the filters changed. */}
                       {rows.map(download => (
-                        <TableRow key={`${download.deploymentId}-${download.kind}-${download.version}`}>
+                        <TableRow key={download.href}>
                           <TableCell className="px-5 text-[15px]">
                             {kinds[download.kind]}
                             {download.variant && (
