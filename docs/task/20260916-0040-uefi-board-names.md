@@ -41,3 +41,11 @@ Renaming the generic systems in the records
   `locks/mica-boards.uefi-x64.lock` and `locks/mica-boards.uefi-arm64.lock`
   and cuts its scoped releases. The renamed products are new products and
   start at generation 2; `cx3576` keeps its floors.
+- 2026-09-16: the records are done, each gated on `make docs-verify` and
+  pushed: `7ed4103` the decision, the task record and the changelog;
+  `f7714c5` the boards and user pages with their Chinese translations and the
+  dossier move to `boards/uefi-arm64.md`; `91fce7c` the design pages, the
+  website briefs and the release-lock vectors (scope, board rows, pool tags,
+  product rows, asset file names and ten renamed vector files, 156/156);
+  `c2cc95e` the earlier decisions. Published tags, products and image files
+  keep their old names and are labelled as history wherever they appear.
