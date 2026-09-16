@@ -81,6 +81,10 @@ make offline-chain PRODUCTS=uefi-x64-dev
 它按依赖顺序在每个检出的一次性克隆里构建各个仓库，并从这些构建结果组合出产品。
 过程很长，并且需要 docker。
 
+在 amd64 工作站上，arm64 那一半是在模拟下构建的，所以离线构建得到的是一个**可用的**
+arm64 根，而不是与已发布版本相同的字节；amd64 那一半则能逐字节复现发布。只有按架构
+原生构建的 CI，才能回答某个 arm64 产物是否仍与它的发布一致。
+
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
 
 `mica-build:tools/local-pins.sh` 让开发期间用并排检出自己的池顶替它的 release。

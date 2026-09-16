@@ -255,8 +255,15 @@ the BSP kernel, native executable, UKI stub and firmware binary. cx3576 uses the
 same root/deployment contracts with a signed FIT and a protected raw firmware
 partition. Its BSP firmware blobs and regulatory database belong to support.
 
-Cross-compilation and execution are different capabilities. An amd64 compiler
-can emit ARM64 binaries without executing them. Root package scripts and binary
+Cross-compilation and execution are different capabilities, and so are
+emulated and native execution. An amd64 compiler can emit ARM64 binaries
+without executing them. Where a stage *runs* arm64 code — `docker buildx
+build --platform linux/arm64` on an amd64 station — the bytes it produces are
+not the bytes a native `ubuntu-24.04-arm` runner produces: measured on
+2026-09-16 across six `mica-core` packages, with the previous build-env lock
+as the control. A local arm64 rebuild that differs from a release is therefore
+not evidence of a changed input, and no version is bumped for it; the
+architecture's answer comes from CI. Root package scripts and binary
 smokes may require BuildKit's user-mode emulator. QEMU system emulation boots a
 complete ARM64 machine independently of binfmt registration. A crun `fexecve`
 limitation in user-mode emulation is explicitly executor-limited, not a version

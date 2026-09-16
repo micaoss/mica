@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-16 09:00 [finding]
+
+Emulated arm64 does not reproduce natively built arm64 bytes, which bounds
+what a local build and an offline build can prove (`mica-core`, 2026-09-16).
+Answering the build-env byte-identity question on `20260916-0735`, its amd64
+pool reproduced release `20260915-1135` six of six while its arm64 pool
+differed six of six — not the shape a toolchain change makes, so it ran the
+control: the same station, the previous lock `20260915-0138`, and got exactly
+the same arm64 bytes, all six still unlike the published ones. The cause is
+that `docker buildx build --platform linux/arm64` on an amd64 station runs the
+arm64 build under emulation, while the published arm64 archives were built
+natively on `ubuntu-24.04-arm`. It predates the build-env move and is a
+property of the station.
+
+Consequences, now recorded: a local version or reuse guard validates the amd64
+half only, and CI is the only answer for arm64, because its gate runs the guard
+over natively built artefacts; `mica-boards` and `mica-system-base` are in the
+same position by construction, and `mica-podman` should check its engine
+build. **A local arm64 difference is not a reason to bump a version** — run
+the control first, and two locks giving the same bytes that both differ from
+the release is emulation, not a change. For offline: an offline build on an
+amd64 station produces a working arm64 root, not the published bytes.
+
+Stated in `docs/design/release-lock.md` section 5, `docs/design/build.md`,
+`docs/design/build-harness.md` section 4 and `docs/user/build.md` with its
+Chinese page. What actually differs inside an archive is unidentified and is
+`docs/task/20260916-0900-emulated-arm64-bytes.md`, deferred until after the
+current round.
+
 ## 2026-09-16 08:30 [decision]
 
 The pause is lifted (user, 2026-09-16), with an order, because the held work
