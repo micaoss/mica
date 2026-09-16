@@ -32,6 +32,13 @@ import { isSample, parseCatalog } from '../catalog-schema'
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
 const ALL = 'all'
 
+/** Enough of a deployment identity to recognise it; the cell's title has it whole. */
+function shortId(id: string | undefined): string {
+  if (!id)
+    return '—'
+  return id.length > 16 ? `${id.slice(0, 12)}…` : id
+}
+
 declare const __BUILD_ID__: string | undefined
 
 /**
@@ -212,7 +219,7 @@ export function DownloadExplorer({
                             className="font-mono text-[13px] text-muted-foreground"
                             title={download.deploymentId}
                           >
-                            {download.deploymentId ? `${download.deploymentId.slice(0, 12)}…` : '—'}
+                            {shortId(download.deploymentId)}
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
                             {formatBytes(download.bytes)}
