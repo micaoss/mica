@@ -36,9 +36,10 @@ Consequences:
   storage, AHCI, the common NICs, xHCI, PCIe and RTC — so that one image boots
   QEMU and ordinary arm64 UEFI machines. `uefi-x64` keeps its current generic
   amd64 configuration.
-- `mica-build`: the products become `uefi-x64-dev`, `uefi-x64-minimal`,
-  `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-minimal` and a new
-  `uefi-arm64-prod`; the pins become `locks/mica-boards.uefi-x64.lock` and
+- `mica-build`: the products become `uefi-x64-dev`, `uefi-x64-prod`,
+  `uefi-arm64-dev` and a new `uefi-arm64-prod` — no minimal products are
+  carried over, they were removed the same day
+  (`docs/decisions/2026-09-16-minimal-products-removed.md`); the pins become `locks/mica-boards.uefi-x64.lock` and
   `locks/mica-boards.uefi-arm64.lock` with `SCOPE=uefi-x64` / `uefi-arm64`;
   the release scopes and the image file names follow
   (`mica-uefi-x64-dev-<stamp>.img.gz`).

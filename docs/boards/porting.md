@@ -168,8 +168,7 @@ reader, frozen historical geometry or in-place migration requirement.
 
 In the assembly, the board enters as an input, `locks/mica-boards.<name>.lock`
 with its pin (`docs/design/release-lock.md` section 4), and as the products
-`products/<name>-minimal/` (local and CI only, never released) and
-`products/<name>-dev/`; `make product PRODUCT=<name>-minimal` composes
+`products/<name>-dev/`; `make product PRODUCT=<name>-dev` composes
 the root, signs the root, kernel and firmware, two deployment records, the
 image and the update archive, and `make product-verify` verifies the image.
 No source in the assembly changes for a new board: the engine dispatches on
@@ -182,7 +181,7 @@ space; DATA is last and is the only partition grown after assembly;
 firmware and SYSTEM ranges/identities must remain unchanged.
 
 **Exit criteria.** `make product` and `make product-verify` pass for the
-board's minimal product, then the complete image reaches actual firmware boot and
+board's `dev` product, then the complete image reaches actual firmware boot and
 clean shutdown. The DATA growth test validates the actual packed policy
 against a disposable disk.
 
@@ -335,10 +334,10 @@ is not done until they pass with its directory in the tree;
 2. `mica-build` pins it as `locks/mica-boards.<board>.lock` with
    `locks/pins/mica-boards.<board>.pin` (`SCOPE=<board>`) and fetches the
    components, checking them against the board's `outputs.tsv`.
-3. `mica-build` carries a `<board>-dev` product and a `<board>-minimal`
-   product for the board; the minimal product is built locally and in CI and
-   is never released. A release-target board also carries `<board>-prod`.
+3. `mica-build` carries a `<board>-dev` product for the board, and a
+   `<board>-prod` product where the board has one. There are no minimal
+   products (`docs/decisions/2026-09-16-minimal-products-removed.md`).
 4. Only then does `BOARD_RELEASE_TARGET=1` mean anything: the board's
    products are built and published by `mica-build`'s scoped releases.
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-minimal-products-not-released.md`, `mica-build:locks`
+> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-16-minimal-products-removed.md`, `mica-build:locks`

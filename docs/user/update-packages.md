@@ -322,7 +322,7 @@ procedure are unverified.
   `firmware` update kind is refused.
 - A kernel package is not published across a change of the verity trust
   certificate; such a release ships `full` only.
-- Update archives are published only for products a release publishes; the
-  minimal products are never released.
+- Update archives are published only for products a release publishes, which
+  today means the `dev` and `prod` products of a release-target board.
 
 > status: unsupported

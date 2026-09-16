@@ -68,13 +68,14 @@ the index `mica/20260915-2242`.
 
 ## 3. Products and boards
 
-`uefi-x64` and `cx3576` are release targets; `uefi-arm64` and `s905x5m` are built
-and tested but not released. Every board has a `<board>-dev` product and a
-`<board>-minimal` product; `uefi-x64` and `cx3576` also have a `<board>-prod`
-product. The minimal products are built locally and in CI and are never
-published.
+`uefi-x64` and `cx3576` are release targets; `uefi-arm64` and `s905x5m` are
+built and tested but not released. The product set is `uefi-x64-dev`,
+`uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`, `cx3576-dev`,
+`cx3576-prod` and `s905x5m-dev`: a `dev` product for every board and a `prod`
+product where the board has one. There are no minimal products
+([decision](../decisions/2026-09-16-minimal-products-removed.md)).
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-15-minimal-products-not-released.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-16-minimal-products-removed.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
 
 ## 4. Where the files are
 

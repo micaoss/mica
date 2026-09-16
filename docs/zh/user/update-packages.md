@@ -270,6 +270,6 @@ jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.
 
 - 没有只含固件的归档：固件维护是独立的，`firmware` 这种更新类型会被拒绝。
 - 跨越 verity 信任证书变更时不发布 kernel 包；这样的发布只出 `full`。
-- 只有发布所涵盖的产品才有更新归档；minimal 产品从不发布。
+- 只有发布所涵盖的产品才有更新归档，今天就是发布目标板的 `dev` 与 `prod` 产品。
 
 > status: unsupported

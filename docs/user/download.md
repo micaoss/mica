@@ -24,9 +24,10 @@ have to walk the release list.
 
 Images and update archives exist only for products whose board is a release
 target — today `uefi-x64` and `cx3576`. `uefi-arm64` is an acceptance target and
-`s905x5m` is not qualified, so neither publishes; the `-minimal` products are
-local and CI only and are never released
-([no released minimal products](../decisions/2026-09-15-minimal-products-not-released.md)).
+`s905x5m` is not qualified, so neither publishes. Every published product is
+a `dev` or `prod` product; the minimal products were removed on 2026-09-16
+([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
+releases cut before that date keep their minimal assets.
 
 Per product a release carries:
 

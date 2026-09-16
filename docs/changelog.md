@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-16 01:20 [decision]
+
+The minimal products are removed on every board (user, 2026-09-16:
+"不需要minimal这个，所有的都不发布这个"), which supersedes
+`docs/decisions/2026-09-15-minimal-products-not-released.md` and returns to
+removal: `docs/decisions/2026-09-16-minimal-products-removed.md`. The product
+set becomes `uefi-x64-dev`, `uefi-x64-prod`, `uefi-arm64-dev`,
+`uefi-arm64-prod`, `cx3576-dev`, `cx3576-prod` and `s905x5m-dev`; no
+`uefi-x64-minimal` or `uefi-arm64-minimal` is created in the rename. Every
+rule, test, fixture and CI entry that required a minimal product goes with
+them, and `PUBLISH` goes too if nothing else uses it — `s905x5m-dev` is
+unpublished through `BOARD_RELEASE_TARGET`, so `mica-build` reports whether
+`PUBLISH=0` still has a user. The coverage minimal gave, that the floor
+composes with no feature selected, stays as a composition test. The guides,
+the build design, the release-artifacts page and `boards/porting.md` (whose
+exit criteria now use the `dev` product) follow, with their Chinese versions;
+releases published before today keep their minimal assets as history.
+
 ## 2026-09-16 00:45 [decision]
 
 The generic systems are named by their firmware class: `x64` becomes

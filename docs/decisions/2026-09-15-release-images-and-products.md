@@ -36,9 +36,9 @@ threshold.
 - The raw signed image is still built, gated and verified.
 
 **Prod products.** `uefi-x64-prod` and `cx3576-prod` are added, so releases carry
-`<board>-dev` and `<board>-prod`; the `<board>-minimal` products stay for
-local builds and CI and are never released
-(`docs/decisions/2026-09-15-minimal-products-not-released.md`). The prod
+`<board>-dev` and `<board>-prod`; the `<board>-minimal` products, kept for
+local builds and CI when this was written, were removed on 2026-09-16
+(`docs/decisions/2026-09-16-minimal-products-removed.md`). The prod
 products are the dev features with `PROFILE=prod`, still signed with the development keys and published on
 the development channel
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`,

@@ -20,8 +20,10 @@ release，其 URL 里仍是旧的 `<scope>/<stamp>` 形式。被 GitHub 标记�
 ## 1. 有哪些东西可下载
 
 只有发布目标板的产品才有镜像和更新归档——今天是 `uefi-x64` 和 `cx3576`。
-`uefi-arm64` 是验收目标，`s905x5m` 尚未合格，两者都不发布；`-minimal` 产品只用于
-本地和 CI，从不发布（[不发布 minimal 产品](../../decisions/2026-09-15-minimal-products-not-released.md)）。
+`uefi-arm64` 是验收目标，`s905x5m` 尚未合格，两者都不发布。发布的产品都是 `dev` 或
+`prod` 产品；minimal 产品已于 2026-09-16 删除
+（[决策](../../decisions/2026-09-16-minimal-products-removed.md)），在那之前切的
+release 仍保留它们的 minimal 资产。
 
 每个产品的发布携带：
 

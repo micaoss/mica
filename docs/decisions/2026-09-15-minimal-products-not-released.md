@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "按推荐处理，minimal只是本地编译和ci用，不发布"); implemented in `mica-build` `669b607` (the property is `PUBLISH=0`; CI rehearses the release path on `x64-prod` and `cx3576-prod`); supersedes `docs/decisions/2026-09-15-no-minimal-products.md`
+- **status**: superseded on 2026-09-16 by `docs/decisions/2026-09-16-minimal-products-removed.md`, which deletes the minimal products outright; accepted (user, 2026-09-15: "按推荐处理，minimal只是本地编译和ci用，不发布"); implemented in `mica-build` `669b607` (the property is `PUBLISH=0`; CI rehearses the release path on `x64-prod` and `cx3576-prod`); supersedes `docs/decisions/2026-09-15-no-minimal-products.md`
 
 ## Decision
 

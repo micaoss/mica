@@ -111,11 +111,11 @@ OCI layer also records as `mica.uncompressed-sha256` and
 from 1362100224 on `cx3576`); update archives stay uncompressed (those
 releases carry `full` archives for every product and `kernel` archives for
 `x64-dev` and `cx3576-dev`, the product names of that release), and the raw image is still built, gated and verified; releases carry `<board>-dev` and
-`<board>-prod` (`uefi-x64-prod`, `cx3576-prod`) and never the `<board>-minimal`
-products, which are built locally and in CI only (the minimal assets of
-`x64/20260915-1458` and `cx3576/20260915-1515` stay as they are,
-`docs/decisions/2026-09-15-minimal-products-not-released.md`), and `s905x5m`
-is not a release target.
+`<board>-prod` (`uefi-x64-prod`, `cx3576-prod`); the `<board>-minimal`
+products were removed entirely on 2026-09-16
+(`docs/decisions/2026-09-16-minimal-products-removed.md`), and the minimal
+assets of `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are.
+`s905x5m` is not a release target.
 A Mica version is the index release `mica/<YYYYMMDD-HHMM>`, cut automatically
 after every successful scoped release: it carries only `mica-build.lock`,
 `mica-index.json` and `SHA256SUMS`, references the newest scoped release of

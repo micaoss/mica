@@ -59,10 +59,11 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 ## 3. 产品与板卡
 
 `uefi-x64` 和 `cx3576` 是发布目标；`uefi-arm64` 和 `s905x5m` 有构建有测试，但不发布。
-每块板都有一个 `<board>-dev` 产品和一个 `<board>-minimal` 产品；`uefi-x64` 和 `cx3576`
-还各有一个 `<board>-prod` 产品。minimal 产品只在本地和 CI 里构建，从不发布。
+产品集合是 `uefi-x64-dev`、`uefi-x64-prod`、`uefi-arm64-dev`、`uefi-arm64-prod`、
+`cx3576-dev`、`cx3576-prod` 和 `s905x5m-dev`：每块板一个 `dev` 产品，有 `prod` 的板再
+加一个。没有 minimal 产品（[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-15-minimal-products-not-released.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-16-minimal-products-removed.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
 
 ## 4. 文件都在哪里
 
