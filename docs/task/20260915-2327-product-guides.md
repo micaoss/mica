@@ -73,3 +73,16 @@ Writing the product guides
   and loader selection) and `mica-core-facts.md` (the device-side refusals,
   the install and confirmation flow, first boot and thirteen traps, marked
   SOURCE / TESTED / NOT VERIFIED). The guides are being completed from them.
+- 2026-09-16: the Chinese set. `user/flashing.md` (`c77f7cc`),
+  `user/update-packages.md` (`586e013`), `user/overview.md` (`7c16661`),
+  `user/build.md` (`a64cc85`) and `user/releasing.md` (`4710258`) are
+  translated, one commit per page, each gated on `make docs-verify`; every
+  Chinese page carries its English page's truth-status lines in the same
+  order, so all 21 rows of `docs/user/` in the coverage table are now
+  `current`. `docs/boards/` and `docs/website/` stay `not-translated` by
+  policy, so `boards/porting.md` is not translated.
+- 2026-09-16: scoped release tags changed from a slash to a dot (user;
+  `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`). The spec, the
+  reference checker and the vectors moved first (`f742615`), then the index
+  spec, the decisions and the guides (`e707e9e`), so the Chinese pages were
+  translated against the new form and need no second pass.
