@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-16 18:20 [spec]
+
+Two rules from `mica-build-env`'s practice, neither of them written down
+anywhere until now, are in `docs/design/release-lock.md` 2.1.
+
+**A release and the images its lock names are one unit.** Images may be
+deleted when the releases naming them go in the same operation, so nothing is
+left pointing at missing bytes. The failure it prevents is silent: a published
+lock that resolves to nothing looks like a working release until someone tries
+to reproduce it.
+
+**Protection is owed to any release whose images a published lock still names,
+not to the release that is merely recent** — and the sentence that makes it
+usable: "does anything still *build* against it" is the right question for
+dropping a **pin** and the wrong one for deleting **images**. Both are
+legitimate; they decide different things. `mica-build-env` asked the first,
+got a clean answer, and then accepted that it had answered a different
+question than the one it was about to act on.
+
+The set is computable rather than a judgement — walk the published locks and
+collect the image references — so the retention policy can be stated
+objectively when it is written: an image release is prunable only if no
+published lock names it and it is mirrored. Today the set is exactly build-env
+`20260915-0138` and `20260916-0735`: nothing builds against `0138` any more,
+but `mica-core` `20260915-1135`, `mica-system-base` `20260915-1102`,
+`mica-podman` `20260915-1057` and the pre-2026-09-16 `mica-build` releases
+name its images in immutable locks.
+
+And a fact that changes what the pruning pause means: **the collector does not
+protect images.** It snapshots Actions runs and jobs, not `ghcr` package
+versions, so a pause lifted on its strength alone would delete images nothing
+had captured. The mirror protects image history, and only for what it holds —
+today `20260916-0735` and not `20260915-0138`. The condition for `0138`
+becoming prunable is stated rather than open-ended: mirrored, **and** a
+consumer shown to read those images from the mirror at the same digests.
+
 ## 2026-09-16 17:55 [spec]
 
 The no-deletion rule of `docs/design/mica-index.md` section 5 gains its one

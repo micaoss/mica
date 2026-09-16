@@ -353,6 +353,54 @@ label `com.mica.build-env.inputs` on every platform image config). Everything is
 read back anonymously before the lock is written; the lock and `SHA256SUMS`
 are uploaded last.
 
+### 2.1 Deletion and what is owed to a published lock
+
+*(fixed here, 2026-09-16, from `mica-build-env`'s practice.)*
+
+**A release and the images its lock names are one unit.** Images may be
+deleted when the releases naming them are deleted in the same operation, so
+nothing is ever left pointing at missing bytes; `mica-build-env` has done that
+on user instruction, and the ordering is what made it safe. The failure it
+prevents is the one nobody notices for months: a published lock that resolves
+to nothing looks like a working release until someone tries to reproduce it.
+
+**Protection is owed to any release whose images are still named by a
+published lock — not to the release that is merely recent.** The two questions
+are different and decide different things:
+
+| Question | What it decides |
+|---|---|
+| does anything still **build** against it? | whether a **pin** may be dropped |
+| does any published lock still **name its images**? | whether those **images** may be deleted |
+
+Asking the first and acting on the second is the mistake available here, and
+it is available precisely because the first question usually has a clean
+answer. `mica-build-env` asked it, got one, and then accepted that it had
+answered a different question than the one it was about to act on.
+
+The protected set is **computable, not a judgement**: walk the published
+locks, collect every image reference, and that is the set. So a retention
+policy can be stated objectively when it is written — *an image release is
+prunable only if no published lock names it and it is mirrored.*
+
+Today that set is exactly `mica-build-env` `20260915-0138` and
+`20260916-0735`. Nothing builds against `0138` any more, every consumer having
+moved, but `mica-core` `20260915-1135`, `mica-system-base` `20260915-1102`,
+`mica-podman` `20260915-1057` and the `mica-build` releases cut before
+2026-09-16 name its images in their immutable locks: deleting them would make
+those releases unreproducible.
+
+**The collector does not protect images.** It snapshots Actions runs and jobs,
+not `ghcr` package versions. A pruning pause lifted on the strength of the
+collector alone would delete images that nothing had captured. What protects
+image history is the mirror, and only for what the mirror holds — today
+`20260916-0735` and not `20260915-0138`.
+
+So the current state, with its condition stated rather than left open-ended:
+`20260915-0138` stays and nothing is pruned; its images become prunable once
+they are mirrored **and** a consumer has been shown to read them from the
+mirror at the same digests.
+
 ## 3. The Base lock: `mica-system-base.lock`
 
 One lock replaces `system-base.lock`, `system-base-packages.lock` and
