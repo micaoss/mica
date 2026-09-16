@@ -67,12 +67,19 @@ and offline, is the [build guide](build.md).
 
 ## 5. First contact
 
-The first boot establishes a machine identity on DATA before services start,
-grows DATA to the medium, and brings up micad and apid; wired interfaces use
-DHCP, the dashboard is at `/_ui/` over HTTPS, and SSH is off by default. See
+The first boot seeds a device identity on DATA, takes its hostname from that
+identity alone (`mica-<first 8 hex>`, never from DHCP or a MAC), grows DATA to
+the medium, and brings up micad and apid. SSH is off whatever the image, and
+no credential exists yet: the device is **unclaimed**.
+
+Claim it with `POST /api/v1/setup` (a password of at least 8 bytes). It
+answers `201` with a freshly minted API token that cannot be recovered
+afterwards — store it then, or you are changing the password instead — and
+`409 already_configured` on a device that is already claimed. A device with no
+network at all is claimed by a `mica-provisioning.toml` document instead; see
 [first run](first-run.md) and [configuration](configuration.md).
 
-> status: shipped — evidence: `mica-core:crates/micad`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
 
 ## 6. Next steps
 

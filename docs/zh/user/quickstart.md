@@ -62,11 +62,17 @@ make product-verify PRODUCT=x64-dev
 
 ## 5. 首次访问
 
-首次启动会在服务起来之前于 DATA 上建立机器身份，把 DATA 扩展到介质大小，并拉起
-micad 和 apid；有线网络使用 DHCP，控制台在 HTTPS 的 `/_ui/`，SSH 默认关闭。
-见[首次启动](first-run.md)和[配置](configuration.md)。
+首次启动会在 DATA 上播下设备身份，并只由这个身份推出主机名
+（`mica-<前 8 位十六进制>`，绝不取自 DHCP 或 MAC），把 DATA 扩展到介质大小，
+然后拉起 micad 和 apid。无论镜像如何，SSH 都是关闭的；此时还没有任何凭据，
+设备处于**未认领**状态。
 
-> status: shipped — evidence: `mica-core:crates/micad`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
+用 `POST /api/v1/setup`（密码至少 8 字节）认领它。成功返回 `201`，并给出一个
+刚铸出的 API token，之后无法再取回——当场保存，否则只能走改密码那条路；对已认领
+的设备返回 `409 already_configured`。完全没有网络的设备改用
+`mica-provisioning.toml` 文档认领，见[首次启动](first-run.md)和[配置](configuration.md)。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `mica-core:crates/mica-apid`, `docs/design/provisioning.md`
 
 ## 6. 继续
 
