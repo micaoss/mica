@@ -36,6 +36,10 @@ export function resolveTheme(mode: ThemeMode, systemDark: boolean): ResolvedThem
 export function useThemeMode() {
   const [mode, setMode] = useState<ThemeMode>('auto')
   const [systemDark, setSystemDark] = useState(false)
+  // False until the effect below has read storage and the media query. Until
+  // then `mode` and `systemDark` are server placeholders, and the resolved theme
+  // computed from them is a guess.
+  const [known, setKnown] = useState(false)
 
   // The island is server-rendered as `auto` because neither localStorage nor
   // the media query exists there. Reading them in an effect is what keeps the
@@ -48,6 +52,8 @@ export function useThemeMode() {
     setMode(readStoredMode())
     // eslint-disable-next-line react/set-state-in-effect -- see above: client-only values
     setSystemDark(query.matches)
+    // eslint-disable-next-line react/set-state-in-effect -- see above: client-only values
+    setKnown(true)
 
     const onChange = (event: MediaQueryListEvent) => setSystemDark(event.matches)
     query.addEventListener('change', onChange)
@@ -57,9 +63,16 @@ export function useThemeMode() {
   const resolved = resolveTheme(mode, systemDark)
 
   useEffect(() => {
+    // Writing the placeholder theme on the first commit overwrote what the
+    // pre-paint script had already set: on a dark system the page went dark,
+    // light, dark within one hydration, and useEffect runs after paint, so the
+    // light frame was visible. The pre-paint script owns the first value; this
+    // only writes once the real one is known.
+    if (!known)
+      return
     document.documentElement.dataset.theme = resolved
     document.documentElement.style.colorScheme = resolved
-  }, [resolved])
+  }, [known, resolved])
 
   const selectMode = useCallback((next: ThemeMode) => {
     setMode(next)

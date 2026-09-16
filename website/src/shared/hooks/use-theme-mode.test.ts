@@ -54,6 +54,50 @@ describe('useThemeMode', () => {
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('auto')
   })
 
+  it('never writes a placeholder theme over the pre-paint one on mount', () => {
+    // A dark system: the pre-paint script has already set dark before hydration.
+    // Hydrating used to write the server placeholder (auto + light system =
+    // light) and then correct it, which painted one light frame.
+    document.documentElement.dataset.theme = 'dark'
+    // Replaced by hand and put back in `finally`: the setup file's matchMedia is
+    // itself a mock, and restoring a spy on it strips its implementation from
+    // every later test.
+    const original = window.matchMedia
+    window.matchMedia = (query: string) => ({
+      matches: true,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })
+
+    const written: (string | null)[] = []
+    const observer = new MutationObserver((records) => {
+      for (const record of records)
+        written.push(record.oldValue, document.documentElement.dataset.theme ?? null)
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+      attributeOldValue: true,
+    })
+
+    try {
+      renderHook(() => useThemeMode())
+      observer.takeRecords().forEach(record => written.push(record.oldValue))
+    }
+    finally {
+      observer.disconnect()
+      window.matchMedia = original
+    }
+
+    expect(written).not.toContain('light')
+    expect(document.documentElement.dataset.theme).toBe('dark')
+  })
+
   it('starts from the stored choice', () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'dark')
     const { result } = renderHook(() => useThemeMode())
