@@ -11,8 +11,9 @@
 带 buildx 的 Docker、bash、make 和 git。每一个编译器、文件系统工具和签名工具都在固定
 版本的 build-env 镜像里运行，并且有一条 lint 拒绝在宿主机上调用工具链。构建也不会从任何
 软件包归档安装东西：工具链烤进镜像，按摘要拉取
-（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）。有些 target
-需要特权（repart 测试）或网络（拉取池和 lock）；`make help` 会逐条说明。
+（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）。
+
+有些 target 需要特权（repart 测试）或网络（拉取池和 lock）；`make help` 会逐条说明。
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `docs/design/build.md`
 

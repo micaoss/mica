@@ -15,9 +15,10 @@ Docker with buildx, bash, make and git. Every compiler, filesystem maker and
 signing tool runs inside the pinned build-env images, and a lint refuses a
 toolchain invocation on the host. A build installs nothing from a package
 archive either: the toolchains are baked into the images and pulled by digest
-([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md)). Some targets need privileges (the repart
-test) or the network (fetching pools and locks); each says so in
-`make help`.
+([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md)).
+
+Some targets need privileges (the repart test) or the network (fetching pools
+and locks); each says so in `make help`.
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `docs/design/build.md`
 

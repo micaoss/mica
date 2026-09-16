@@ -14,7 +14,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 
 | 仓库 | 产出 |
 |---|---|
-| `mica-build-env` | 构建镜像 `base`、`c`、`go`、`rust`，以及每个仓库都遵守的构建规则 |
+| `mica-build-env` | 构建镜像 `base`、`c`、`go`、`rust`、`bsp`，以及每个仓库都遵守的构建规则 |
 | `mica-system-base` | 与板卡无关的基础系统：固定版本的 Debian 包、四个策略包和基础根镜像 |
 | `mica-core` | `micad`、`mica-apid`、MQTT 服务、SFTP 服务器、`mica-deploy` 和 lifecycle 二进制 |
 | `mica-podman` | 容器引擎包 `mica-podman` |

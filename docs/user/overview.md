@@ -18,7 +18,7 @@ from source with [build](build.md), an image reaches a board through
 
 | Repository | Produces |
 |---|---|
-| `mica-build-env` | the build images `base`, `c`, `go` and `rust`, and the rules every repository builds under |
+| `mica-build-env` | the build images `base`, `c`, `go`, `rust` and `bsp`, and the rules every repository builds under |
 | `mica-system-base` | the board-independent base: the pinned Debian packages, the four policy packages and the base root image |
 | `mica-core` | `micad`, `mica-apid`, the MQTT services, the SFTP server, `mica-deploy` and the lifecycle binary |
 | `mica-podman` | the container engine package `mica-podman` |
