@@ -8,7 +8,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 
 - [`architecture.md`](../architecture.md) — 系统架构总览与组件地图（从这里开始）
 - [板卡状态表](../boards/support-tiers.md#current-boards) — 各板卡的构建、验收与支持层级
-- `user/` — 用户文档（已覆盖 18 篇，含文档契约本身）
+- `user/` — 用户文档（已覆盖 19 篇，含文档契约本身）
+  - [`overview.md`](user/overview.md) — 一页读懂：七个仓库、发布链、产品与文件位置
   - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 x64 基线
   - [`download.md`](user/download.md) — 发布版组成与镜像获取
   - [`install.md`](user/install.md) — 安装的操作顺序：从选镜像到首次启动
@@ -51,7 +52,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../user/flashing.md` | 97fbfcbc | current |
 | `../user/update-packages.md` | e707e9e3 | current |
 | `../user/releasing.md` | aa9e6a86 | not-translated |
-| `../user/overview.md` | 1cddbe2d | not-translated |
+| `../user/overview.md` | 586e013c | current |
 | `../user/api.md` | db66fc02 | current |
 | `../user/applications.md` | 965de492 | current |
 | `../user/configuration.md` | 88db4ae9 | current |
