@@ -13,7 +13,9 @@ the operator's path through them.
 
 Docker with buildx, bash, make and git. Every compiler, filesystem maker and
 signing tool runs inside the pinned build-env images, and a lint refuses a
-toolchain invocation on the host. Some targets need privileges (the repart
+toolchain invocation on the host. A build installs nothing from a package
+archive either: the toolchains are baked into the images and pulled by digest
+([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md)). Some targets need privileges (the repart
 test) or the network (fetching pools and locks); each says so in
 `make help`.
 
@@ -23,7 +25,7 @@ test) or the network (fetching pools and locks); each says so in
 
 | Repository | Build | Gates |
 |---|---|---|
-| `mica-build-env` | the four build images | `bash from.sh --check`, `bash tests/publish-test.sh` |
+| `mica-build-env` | the five build images, `bsp` among them | `bash from.sh --check`, `bash tests/publish-test.sh` |
 | `mica-system-base` | the four policy packages and the base root | `bun run check`, `bun src/container.ts debs`, `bun src/container.ts rootfs --arch amd64\|arm64` |
 | `mica-core` | the seven packages | `make check` |
 | `mica-podman` | `mica-podman` | `make check` |

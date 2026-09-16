@@ -60,11 +60,17 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
-State on 2026-09-15: `mica-build-env` `20260915-0138`, `mica-system-base`
-`20260915-1102`, `mica-podman` `20260915-1057`, `mica-core` `20260915-1135`,
-`mica-boards` `<board>/20260915-1926` for `uefi-x64`, `uefi-arm64`, `cx3576` and
-`s905x5m`, `mica-build` `x64/20260915-2230` and `cx3576/20260915-2230`, and
-the index `mica/20260915-2242`.
+State on 2026-09-16: `mica-build-env` `20260916-0735`, which adds the `bsp`
+image and is a breaking update its consumers take in sequence
+([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md));
+`mica-system-base` `20260915-1102`, `mica-podman` `20260915-1057`, `mica-core`
+`20260915-1135`, all still on `mica-build-env` `20260915-0138`. The newest
+product releases are the ones cut on 2026-09-15, under the names of that day:
+`mica-boards` `x64/20260915-1926`, `virt-arm64/20260915-1926`,
+`cx3576/20260915-1926` and `s905x5m/20260915-1926`, `mica-build`
+`x64/20260915-2230` and `cx3576/20260915-2230`, and the index
+`mica/20260915-2242`. The renamed boards and products are released from the
+`uefi` round on.
 
 ## 3. Products and boards
 

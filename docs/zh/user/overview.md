@@ -50,11 +50,16 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
-2026-09-15 的状态：`mica-build-env` `20260915-0138`、`mica-system-base`
-`20260915-1102`、`mica-podman` `20260915-1057`、`mica-core` `20260915-1135`、
-`mica-boards` 的 `uefi-x64`、`uefi-arm64`、`cx3576`、`s905x5m` 均为
-`<board>/20260915-1926`，`mica-build` 为 `x64/20260915-2230` 和
-`cx3576/20260915-2230`，索引为 `mica/20260915-2242`。
+2026-09-16 的状态：`mica-build-env` 为 `20260916-0735`，它新增 `bsp` 镜像，对消费方是
+破坏性更新，各仓按顺序迁移
+（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）；
+`mica-system-base` `20260915-1102`、`mica-podman` `20260915-1057`、`mica-core`
+`20260915-1135`，三者仍固定在 `mica-build-env` `20260915-0138`。最新的产品发布是
+2026-09-15 切出的那批，用的是当天的名字：`mica-boards` 的
+`x64/20260915-1926`、`virt-arm64/20260915-1926`、`cx3576/20260915-1926`、
+`s905x5m/20260915-1926`，`mica-build` 的 `x64/20260915-2230` 和
+`cx3576/20260915-2230`，索引 `mica/20260915-2242`。改名后的板卡与产品从 `uefi`
+这一轮开始发布。
 
 ## 3. 产品与板卡
 

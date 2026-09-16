@@ -5,8 +5,11 @@ consumer records its inputs with, and the contract for building the chain
 without reading a published release. The decision is
 `docs/decisions/2026-09-14-release-lock-and-offline-build.md`; the migration
 is `docs/plan/20260914-2042-release-lock-offline-build.md`. `mica-build-env`
-implements the release lock and `locks/upstream.lock` (release to pin
-`20260915-0138`), `mica-system-base` (current release `20260915-1102`),
+implements the release lock and `locks/upstream.lock` (current release
+`20260916-0735`, which adds the `bsp` image and the Ubuntu snapshot rows;
+`20260915-0138` stays in the package until every consumer has moved,
+`docs/decisions/2026-09-16-toolchains-live-in-build-env.md`),
+`mica-system-base` (current release `20260915-1102`),
 `mica-podman` (`20260915-1057`), `mica-core` (`20260915-1135`) and
 `mica-boards` (per board, `<board>.20260915-1926`); `mica-build` adopts it
 last, with its own scripts, and every repository proves them with the test

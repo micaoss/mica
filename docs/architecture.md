@@ -151,7 +151,7 @@ pinned release — never by reaching into another's build tree.
 | Repository | Produces | Consumes |
 |---|---|---|
 | `mica` | the product documentation, decisions and the project's task and plan records | nothing |
-| `mica-build-env` | four build-env images (`base`, `c`, `go`, `rust`) and `RULES.md`, the rules every repository implements | nothing |
+| `mica-build-env` | five build-env images (`base`, `c`, `go`, `rust`, `bsp`) and `RULES.md`, the rules every repository implements | nothing |
 | `mica-system-base` | the board-independent base: the pinned Debian lock, the Base's own packages, the base root | `mica-build-env` |
 | `mica-core` | the management plane as Debian packages: `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` | `mica-build-env`, `mica-system-base` |
 | `mica-podman` | `mica-podman`, the container engine package, from pinned upstream source | `mica-build-env`, `mica-system-base` |

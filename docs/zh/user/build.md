@@ -9,7 +9,9 @@
 ## 1. 前置条件
 
 带 buildx 的 Docker、bash、make 和 git。每一个编译器、文件系统工具和签名工具都在固定
-版本的 build-env 镜像里运行，并且有一条 lint 拒绝在宿主机上调用工具链。有些 target
+版本的 build-env 镜像里运行，并且有一条 lint 拒绝在宿主机上调用工具链。构建也不会从任何
+软件包归档安装东西：工具链烤进镜像，按摘要拉取
+（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）。有些 target
 需要特权（repart 测试）或网络（拉取池和 lock）；`make help` 会逐条说明。
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `docs/design/build.md`
@@ -18,7 +20,7 @@
 
 | 仓库 | 构建 | 门 |
 |---|---|---|
-| `mica-build-env` | 四个构建镜像 | `bash from.sh --check`、`bash tests/publish-test.sh` |
+| `mica-build-env` | 五个构建镜像，含 `bsp` | `bash from.sh --check`、`bash tests/publish-test.sh` |
 | `mica-system-base` | 四个策略包和基础根 | `bun run check`、`bun src/container.ts debs`、`bun src/container.ts rootfs --arch amd64\|arm64` |
 | `mica-core` | 七个软件包 | `make check` |
 | `mica-podman` | `mica-podman` | `make check` |
