@@ -49,3 +49,13 @@ Renaming the generic systems in the records
   product rows, asset file names and ten renamed vector files, 156/156);
   `c2cc95e` the earlier decisions. Published tags, products and image files
   keep their old names and are labelled as history wherever they appear.
+- 2026-09-16: two more user decisions landed in this round. The minimal
+  products are removed outright
+  (`docs/decisions/2026-09-16-minimal-products-removed.md`, `966303e`), which
+  supersedes the 2026-09-15 "kept but never published" position; and the
+  naming rules are written down
+  (`docs/decisions/2026-09-16-board-and-product-naming.md`) with the normative
+  text in `docs/boards/contract.md` 1.1, cross-linked from the release-lock
+  spec, `user/overview.md` and `user/releasing.md` and their Chinese versions.
+  Open with `mica-build`: whether `PUBLISH=0` still has a user once the
+  minimal products are gone.

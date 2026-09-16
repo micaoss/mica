@@ -58,6 +58,11 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 ## 3. 产品与板卡
 
+板卡分两类：**通用系统**按固件类与架构命名（`uefi-x64`、`uefi-arm64`），一个镜像
+服务于该类的每一台机器；**硬件板**按硬件命名（`cx3576`、`s905x5m`）。一个新变体到底
+是新板卡、新产品，还是仅仅另一种镜像类型，见
+[命名规则](../../decisions/2026-09-16-board-and-product-naming.md)。
+
 `uefi-x64` 和 `cx3576` 是发布目标；`uefi-arm64` 和 `s905x5m` 有构建有测试，但不发布。
 产品集合是 `uefi-x64-dev`、`uefi-x64-prod`、`uefi-arm64-dev`、`uefi-arm64-prod`、
 `cx3576-dev`、`cx3576-prod` 和 `s905x5m-dev`：每块板一个 `dev` 产品，有 `prod` 的板再

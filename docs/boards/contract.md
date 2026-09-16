@@ -11,6 +11,42 @@ directory (when a vendor ships BSP solely as Yocto layers, run
 `bitbake virtual/kernel virtual/bootloader` and export the deploy dir) — never
 in the OS build chain.
 
+## 1.1 Naming: board, product, image kind
+
+Normative, with the rationale in
+[the naming decision](../decisions/2026-09-16-board-and-product-naming.md).
+
+**Two classes of board.** *Generic systems* are named by firmware class and
+architecture — `uefi-x64`, `uefi-arm64` — and one image serves every machine of
+that class, QEMU included. *Hardware-specific boards* are named by their
+hardware: `cx3576`, `s905x5m`.
+
+**What a new variant is.** The kernel, the loader and the partition layout
+belong to a board; the root composition belongs to a product; the downloaded
+file format belongs to `images.tsv`:
+
+| The variant changes | It is | Example |
+|---|---|---|
+| kernel, loader or disk layout | a new board | a slim virtio-only guest kernel: `qemu-x64`, `qemu-arm64` |
+| only what the root installs | a product on an existing board | a cloud image with its guest agents |
+| only the downloaded file format | an image kind in `images.tsv`, per product | `qcow2` or `vmdk` beside `disk` |
+
+**Name forms.** A board is `[a-z0-9][a-z0-9-]*` and never contains a dot, which
+is what lets `<board>.<YYYYMMDD-HHMM>` be parsed
+([release lock](../design/release-lock.md) 1.0). A product is
+`<board>-<variant>`, the variant naming what the image is for (`dev`, `prod`,
+later for example `cloud`). A board package is `mica-board-<board>`. A
+platform-specific guest board is `<platform>-<arch>`.
+
+**Today's set.** Boards `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`;
+products `uefi-x64-dev`, `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`,
+`cx3576-dev`, `cx3576-prod`, `s905x5m-dev`. There are no minimal products
+([decision](../decisions/2026-09-16-minimal-products-removed.md)). The names
+published before 2026-09-16 — `x64`, `virt-arm64`, their products and the
+slash tag form — are history and are not rewritten.
+
+> status: shipped — evidence: `docs/decisions/2026-09-16-board-and-product-naming.md`, `docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`, `mica-boards:boards/boards.tsv`
+
 ## 2. Board directory layout
 
 A board is a directory under `mica-boards:boards/`, discovered by its

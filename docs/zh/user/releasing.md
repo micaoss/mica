@@ -21,6 +21,8 @@ gh release create <tag> --target <commit of main>
 | `mica-build` | `<scope>.<YYYYMMDD-HHMM>`，一块板或一个产品，用 `--latest=false` 切 |
 | `mica-build` 版本索引 | `mica.<YYYYMMDD-HHMM>`，由索引 job 切，绝不手工切 |
 
+标签形式跟随板卡名与产品名，而这些名字连同 OCI 标签和资产名一起由
+[命名规则](../../decisions/2026-09-16-board-and-product-naming.md)固定。
 时间戳是这次发布的 UTC 时间，没有 `v` 前缀、没有 semver、没有提交后缀。自 2026-09-16
 起，作用域标签用**点号**分隔作用域；在那之前切的 release 仍是旧的 `<scope>/<stamp>`
 形式，不做改写。删除或重切一个已发布的 release，只在用户明确指示时进行。

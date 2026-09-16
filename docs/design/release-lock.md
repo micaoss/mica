@@ -43,9 +43,10 @@ every other repository's release is unscoped:
   (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its lock rows
   are those of 1.2.2.
 
-`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name), so it never
-contains a dot and everything before the first dot of a scoped tag is the
-scope. The separator is a dot, not a slash (user, 2026-09-16,
+`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name, named by
+`docs/boards/contract.md` 1.1 and
+`docs/decisions/2026-09-16-board-and-product-naming.md`), so it never contains
+a dot and everything before the first dot of a scoped tag is the scope. The separator is a dot, not a slash (user, 2026-09-16,
 `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`): a slash in a release
 row is refused as `field-value`, with no compatibility form. A scoped
 `mica-boards` lock holds only its board: every `board` row names the scope's

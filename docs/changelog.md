@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-16 01:40 [decision]
+
+The naming rules are written down so a new variant is a lookup rather than a
+discussion (user, 2026-09-16):
+`docs/decisions/2026-09-16-board-and-product-naming.md`, with the normative
+text in `docs/boards/contract.md` 1.1. Two classes of board — generic systems
+named by firmware class and architecture (`uefi-x64`, `uefi-arm64`), hardware
+boards named by their hardware (`cx3576`, `s905x5m`). What a variant is
+follows from what it changes: kernel, loader or layout make a new board (a
+slim virtio-only guest kernel would be `qemu-x64`, not a product), the root
+composition makes a product, the downloaded file format is an image kind in
+`images.tsv`. A board is `[a-z0-9][a-z0-9-]*` with no dot, which is what lets
+`<board>.<stamp>` be parsed; a product is `<board>-<variant>`; a board package
+is `mica-board-<board>`; a platform-specific guest board is `<platform>-<arch>`.
+The tag, OCI and asset forms follow, and the product set is the seven names
+left after the minimal removal. `docs/design/release-lock.md` 1.0,
+`docs/user/overview.md` and `docs/user/releasing.md` point at the rules, with
+the Chinese pages. Names published before today stay as they were published.
+
 ## 2026-09-16 01:20 [decision]
 
 The minimal products are removed on every board (user, 2026-09-16:

@@ -68,6 +68,13 @@ the index `mica/20260915-2242`.
 
 ## 3. Products and boards
 
+A board is one of two kinds: a **generic system**, named for its firmware
+class and architecture (`uefi-x64`, `uefi-arm64`), whose one image serves every
+machine of that class; or a **hardware board**, named for the hardware
+(`cx3576`, `s905x5m`). What makes a variant a new board, a new product or just
+another image kind is
+[the naming rules](../decisions/2026-09-16-board-and-product-naming.md).
+
 `uefi-x64` and `cx3576` are release targets; `uefi-arm64` and `s905x5m` are
 built and tested but not released. The product set is `uefi-x64-dev`,
 `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`, `cx3576-dev`,

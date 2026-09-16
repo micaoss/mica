@@ -22,8 +22,10 @@ the assets. `ci.yml` publishes nothing.
 | `mica-build` | `<scope>.<YYYYMMDD-HHMM>`, a board or one product, cut with `--latest=false` |
 | `mica-build` version index | `mica.<YYYYMMDD-HHMM>`, cut by the index job, never by hand |
 
-The stamp is the UTC time of the release, with no `v` prefix, no semver and
-no commit suffix. A scoped tag separates its scope with a **dot** since
+The tag forms follow the board and product names, which
+[the naming rules](../decisions/2026-09-16-board-and-product-naming.md) fix
+along with the OCI tags and the asset names. The stamp is the UTC time of the
+release, with no `v` prefix, no semver and no commit suffix. A scoped tag separates its scope with a **dot** since
 2026-09-16; the releases cut before that date carry the older
 `<scope>/<stamp>` form and are not rewritten. Deleting or re-cutting a
 published release happens only on the user's explicit instruction.

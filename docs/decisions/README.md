@@ -37,3 +37,4 @@ Kinds:
 | [Scoped release tags separate the scope with a dot](2026-09-16-scoped-tags-use-a-dot.md) | engineering decision | 2027-03-16 |
 | [The generic systems are named by their firmware class](2026-09-16-generic-systems-named-by-firmware.md) | engineering decision | 2027-03-16 |
 | [The minimal products are removed](2026-09-16-minimal-products-removed.md) | engineering decision | 2027-03-16 |
+| [Naming: what is a board, what is a product, what is an image kind](2026-09-16-board-and-product-naming.md) | engineering decision | 2027-03-16 |
