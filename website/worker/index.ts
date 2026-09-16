@@ -1,6 +1,5 @@
 import type { Download } from '../src/features/download/catalog'
-import type { GithubRelease } from '../src/features/download/github'
-import { downloadsFromReleases } from '../src/features/download/github'
+import { downloadsFromIndex } from '../src/features/download/mica-index'
 
 /**
  * The site is static; this Worker exists for the download catalogue.
@@ -28,7 +27,7 @@ interface StoredCatalogue {
   downloads: Download[]
   /** When the stored copy was built. */
   refreshedAt: string
-  /** Newest `published_at` seen upstream, so a refresh can skip an unchanged set. */
+  /** The index release the stored copy was read from. */
   latestRelease?: string
 }
 
@@ -36,6 +35,7 @@ const CATALOG_PATH = '/api/catalog'
 const REFRESH_PATH = '/api/catalog/refresh'
 const KEY = 'catalog'
 const DEFAULT_REPO = 'micaoss/mica-build'
+const INDEX_ASSET = 'mica-index.json'
 /** Long enough to stay cheap, short enough that a refresh surfaces quickly. */
 const CACHE_SECONDS = 300
 
@@ -65,7 +65,21 @@ function json(body: unknown, seconds: number): Response {
   })
 }
 
-/** Reads every release of the configured repository and stores what parses. */
+interface GithubRelease {
+  tag_name: string
+  assets: { name: string, browser_download_url: string }[]
+}
+
+/**
+ * Reads `mica-index.json` from the repository's latest release and stores what
+ * it names.
+ *
+ * The index release is the one GitHub marks latest, cut automatically after a
+ * scoped release, and it is the documented entry point: one file names every
+ * current product with its files, sizes and hashes
+ * (`mica:docs/design/mica-index.md`). Walking the release list and parsing file
+ * names would reconstruct less, and reconstruct it worse.
+ */
 async function refresh(env: Env): Promise<StoredCatalogue> {
   const repo = env.CATALOG_REPO ?? DEFAULT_REPO
   const headers: Record<string, string> = {
@@ -75,20 +89,23 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
   if (env.GITHUB_TOKEN)
     headers.authorization = `Bearer ${env.GITHUB_TOKEN}`
 
-  const response = await fetch(`https://api.github.com/repos/${repo}/releases?per_page=100`, {
-    headers,
-  })
-  if (!response.ok)
-    throw new Error(`github answered ${response.status}`)
+  const latest = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers })
+  if (!latest.ok)
+    throw new Error(`github answered ${latest.status}`)
 
-  const releases = (await response.json()) as GithubRelease[]
+  const release = (await latest.json()) as GithubRelease
+  const asset = release.assets.find(candidate => candidate.name === INDEX_ASSET)
+  if (!asset)
+    throw new Error(`${release.tag_name} carries no ${INDEX_ASSET}`)
+
+  const index = await fetch(asset.browser_download_url, { headers: { accept: 'application/json' } })
+  if (!index.ok)
+    throw new Error(`${INDEX_ASSET} answered ${index.status}`)
+
   const stored: StoredCatalogue = {
-    downloads: downloadsFromReleases(releases),
+    downloads: downloadsFromIndex(await index.json()),
     refreshedAt: new Date().toISOString(),
-    latestRelease: releases
-      .map(release => release.published_at ?? '')
-      .sort()
-      .at(-1) || undefined,
+    latestRelease: release.tag_name,
   }
 
   await env.KV.put(KEY, JSON.stringify(stored))

@@ -54,25 +54,31 @@ control loads the earlier ones.
 ### Where the rows come from
 
 ```
-mica-build releases ──(parse)──> KV ──(read)──> GET /api/catalog ──> the board pages
-                         ▲
-              cron every 30 min, or POST /api/catalog/refresh
+mica-build's latest release ──> mica-index.json ──(parse)──> KV ──> GET /api/catalog
+                                                      ▲
+                                    cron every 30 min, or POST /api/catalog/refresh
 ```
 
 The read path is a KV lookup and never calls GitHub, so an upstream rate limit or outage
-costs a stale answer rather than a broken page. `worker/index.ts` holds both paths;
-`src/features/download/github.ts` is the parser, unit-tested apart from the Worker.
+costs a stale answer rather than a broken page.
 
-A release of `mica-build` is scoped to a board — tag `<board>/<version>` — and its assets are
-named `mica-<board>-<product>-<version>.<ext>`. The parser reads the board and version from
-the tag, the product from the asset name, and the form from the extension (`.img`, and
-`.img.gz`/`.xz`/`.zst`, are images; `.micaupd` is an update package). **The product is not a
-fixed set**: `dev`, `minimal`, `prod` or anything else the build publishes becomes a value in
-the page's filter. Assets that are not downloads — the lock, the checksums — are skipped, as
-is any asset GitHub reports without a digest.
+`mica-build` publishes a version index — `mica-index.json` on the release GitHub marks
+*latest*, cut automatically after a scoped release. It is the documented entry point: one
+file names every current product with its board, profile, deployment identity, release, and
+each image and update archive with its URL, sha256 and size
+(`mica:docs/design/mica-index.md`). The Worker reads that file and nothing else; nothing is
+inferred from a file name.
 
-Firmware has no rule yet: no release has carried a firmware asset, so its naming is unknown
-and a rule written now would be a guess.
+What the index gives that a release listing does not: the **deployment identity** behind each
+row, the **uncompressed size** beside the compressed one (an image is `.img.gz`, a fraction
+of what it writes), and which of the three update archives a row is — `full` always applies,
+`root` only where the device already runs the kernel it names, `kernel` only where it runs
+the rootfs (`mica:docs/user/update-packages.md`). Those are not interchangeable, so the table
+says which.
+
+A product absent from `products` is absent on purpose: the catalogue lists it with
+`publish: false`, which is how the `-minimal` products stay off the site. An archive kind the
+parser does not know is skipped rather than shown as a plain update.
 
 ### Setting it up
 

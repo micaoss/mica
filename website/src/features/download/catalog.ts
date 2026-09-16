@@ -22,11 +22,21 @@ export type DownloadKind = 'image' | 'update' | 'firmware'
 
 export const DOWNLOAD_KINDS: DownloadKind[] = ['image', 'update', 'firmware']
 
+/**
+ * Which of a form's variants this is. A deployment publishes up to three update
+ * archives — `full` always, `root` when the kernel identity is unchanged,
+ * `kernel` when the rootfs is — and they are not interchangeable, so the row
+ * says which one it is.
+ */
+export type DownloadVariant = 'full' | 'root' | 'kernel'
+
 export interface Download {
   /** Board identifier, as `mica-boards` names it. */
   board: string
   profile: Profile
   kind: DownloadKind
+  /** Which variant of the form, where the form has more than one. */
+  variant?: DownloadVariant
   /** Release version or generation. */
   version: string
   /** Signed deployment this download carries, when the source names one. */
@@ -34,6 +44,8 @@ export interface Download {
   /** ISO 8601 date the release was published; orders the versions. */
   releasedAt: string
   bytes: number
+  /** Size once decompressed, where the file is compressed. */
+  uncompressedBytes?: number
   digest: string
   href: string
   /** File name as published, so the row says what lands on disk. */

@@ -3517,3 +3517,27 @@ can leave blank.
 
 Still to do, and it needs Cloudflare access I do not have: create the KV namespace, set the
 two secrets, drop `CATALOG_DEMO`. `website/README.md` has the five commands.
+
+## 2026-09-16 03:45 [progress]
+
+The download catalogue reads `mica-index.json` instead of parsing release asset names.
+
+`mica-build` now cuts a version index — `mica/<stamp>`, the release GitHub marks latest,
+carrying `mica-index.json` — and `docs/design/mica-index.md` specifies it as the entry point
+for exactly this: one file naming every current product, its files, their sizes and their
+hashes. The parser that read `mica-<board>-<product>-<stamp>.<ext>` is deleted; the Worker
+fetches the latest release, takes that one asset, and reads it.
+
+Three things the site could not state before and now does:
+
+- **The deployment identity** of each row, from `products[].deployment`. The column showed
+  `—` because GitHub's release metadata does not carry one.
+- **The uncompressed size** beside the compressed one. Images are `.img.gz`: the cx3576
+  image is 82 MiB to download and 1.3 GiB written. Showing only the former misleads.
+- **Which update archive a row is.** A deployment publishes up to three — `full` always,
+  `root` when the kernel identity is unchanged, `kernel` when the rootfs is — and they are
+  not interchangeable (`docs/user/update-packages.md`). A row now says which, and an archive
+  kind the parser does not know is skipped rather than flattened into "update".
+
+The `-minimal` products drop out on their own: the index omits what the catalogue marks
+`publish: false`, so the rule lives upstream rather than in a filter here.

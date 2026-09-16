@@ -191,7 +191,14 @@ export function DownloadExplorer({
                     <TableBody>
                       {rows.map(download => (
                         <TableRow key={`${download.deploymentId}-${download.kind}-${download.version}`}>
-                          <TableCell className="px-5 text-[15px]">{kinds[download.kind]}</TableCell>
+                          <TableCell className="px-5 text-[15px]">
+                            {kinds[download.kind]}
+                            {download.variant && (
+                              <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
+                                {copy.download.variants[download.variant]}
+                              </span>
+                            )}
+                          </TableCell>
                           <TableCell className="font-mono text-[13px]">{download.profile}</TableCell>
                           <TableCell className="font-mono text-[13px]">{download.version}</TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
@@ -202,6 +209,15 @@ export function DownloadExplorer({
                           </TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
                             {formatBytes(download.bytes)}
+                            {/* An image is gzip-compressed: the download is a
+                                fraction of what it writes to a disk. */}
+                            {download.uncompressedBytes !== undefined && (
+                              <span className="block text-[12px]">
+                                {copy.download.uncompressed}
+                                {' '}
+                                {formatBytes(download.uncompressedBytes)}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className="pr-5 font-mono text-[13px]">
                             <a href={download.href}>{download.filename}</a>

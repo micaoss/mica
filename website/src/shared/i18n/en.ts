@@ -96,6 +96,12 @@ export const en: typeof zh = {
       query: 'Version or deployment ID',
       all: 'All',
     },
+    variants: {
+      full: 'full',
+      root: 'root only',
+      kernel: 'kernel only',
+    },
+    uncompressed: 'unpacked',
     cols: {
       board: 'Board',
       profile: 'Profile',

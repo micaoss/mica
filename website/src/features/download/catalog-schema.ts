@@ -1,4 +1,4 @@
-import type { Download, DownloadKind } from './catalog'
+import type { Download, DownloadKind, DownloadVariant } from './catalog'
 import { DOWNLOAD_KINDS } from './catalog'
 
 /**
@@ -21,17 +21,25 @@ function readDownload(value: unknown): Download | null {
     return null
   if (!DOWNLOAD_KINDS.includes(entry.kind as DownloadKind))
     return null
+  const variants: DownloadVariant[] = ['full', 'root', 'kernel']
+  const variant = variants.includes(entry.variant as DownloadVariant)
+    ? (entry.variant as DownloadVariant)
+    : undefined
 
   return {
     board: entry.board as string,
     profile: entry.profile as string,
     kind: entry.kind as DownloadKind,
+    ...(variant ? { variant } : {}),
     version: entry.version as string,
     ...(typeof entry.deploymentId === 'string' && entry.deploymentId !== ''
       ? { deploymentId: entry.deploymentId }
       : {}),
     releasedAt: entry.releasedAt as string,
     bytes: entry.bytes,
+    ...(typeof entry.uncompressedBytes === 'number' && Number.isFinite(entry.uncompressedBytes)
+      ? { uncompressedBytes: entry.uncompressedBytes }
+      : {}),
     digest: entry.digest as string,
     href: entry.href as string,
     filename: entry.filename as string,

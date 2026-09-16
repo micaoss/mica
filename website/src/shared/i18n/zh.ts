@@ -106,6 +106,12 @@ export const zh = {
       query: '版本或部署 ID',
       all: '全部',
     },
+    variants: {
+      full: '完整',
+      root: '仅 root',
+      kernel: '仅 kernel',
+    },
+    uncompressed: '解压后',
     cols: {
       board: '板卡',
       profile: 'Profile',
