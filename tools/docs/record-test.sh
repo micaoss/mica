@@ -25,20 +25,33 @@ fail() { FAIL=$((FAIL + 1)); echo "  FAIL $*" >&2; }
 
 echo "tools/docs/record-test.sh: the gated records sequence"
 
-# A bare "remote" plus a clone of the working tree's HEAD.
+# The fixture is a repository this test builds: the tracked tree of HEAD,
+# committed once here, with its own bare remote. It is deliberately NOT a clone
+# of the repository under test -- actions/checkout clones with `fetch-depth: 1`,
+# and git refuses to push a shallow history into a fresh remote ("shallow
+# update not allowed"), so a clone-based fixture passed on a workstation and
+# failed in CI. `git archive HEAD` reads a shallow repository perfectly well:
+# it needs one commit, not the history behind it.
 git init -q --bare "$WORK/remote.git"
-git clone -q "$REPO" "$WORK/clone"
+mkdir -p "$WORK/clone"
+git -C "$REPO" archive HEAD | tar -x -C "$WORK/clone"
+# The script under test comes from the working tree, so an edit to it is proven
+# before it is committed.
+cp "$REPO/tools/docs/record.sh" "$WORK/clone/tools/docs/record.sh"
 cd "$WORK/clone"
-git remote set-url origin "$WORK/remote.git"
-git branch -M main
-# Test the script as it is in the working tree, not as it was last committed.
-cp "$REPO/tools/docs/record.sh" tools/docs/record.sh
-git add tools/docs/record.sh
-# Only a working-tree edit needs a fixture commit; normally the clone already
-# carries the committed script and there is nothing to commit here.
-git diff --cached --quiet \
-    || git -c user.name=test -c user.email=test@example.invalid \
-           commit -q -m 'fixture: the script under test'
+git init -q -b main
+git add -A
+git -c user.name=test -c user.email=test@example.invalid \
+    commit -q -m 'fixture: the tree under test'
+git remote add origin "$WORK/remote.git"
+# The invariant the CI failure of 2026-09-16 broke: the fixture must own a
+# complete history, because git refuses to push a shallow one into a fresh
+# remote. Asserting it here names the cause; the push would only say
+# "shallow update not allowed".
+if [ "$(git rev-parse --is-shallow-repository)" != false ]; then
+    echo "  FAIL the fixture repository is shallow; it cannot be pushed" >&2
+    exit 1
+fi
 git push -q origin main
 BASE=$(git rev-parse HEAD)
 
