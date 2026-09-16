@@ -7,6 +7,7 @@
         { "name": "quickstart" },
         { "name": "download" },
         { "name": "install" },
+        { "name": "flashing" },
         { "name": "first-run" }
       ]
     },

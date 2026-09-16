@@ -124,6 +124,7 @@ export const en: typeof zh = {
       quickstart: { title: 'Quickstart', body: 'Build an image and boot it.' },
       install: { title: 'Flashing', body: 'Writing an image to the board, through to first boot.' },
       firstRun: { title: 'First run', body: 'Install offline, then configure the device to be yours.' },
+      flashing: { title: 'Writing the image', body: 'Getting a release image onto a board, board by board, and what is not a verified path.' },
       update: { title: 'Updates and rollback', body: 'Signed A/B deployments, the health gate, and falling back when one fails.' },
       recovery: { title: 'Recovery', body: 'What to do when a device does not boot, and what recovery costs.' },
       trouble: { title: 'When something goes wrong', body: 'How to get in, what evidence to read, and how to interpret a refusal.' },

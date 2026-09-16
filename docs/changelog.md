@@ -3541,3 +3541,24 @@ Three things the site could not state before and now does:
 
 The `-minimal` products drop out on their own: the index omits what the catalogue marks
 `publish: false`, so the rule lives upstream rather than in a filter here.
+
+## 2026-09-16 05:15 [progress]
+
+`user/flashing.md` now has a Chinese translation, so the site publishes it: the download
+pages were sending readers to `user/install` for flashing, and install owns the order of
+operations, not the per-board write. Every board page links the flashing guide, and
+`published-docs.json` carries it — 32 prepared documents, up from 30.
+
+Five user pages stay unpublished, and the reason differs:
+
+- `overview.md`, `update-packages.md` — English only so far. `docs/zh/README.md` lists them
+  `not-translated`. Publishing an English-only page would leave the Chinese site with a hole
+  where the rest of the set has a page.
+- `build.md`, `releasing.md` — `releasing.md` opens "For maintainers", and `build.md` is the
+  building guide rather than a step in the customer journey. Whether they belong on a public
+  site is a content decision, not mine.
+- `manufacturing.md` — unpublished since the first allowlist, unchanged.
+
+`docs/user/doc-contract.md` §2's information architecture does not list any of the five
+either, so the contract is behind the document set it governs. That is worth reconciling
+upstream before the site decides anything.

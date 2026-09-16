@@ -134,6 +134,7 @@ export const zh = {
       quickstart: { title: '快速上手', body: '构建一份镜像并把它启动起来。' },
       install: { title: '刷机指南', body: '把镜像写到板子上，直到第一次启动起来。' },
       firstRun: { title: '首次配置', body: '离线装机，然后把设备配成你要的样子。' },
+      flashing: { title: '写入镜像', body: '按板卡把发布镜像写进设备，以及哪些步骤尚未验证。' },
       update: { title: '升级与回滚', body: '签名的 A/B 部署、健康确认，以及失败时退回上一份。' },
       recovery: { title: '恢复', body: '设备起不来时怎么办，以及恢复的代价。' },
       trouble: { title: '出问题的时候', body: '怎么接进去、该读哪些证据、系统的拒绝信息怎么解读。' },

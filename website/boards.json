@@ -5,6 +5,7 @@
       "board": "x64",
       "guides": [
         { "id": "install", "doc": "user/install" },
+        { "id": "flashing", "doc": "user/flashing" },
         { "id": "firstRun", "doc": "user/first-run" },
         { "id": "update", "doc": "user/update-rollback" },
         { "id": "trouble", "doc": "user/troubleshooting" }
@@ -15,6 +16,7 @@
       "guides": [
         { "id": "quickstart", "doc": "user/quickstart" },
         { "id": "install", "doc": "user/install" },
+        { "id": "flashing", "doc": "user/flashing" },
         { "id": "update", "doc": "user/update-rollback" },
         { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/virt-arm64.md" }
       ]
@@ -23,6 +25,7 @@
       "board": "cx3576",
       "guides": [
         { "id": "install", "doc": "user/install" },
+        { "id": "flashing", "doc": "user/flashing" },
         { "id": "update", "doc": "user/update-rollback" },
         { "id": "recovery", "doc": "user/recovery" },
         { "id": "trouble", "doc": "user/troubleshooting" },
@@ -34,6 +37,7 @@
       "board": "s905x5m",
       "guides": [
         { "id": "install", "doc": "user/install" },
+        { "id": "flashing", "doc": "user/flashing" },
         { "id": "update", "doc": "user/update-rollback" },
         { "id": "trouble", "doc": "user/troubleshooting" },
         { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/s905x5m.md" }
