@@ -71,22 +71,38 @@ Not started
 
 ## Controls that bound it
 
-Both controls are the *on-target* shape: their build container runs on the
-platform it builds for, so local and CI differ only by emulation. Their
-byte-identical results are what that shape predicts, and they are why the
-first framing — emulation changes bytes — could not survive.
+These are the *on-target* shape: the build container runs on the platform it
+builds for, so local and CI differ only by emulation. Their byte-identical
+results are what that shape predicts, and they are why the first framing —
+emulation changes bytes — could not survive. Rust is among them, so the
+difference this record investigates is not a property of the language.
 
 - `mica-system-base`, 2026-09-16 on build-env `20260916-0735`: all eight
   archives byte-identical to `20260915-1102` on both architectures, in CI over
   natively built artefacts and locally with arm64 under QEMU. It compiles
   BusyBox and systemd-boot — C, make, meson, ninja — and packs two data
   packages.
-- `mica-podman`, 2026-09-14 at `09ccebe`: a local `make offline` with arm64
-  under emulation compared byte for byte against the CI artefacts of the same
-  commit, both architectures identical across the `.deb`, `Packages` and
-  `SHA256SUMS`. Its re-check against the natively published arm64 archive of
-  `20260916-0846` is pending, so treat it as a strong prior rather than
-  settled.
+- `mica-podman`, three trees: a local `make offline` at `09ccebe` against the
+  CI artefacts of the same commit, both architectures identical across the
+  `.deb`, `Packages` and `SHA256SUMS`; and — the measurement that settles the
+  language question — its **Rust** stage, `netavark` and `aardvark-dns` built
+  with `cargo build --release` in a container run on the target platform, whose
+  emulated arm64 package is byte-identical to the natively built archive of
+  release `20260916-0846`, sha256
+  `b7f23a277a4d3204b6d1551fe0bad5bca8d2aee5c31f413a2d5a977324606de3`.
+  Emulation has not moved a byte in any of them. The caveat therefore does not
+  bind `mica-podman`: it verified from its own scripts that every compiling
+  stage runs on the target platform and that its one host-platform stage clones
+  and verifies pinned upstream trees without compiling, so its local arm64
+  build does validate its arm64 half.
+- `mica-boards`, 2026-09-16, the worked example that the question is answered
+  **per artifact**: its pools are on-target (a locally emulated arm64 pool
+  rebuild matched the CI-published `cx3576` packages byte for byte, the fourth
+  measurement of emulation not changing bytes), its kernels are cross-built
+  locally against a natively built CI, which is this record's position, and its
+  U-Boots are cross-built on amd64 in both places, which is nothing to compare.
+  Its method matters too: it compared OCI layer bytes, not manifest digests,
+  which move with the release string.
 
 ## The sorting question, for any repository
 
@@ -118,3 +134,7 @@ Is the local build the same build as the CI one?
   **the** record of the investigation: it is workspace-wide and carries the
   controls from repositories that are not the owner. `mica-core`'s task is the
   working record and cites this one rather than restating them.
+- 2026-09-16: `mica-podman` measured Rust under emulation and it reproduces, so
+  nothing measured here says emulation changes bytes — for any language. The
+  sorting question is answered per artifact: `mica-boards` holds all three
+  answers in one tree.

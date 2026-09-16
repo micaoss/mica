@@ -35,11 +35,14 @@ one lock, and turns every consumer build into a digest pull.
 With `mica-podman`'s pinned build closure, this removes the last
 consumer-time `apt` from the workspace.
 
-**Paused on 2026-09-16** (user): every consumer move except `mica-build`'s
-current round is held until the cache and mirror design is settled, so the
-`bsp` switch in `mica-boards` and `mica-podman`'s pinned build closure are
-committed work that has not landed. The decision stands; only its adoption
-waits.
+**Measured on 2026-09-16.** The `bsp` switch holds: every kernel on all four
+boards, both vendor trees included, the `cx3576` U-Boot, all board and
+firmware components and three of four pools rebuilt byte-identically under the
+digest-pinned `bsp` image. In one sentence — the Ubuntu snapshot pin that was
+removed from `mica-boards` produced the same bytes the `bsp` image now
+produces. Two exceptions, neither the toolchain: the `s905x5m` U-Boot vendor
+signing non-determinism, which is pre-existing and recorded in that
+repository, and one package deliberately bumped.
 
 ## Consequences for consumers
 

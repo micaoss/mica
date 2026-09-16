@@ -94,14 +94,15 @@ checkout and composes the products from those builds. It is long and needs
 docker.
 
 On an amd64 workstation, whether an arm64 artefact comes out byte-identical to
-the published one depends on how that repository builds it. Where the build
-container runs on the target platform, the local build is the same build under
-emulation and reproduces — measured for the base packages and for the
-container engine. Where it runs on the host with a cross toolchain while CI
-builds natively, they are two different builds: `mica-core`'s arm64 packages
-are cross-built locally and differ from the published ones, which are native.
-An offline build is a **working** system either way; only CI answers whether
-an arm64 artefact still matches its release.
+the published one depends on how that repository builds it — not on emulation,
+which has never moved a byte in any measurement here, Rust included. Where the
+build container runs on the target platform, the local build is the same build
+under emulation and reproduces: the base packages and the container engine
+both do, so for those a local build does answer for the arm64 half. Where it
+runs on the host with a cross toolchain while CI builds natively, they are two
+different builds and the local one is a valid archive that is not the
+published one; `mica-core` is that case today. An offline build is a
+**working** system either way.
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
 

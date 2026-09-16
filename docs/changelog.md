@@ -1,5 +1,55 @@
 # Changelog
 
+## 2026-09-16 11:40 [finding]
+
+Two more measurements close the arm64 byte question, and one of them corrects
+a claim in the 11:05 entry.
+
+**Rust under emulation reproduces.** `mica-podman` builds `netavark` and
+`aardvark-dns` with `cargo build --release` in a container run on the *target*
+platform, so it is emulated on the amd64 station and native in CI; its
+emulated arm64 package is byte-identical to the natively built archive of
+release `20260916-0846`, sha256
+`b7f23a277a4d3204b6d1551fe0bad5bca8d2aee5c31f413a2d5a977324606de3`. That is
+its third independent measurement on three trees. The accurate statement is
+therefore simpler than any version so far: **nothing measured here says
+emulation changes bytes** — not for C, make, meson, ninja or data packaging,
+and not for Rust. What changes bytes is a local build that is not the same
+build as the CI one, which for `mica-core` means cross-compiled against
+native. The caveat does not bind `mica-podman`, which verified from its own
+scripts that every compiling stage runs on the target platform, so its local
+arm64 build validates its arm64 half and its `make offline` produces the
+published arm64 bytes.
+
+**The question is answered per artifact, not per repository.** `mica-boards`
+answered it on paper for three artifacts and got three different answers in
+one tree: its pools run on the target platform (and a locally emulated arm64
+pool rebuild matched the CI-published `cx3576` packages byte for byte, a
+fourth measurement of emulation not changing bytes); its kernels are
+cross-built locally while CI builds every one of them natively, which is
+`mica-core`'s position; and its U-Boots are cross-built on amd64 in both
+places, pinned there because the assembly runs the FIT host tools on x86-64,
+which is nothing to compare. Its method is recorded with it: compare OCI layer
+bytes, not manifest digests, which move with the release string and would have
+reported four boards of noise.
+
+Both are in `docs/design/build-harness.md` section 4, with the per-artifact
+rule stated where a reader will bring the wrong question, and in
+`docs/design/release-lock.md` section 5, `docs/design/build.md` and
+`docs/user/build.md` with its Chinese page. The reachability claim, the
+control procedure and the sentence that a real local difference stays visible
+are unchanged.
+
+**The `bsp` toolchain switch is measured and holds** (same report): every
+kernel on all four boards including both vendor trees, the `cx3576` U-Boot,
+all board and firmware components and three of four pools rebuilt
+byte-identically under the digest-pinned `bsp` image — the Ubuntu snapshot pin
+removed from `mica-boards` produced the same bytes the `bsp` image now
+produces. The two exceptions are the `s905x5m` U-Boot vendor signing
+non-determinism, pre-existing and recorded there, and one package deliberately
+bumped. `docs/decisions/2026-09-16-toolchains-live-in-build-env.md` carries it
+in place of the pause note.
+
 ## 2026-09-16 11:05 [finding]
 
 The mechanism behind the arm64 byte difference is corrected, by the repository

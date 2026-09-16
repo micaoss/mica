@@ -67,16 +67,42 @@ BuildKit's emulator and host binfmt registration are separate facilities.
 
 Nor does it establish the released bytes. Before trusting a local arm64
 artefact against a release, answer one question: **is the local build the same
-build as the CI one?**
+build as the CI one?** Ask it **per artifact, not per repository** — one tree
+can hold all three answers, and "which position is my repository in" is the
+question that gets this wrong.
 
 | The build container runs | Local versus CI | Measured |
 |---|---|---|
-| on the target platform | the same build, emulated | reproduces (`mica-system-base`, eight archives; `mica-podman`, its offline build) |
+| on the target platform | the same build, emulated | reproduces (`mica-system-base`, eight archives; `mica-podman`, three trees including its Rust stage) |
 | on the host with a cross toolchain, CI native | two different builds | differs (`mica-core`, six Rust packages of six) |
 | on the host with a cross toolchain, CI the same | the same build | nothing to compare |
 
+`mica-boards` answered it on paper for three artifacts and got three different
+answers in one repository (2026-09-16):
+
+- **pools** run on the target platform — `tools/deb/build.sh` sets the platform
+  to the package architecture — so CI is native per architecture and a foreign
+  local host is emulated. Measured: a locally emulated arm64 pool rebuild
+  matched the CI-published `cx3576` packages byte for byte, the fourth
+  independent measurement of emulation not changing bytes.
+- **kernels** are built on the host with the toolchain doing the crossing, and
+  CI cross-builds no kernel: all four run on their matching native runner. So
+  on an x86-64 workstation the three arm64 kernels are the `mica-core`
+  position, while `uefi-x64` is the same build in both places.
+- **U-Boots** are cross-built on amd64 in CI and cross-built on amd64 locally,
+  pinned there deliberately because the assembly runs the FIT host tools on
+  x86-64. Same build in both places: nothing to sort.
+
+Compare **OCI layer bytes, not manifest digests**. A manifest digest moves
+with the release string, so comparing manifests reports noise for every
+artefact and signal for none.
+
 So a local reuse or version guard is authoritative for the half CI builds the
-same way, and for the other half only once the shapes are known to match.
+same way — for `mica-podman`, which checked its scripts stage by stage, that
+is both halves — and for the other half only once the shapes are known to
+match. Name the repositories the caveat binds rather than stating it of the
+workspace: today it binds `mica-core`, and `mica-boards` is answering the same
+question on paper.
 Before treating an arm64 difference as a changed input, run the control: the
 same station, the same command, the previous lock. Two locks giving the same
 bytes, both unlike the release, means the difference is in how the build runs
