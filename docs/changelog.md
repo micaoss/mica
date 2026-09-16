@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-16 17:15 [milestone]
+
+The **root-only update archive ran for the first time**, on real releases and
+on all six products at once
+(`docs/task/20260916-1653-root-only-archive.md`). The rule has been in
+`docs/decisions/2026-09-15-update-packages.md` since 2026-09-15 — an unchanged
+kernel identity publishes a `root` archive beside `full` — and nothing had
+ever exercised it.
+
+Three predictions were written before the cut and all three held after it: the
+kernel identities would hold on all four boards, because the `mica-boards`
+kernels came out byte-identical under `bsp`; every product root would move,
+because `mica-apid` went `0.1.0-2`; and therefore every product would emit
+`full` plus `root` and no `kernel` archive. No divergence.
+
+It applies to devices rather than to a fixture. `cx3576-dev`'s `root` archive
+requires kernel `620f60e6a012`, the identity the generation-4 devices are
+running, so that population can take it; and `requires.generationBelow` equals
+each product's own generation, so the `cx3576` archives refuse the
+generation-2 rows of the defective `cx3576.20260916-0847` without anyone
+having to remember that release is bad. The counter does it.
+
+The prediction-then-check shape is recorded with the result, because it is
+what makes this a measurement: a release that happens to produce the expected
+artifacts proves only that it produced them, while a prediction that survives
+the cut proves the rule it came from. The device side remains unexercised on
+hardware, and the record says so.
+
 ## 2026-09-16 17:09 [release]
 
 `mica-build` published the re-pin round from `04f05227`:

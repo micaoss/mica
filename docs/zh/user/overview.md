@@ -45,8 +45,8 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
   它列出每个已发布产品的最新 release。索引是 GitHub 的 latest release，所以最大的
   `mica.*` 标签就是最新的 Mica 版本。
 - 自 2026-09-16 起，作用域标签用点号分隔作用域
-  （[决策](../../decisions/2026-09-16-scoped-tags-use-a-dot.md)）；下面列出的标签是在
-  那之前切的，仍带斜杠。
+  （[决策](../../decisions/2026-09-16-scoped-tags-use-a-dot.md)）；在那之前切的发布
+  仍带斜杠，属于历史。
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 

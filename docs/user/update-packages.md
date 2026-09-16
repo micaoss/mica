@@ -28,7 +28,10 @@ Each product release has one signed deployment, published as up to three
 | `root` | `mica-<product>-<stamp>.root.micaupd` | the kernel identity is unchanged from the product's previous release |
 | `kernel` | `mica-<product>-<stamp>.kernel.micaupd` | the rootfs identity is unchanged |
 
-When both changed, only `full` is published. A `root` archive carries the
+When both changed, only `full` is published. The `root` case first ran on
+real releases on 2026-09-16, on all six products at once and against the
+devices that exist
+([record](../task/20260916-1653-root-only-archive.md)). A `root` archive carries the
 rootfs objects, a `kernel` archive the boot artifact and the support image
 with its modules and firmware; the objects they leave out must already be on
 the device, which is why each states what it requires. Update archives are not

@@ -55,8 +55,8 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
   published product. The index is the GitHub latest release, so the greatest
   `mica.*` tag is the newest Mica version.
 - A scoped tag separates its scope with a dot since 2026-09-16
-  ([decision](../decisions/2026-09-16-scoped-tags-use-a-dot.md)); the tags
-  listed below were cut before that date and keep their slash.
+  ([decision](../decisions/2026-09-16-scoped-tags-use-a-dot.md)); the releases
+  cut before that date keep their slash and are history.
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
