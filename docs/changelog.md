@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-16 17:55 [spec]
+
+The no-deletion rule of `docs/design/mica-index.md` section 5 gains its one
+exception, named rather than left to be discovered: **withdrawal for safety**.
+The rule stands for a defect in content, where superseding is the whole remedy
+and the generation counter protects devices. It does not cover a release whose
+artefacts are unsafe to have on a device at all — compromised signing
+material, an artefact signed that should not have been, bytes that must not
+remain fetchable. Removing those is a user decision that accepts a cost, and
+the cost is stated when it is taken: every index referencing the release
+becomes permanently unverifiable by `--full`, so the withdrawal covers those
+indexes too rather than leaving them pointing at something gone, and a record
+names which releases and which indexes were withdrawn and why — after the
+fact, nothing in the published set can explain its own absence.
+
+The reason for naming it rather than softening the rule: a rule with a named
+exception is followed, while "never delete" against a compromised release is
+either broken quietly or obeyed wrongly.
+
 ## 2026-09-16 17:40 [decision]
 
 The separate `cx3576` re-cut was cancelled, and the defective release stays

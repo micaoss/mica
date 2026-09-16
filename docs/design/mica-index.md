@@ -188,3 +188,22 @@ generation and stays published, with `mica.20260916-0858` which references it;
 `cx3576.20260916-1653` supersedes it at the corrected generations, and the
 generation counter makes devices refuse the bad rows without anyone having to
 remember which release was bad.
+
+**The one exception, named so that it is not taken silently: withdrawal for
+safety.** The rule above is about a defect in *content*, where a superseding
+release is the whole remedy and the counter protects devices. It does not
+cover a release whose artefacts are unsafe to have on a device at all —
+compromised signing material, an artefact signed that should not have been,
+bytes that must not remain fetchable. Removing those is a **user decision that
+accepts a cost**, and the cost is stated when it is taken:
+
+- every index that references the release becomes permanently unverifiable by
+  `--full`, so the withdrawal covers those indexes too — they are removed with
+  it, not left pointing at something that is gone;
+- a record names which releases and which indexes were withdrawn and why,
+  because after the fact nothing in the published set can explain its own
+  absence.
+
+A rule with a named exception is followed. A rule that reads "never delete"
+against a compromised release is either broken quietly or obeyed wrongly, and
+both are worse than a documented cost.
