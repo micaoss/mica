@@ -1,5 +1,44 @@
 # Changelog
 
+## 2026-09-16 11:05 [finding]
+
+The mechanism behind the arm64 byte difference is corrected, by the repository
+that reported it, with evidence: **it is not emulation, it is
+cross-compilation**. `mica-core` does not emulate arm64 at all. It runs its
+rust container on the host platform and cross-compiles with
+`--target aarch64-unknown-linux-gnu`, while its CI arm64 job runs on an arm64
+runner where the same command is a native build — two different builds, not
+one build run two ways. The proof is in the artefact: the local binary carries
+an ELF note `.note.package` naming `cross-toolchain-base`, architecture
+`amd64`, which the released binary does not carry, and the Rust crate
+disambiguators differ because the `rustc` host triple feeds `-C metadata`. The
+compiler version is the same in both.
+
+So the question a reader applies is not "does my build emulate" but **is my
+local build the same build as the CI one**. A container that runs on the
+target platform differs from CI only by emulation, and that reproduces —
+measured twice, `mica-system-base`'s eight archives and `mica-podman`'s
+offline build, with podman's re-check against the natively published
+`20260916-0846` archive still pending. A container that runs on the host with
+a cross toolchain, against a CI that builds natively, is a different build and
+differs. A container that cross-builds in both places is the same build and
+has nothing to compare.
+
+This supersedes the 09:00 and 10:10 entries at the mechanism; both are kept,
+because the sequence is the point: broadcast from one repository, contradicted
+by two controls, reframed, then corrected at the cause by its own author inside
+a day. Nothing measured anywhere says emulation changes bytes, and the earlier
+entries said it did.
+
+Corrected in `docs/design/release-lock.md` section 5,
+`docs/design/build.md`, `docs/design/build-harness.md` section 4 and
+`docs/user/build.md` with its Chinese page. Unchanged, because they were right:
+CI is the authority for an architecture's half, a local difference is not
+evidence until the control has been run, nothing is bumped on one, and the
+control procedure itself — which produced both refinements. The bound for
+`mica-core` is stated where it matters: a local arm64 archive built on an
+amd64 station is a valid archive and is not the published one.
+
 ## 2026-09-16 10:10 [finding]
 
 The emulation finding of 09:00 is narrower than it was first stated, and two

@@ -509,18 +509,28 @@ keeping its own copy:
 
 The cache never adds an input: only a pinned sha256, commit or tree enters a
 build, and an offline build's output is byte-identical to the online one.
-Emulation does not by itself break that: on the amd64 station,
-`mica-system-base` reproduced all eight archives of `20260915-1102` on both
-architectures with arm64 built under QEMU, and `mica-podman` compared a local
-emulated `make offline` against its CI artefacts of the same commit and found
-both architectures identical. One pool does differ — `mica-core`'s six Rust
-packages, six of six, with its amd64 half reproducing exactly and the control
-on the previous build-env lock giving the same emulated bytes — so something
-in that build is sensitive to the emulated environment
-(`docs/task/20260916-0900-emulated-arm64-bytes.md`). Either way, CI is the
-authority for an architecture's half, because its gate runs the guard over
-natively built artefacts; a local rebuild is evidence only after the control
-of `docs/design/build-harness.md` section 4 has been run.
+The exception is a repository whose **local build is not the same build as
+its CI build**. Ask that question first: does the build container run on the
+target platform, or on the host with a cross toolchain?
+
+- On the target platform, local and CI differ only by emulation, and emulation
+  reproduces — `mica-system-base` rebuilt all eight archives of
+  `20260915-1102` byte-identically on both architectures with arm64 under
+  QEMU, and `mica-podman` compared a local `make offline` against its CI
+  artefacts of the same commit and found both architectures identical (its
+  re-check against the natively published arm64 archive of `20260916-0846` is
+  pending, so that one is a strong prior, not settled).
+- On the host with a cross toolchain, while CI builds natively on a runner of
+  that architecture, the two halves come out of **different toolchains**.
+  `mica-core` is this shape: its arm64 packages are cross-built locally and
+  native in CI, and all six differ. A local arm64 archive from an amd64
+  station there is a valid archive and is not the published one.
+
+No measurement says emulation changes bytes. What is measured is
+cross-compiled against native (`docs/task/20260916-0900-emulated-arm64-bytes.md`).
+Either way, CI is the authority for an architecture's half, because its gate
+runs the guard over natively built artefacts; a local rebuild is evidence only
+after the control of `docs/design/build-harness.md` section 4 has been run.
 Language dependencies keep their own hashes (`Cargo.lock`, `bun.lock`,
 `go.sum`) and are vendored into `repos/`. Base images by digest stay in the
 local image store; offline, a missing one is refused.

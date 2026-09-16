@@ -65,16 +65,24 @@ Building an ARM64 image under a buildx executor does not establish that a
 direct `docker run --platform linux/arm64` can execute on the daemon host.
 BuildKit's emulator and host binfmt registration are separate facilities.
 
-Nor does it establish the released bytes. An arm64 artefact built under
-emulation on an amd64 station *may* differ from the same artefact built
-natively on an arm64 runner with every pinned input equal — measured on
-2026-09-16, `mica-core`'s Rust pool differs six of six while
-`mica-system-base`'s eight archives and `mica-podman`'s offline build
-reproduce — so a local reuse or version guard is authoritative for the amd64
-half only, whatever the arm64 half shows. Before treating an arm64 difference
-as a changed input, run the control: the same station, the same emulation, the
-previous lock. Two locks giving the same bytes, both unlike the release, is
-emulation (`docs/task/20260916-0900-emulated-arm64-bytes.md`).
+Nor does it establish the released bytes. Before trusting a local arm64
+artefact against a release, answer one question: **is the local build the same
+build as the CI one?**
+
+| The build container runs | Local versus CI | Measured |
+|---|---|---|
+| on the target platform | the same build, emulated | reproduces (`mica-system-base`, eight archives; `mica-podman`, its offline build) |
+| on the host with a cross toolchain, CI native | two different builds | differs (`mica-core`, six Rust packages of six) |
+| on the host with a cross toolchain, CI the same | the same build | nothing to compare |
+
+So a local reuse or version guard is authoritative for the half CI builds the
+same way, and for the other half only once the shapes are known to match.
+Before treating an arm64 difference as a changed input, run the control: the
+same station, the same command, the previous lock. Two locks giving the same
+bytes, both unlike the release, means the difference is in how the build runs
+rather than in an input (`docs/task/20260916-0900-emulated-arm64-bytes.md`) —
+and that is a reason to look, not a reason to stop looking: a real change hides
+in exactly the same shape.
 
 Use the native pinned Rust builder's `aarch64-linux-gnu-gcc` for cross C test
 helpers on an x86-64 host. The C-only builder is native-only. Use QEMU full-system
