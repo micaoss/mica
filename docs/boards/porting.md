@@ -10,7 +10,7 @@ Two boards run through this manual as references:
 
 - **cx3576** (CX3576-Z, RK3576) — the full-effort case: the board builds its
   own boot chain under `mica-boards:boards/cx3576/`, so every stage below applies.
-- **x64** and **virt-arm64** use the platform's UEFI firmware plus the
+- **uefi-x64** and **uefi-arm64** use the platform's UEFI firmware plus the
   independently built signed systemd-boot manager and UKI. Each has a BSP kernel
   and current board definition; no boot script is used.
 
@@ -90,8 +90,8 @@ stacking) and local fixes as an ordered patch series under
 
 > status: board-dependent — evidence: `mica-boards:boards/cx3576/kernel/configure.sh`, `mica-boards:boards/cx3576/kernel/hooks/configure.sh`, `mica-boards:boards/cx3576/kernel/patches/series`
 
-x64 follows the same procedure over mainline rather than a vendor tree, with
-no patch series and no DTS: `mica-boards:boards/x64/kernel/` pins the tag and the
+uefi-x64 follows the same procedure over mainline rather than a vendor tree, with
+no patch series and no DTS: `mica-boards:boards/uefi-x64/kernel/` pins the tag and the
 sha256 of `git archive` over it, merges the shared fragment and its own on top
 of `x86_64_defconfig`, and records the resolved `.config` in-tree so the build
 can refuse one that drifted.
@@ -200,7 +200,7 @@ LEDs, MAC provisioning needs.
 `boards/<name>/hwinit/`, reading its facts from `/etc/mica/<concern>.conf`;
 declare the conf set in `BOARD_HWINIT_CONFS`. The facts themselves come from
 `package/init/` and are staged by the board package. A board with no such
-hardware declares the list empty — x64 does.
+hardware declares the list empty — uefi-x64 does.
 
 > status: board-dependent — evidence: `mica-boards:boards/cx3576/package/hwinit`
 
@@ -303,7 +303,7 @@ package pool. The `board` and `kernel` components carry the verity trust
 certificate annotation; a component whose inputs are unchanged is reused from
 the board's latest release by digest.
 
-> status: shipped — evidence: `mica-boards:tools/new-board.sh`, `mica-boards:boards/boards.tsv`, `mica-boards:boards/x64/images.tsv`, `mica-boards:boards/x64/outputs.tsv`, `docs/boards/contract.md`
+> status: shipped — evidence: `mica-boards:tools/new-board.sh`, `mica-boards:boards/boards.tsv`, `mica-boards:boards/uefi-x64/images.tsv`, `mica-boards:boards/uefi-x64/outputs.tsv`, `docs/boards/contract.md`
 
 The board's packages are built by the producers in `mica-boards:producers/`
 (`board`, `radio`, `radio-wifi`, `radio-bluetooth`). Each package declares its

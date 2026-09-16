@@ -120,14 +120,14 @@ targets `MASQUERADE`, `REDIRECT`, `SNAT`, `DNAT`, `MARK`, `CHECKSUM` and `CT
 verdicts (`ACCEPT`, `DROP`, `RETURN`, jumps) and the built-in matches (`-p`,
 `--dport`, `-i`, `-o`, `--tcp-flags`); and the four tables `filter`, `nat`,
 `mangle` and `raw` in both address families. Before 2026-09-04 `REDIRECT`,
-`CHECKSUM` and `CT` worked on the arm64 board and were refused on x64 — that
+`CHECKSUM` and `CT` worked on the arm64 board and were refused on uefi-x64 — that
 asymmetry is what the floor replaced.
 
 **Outside that set, ask before you rely on it, and do not assume the two boards
 answer alike.** Measured on 2026-09-04, four extensions still differ, and not
 all in the same direction:
 
-| | x64 | arm64 (cx3576) |
+| | uefi-x64 | arm64 (cx3576) |
 |---|---|---|
 | `-m multiport`, `-m comment`, `-j CT --zone` | refused | works |
 | `-j LOG` | works | **refused** |

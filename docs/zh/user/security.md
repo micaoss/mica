@@ -97,13 +97,13 @@ Warning: Extension REDIRECT revision 0 not supported, missing kernel module?
 `addrtype`、`conntrack`、`state`、`mark`；纯裁决（`ACCEPT`、`DROP`、`RETURN`、
 跳转）与内建匹配（`-p`、`--dport`、`-i`、`-o`、`--tcp-flags`）；以及两个地址族
 各自的四张表 `filter`、`nat`、`mangle`、`raw`。在 2026-09-04 之前，`REDIRECT`、
-`CHECKSUM` 和 `CT` 在 arm64 板上可用、在 x64 上被拒绝——下限取代的正是那种不
+`CHECKSUM` 和 `CT` 在 arm64 板上可用、在 uefi-x64 上被拒绝——下限取代的正是那种不
 对称。
 
 **这个集合之外的东西，依赖它之前请先问，并且不要假设两块板子答得一样。**
 2026-09-04 实测，仍有四个扩展存在差异，而且方向并不一致：
 
-| | x64 | arm64（cx3576） |
+| | uefi-x64 | arm64（cx3576） |
 |---|---|---|
 | `-m multiport`、`-m comment`、`-j CT --zone` | 拒绝 | 可用 |
 | `-j LOG` | 可用 | **拒绝** |

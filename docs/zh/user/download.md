@@ -19,8 +19,8 @@ release，其 URL 里仍是旧的 `<scope>/<stamp>` 形式。被 GitHub 标记�
 
 ## 1. 有哪些东西可下载
 
-只有发布目标板的产品才有镜像和更新归档——今天是 `x64` 和 `cx3576`。
-`virt-arm64` 是验收目标，`s905x5m` 尚未合格，两者都不发布；`-minimal` 产品只用于
+只有发布目标板的产品才有镜像和更新归档——今天是 `uefi-x64` 和 `cx3576`。
+`uefi-arm64` 是验收目标，`s905x5m` 尚未合格，两者都不发布；`-minimal` 产品只用于
 本地和 CI，从不发布（[不发布 minimal 产品](../../decisions/2026-09-15-minimal-products-not-released.md)）。
 
 每个产品的发布携带：
@@ -38,7 +38,7 @@ release，其 URL 里仍是旧的 `<scope>/<stamp>` 形式。被 GitHub 标记�
 REL=https://github.com/micaoss/mica-build/releases/download
 curl -fsSL "$REL/mica.<index release>/mica-index.json" -o mica-index.json
 
-jq -r '.products[] | select(.product=="x64-dev")
+jq -r '.products[] | select(.product=="uefi-x64-dev")
        | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
 ```
 
@@ -51,9 +51,9 @@ sha256 和大小，以及每块板和每个产品的目录。`previous` 指向�
 ## 3. 下载并校验
 
 ```sh
-curl -fsSLO "$REL/x64.<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64.<release>/mica-build.lock"
-curl -fsSLO "$REL/x64.<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/uefi-x64.<release>/SHA256SUMS"
+curl -fsSLO "$REL/uefi-x64.<release>/mica-build.lock"
+curl -fsSLO "$REL/uefi-x64.<release>/mica-uefi-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
 ```
 
@@ -71,19 +71,19 @@ sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
    lock 和索引条目引用的值。
 2. **lock 的 `asset` 行**记录同一个摘要，于是信任 lock 的读者不必再信任清单：
    ```sh
-   awk -F'\t' '$1 == "asset" && $2 == "x64-dev"' mica-build.lock
+   awk -F'\t' '$1 == "asset" && $2 == "uefi-x64-dev"' mica-build.lock
    ```
 3. **索引**同时描述两种形态：`sha256` 和 `size` 属于 `.gz`，
    `uncompressedSha256` 和 `uncompressedSize` 属于 `gzip -dc` 的输出。
    ```sh
-   gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
-   jq -r '.products[]|select(.product=="x64-dev")|.images[]
+   gzip -dc mica-uefi-x64-dev-<release>.img.gz | sha256sum
+   jq -r '.products[]|select(.product=="uefi-x64-dev")|.images[]
           |[.file,.sha256,.size,.uncompressedSha256,.uncompressedSize]|@tsv' mica-index.json
    ```
 4. **OCI 层**携带同样的事实，且可匿名读取；层摘要等于 asset 行的 sha256，它的
    `mica.uncompressed-*` 注解等于索引里的字段：
    ```sh
-   REF=$(jq -r '.products[]|select(.product=="x64-dev")|.bundles.image' mica-index.json)
+   REF=$(jq -r '.products[]|select(.product=="uefi-x64-dev")|.bundles.image' mica-index.json)
    T=$(curl -fsS "https://ghcr.io/token?scope=repository:micaoss/mica-build:pull&service=ghcr.io" | jq -r .token)
    curl -fsSL -H "Authorization: Bearer $T" \
      -H 'Accept: application/vnd.oci.image.manifest.v1+json' \

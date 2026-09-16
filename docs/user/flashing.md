@@ -19,7 +19,7 @@ or an eMMC, and no physical board has booted one. The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
 where they are not verified.
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. Before you write
 
@@ -27,16 +27,18 @@ Verify the file, then decompress it:
 
 ```sh
 sha256sum -c SHA256SUMS                              # the release's own list, covers the .gz
-gzip -dc mica-x64-dev-<release>.img.gz > disk.img
+gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
 sha256sum disk.img                                   # compare with uncompressedSha256
 ```
 
 The full chain — release list, the lock's `asset` row, the index's
 `uncompressedSha256`, the OCI layer annotations — is
 [download](download.md#4-which-digest-at-which-step). For
-`mica-x64-dev-20260915-2230.img.gz` the decompressed image is 1 881 145 344
-bytes with sha256 `e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`,
-which the index and the OCI layer both state.
+`mica-x64-dev-20260915-2230.img.gz` — published before the boards were renamed
+on 2026-09-16, so it carries the old product name — the decompressed image is
+1 881 145 344 bytes with sha256
+`e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`, which the
+index and the OCI layer both state.
 
 Then know three things about the write:
 
@@ -61,24 +63,25 @@ packer is implemented. What differs is where the bootloader lives.
 
 | Board | Firmware format | Does the raw image boot a blank board? | State |
 |---|---|---|---|
-| `x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
-| `virt-arm64` | `efi` (systemd-boot in the ESP) | yes, as a QEMU guest | the acceptance path |
+| `uefi-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
+| `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, as a QEMU guest | the acceptance path; not a release target yet |
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
-Only `x64` and `cx3576` are release targets, so only their images exist as
+Only `uefi-x64` and `cx3576` are release targets, so only their images exist as
 release assets. There is no A/B partition pair to choose between and no
 conversion from an older layout: a write is a full write.
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
-## 3. x64
+## 3. uefi-x64
 
 ### The image
 
-The published x64 image is a GPT disk with disk GUID
+The published uefi-x64 image is a GPT disk with disk GUID
 `5AC35760-0064-4000-8000-000000000000` and three partitions, read out of
-`mica-x64-dev-20260915-2230.img`:
+`mica-x64-dev-20260915-2230.img` (the last image published under the old
+`x64` name; the layout is the board's and did not change with it):
 
 | Partition | Type | Start sector | Size |
 |---|---|---|---|
@@ -90,11 +93,11 @@ The ESP is FAT, labelled `MICAESP`, and carries `EFI/BOOT/BOOTX64.EFI` and
 `loader/loader.conf`. The image boots wherever UEFI firmware starts
 `BOOTX64.EFI`, so the whole image goes to the target medium.
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:build/src/file-layout.ts`
 
 ### Which media the kernel can drive
 
-The pinned x64 kernel has built in: USB host XHCI and EHCI with
+The pinned uefi-x64 kernel has built in: USB host XHCI and EHCI with
 `USB_STORAGE`, SATA through AHCI and `ATA_PIIX`, NVMe, and virtio-blk and
 virtio-scsi for VMs. `CONFIG_USB_UAS` is not set, so a UAS-only enclosure
 falls back to bulk-only transport or is not driven, and `CONFIG_MMC` is not
@@ -104,11 +107,11 @@ card reader is ordinary USB mass storage.
 So the driver answer is USB sticks and disks, SATA and NVMe. Which of those
 media the assembly qualifies is still open — nothing physical has been tested.
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/kernel/config/x64.config`, `mica-boards:make kernel-config-test`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-boards:make kernel-config-test`
 
 ### Writing it (not verified)
 
-No physical x64 write has been performed or witnessed here. The commands below
+No physical uefi-x64 write has been performed or witnessed here. The commands below
 are the form the assembly would document; publish nothing from this block as
 qualified, and expect the target identification to be the risky part:
 
@@ -116,7 +119,7 @@ qualified, and expect the target identification to be the risky part:
 > # NOT VERIFIED: never run against physical hardware by this project
 > lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS      # before and after plugging it in
 > udevadm info --query=property --name=/dev/sdX | grep -E 'ID_BUS|ID_MODEL|ID_SERIAL'
-> gzip -dc mica-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+> gzip -dc mica-uefi-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
 > sync
 > sudo cmp -n 1881145344 /dev/sdX disk.img            # or re-read and compare sha256
 > sudo sfdisk -d /dev/sdX                             # expect 2048, 1050624, 3147776
@@ -140,10 +143,12 @@ Boot governs who may load the kernel, not whether the root is verified.
 
 > status: unsupported
 
-## 4. QEMU: x64 and virt-arm64
+## 4. QEMU: uefi-x64 and uefi-arm64
 
-This is the path that is actually run. `virt-arm64` exists for it: it is a
-QEMU board, not a release target.
+This is the path that is actually run. All of `uefi-arm64`'s evidence is
+QEMU, and it is not a release target yet: making it the generic arm64 system,
+with a driver set beyond virtio, is
+`docs/task/20260916-0040-uefi-board-names.md`.
 
 Firmware files, as the acceptance lab uses them:
 
@@ -156,7 +161,7 @@ Build the variable store once, enrolling the release's boot certificate — this
 is what makes the guest trust the image:
 
 ```sh
-cp /usr/share/AAVMF/AAVMF_VARS.fd vars.template.fd          # OVMF_VARS_4M.fd for x64
+cp /usr/share/AAVMF/AAVMF_VARS.fd vars.template.fd          # OVMF_VARS_4M.fd for uefi-x64
 virt-fw-vars --input vars.template.fd --output vars.fd \
   --set-pk 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
   --add-kek 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
@@ -175,11 +180,11 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
   -device virtio-blk-pci,drive=disk0,bootindex=0
 ```
 
-x64 is the same line with `qemu-system-x86_64 -machine q35` and the OVMF
+uefi-x64 is the same line with `qemu-system-x86_64 -machine q35` and the OVMF
 files. Append `,readonly=on` to the `-drive if=none,id=disk0,…` value to boot
 the image read-only. The guest writes to `disk.img`, so copy it first.
 
-The devices are not free choices on `virt-arm64`: after the kernel trim the
+The devices are not free choices on `uefi-arm64`: after the kernel trim the
 guest has no SCSI, SATA, NVMe, MMC, USB or virtio-scsi driver at all, so the
 disk must be `virtio-blk-pci` and the network `virtio-net-pci`; the console is
 PL011 (`console=ttyAMA0,115200n8`), the watchdog the built-in i6300esb, the
@@ -204,10 +209,10 @@ The whole acceptance suite — boot, runtime, updates, faults, reset, shutdown �
 is one target in `mica-build`:
 
 ```sh
-make lifecycle-uefi PRODUCT=virt-arm64-dev
+make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/virt-arm64/kernel/config`, `docs/boards/virt-arm64.md`
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 A stock release image boots to its login prompt and its services. The
 `FILE_AB_*` markers the acceptance console prints come from the suite's own
@@ -355,4 +360,4 @@ been run on hardware. The device-side half of this section is read out of
   running device to a newer release, take an update archive
   ([update packages](update-packages.md)).
 
-> status: shipped — evidence: `mica-boards:boards/x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`

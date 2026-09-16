@@ -151,8 +151,8 @@ The board list and each board's expected outputs are machine-readable
 - `mica-boards:boards/boards.tsv`: line 1 `# mica-boards boards v1`, then one
   tab-separated row per supported board, sorted by board,
   `<board> <arch> <boot backend>` (`cx3576 arm64 uboot-fit`,
-  `s905x5m arm64 uboot-fit`, `virt-arm64 arm64 systemd-boot`,
-  `x64 amd64 systemd-boot`).
+  `s905x5m arm64 uboot-fit`, `uefi-arm64 arm64 systemd-boot`,
+  `uefi-x64 amd64 systemd-boot`).
 - `mica-boards:boards/<board>/outputs.tsv`: line 1
   `# mica-boards board outputs v1`, then rows `package <name>` (an archive of
   `pool.<board>.<arch>.<release>`) and `file <component> <path>` (a file of
@@ -274,7 +274,7 @@ It `depends on MODULES` and on `HAVE_CBPF_JIT || HAVE_EBPF_JIT` (v6.1
 `kernel/bpf/Kconfig`); the board has both.
 
 **`CONFIG_DEBUG_INFO_BTF` is deliberately NOT in the floor, and the price was
-measured rather than estimated.** Debian sets it `=y`, so it is free on x64 and
+measured rather than estimated.** Debian sets it `=y`, so it is free on uefi-x64 and
 not free on cx3576: it `depends on !DEBUG_INFO_SPLIT && !DEBUG_INFO_REDUCED`
 (v6.1 `lib/Kconfig.debug`) and the board config sets
 `CONFIG_DEBUG_INFO_REDUCED=y`, so adopting it means compiling the whole tree
@@ -356,7 +356,7 @@ local` exactly as a native one would. Classifying from the text output gets
 every row of that table wrong.
 
 `nft_compat` resolves an `xt` expression by loading the `xt_*` module by name.
-With the module absent the rule is **refused**, on the x64 kernel this tree
+With the module absent the rule is **refused**, on the uefi-x64 kernel this tree
 builds:
 
 ```
@@ -382,7 +382,7 @@ for actually runs:
 extensions an operator names needs its own module and the image will not carry
 all of them. These eight are the symbols the operator-visible split was *made
 of* — and not, which would sound tidier and be false, "everything both boards
-already had": three of them (`CHECKSUM`, `CT`, `REDIRECT`) were absent on x64,
+already had": three of them (`CHECKSUM`, `CT`, `REDIRECT`) were absent on uefi-x64,
 so adopting them added capability there.
 
 **Eight, derived from running the rules** rather than from the symbols an
@@ -390,7 +390,7 @@ earlier floor swap dropped; the legacy tables of §4.2.2 leave by their own
 route. `NETFILTER_XT_MATCH_CONNTRACK` is here because
 cx3576's board loop stopped restating it and the assertion had to land
 somewhere. And `NETFILTER_XT_NAT` is on this list without being on that one: it
-is `=y` on cx3576 and `=m` on x64, the same split as `TARGET_MASQUERADE` beside
+is `=y` on cx3576 and `=m` on uefi-x64, the same split as `TARGET_MASQUERADE` beside
 it, and a nat compatibility path that answers `-j MASQUERADE` but leaves
 `-j DNAT` one class weaker would keep the defect this section closes.
 
@@ -398,9 +398,9 @@ it, and a nat compatibility path that answers `-j MASQUERADE` but leaves
 
 | | before | after | delta |
 |---|---|---|---|
-| x64 `bzImage` | 14,971,904 B | 14,980,096 B | **+8,192 B, +0.055 %** |
-| x64 `modules.tar` | 337,920 B | 286,720 B | −51,200 B |
-| x64 loadable modules | 8 | 4 | −4 |
+| uefi-x64 `bzImage` | 14,971,904 B | 14,980,096 B | **+8,192 B, +0.055 %** |
+| uefi-x64 `modules.tar` | 337,920 B | 286,720 B | −51,200 B |
+| uefi-x64 loadable modules | 8 | 4 | −4 |
 | cx3576 `Image` | 44,493,312 B | 44,493,312 B | **0 B** |
 
 cx3576 is zero because its committed vendor config already set all eight `=y`,
@@ -409,7 +409,7 @@ from this tree with only the fragment differing, to show that rather than
 assert it. **The comparison was by size, not by hash, and the reason is worth
 keeping now that it has been repaired:** at the time
 the cx3576 kernel Dockerfile (now `mica-boards:boards/cx3576/kernel/Dockerfile`) pinned none of `KBUILD_BUILD_TIMESTAMP`,
-`_USER` or `_HOST`, which x64's did, so two builds of one unchanged tree already
+`_USER` or `_HOST`, which uefi-x64's did, so two builds of one unchanged tree already
 differed — the two `Image` files here have equal size and different sha256, and
 that difference was the build clock rather than this change.
 
@@ -422,10 +422,10 @@ reaches — they are cpp builtins reading the wall clock, and mainline's
 GNU build-id, a hash OF the linked image, which moved only because the five did.
 `modules.tar` differed for an unrelated reason: every member was byte-identical
 and every tar header carried the build's mtime, a packaging defect the same line
-gave x64 and virt-arm64. `SOURCE_DATE_EPOCH` pins the first and
+gave uefi-x64 and uefi-arm64. `SOURCE_DATE_EPOCH` pins the first and
 `--sort=name --mtime --numeric-owner` the second; **all three boards' kernels are
 byte-reproducible now and may be compared by sha256.**
-The x64 figure is `=y` payload — permanent kernel RAM carried by each retained
+The uefi-x64 figure is `=y` payload — permanent kernel RAM carried by each retained
 kernel component — and 8 KiB is not a number that constrains anything. The four `.ko` that stopped being built are
 the same four symbols moving from `=m` to `=y`, so the modules half of
 `verify/src/checks-kernel.ts` keeps four subjects rather than none.
@@ -437,7 +437,7 @@ the same four symbols moving from `=m` to `=y`, so the modules half of
 answer is the other way.
 
 `iptables-nft` builds its `raw`, `nat`, `mangle` and `filter` tables **in
-nf_tables**, not in the legacy table store. On the x64 kernel, which sets
+nf_tables**, not in the legacy table store. On the uefi-x64 kernel, which sets
 `# CONFIG_IP_NF_RAW is not set`:
 
 ```
@@ -453,20 +453,20 @@ mode, where the nft front-end outranks the legacy one, and `update-alternatives`
 is run nowhere here. So cx3576's board loop no longer asserts the ten legacy
 entries it carried. That is not a config change on cx3576 — the vendor config
 still sets them and they stay `=y` — it is the removal of an assertion that
-made a leftover look like a requirement. x64 keeps whatever `x86_64_defconfig`
+made a leftover look like a requirement. uefi-x64 keeps whatever `x86_64_defconfig`
 resolves (a partial legacy surface: `filter` and `mangle` in both families,
 `nat` in ip only, `raw` in neither), because trimming it is a subtraction with
 its own size argument and no consumer asking for it either way.
 
 #### 4.2.3 Four differences of the same class, measured and NOT closed
 
-Running the wider extension set against the rebuilt x64 kernel found four more
+Running the wider extension set against the rebuilt uefi-x64 kernel found four more
 board differences of exactly the shape §4.2.1 closes. They are recorded here
 rather than fixed, because each needs a **direction chosen** and that is a
 decision about what the product's compatibility path guarantees, not a
 measurement:
 
-| Extension | Symbol | x64 | cx3576 |
+| Extension | Symbol | uefi-x64 | cx3576 |
 |---|---|---|---|
 | `-m multiport` | `NETFILTER_XT_MATCH_MULTIPORT` | refused | works |
 | `-m comment` | `NETFILTER_XT_MATCH_COMMENT` | refused | works |
@@ -512,7 +512,7 @@ and its hooks register once a bridge exists. Built in — as it is on an in-tree
 board kernel — that happens at the first bridge; as a module, as on Debian's,
 only once something loads it. So on cx3576 an ip-family FORWARD policy applies
 to same-bridge container traffic from the moment podman creates its network,
-and on x64 today it does not. The capability is common; the default state is
+and on uefi-x64 today it does not. The capability is common; the default state is
 not, and a DROP policy written against one board will not behave the same on
 the other. Anyone writing that policy has to decide the `bridge-nf-call-*`
 sysctls explicitly rather than inherit them.
@@ -542,7 +542,7 @@ choice on merit, not a constraint:
 
 ### 4.4 Measured against Debian: what is required, deferred and dropped
 
-x64 will eventually build its own kernel, at which point "Debian must satisfy
+uefi-x64 will eventually build its own kernel, at which point "Debian must satisfy
 it" stops being a constraint. So every candidate was measured against Debian's
 shipped config and put in one of three buckets, and the middle one is a list
 the later task consumes rather than re-derives.
@@ -551,7 +551,7 @@ the later task consumes rather than re-derives.
 Verified against the config the cx3576 build actually produces (exported after
 `olddefconfig`, not the committed input): every one comes out `=y`.
 
-**Deferred to the x64 kernel** — cx3576 has it, Debian does not. **Measured
+**Deferred to the uefi-x64 kernel** — cx3576 has it, Debian does not. **Measured
 empty.** Of the 101 symbols the built cx3576 kernel sets in the
 BPF / netfilter / bridge / VLAN / veth namespaces, exactly two are not satisfied
 by Debian's `6.12.107+deb13-amd64`, and neither is a capability worth carrying
@@ -562,7 +562,7 @@ forward:
 | `CONFIG_NETFILTER_XTABLES_COMPAT` | `=y` | not set | the 32-bit compat layer for x_tables ioctls on a 64-bit kernel; the image has no 32-bit userspace. Dropped on merit |
 | `CONFIG_DEBUG_INFO_REDUCED` | `=y` | not set | a build-cost knob, not a capability — and Debian's "off" is *more* debug information, not less |
 
-So the x64-kernel task inherits **no backlog of symbols** from this one. What it
+So the uefi-x64-kernel task inherits **no backlog of symbols** from this one. What it
 inherits is the removal of the constraint: a future addition to the floor no
 longer has to clear Debian's config first.
 
@@ -579,7 +579,7 @@ and they are floor now.
 `BPF_LSM depends on BPF_EVENTS && BPF_SYSCALL && SECURITY && BPF_JIT`
 (`kernel/bpf/Kconfig`); the board already had the first three, and
 `CONFIG_BPF_JIT=y` in §4.1 removed the fourth — so `CONFIG_BPF_LSM` is now
-*available* on cx3576 and is simply left at its default of `n`. On x64 the
+*available* on cx3576 and is simply left at its default of `n`. On uefi-x64 the
 `bpf` entry is real (Debian sets `CONFIG_BPF_LSM=y`), so the boot list means
 different things on the two boards. Nothing in the image uses a BPF LSM hook,
 so this task does not enable it; closing the gap is now one config line, and
@@ -666,8 +666,8 @@ merge the same shared fragment before `olddefconfig`. Board intake tiers:
 
 | Board | Architecture | Boot policy | Evidence |
 |---|---|---|---|
-| x64 | amd64 | UEFI Secure Boot → counted systemd-boot entry → signed UKI | Full QEMU runtime, API, updates, faults and shutdown |
-| virt-arm64 | arm64 | AAVMF Secure Boot → counted systemd-boot entry → signed UKI | Full QEMU runtime/API and common update/fault policy |
+| uefi-x64 | amd64 | UEFI Secure Boot → counted systemd-boot entry → signed UKI | Full QEMU runtime, API, updates, faults and shutdown |
+| uefi-arm64 | arm64 | AAVMF Secure Boot → counted systemd-boot entry → signed UKI | Full QEMU runtime/API and common update/fault policy |
 | cx3576 | arm64 | Fixed Mica OS U-Boot → required signed FIT | Current full-image offline/FIT/IO proof; physical bench qualification pending |
 | s905x5m | arm64 | eMMC boot0 Mica OS firmware → SD native records → required signed FIT | SD development port; physical qualification pending, excluded from qualified releases |
 

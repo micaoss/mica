@@ -66,7 +66,7 @@ second version router or an adapter under this development policy
 
 ## 5. Trying it
 
-The API acceptance suite boots the x64 image in QEMU and drives every phase
+The API acceptance suite boots the uefi-x64 image in QEMU and drives every phase
 of the contract over a real socket — it is also the reference for how the
 surface behaves end to end, including TLS, redirects and auth gating:
 

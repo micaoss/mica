@@ -44,8 +44,8 @@ In `mica-build`:
 make locks-verify                 # every lock and pin, and what they name
 make board-fetch-all              # the board components of every board row of locks/
 make os-pool                      # fetch and verify every pinned archive, index both pools
-make product PRODUCT=x64-dev      # the product's closure: compose, sign, image, update archive
-make product-verify PRODUCT=x64-dev
+make product PRODUCT=uefi-x64-dev      # the product's closure: compose, sign, image, update archive
+make product-verify PRODUCT=uefi-x64-dev
 ```
 
 - `make products` builds every product whose board is a release target.
@@ -83,7 +83,7 @@ managed by `tools/repos.sh`. The workspace driver chains them:
 
 ```sh
 make offline-chain                       # in mica-build; MICA_WORKSPACE defaults to ..
-make offline-chain PRODUCTS=x64-dev
+make offline-chain PRODUCTS=uefi-x64-dev
 ```
 
 It builds the repositories in dependency order in throw-away clones of each

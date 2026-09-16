@@ -74,7 +74,7 @@ UI 的自动更新面板就是驱动它的。
 
 > status: shipped — evidence: `mica-core:apid/openapi.json`, `mica-core:micad-settings/`
 
-WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；x64 QEMU 基线没有无线电。
+WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；uefi-x64 QEMU 基线没有无线电。
 
 > status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
 

@@ -94,7 +94,7 @@ The authoritative list is the API contract, not this prose: what
 > status: shipped — evidence: `mica-core:apid/openapi.json`, `mica-core:micad-settings/`
 
 WiFi presence is board-dependent: the cx3576 carries WiFi and Bluetooth; the
-x64 QEMU baseline has no radio.
+uefi-x64 QEMU baseline has no radio.
 
 > status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
 

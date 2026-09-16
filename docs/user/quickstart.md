@@ -1,6 +1,6 @@
 # Quickstart
 
-The shortest honest path to a running Mica OS system is a published `x64-dev`
+The shortest honest path to a running Mica OS system is a published `uefi-x64-dev`
 image under QEMU. That is also the only path that is qualified today: no
 physical machine has been booted from a release image
 ([flashing](flashing.md)).
@@ -19,10 +19,10 @@ images.
 
 ```sh
 REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/uefi-x64/<release>/SHA256SUMS"
+curl -fsSLO "$REL/uefi-x64/<release>/mica-uefi-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS
-gzip -dc mica-x64-dev-<release>.img.gz > disk.img
+gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
 ```
 
 Which release, and how to check the decompressed image against the version
@@ -36,12 +36,12 @@ SYSTEM and DATA — carrying two signed deployment records.
 The guest must trust the release's boot certificate: the acceptance suites
 enroll it into throwaway secure-boot variables (`vars.fd` from `OVMF_VARS.fd`,
 `AAVMF_VARS.fd` on ARM64) and boot the image as a virtio disk. The reference
-command lines are in [flashing](flashing.md#4-qemu-x64-and-virt-arm64).
+command lines are in [flashing](flashing.md#4-qemu-x64-and-uefi-arm64).
 
 From a `mica-build` checkout the whole thing is one target:
 
 ```sh
-make lifecycle-uefi PRODUCT=x64-dev
+make lifecycle-uefi PRODUCT=uefi-x64-dev
 ```
 
 It boots the product and exercises runtime, updates, faults, reset and
@@ -54,11 +54,11 @@ shutdown.
 ```sh
 make locks-verify
 make os-pool
-make product PRODUCT=x64-dev
-make product-verify PRODUCT=x64-dev
+make product PRODUCT=uefi-x64-dev
+make product-verify PRODUCT=uefi-x64-dev
 ```
 
-The result lands in `mica-build:_out/products/x64-dev/`. A build never invents
+The result lands in `mica-build:_out/products/uefi-x64-dev/`. A build never invents
 keys or inputs: signing material is explicit (`make os-devkeys` writes a
 development set) and every input comes from `locks/`. The full path, online
 and offline, is the [build guide](build.md).

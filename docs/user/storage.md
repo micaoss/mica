@@ -4,7 +4,7 @@ Mica OS uses three partitions. UEFI boards have ESP/SYSTEM/DATA; U-Boot boards (
 have FIRMWARE/SYSTEM/DATA. Only DATA grows to use the medium. SYSTEM contains immutable
 signed deployment files, and firmware remains separate from normal OS updates.
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/virt-arm64/board.env`, `mica-boards:boards/cx3576/board.env`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`
 
 ## Where files belong
 

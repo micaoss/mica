@@ -115,7 +115,7 @@ work in progress lives in `plan/` and `task/`.
   - `cx3576-bench.md` — the cx3576 bench session: stage order, scriptable and human rows, the power-cut window and the collector
   - `cx3576-bsp-sync.md` — cx3576 upstream BSP: source repository, synced commit, deviation register
   - `s905x5m.md` — board dossier: BM201 / S905X5M mainline adaptation and qualification boundary
-  - `virt-arm64.md` — board dossier: ARM64 UEFI/QEMU image and its evidence boundary
+  - `uefi-arm64.md` — board dossier: the generic arm64 UEFI system and its evidence boundary
 - `user/` — the customer journey from download to support
   - `overview.md` — Mica OS in one page: the repositories, the release chain, the products and where the files are
   - `doc-contract.md` — the contract behind this set: audience, page ownership, truth-status taxonomy, evidence rules

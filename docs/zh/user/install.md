@@ -35,8 +35,8 @@ profile（`dev` 或 `prod`）固化在该产品签名后的内核命令行里。
 
 | 板卡 | 方式 | 状态 |
 |---|---|---|
-| `x64` | 整个镜像写入介质，经 UEFI 启动 | 仅在 QEMU 下合格 |
-| `virt-arm64` | 注册了 secure-boot 变量的 QEMU guest | 验收路径 |
+| `uefi-x64` | 整个镜像写入介质，经 UEFI 启动 | 仅在 QEMU 下合格 |
+| `uefi-arm64` | 注册了 secure-boot 变量的 QEMU guest | 验收路径 |
 | `cx3576` | `mica-boards` 里经 USB 的 `rkdeveloptool`，带回读 | 未在实机上验证 |
 | `s905x5m` | 没有受支持的路径：loader 在 eMMC boot0 里 | 属于 bring-up 工作 |
 

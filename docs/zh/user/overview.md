@@ -52,14 +52,14 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 2026-09-15 的状态：`mica-build-env` `20260915-0138`、`mica-system-base`
 `20260915-1102`、`mica-podman` `20260915-1057`、`mica-core` `20260915-1135`、
-`mica-boards` 的 `x64`、`virt-arm64`、`cx3576`、`s905x5m` 均为
+`mica-boards` 的 `uefi-x64`、`uefi-arm64`、`cx3576`、`s905x5m` 均为
 `<board>/20260915-1926`，`mica-build` 为 `x64/20260915-2230` 和
 `cx3576/20260915-2230`，索引为 `mica/20260915-2242`。
 
 ## 3. 产品与板卡
 
-`x64` 和 `cx3576` 是发布目标；`virt-arm64` 和 `s905x5m` 有构建有测试，但不发布。
-每块板都有一个 `<board>-dev` 产品和一个 `<board>-minimal` 产品；`x64` 和 `cx3576`
+`uefi-x64` 和 `cx3576` 是发布目标；`uefi-arm64` 和 `s905x5m` 有构建有测试，但不发布。
+每块板都有一个 `<board>-dev` 产品和一个 `<board>-minimal` 产品；`uefi-x64` 和 `cx3576`
 还各有一个 `<board>-prod` 产品。minimal 产品只在本地和 CI 里构建，从不发布。
 
 > status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-15-minimal-products-not-released.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
@@ -86,6 +86,6 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 
 - 板卡专用的刷写格式（Rockchip 的 `update.img`、Amlogic 的烧录镜像）有设计但未实现：
   今天每块板只声明 `disk` 一种镜像类型。
-- `s905x5m` 不是发布目标，`virt-arm64` 是验收目标，所以两者都不发布镜像。
+- `s905x5m` 不是发布目标，`uefi-arm64` 是验收目标，所以两者都不发布镜像。
 
 > status: unsupported

@@ -784,8 +784,8 @@ establish eMMC flush or power-loss behavior.
 ## 6. Software and hardware evidence boundaries
 
 The native updater and firmware policy have automated authentication,
-persist-before-load, failure-injection and update/fallback tests. Current x64
-and virt-arm64 images execute complete runtime sequences in QEMU. cx3576's
+persist-before-load, failure-injection and update/fallback tests. Current uefi-x64
+and uefi-arm64 images execute complete runtime sequences in QEMU. cx3576's
 produced loader and FIT have sandbox/host policy tests, required signature
 negatives, whole-image verification and DATA-only growth evidence.
 

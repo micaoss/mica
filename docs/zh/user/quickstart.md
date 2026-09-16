@@ -1,7 +1,7 @@
 # 快速上手
 
 到一个运行中的 Mica OS 系统，最短且诚实的路径是：在 QEMU 里跑一个已发布的
-`x64-dev` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
+`uefi-x64-dev` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
 启动过（[刷写](../../user/flashing.md)）。
 
 ## 1. 需要什么
@@ -17,10 +17,10 @@
 
 ```sh
 REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSLO "$REL/x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64/<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/uefi-x64/<release>/SHA256SUMS"
+curl -fsSLO "$REL/uefi-x64/<release>/mica-uefi-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS
-gzip -dc mica-x64-dev-<release>.img.gz > disk.img
+gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
 ```
 
 选哪个发布、以及如何用版本索引校验解压后的镜像，见[获取发布版](download.md)。
@@ -33,12 +33,12 @@ gzip -dc mica-x64-dev-<release>.img.gz > disk.img
 guest 必须信任该发布的启动证书：验收套件把它注册进一次性的 secure-boot 变量
 （由 `OVMF_VARS.fd`、ARM64 上由 `AAVMF_VARS.fd` 生成的 `vars.fd`），再把镜像作为
 virtio 磁盘启动。参考命令行见
-[刷写](../../user/flashing.md#4-qemu-x64-and-virt-arm64)。
+[刷写](../../user/flashing.md#4-qemu-x64-and-uefi-arm64)。
 
 在 `mica-build` 检出里，这一整套是一个 target：
 
 ```sh
-make lifecycle-uefi PRODUCT=x64-dev
+make lifecycle-uefi PRODUCT=uefi-x64-dev
 ```
 
 它启动产品并依次验证运行时、更新、故障、重置和关机。
@@ -50,11 +50,11 @@ make lifecycle-uefi PRODUCT=x64-dev
 ```sh
 make locks-verify
 make os-pool
-make product PRODUCT=x64-dev
-make product-verify PRODUCT=x64-dev
+make product PRODUCT=uefi-x64-dev
+make product-verify PRODUCT=uefi-x64-dev
 ```
 
-产物落在 `mica-build:_out/products/x64-dev/`。构建不会凭空造出密钥或输入：签名
+产物落在 `mica-build:_out/products/uefi-x64-dev/`。构建不会凭空造出密钥或输入：签名
 材料是显式的（`make os-devkeys` 写出一套开发密钥），每一项输入都来自 `locks/`。
 在线与离线的完整路径见[构建指南](../../user/build.md)。
 

@@ -52,7 +52,7 @@ eight hex characters of the device id) and the machine id.
 
 **Hardware-dependent, and unvalidated.** What the thermal, watchdog and
 reset-cause adapters report has been proven against fixture trees, not against
-the cx3576 or x64 boards. An absent or implausible reading there is an
+the cx3576 or uefi-x64 boards. An absent or implausible reading there is an
 escalation carrying the board identity, never a green result.
 
 > status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
@@ -139,7 +139,7 @@ degrading, so the refusal text is the diagnosis:
   from a different commit each name the exact `make` target to run; the
   build-failure table in [../design/build.md](../design/build.md) maps the
   common messages to actions.
-- `make os-verify` (and the x64 equivalent) checks an assembled image
+- `make os-verify` (and the uefi-x64 equivalent) checks an assembled image
   against the image contract check by check; a red check names what it read
   and what it expected. An image built on a generated trust root verifies like
   any other; the keyring check states which grade of material it read, and that

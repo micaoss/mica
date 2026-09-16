@@ -23,7 +23,7 @@ have to walk the release list.
 ## 1. What exists to download
 
 Images and update archives exist only for products whose board is a release
-target — today `x64` and `cx3576`. `virt-arm64` is an acceptance target and
+target — today `uefi-x64` and `cx3576`. `uefi-arm64` is an acceptance target and
 `s905x5m` is not qualified, so neither publishes; the `-minimal` products are
 local and CI only and are never released
 ([no released minimal products](../decisions/2026-09-15-minimal-products-not-released.md)).
@@ -45,7 +45,7 @@ Per product a release carries:
 REL=https://github.com/micaoss/mica-build/releases/download
 curl -fsSL "$REL/mica.<index release>/mica-index.json" -o mica-index.json
 
-jq -r '.products[] | select(.product=="x64-dev")
+jq -r '.products[] | select(.product=="uefi-x64-dev")
        | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
 ```
 
@@ -59,9 +59,9 @@ catalogue of every board and product. `previous` names the index before it.
 ## 3. Download and verify
 
 ```sh
-curl -fsSLO "$REL/x64.<release>/SHA256SUMS"
-curl -fsSLO "$REL/x64.<release>/mica-build.lock"
-curl -fsSLO "$REL/x64.<release>/mica-x64-dev-<release>.img.gz"
+curl -fsSLO "$REL/uefi-x64.<release>/SHA256SUMS"
+curl -fsSLO "$REL/uefi-x64.<release>/mica-build.lock"
+curl -fsSLO "$REL/uefi-x64.<release>/mica-uefi-x64-dev-<release>.img.gz"
 sha256sum -c SHA256SUMS                       # lists the lock and every asset
 ```
 
@@ -83,20 +83,20 @@ different places:
 2. **The lock's `asset` row** names the same digest, so a reader who trusts
    the lock does not have to trust the list:
    ```sh
-   awk -F'\t' '$1 == "asset" && $2 == "x64-dev"' mica-build.lock
+   awk -F'\t' '$1 == "asset" && $2 == "uefi-x64-dev"' mica-build.lock
    ```
 3. **The index** describes both forms: `sha256` and `size` are the `.gz`,
    `uncompressedSha256` and `uncompressedSize` are what `gzip -dc` produces.
    ```sh
-   gzip -dc mica-x64-dev-<release>.img.gz | sha256sum
-   jq -r '.products[]|select(.product=="x64-dev")|.images[]
+   gzip -dc mica-uefi-x64-dev-<release>.img.gz | sha256sum
+   jq -r '.products[]|select(.product=="uefi-x64-dev")|.images[]
           |[.file,.sha256,.size,.uncompressedSha256,.uncompressedSize]|@tsv' mica-index.json
    ```
 4. **The OCI layer** carries the same facts and is readable anonymously; the
    layer digest equals the asset row's sha256, and its `mica.uncompressed-*`
    annotations equal the index's fields:
    ```sh
-   REF=$(jq -r '.products[]|select(.product=="x64-dev")|.bundles.image' mica-index.json)
+   REF=$(jq -r '.products[]|select(.product=="uefi-x64-dev")|.bundles.image' mica-index.json)
    T=$(curl -fsS "https://ghcr.io/token?scope=repository:micaoss/mica-build:pull&service=ghcr.io" | jq -r .token)
    curl -fsSL -H "Authorization: Bearer $T" \
      -H 'Accept: application/vnd.oci.image.manifest.v1+json' \

@@ -1,8 +1,8 @@
 # Current board.env contract
 
 `boards/<name>/board.env` declares the board's target architecture, current disk
-geometry and hardware capabilities. The active system-image targets are x64,
-virt-arm64, cx3576 and the s905x5m development port. `build/src/file-layout.ts` parses the current layout;
+geometry and hardware capabilities. The active system-image targets are uefi-x64,
+uefi-arm64, cx3576 and the s905x5m development port. `build/src/file-layout.ts` parses the current layout;
 `make os-layout-lint` exercises it.
 
 > status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `mica-build:make os-layout-lint`
@@ -128,4 +128,4 @@ bounds userspace composition; it is separate from SYSTEM storage capacity.
 value means no OS presence assertion exists. cx3576's local rockusb loader button
 does not implicitly authorize credential recovery or factory reset through apid.
 
-> status: shipped — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/x64/board.env`, `mica-boards:boards/virt-arm64/board.env`
+> status: shipped — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`

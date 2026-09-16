@@ -38,8 +38,8 @@
 make locks-verify                 # 每个 lock 和 pin，以及它们指向的东西
 make board-fetch-all              # locks/ 里每个 board 行对应的板卡组件
 make os-pool                      # 拉取并校验每个固定的归档，索引两个池
-make product PRODUCT=x64-dev      # 该产品的全部闭包：组合、签名、镜像、更新归档
-make product-verify PRODUCT=x64-dev
+make product PRODUCT=uefi-x64-dev      # 该产品的全部闭包：组合、签名、镜像、更新归档
+make product-verify PRODUCT=uefi-x64-dev
 ```
 
 - `make products` 构建每个板卡是发布目标的产品。
@@ -72,7 +72,7 @@ make product-verify PRODUCT=x64-dev
 
 ```sh
 make offline-chain                       # 在 mica-build 里；MICA_WORKSPACE 默认为 ..
-make offline-chain PRODUCTS=x64-dev
+make offline-chain PRODUCTS=uefi-x64-dev
 ```
 
 它按依赖顺序在每个检出的一次性克隆里构建各个仓库，并从这些构建结果组合出产品。

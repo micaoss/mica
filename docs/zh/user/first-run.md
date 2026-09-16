@@ -81,7 +81,7 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 `journalctl -u mica-provisioning-import` 才是"插了 U 盘却没反应"时第一个要
 看的地方——而不是状态路由。
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/x64/board.env`
+> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`
 
 ### 它能带什么，以及它点名拒绝什么
 

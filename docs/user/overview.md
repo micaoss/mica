@@ -62,15 +62,15 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 State on 2026-09-15: `mica-build-env` `20260915-0138`, `mica-system-base`
 `20260915-1102`, `mica-podman` `20260915-1057`, `mica-core` `20260915-1135`,
-`mica-boards` `<board>/20260915-1926` for `x64`, `virt-arm64`, `cx3576` and
+`mica-boards` `<board>/20260915-1926` for `uefi-x64`, `uefi-arm64`, `cx3576` and
 `s905x5m`, `mica-build` `x64/20260915-2230` and `cx3576/20260915-2230`, and
 the index `mica/20260915-2242`.
 
 ## 3. Products and boards
 
-`x64` and `cx3576` are release targets; `virt-arm64` and `s905x5m` are built
+`uefi-x64` and `cx3576` are release targets; `uefi-arm64` and `s905x5m` are built
 and tested but not released. Every board has a `<board>-dev` product and a
-`<board>-minimal` product; `x64` and `cx3576` also have a `<board>-prod`
+`<board>-minimal` product; `uefi-x64` and `cx3576` also have a `<board>-prod`
 product. The minimal products are built locally and in CI and are never
 published.
 
@@ -101,7 +101,7 @@ checked before and after decompressing.
 - Board-specific flashing formats (a Rockchip `update.img`, an Amlogic burn
   image) are designed but not implemented: every board declares only the
   `disk` image kind today.
-- `s905x5m` is not a release target, and `virt-arm64` is an acceptance
+- `s905x5m` is not a release target, and `uefi-arm64` is an acceptance
   target, so neither publishes images.
 
 > status: unsupported

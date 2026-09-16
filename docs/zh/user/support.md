@@ -32,12 +32,12 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 | 板卡 | 是什么 | 地位 |
 |---|---|---|
 | cx3576（CX3576-Z，RK3576，arm64） | 参考硬件板卡：厂商内核、带 A/B 握手的主线 U-Boot、WiFi/蓝牙 | 完整契约据以构建和测试的板卡；行为在本地验证，硬件上的验收在设计记录中跟踪 |
-| x64（通用 UEFI x86_64） | QEMU 与 CI 基线 | 作为开发与验证目标受支持，不是产品板卡 |
+| uefi-x64（通用 UEFI x86_64） | QEMU 与 CI 基线 | 作为开发与验证目标受支持，不是产品板卡 |
 
 自带硬件的集成商从 [../../boards/porting.md](../../boards/porting.md) 开始；
 板卡契约本身（产物边界、内核断言集、布局 schema）已发布并由构建强制。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`, `docs/boards/contract.md`
 
 ## 3. 生命周期归属
 

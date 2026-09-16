@@ -13,7 +13,7 @@
 Mica OS 镜像被写进过 U 盘、SATA 硬盘、NVMe 或 eMMC，也没有任何实体板卡从中启动过。
 下面的 QEMU 小节是实际跑过的；硬件小节是从仓库里读出来的，未验证之处都有标注。
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. 写入之前
 
@@ -21,15 +21,16 @@ Mica OS 镜像被写进过 U 盘、SATA 硬盘、NVMe 或 eMMC，也没有任何
 
 ```sh
 sha256sum -c SHA256SUMS                              # 发布自带的清单，覆盖 .gz
-gzip -dc mica-x64-dev-<release>.img.gz > disk.img
+gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
 sha256sum disk.img                                   # 与 uncompressedSha256 比较
 ```
 
 完整的摘要链——发布清单、lock 的 `asset` 行、索引的 `uncompressedSha256`、OCI 层
 注解——见[获取发布版](download.md#4-哪一步该核对哪个摘要)。以
-`mica-x64-dev-20260915-2230.img.gz` 为例，解压后的镜像是 1 881 145 344 字节，
-sha256 为 `e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`，
-索引和 OCI 层都是这么写的。
+`mica-x64-dev-20260915-2230.img.gz` 为例——它发布于 2026-09-16 板卡改名之前，
+所以带的是旧产品名——解压后的镜像是 1 881 145 344 字节，sha256 为
+`e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`，索引和 OCI 层
+都是这么写的。
 
 然后记住关于这次写入的三件事：
 
@@ -51,23 +52,24 @@ sha256 为 `e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`，
 
 | 板卡 | 固件形态 | 裸镜像能启动一块空板吗？ | 状态 |
 |---|---|---|---|
-| `x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI` | 仅在 QEMU 下合格 |
-| `virt-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，作为 QEMU guest | 验收路径 |
+| `uefi-x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI` | 仅在 QEMU 下合格 |
+| `uefi-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，作为 QEMU guest | 验收路径；暂未成为发布目标 |
 | `cx3576` | `rockchip-loader` | 能——U-Boot 就写在镜像的第 64 扇区 | 未在实机上验证 |
 | `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在镜像之外 | 没有受支持的路径 |
 
-只有 `x64` 和 `cx3576` 是发布目标，所以只有它们的镜像作为发布资产存在。没有可选的
+只有 `uefi-x64` 和 `cx3576` 是发布目标，所以只有它们的镜像作为发布资产存在。没有可选的
 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
-## 3. x64
+## 3. uefi-x64
 
 ### 镜像本身
 
-已发布的 x64 镜像是一块 GPT 磁盘，磁盘 GUID
+已发布的 uefi-x64 镜像是一块 GPT 磁盘，磁盘 GUID
 `5AC35760-0064-4000-8000-000000000000`，三个分区，以下数据读自
-`mica-x64-dev-20260915-2230.img`：
+`mica-x64-dev-20260915-2230.img`（旧 `x64` 名下发布的最后一个镜像；布局属于板卡，
+并未随改名变化）：
 
 | 分区 | 类型 | 起始扇区 | 大小 |
 |---|---|---|---|
@@ -78,11 +80,11 @@ A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loader.conf`。
 只要 UEFI 固件启动 `BOOTX64.EFI` 它就能起来，所以整个镜像写到目标介质上。
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:build/src/file-layout.ts`
 
 ### 内核能驱动哪些介质
 
-固定版本的 x64 内核内建了：USB 主机 XHCI 与 EHCI 加 `USB_STORAGE`，经 AHCI 和
+固定版本的 uefi-x64 内核内建了：USB 主机 XHCI 与 EHCI 加 `USB_STORAGE`，经 AHCI 和
 `ATA_PIIX` 的 SATA，NVMe，以及给虚拟机用的 virtio-blk 和 virtio-scsi。
 `CONFIG_USB_UAS` 没有开，所以只支持 UAS 的硬盘盒会退回 bulk-only 传输或者干脆不被
 驱动；`CONFIG_MMC` 完全没开：挂在 MMC 控制器上的读卡器不被驱动，而 USB 读卡器属于
@@ -91,11 +93,11 @@ ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loade
 所以从驱动角度的答案是：U 盘和 USB 硬盘、SATA、NVMe。这些介质中哪些被组装侧判为
 合格仍然是开放问题——没有做过任何实机测试。
 
-> status: board-dependent — evidence: `mica-boards:boards/x64/kernel/config/x64.config`, `mica-boards:make kernel-config-test`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-boards:make kernel-config-test`
 
 ### 写入（未验证）
 
-这里没有人做过、也没有人见证过一次实体 x64 写入。下面的命令只是组装侧会采用的
+这里没有人做过、也没有人见证过一次实体 uefi-x64 写入。下面的命令只是组装侧会采用的
 形式；不要把这一段里的任何东西当作已合格的流程发布出去，并且要预料到认错目标设备
 才是真正危险的地方：
 
@@ -103,7 +105,7 @@ ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loade
 > # NOT VERIFIED: never run against physical hardware by this project
 > lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS      # 插入设备前后各看一次
 > udevadm info --query=property --name=/dev/sdX | grep -E 'ID_BUS|ID_MODEL|ID_SERIAL'
-> gzip -dc mica-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+> gzip -dc mica-uefi-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
 > sync
 > sudo cmp -n 1881145344 /dev/sdX disk.img            # 或者回读后比较 sha256
 > sudo sfdisk -d /dev/sdX                             # 应为 2048、1050624、3147776
@@ -123,9 +125,11 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 
 > status: unsupported
 
-## 4. QEMU：x64 与 virt-arm64
+## 4. QEMU：uefi-x64 与 uefi-arm64
 
-这是真正跑起来的那条路。`virt-arm64` 就是为它存在的：它是 QEMU 板卡，不是发布目标。
+这是真正跑起来的那条路。`uefi-arm64` 目前的全部证据都来自 QEMU，它还不是发布目标；
+把它做成带 virtio 之外驱动集的通用 arm64 系统，是
+`docs/task/20260916-0040-uefi-board-names.md` 的工作。
 
 验收实验室使用的固件文件：
 
@@ -137,7 +141,7 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 变量存储做一次就够，注册该发布的启动证书——正是这一步让 guest 信任镜像：
 
 ```sh
-cp /usr/share/AAVMF/AAVMF_VARS.fd vars.template.fd          # x64 用 OVMF_VARS_4M.fd
+cp /usr/share/AAVMF/AAVMF_VARS.fd vars.template.fd          # uefi-x64 用 OVMF_VARS_4M.fd
 virt-fw-vars --input vars.template.fd --output vars.fd \
   --set-pk 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
   --add-kek 6b62601e-3448-4418-8923-7c9fa22ab09b db.cert.pem \
@@ -156,11 +160,11 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
   -device virtio-blk-pci,drive=disk0,bootindex=0
 ```
 
-x64 是同一条命令行，换成 `qemu-system-x86_64 -machine q35` 和 OVMF 文件。在
+uefi-x64 是同一条命令行，换成 `qemu-system-x86_64 -machine q35` 和 OVMF 文件。在
 `-drive if=none,id=disk0,…` 的值后面加 `,readonly=on` 可以只读启动镜像。guest 会
 写 `disk.img`，所以先复制一份。
 
-在 `virt-arm64` 上这些设备不是可以随便换的：内核裁剪之后 guest 里根本没有 SCSI、
+在 `uefi-arm64` 上这些设备不是可以随便换的：内核裁剪之后 guest 里根本没有 SCSI、
 SATA、NVMe、MMC、USB 或 virtio-scsi 驱动，所以磁盘必须是 `virtio-blk-pci`、网卡必须
 是 `virtio-net-pci`；控制台是 PL011（`console=ttyAMA0,115200n8`），看门狗是内建的
 i6300esb，RTC 是 PL031，ACPI button 是开的，所以宿主请求的优雅关机能传到 guest。
@@ -182,10 +186,10 @@ mica-deploy import /run/mica/import/update.micaupd
 整套验收——启动、运行时、更新、故障、重置、关机——在 `mica-build` 里是一个 target：
 
 ```sh
-make lifecycle-uefi PRODUCT=virt-arm64-dev
+make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/virt-arm64/kernel/config`, `docs/boards/virt-arm64.md`
+> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 普通的发布镜像启动到登录提示符并拉起它的服务。验收控制台上打印的 `FILE_AB_*`
 标记来自套件自己塞进镜像的脚本，不是出厂镜像的行为；在设备上不要指望看到它们。
@@ -310,4 +314,4 @@ loader 处、20 MiB 处和接近末尾处各损坏一个字节都能被发现并
 - **不能靠重刷来升级。** 写镜像会抹掉 DATA。要把运行中的设备带到新发布，用更新归档
   （[更新包](../../user/update-packages.md)）。
 
-> status: shipped — evidence: `mica-boards:boards/x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`

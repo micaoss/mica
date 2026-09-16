@@ -237,7 +237,7 @@ destroy the medium. Nothing softer is honest today, and section 6 says why.
 The last resort sits below the OS and is reachable when nothing else is: on
 cx3576 the Rockchip loader path (recovery button at power-on, the automatic
 fallthrough when boot fails, or maskrom when the loader area itself is gone),
-followed by writing the full disk image over USB; on x64, boot another medium
+followed by writing the full disk image over USB; on uefi-x64, boot another medium
 and rewrite the disk. [install.md](install.md) is the procedure.
 
 - **Fixes:** everything software can be wrong with the device, both deployments
@@ -277,7 +277,7 @@ a recovery that does not exist.
   recovery actions it has — a bootloader menu entry, a button pattern, a USB
   event — and the device maps the one the operator took into an assertion and,
   where the action says so, a reset tier. **No shipped board declares one** —
-  not cx3576, not x64, not virt-arm64 — because none has an implemented
+  not cx3576, not uefi-x64, not uefi-arm64 — because none has an implemented
   physical action, so the gate
   refuses every request a fielded device can make of it — `403`, with
   `presence_required`, audited, nothing staged, and the refusal says the board

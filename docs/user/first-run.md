@@ -93,7 +93,7 @@ candidate for the `media` source. A medium that will not mount never becomes a
 document at all, so `journalctl -u mica-provisioning-import` is where an
 operator whose stick did nothing looks first — not the status route.
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/x64/board.env`
+> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`
 
 ### What it may carry, and what it refuses by name
 

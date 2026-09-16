@@ -3,7 +3,7 @@
 Mica OS 使用三个分区：UEFI 板为 ESP/SYSTEM/DATA，U-Boot 板（cx3576、s905x5m）为 FIRMWARE/SYSTEM/DATA。
 只有 DATA 随介质扩容。SYSTEM 存放不可变签名部署文件；固件独立于普通系统更新。
 
-> status: shipped — evidence: `mica-boards:boards/x64/board.env`, `mica-boards:boards/virt-arm64/board.env`, `mica-boards:boards/cx3576/board.env`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`
 
 ## 文件放在哪里
 

@@ -39,14 +39,14 @@ completed dossier.
 | Board | What it is | Standing |
 |---|---|---|
 | cx3576 (CX3576-Z, RK3576, arm64) | the reference hardware board: vendor kernel, mainline U-Boot with the A/B handshake, WiFi/Bluetooth | the board the full contract is built and tested against; behaviours verified locally, with on-hardware acceptance tracked in the design records |
-| x64 (generic UEFI x86_64) | the QEMU and CI baseline | supported as a development and verification target, not a product board |
+| uefi-x64 (generic UEFI x86_64) | the QEMU and CI baseline | supported as a development and verification target, not a product board |
 
 Integrators bringing their own hardware start at
 [../boards/porting.md](../boards/porting.md); the board contract itself (artifact
 boundary, kernel assertion set, layout schema) is shipped and enforced by the
 build.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`, `docs/boards/contract.md`
 
 ## 3. Lifecycle ownership
 

@@ -4,7 +4,7 @@ A board dossier is the machine-validated contract for one board: the single
 document where a board's identity, provenance, hardware facts, recovery
 story, assurance level and qualification evidence live together. Every
 supported or in-progress board has exactly one dossier; [cx3576.md](cx3576.md),
-[s905x5m.md](s905x5m.md) and [virt-arm64.md](virt-arm64.md) are the current instances.
+[s905x5m.md](s905x5m.md) and [uefi-arm64.md](uefi-arm64.md) are the current instances.
 
 **Validation.** A dossier MUST carry the thirteen H2 headings below, spelled
 exactly and in this order, with no H2 heading outside this list.
