@@ -23,9 +23,9 @@ have to walk the release list.
 ## 1. What exists to download
 
 Images and update archives exist only for products whose board is a release
-target — `uefi-x64`, `cx3576`, and `uefi-arm64` since 2026-09-16, whose
-product images appear from the next `mica-build` round on. `s905x5m` is not a
-release target, so it publishes nothing. Every published product is
+target — `uefi-x64`, `cx3576`, and `uefi-arm64` since 2026-09-16, whose first
+product images are in `uefi-arm64.20260916-1653`. `s905x5m` is not a release
+target, so it publishes nothing. Every published product is
 a `dev` or `prod` product; the minimal products were removed on 2026-09-16
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
 releases cut before that date keep their minimal assets.

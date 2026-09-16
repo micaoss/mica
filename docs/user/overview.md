@@ -60,18 +60,19 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
-State on 2026-09-16: `mica-build-env` `20260916-0735`, which adds the `bsp`
-image and is a breaking update its consumers take in sequence
-([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md));
-`mica-system-base` `20260915-1102`, `mica-podman` `20260915-1057` and
-`mica-core` `20260915-1135`, all still on `mica-build-env` `20260915-0138`.
-`mica-boards` has released the renamed boards: `uefi-x64.20260916-0744` and
-`uefi-arm64.20260916-0744`, with `cx3576.20260916-0558` and
-`s905x5m.20260916-0558` beside them. `mica-build`'s newest product releases
-are still the ones cut on 2026-09-15 under that day's names,
-`x64/20260915-2230` and `cx3576/20260915-2230`, with the index
-`mica/20260915-2242`; the renamed products are published from its next round
-on.
+State on 2026-09-16, and the sentence worth reading twice: **every published
+product is built entirely from released producers, with no in-flight pin.**
+Six pins, each verified anonymously when it was taken, none of them pointing
+at a branch, a local build or an unreleased commit — `mica-boards`
+`uefi-x64`, `uefi-arm64`, `cx3576` and `s905x5m` at `20260916-0857`,
+`mica-core` `20260916-0916`, `mica-podman` `20260916-0846`,
+`mica-system-base` `20260915-1102` and `mica-build-env` `20260916-0735`.
+
+`mica-build` published `uefi-x64.20260916-1653`,
+`uefi-arm64.20260916-1653` and `cx3576.20260916-1653` from those pins, and
+the index job cut `mica.20260916-1709`, which is the GitHub latest release.
+The index was rebuilt byte-identically from a fresh clone, both incrementally
+from its previous and in full from all three releases it references.
 
 ## 3. Products and boards
 
@@ -118,7 +119,7 @@ checked before and after decompressing.
   image) are designed but not implemented: every board declares only the
   `disk` image kind today.
 - `s905x5m` is not a release target, so it publishes no images.
-- `uefi-arm64` became a release target on 2026-09-16; its product images
-  appear from the next `mica-build` round on.
+- Nothing on this list is waiting for a release any more: `uefi-arm64`'s
+  product images exist, from `uefi-arm64.20260916-1653` on.
 
 > status: unsupported

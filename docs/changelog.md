@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-16 17:09 [release]
+
+`mica-build` published the re-pin round from `04f05227`:
+`uefi-x64.20260916-1653` (trust `35317ed668ed0b7e…`),
+`uefi-arm64.20260916-1653` (`e21e69c61d48b422…`) and
+`cx3576.20260916-1653` (`625696f6a16f6a4d…`), and the index job cut
+`mica.20260916-1709` (trust
+`63e3658dc1cca0b44686e5a11820443b9fd84814cd8b510ac4c19bad824b6cb3`, previous
+`mica.20260916-1703`, GitHub latest). Verified anonymously from a fresh clone:
+the index rebuilt byte-identically from its previous plus the one entering
+release, and `--full` rebuilt byte-identically from all three releases it
+references.
+
+**The milestone: every published product is now built entirely from released
+producers, with no in-flight pin.** Six pins, each verified anonymously at pin
+time and none pointing at a branch, a local build or an unreleased commit —
+`mica-boards` `uefi-x64`, `uefi-arm64`, `cx3576` and `s905x5m` at
+`20260916-0857`, `mica-core` `20260916-0916`, `mica-podman` `20260916-0846`,
+`mica-system-base` `20260915-1102` (deliberately unchanged) and
+`mica-build-env` `20260916-0735`.
+
+The two places that said `uefi-arm64` images would come from a later round are
+corrected, in `docs/user/overview.md`, `docs/user/download.md` and
+`docs/user/flashing.md` with their Chinese pages; the state paragraph of the
+overview now leads with the milestone instead of a list of pending things.
+
 ## 2026-09-16 12:30 [finding]
 
 The cross-compiled arm64 investigation is closed with an answer: the

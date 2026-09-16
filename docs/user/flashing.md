@@ -68,10 +68,10 @@ packer is implemented. What differs is where the bootloader lives.
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
-`uefi-x64`, `uefi-arm64` and `cx3576` are release targets; `uefi-arm64`
-became one on 2026-09-16, so its product images appear from the next
-`mica-build` round on. `s905x5m` is not. There is no A/B partition pair to choose between and no
-conversion from an older layout: a write is a full write.
+`uefi-x64`, `uefi-arm64` and `cx3576` are release targets, and all three have
+published images since `20260916-1653`; `s905x5m` is not. There is no A/B
+partition pair to choose between and no conversion from an older layout: a
+write is a full write.
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 

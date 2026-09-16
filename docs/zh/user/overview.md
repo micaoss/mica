@@ -50,15 +50,17 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 > status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
 
-2026-09-16 的状态：`mica-build-env` 为 `20260916-0735`，它新增 `bsp` 镜像，对消费方是
-破坏性更新，各仓按顺序迁移
-（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）；
-`mica-system-base` `20260915-1102`、`mica-podman` `20260915-1057`、`mica-core`
-`20260915-1135`，三者仍固定在 `mica-build-env` `20260915-0138`。`mica-boards` 已发布
-改名后的板卡：`uefi-x64.20260916-0744` 和 `uefi-arm64.20260916-0744`，旁边还有
-`cx3576.20260916-0558` 与 `s905x5m.20260916-0558`。`mica-build` 最新的产品发布仍是
-2026-09-15 切出的那批、用当天的名字：`x64/20260915-2230` 和 `cx3576/20260915-2230`，
-索引 `mica/20260915-2242`；改名后的产品从它的下一轮开始发布。
+2026-09-16 的状态，其中有一句值得读两遍：**每一个已发布的产品都完全由已发布的
+生产方构建，没有任何在途的 pin。** 六个 pin，每个在钉下时都经过匿名验证，没有一个
+指向分支、本地构建或未发布的提交——`mica-boards` 的 `uefi-x64`、`uefi-arm64`、
+`cx3576`、`s905x5m` 均为 `20260916-0857`，`mica-core` `20260916-0916`，
+`mica-podman` `20260916-0846`，`mica-system-base` `20260915-1102`，
+`mica-build-env` `20260916-0735`。
+
+`mica-build` 基于这些 pin 发布了 `uefi-x64.20260916-1653`、
+`uefi-arm64.20260916-1653` 和 `cx3576.20260916-1653`，索引 job 切出
+`mica.20260916-1709`，它是 GitHub 的 latest release。索引在全新克隆里被逐字节重建过
+两次：相对上一个索引的增量重建，以及基于它引用的全部三个发布的完整重建。
 
 ## 3. 产品与板卡
 
@@ -99,7 +101,7 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 - 板卡专用的刷写格式（Rockchip 的 `update.img`、Amlogic 的烧录镜像）有设计但未实现：
   今天每块板只声明 `disk` 一种镜像类型。
 - `s905x5m` 不是发布目标，因此不发布镜像。
-- `uefi-arm64` 自 2026-09-16 起成为发布目标；它的产品镜像从 `mica-build` 的下一轮
-  开始出现。
+- 这份清单上已经没有“在等某个发布”的条目了：`uefi-arm64` 的产品镜像已经存在，自
+  `uefi-arm64.20260916-1653` 起。
 
 > status: unsupported

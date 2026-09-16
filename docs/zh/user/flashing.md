@@ -57,9 +57,9 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 | `cx3576` | `rockchip-loader` | 能——U-Boot 就写在镜像的第 64 扇区 | 未在实机上验证 |
 | `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在镜像之外 | 没有受支持的路径 |
 
-`uefi-x64`、`uefi-arm64` 和 `cx3576` 是发布目标；`uefi-arm64` 自 2026-09-16 起成为
-发布目标，它的产品镜像从 `mica-build` 的下一轮开始出现。`s905x5m` 不是。没有可选的
-A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
+`uefi-x64`、`uefi-arm64` 和 `cx3576` 是发布目标，三者自 `20260916-1653` 起都有已发布
+的镜像；`s905x5m` 不是。没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘
+写入。
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
