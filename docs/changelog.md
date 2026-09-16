@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-16 02:10 [decision]
+
+`PUBLISH` goes with the minimal products (coordinator, accepting `mica-build`'s
+proposal, 2026-09-16). It appeared only on the four minimal products, nothing
+else set it, and `s905x5m-dev` is unpublished through its board's
+`BOARD_RELEASE_TARGET=0`, so the key, its default in `tools/product.sh`, the
+release scope filter and their tests are dead machinery and `mica-build`
+removes them in the rename round. Its one consumer was the index catalogue's
+`publish` field: `docs/design/mica-index.md` 3.1 now fixes that a catalogue
+product's `publish` is true when its board is a release target, which
+reproduces today's output exactly — `s905x5m-dev` stays `publish` and `indexed`
+false, every `uefi-x64`, `uefi-arm64` and `cx3576` product is published — and
+leaves one mechanism instead of two. Keeping `PUBLISH` as a documented key no
+product sets was rejected. The version-index decision follows, and the minimal
+decision records the question as settled.
+
 ## 2026-09-16 01:40 [decision]
 
 The naming rules are written down so a new variant is a lookup rather than a

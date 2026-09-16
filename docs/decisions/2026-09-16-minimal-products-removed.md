@@ -20,9 +20,15 @@ unpublished — that was the 2026-09-15 position — they do not exist.
 - Every rule, test, fixture and CI matrix entry that required a
   `<board>-minimal` product goes with them, including the "every board has a
   minimal product" rule.
-- The `PUBLISH` machinery goes too if nothing else uses it. `s905x5m-dev` is
-  unpublished through `BOARD_RELEASE_TARGET`, not through `PUBLISH`, so
-  `PUBLISH=0` may have no user left; `mica-build` decides and reports.
+- The `PUBLISH` machinery goes too, settled on 2026-09-16: `PUBLISH=0`
+  appeared only on the four minimal products, nothing else set it, and
+  `s905x5m-dev` is unpublished through its board's `BOARD_RELEASE_TARGET=0`.
+  The key, its default in `tools/product.sh`, the release scope filter and
+  their tests are removed. Its one consumer, the `publish` field of the index
+  catalogue, is redefined as "the product's board is a release target", which
+  reproduces today's output exactly (`docs/design/mica-index.md` 3.1). Keeping
+  `PUBLISH` as a documented key no product sets was the alternative and was
+  rejected.
 - The coverage minimal gave — that the floor composes with no feature selected
   — stays as a cheap composition test, not as a product (agreed 2026-09-15).
 - CI's release rehearsal runs the prod products and is unaffected.

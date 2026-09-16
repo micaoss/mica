@@ -24,7 +24,9 @@ GitHub latest release, and scoped releases are cut with `--latest=false`.
 workflow token: a draft, its assets, the checks, publication, and an
 anonymous read-back. It targets the tip of `main`, is serialized
 (`concurrency: mica-index`), and selects at run time the newest scoped
-release for every product with `PUBLISH=1`. A manual `mica.*` release is
+release for every published product — `PUBLISH=1` when this was written, the
+board's `BOARD_RELEASE_TARGET=1` since 2026-09-16
+(`docs/decisions/2026-09-16-minimal-products-removed.md`). A manual `mica.*` release is
 refused. The cut refuses a product generation lower than in the previous
 index, a copied row that differs from its source, and a trust hash that does
 not match; the stamp must be later than every referenced release and the
@@ -61,7 +63,7 @@ as `mica-build` emits it at `9c2f399e`, `docs/design/mica-index.md`):
   published. Carried entries are copied unread; entering entries are fully
   checked, refusing a generation that goes down, conflicting trust for one
   input, two releases of one scope, or a stamp that is not later. The first
-  index is built in full. `PUBLISH=0` products are dropped and shown in the
+  index is built in full. Unpublished products are dropped and shown in the
   catalogue with `publish` and `indexed` false. No index is cut when nothing
   enters or drops.
 - `tools/release.sh verify-index <tag>` re-derives an index incrementally and

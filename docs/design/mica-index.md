@@ -86,8 +86,13 @@ digests are lowercase hex.
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,
   profile, features, whether it is published and whether this index includes
-  it. A product with `PUBLISH=0` is absent from `products` and listed here
-  with `publish` and `indexed` false.
+  it. A catalogue product's `publish` is **true when its board is a release
+  target** (`BOARD_RELEASE_TARGET=1`) *(fixed here, 2026-09-16)*: the
+  `PUBLISH` product key is gone with the minimal products
+  (`docs/decisions/2026-09-16-minimal-products-removed.md`), and one mechanism
+  decides both. A product whose board is not a release target is absent from
+  `products` and listed here with `publish` and `indexed` false, which is
+  `s905x5m-dev` today.
 
 Sort orders: `inputs` by `id` bytes; `releases` by `release`, each with its
 `inputs` sorted; `products` by `product`; `images` and `updates` by `kind`;
@@ -115,8 +120,8 @@ measured 1.9 KB per product. Both the member and the threshold are proposals.
   fully checked.
 - A cut is refused for a generation that goes down, conflicting trust for
   one input, two releases of one scope, or a stamp that is not later.
-- Products with `PUBLISH=0` are dropped from `products` and shown in the
-  catalogue with `publish` and `indexed` false.
+- Products whose board is not a release target are dropped from `products`
+  and shown in the catalogue with `publish` and `indexed` false.
 - No index is cut when nothing enters or drops.
 
 ## 5. Checks
