@@ -35,6 +35,12 @@ one lock, and turns every consumer build into a digest pull.
 With `mica-podman`'s pinned build closure, this removes the last
 consumer-time `apt` from the workspace.
 
+**Paused on 2026-09-16** (user): every consumer move except `mica-build`'s
+current round is held until the cache and mirror design is settled, so the
+`bsp` switch in `mica-boards` and `mica-podman`'s pinned build closure are
+committed work that has not landed. The decision stands; only its adoption
+waits.
+
 ## Consequences for consumers
 
 `20260916-0735` is a **breaking update for every consumer**: every image moved,

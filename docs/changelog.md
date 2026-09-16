@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-16 08:10 [decision]
+
+Work that is not the cache and mirror design is paused (user, 2026-09-16), so
+that everything else lands in one consolidated round once those details are
+settled. `mica-build` finishes the round it is holding — the four board pins
+(`uefi-x64` and `uefi-arm64` at `20260916-0744`, `cx3576` and `s905x5m` at
+`20260916-0558`), the build-env pin to `20260916-0735`, the product renames,
+the deleted minimal products and the `PUBLISH` removal — cuts its scoped
+releases, lets the index job run, and stops there; stopping earlier would have
+left the workspace with the boards renamed and the assembly still pinning the
+old names. `mica-boards` holds the `bsp` switch and the i386 packer round,
+`mica-podman` holds its pinned build closure, the engine stages and
+`5.8.6-2`, and `mica-core`, `mica-system-base` and `mica-build-env` start
+nothing. `mica-res` continues, because it is the cache and mirror design.
+
+Also decided, for every repository: **Actions run pruning is paused.** No
+workflow run is deleted anywhere until a collector keeps the history and a
+retention policy is agreed. `mica` has no step that deletes runs — its
+workflows are `ci` (the `docs` job) and `website` (`checks`, and `deploy`
+only on a manual dispatch) — so nothing here changes in practice.
+
 ## 2026-09-16 07:44 [release]
 
 `mica-boards` released the renamed boards from `main` `65c25c8`:

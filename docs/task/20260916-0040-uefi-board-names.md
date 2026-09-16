@@ -79,3 +79,7 @@ Renaming the generic systems in the records
   generic driver set; the records state it as fact and keep the qualification
   where it is, QEMU `virt` only. Left in this round: `mica-build`'s renamed
   products and their first scoped releases, which are its own to cut.
+- 2026-09-16: paused after `mica-build`'s current round (user). This record
+  stays open for that round's result — the renamed products and their first
+  scoped releases — and for nothing else; the `bsp` switch and the pinned
+  build closure are held and are not part of it.
