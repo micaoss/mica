@@ -40,9 +40,14 @@ git -C "$REPO" archive HEAD | tar -x -C "$WORK/clone"
 cp "$REPO/tools/docs/record.sh" "$WORK/clone/tools/docs/record.sh"
 cd "$WORK/clone"
 git init -q -b main
+# The identity belongs to the fixture repository, not to this shell: record.sh
+# commits inside it too, and a CI runner has no global git identity -- without
+# this the happy path fails with "empty ident name" on the runner and passes on
+# a workstation.
+git config user.name test
+git config user.email test@example.invalid
 git add -A
-git -c user.name=test -c user.email=test@example.invalid \
-    commit -q -m 'fixture: the tree under test'
+git commit -q -m 'fixture: the tree under test'
 git remote add origin "$WORK/remote.git"
 # The invariant the CI failure of 2026-09-16 broke: the fixture must own a
 # complete history, because git refuses to push a shallow one into a fresh
