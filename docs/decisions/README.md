@@ -34,3 +34,4 @@ Kinds:
 | [There are no minimal products](2026-09-15-no-minimal-products.md) (superseded) | engineering decision | 2027-03-15 |
 | [Minimal products are built locally and in CI, never released](2026-09-15-minimal-products-not-released.md) | engineering decision | 2027-03-15 |
 | [The Mica version index release](2026-09-15-mica-version-index.md) | engineering decision | 2027-03-15 |
+| [Scoped release tags separate the scope with a dot](2026-09-16-scoped-tags-use-a-dot.md) | engineering decision | 2027-03-16 |

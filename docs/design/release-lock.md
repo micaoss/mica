@@ -8,7 +8,7 @@ is `docs/plan/20260914-2042-release-lock-offline-build.md`. `mica-build-env`
 implements the release lock and `locks/upstream.lock` (release to pin
 `20260915-0138`), `mica-system-base` (current release `20260915-1102`),
 `mica-podman` (`20260915-1057`), `mica-core` (`20260915-1135`) and
-`mica-boards` (per board, `<board>/20260915-1926`); `mica-build` adopts it
+`mica-boards` (per board, `<board>.20260915-1926`); `mica-build` adopts it
 last, with its own scripts, and every repository proves them with the test
 vectors of section 9.
 
@@ -24,7 +24,7 @@ exactly one file, `<repository>.lock`, in `sha256sum` format. There are no
 This holds from a repository's first release in this format on: there is no
 transition period and no release carries old assets beside the lock (user,
 2026-09-14). The exceptions are `mica-build`'s scoped releases, which carry
-image files (1.0), and its index releases `mica/<YYYYMMDD-HHMM>`, which carry
+image files (1.0), and its index releases `mica.<YYYYMMDD-HHMM>`, which carry
 exactly `mica-build.lock`, `mica-index.json` and a `SHA256SUMS` listing both
 (1.2.3, `docs/design/mica-index.md`).
 
@@ -34,16 +34,20 @@ Two repositories release by scope instead of all at once (user, 2026-09-15);
 every other repository's release is unscoped:
 
 - `mica-boards` releases per board: the tag and GitHub Release are
-  `<board>/<YYYYMMDD-HHMM>`, a release builds and publishes only that board,
+  `<board>.<YYYYMMDD-HHMM>`, a release builds and publishes only that board,
   and it carries exactly `mica-boards.lock` and `SHA256SUMS`
   (`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`);
 - `mica-build`, which nothing consumes, releases per board (all its products)
-  or per product: the tag is `<scope>/<YYYYMMDD-HHMM>`, and it also carries
+  or per product: the tag is `<scope>.<YYYYMMDD-HHMM>`, and it also carries
   image files beside `mica-build.lock` and `SHA256SUMS`
   (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`); its lock rows
   are those of 1.2.2.
 
-`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name). A scoped
+`<scope>` is `[a-z0-9][a-z0-9-]*` (a board or product name), so it never
+contains a dot and everything before the first dot of a scoped tag is the
+scope. The separator is a dot, not a slash (user, 2026-09-16,
+`docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`): a slash in a release
+row is refused as `field-value`, with no compatibility form. A scoped
 `mica-boards` lock holds only its board: every `board` row names the scope's
 board with a reference tag `<component>.<scope>.<release>`, and every `pool`
 tag is `pool.<scope>.<arch>.<release>` (`scope-content`). A `mica-boards` lock
@@ -67,7 +71,7 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 
 | Kind | Columns | Key | Meaning |
 |---|---|---|---|
-| `release` | `release <repository> <release> <commit>` | -- | exactly once, the first row; `<release>` is `<YYYYMMDD-HHMM>`, or `<scope>/<YYYYMMDD-HHMM>` for `mica-boards` and `mica-build` only (1.0), for example `release mica-boards x64/20260915-0300 <commit>`; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` in place of `<YYYYMMDD-HHMM>` (`<scope>/offline` for a scoped repository, *fixed here*) |
+| `release` | `release <repository> <release> <commit>` | -- | exactly once, the first row; `<release>` is `<YYYYMMDD-HHMM>`, or `<scope>.<YYYYMMDD-HHMM>` for `mica-boards` and `mica-build` only (1.0), for example `release mica-boards x64.20260915-0300 <commit>`; `<commit>` is 40 lowercase hex; an offline lock (section 6) has `offline` in place of `<YYYYMMDD-HHMM>` (`<scope>.offline` for a scoped repository, *fixed here*) |
 | `image` | `image <source> <name> <platform> <reference>` | source, name, platform | `<source>` is the producing repository or `upstream` (1.2.1); `<platform>` is `index`, `amd64`, `arm64` or `386` |
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
@@ -127,7 +131,7 @@ The user unified the versions (2026-09-14): `registry:3.1.1`,
 
 A `mica-build` release lock (user, 2026-09-15,
 `docs/decisions/2026-09-15-update-packages.md`) is
-`release mica-build <scope>/<YYYYMMDD-HHMM> <commit>` followed by:
+`release mica-build <scope>.<YYYYMMDD-HHMM> <commit>` followed by:
 
 - `input <repository>[.<scope>] <release> <sha256>`: each input release, named
   as its consumer files are (`mica-boards.x64`, `mica-system-base`), with the
@@ -156,7 +160,7 @@ A `mica-build` release lock (user, 2026-09-15,
 A reader checks an asset's `<file>` only for the
 `mica-<product>-<YYYYMMDD-HHMM>.` prefix, not for the `.gz` suffix *(fixed
 here)*: `mica-build` reads the earlier scoped release locks
-`x64/20260915-1458` and `cx3576/20260915-1515`, whose image assets are raw
+`x64.20260915-1458` and `cx3576.20260915-1515`, whose image assets are raw
 `.img`, to compute generations and the `root` and `kernel` conditions.
 
 Every `bundle` and `asset` names a product with a `product` row
@@ -166,9 +170,9 @@ Every `bundle` and `asset` names a product with a `product` row
 
 #### 1.2.3 The index lock
 
-The Mica version index release `mica/<YYYYMMDD-HHMM>` of `mica-build` (user,
+The Mica version index release `mica.<YYYYMMDD-HHMM>` of `mica-build` (user,
 2026-09-15, `docs/decisions/2026-09-15-mica-version-index.md`) has a lock
-`release mica-build mica/<YYYYMMDD-HHMM> <commit>`, the scope `mica`, with:
+`release mica-build mica.<YYYYMMDD-HHMM> <commit>`, the scope `mica`, with:
 
 - `input mica-build.<scope> <release> <sha256>` for each scoped release it
   references, with that release's `SHA256SUMS` sha256;
@@ -253,7 +257,7 @@ the ones the vectors use:
 | `image-source` | an `image` row whose source is neither `upstream` nor a repository name, or a repository other than the release row's |
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
-| `release-scope` | a scoped release (`<scope>/...`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
+| `release-scope` | a scoped release (`<scope>.<release>`) in a lock of any repository but `mica-boards` and `mica-build`, or an unscoped one in theirs |
 | `scope-content` | in a scoped `mica-boards` lock, a `board` row naming another board than the scope or whose reference tag is not `<component>.<scope>.<...>` for its row's component, or a `pool` reference whose tag is not `pool.<scope>.<arch>.<...>` for its row's arch (an untagged reference included) |
 | `field-value` | a value outside its form (release tag, scope, commit, arch, platform, name, component, version, sha256, url, roots, apt, profile, generation, identity, bundle type, update kind, asset file name) |
 | `reference-digest` | a reference without `@sha256:<digest>` |
@@ -264,7 +268,7 @@ the ones the vectors use:
 | `base-only-kind` | an `upstream` or `apt` row in a lock of any repository but `mica-system-base` |
 | `package-without-pool` | a `package` row whose arch has no `pool` row |
 | `build-only-kind` | an `input`, `origin`, `built`, `index`, `product`, `bundle` or `asset` row in a lock of any repository but `mica-build` |
-| `index-scope` | an `origin`, `built` or `index` row outside a `mica-build` `mica/...` lock, a `mica` lock without an `index` row, or `mica` as another repository's scope, an input's scope, a product or a board |
+| `index-scope` | an `origin`, `built` or `index` row outside a `mica-build` `mica.<release>` lock, a `mica` lock without an `index` row, or `mica` as another repository's scope, an input's scope, a product or a board |
 | `index-only-inputs` | in an index lock, an `input` of another repository than `mica-build`, or an `image`, `pool`, `package`, `board`, `upstream` or `apt` row |
 | `index-input` | in an index lock, an `index`, `origin` or `built` row naming no `input`, or an `input` without exactly one `origin` or without a `built` row |
 | `index-product-source` | in an index lock, `product` rows not exactly for the indexed products, a `bundle` or `asset` of a product not indexed, or a bundle tag or asset file not carrying the release of the product's `index` input |
@@ -510,7 +514,7 @@ Each repository's `make offline` builds its release outputs from `locks/`
 into `_out/offline/`:
 
 - `<repository>.lock`: a lock whose release row has `offline` (or
-  `<scope>/offline`, one lock per scope built) and the checked-out commit; a
+  `<scope>.offline`, one lock per scope built) and the checked-out commit; a
   dirty tree is refused;
 - `oci/`: an OCI image layout holding every pool, board and image the lock
   names, by digest;
@@ -572,7 +576,8 @@ The vectors are files every repository copies into its own tests:
   `upstream-image-republished.lock` (`reference-upstream`) and
   `upstream-image-without-digest.lock` (`reference-digest`); the scope
   refusals are `scoped-release-not-allowed.lock` and `unscoped-release.lock`
-  (`release-scope`), `scope-content-board.lock`, `scope-content-pool.lock`
+  (`release-scope`), `release-slash.lock` (`field-value`, the retired
+  `<scope>/<release>` form), `scope-content-board.lock`, `scope-content-pool.lock`
   and `scope-content-tag.lock` (`scope-content`); the component refusals are
   `board-component.lock` (`field-value`), `board-duplicate-component.lock`
   (`duplicate-key`) and `board-components.lock` (`board-components`, no

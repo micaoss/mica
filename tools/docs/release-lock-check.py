@@ -95,7 +95,7 @@ def check_lock(path):
     if not rows or rows[0][0] != "release" or sum(r[0] == "release" for r in rows) != 1:
         raise Refused("release-row")
     _, repository, release, commit = rows[0]
-    scope, _, release = release.rpartition("/")
+    scope, _, release = release.rpartition(".")
     field(REPOSITORY.match(repository) and (RELEASE.match(release) or release == "offline") and COMMIT.match(commit)
           and (scope == "" or SCOPE.match(scope)))
     if (scope != "") != (repository in SCOPED):
