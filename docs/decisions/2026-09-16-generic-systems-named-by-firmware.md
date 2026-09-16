@@ -40,7 +40,10 @@ Consequences:
   (`BOARD_RELEASE_TARGET=1`), with a driver set beyond virtio — NVMe, USB
   storage, AHCI, the common NICs, xHCI, PCIe and RTC — so that one image boots
   QEMU and ordinary arm64 UEFI machines. `uefi-x64` keeps its current generic
-  amd64 configuration.
+  amd64 configuration. **Done on 2026-09-16**: `uefi-x64.20260916-0744` and
+  `uefi-arm64.20260916-0744` from `mica-boards` `65c25c8`, with the driver set
+  enforced by a 122-symbol required list. The qualification did not move with
+  it: QEMU `virt` only, for both boards.
 - `mica-build`: the products become `uefi-x64-dev`, `uefi-x64-prod`,
   `uefi-arm64-dev` and a new `uefi-arm64-prod` — no minimal products are
   carried over, they were removed the same day

@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-09-16 07:44 [release]
+
+`mica-boards` released the renamed boards from `main` `65c25c8`:
+`uefi-x64.20260916-0744` (`SHA256SUMS` sha256
+`10165c9721237b2a8e8e06a0fa82da05f95f1e8cbd2a53053b424684aecf12ca`) and
+`uefi-arm64.20260916-0744`
+(`4ed5a94eef767b65dfb1235c629a6d2f1d7350da29b5c7db84f34a795cef230b`), both
+verified anonymously, with `cx3576.20260916-0558` and `s905x5m.20260916-0558`
+unchanged beside them. The board packages are new names with fresh versions,
+`mica-board-uefi-x64` and `mica-board-uefi-arm64` at `0.1.0-1`, not bumps, and
+every identity carried over: the partition GUIDs, the filesystem UUIDs and the
+ESP volume id are the values the old boards had.
+
+`uefi-arm64` is now a release target and carries the generic driver set, as
+fact rather than proposal. Built in, because a dm-verity root has no initramfs
+and nothing can load before it is mounted: EFI and its stub, `EFIVAR_FS`,
+ACPI, DMI, PCI with `PCI_HOST_GENERIC` and `PCIEPORTBUS`, `EFI_PARTITION`, the
+PL011 UART and its console, RTC through PL031 and EFI; storage as virtio,
+SCSI, AHCI, NVMe and USB mass storage over xHCI and EHCI; HID and evdev.
+Networking is carried **as modules** — the Intel, Realtek, Broadcom, Mellanox
+and Aquantia drivers with the common PHYs — because it is not on the path to
+the root and loads from the signed support image. SD and eMMC are deliberately
+absent: a machine that boots from a platform MMC controller is a hardware
+board of its own, not this image, which is the line between the two board
+classes. The set is enforced by `kernel/config/uefi-arm64.required`, 122
+symbols the kernel configuration test holds. Cost: 1568 built-in and 240
+module symbols where there were 1319 and 75, 232 modules instead of 71, a
+24.5 MB `Image`, and a CI kernel job of 718 s where it was 330 s.
+
+The qualification did not move: QEMU `virt` only, exactly as `uefi-x64`
+claims, and `evidence.json` says so. The dossier, the board status table, the
+flashing guide, the download and install pages and the overview all state the
+new status and, in the same breath, that carrying a driver is not evidence
+that a machine boots.
+
 ## 2026-09-16 07:35 [release]
 
 `mica-build-env` `20260916-0735` at `bf347e2` (`SHA256SUMS` sha256

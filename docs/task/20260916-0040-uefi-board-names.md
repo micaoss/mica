@@ -73,3 +73,9 @@ Renaming the generic systems in the records
   page documents `PUBLISH` as a product key any more. Nothing is open on this
   repository's side; the remaining wait is the `uefi-arm64` symbol list, which
   arrives with `mica-boards`' release.
+- 2026-09-16: `mica-boards` cut the renamed boards, `uefi-x64.20260916-0744`
+  and `uefi-arm64.20260916-0744` from `65c25c8`, with `cx3576.20260916-0558`
+  and `s905x5m.20260916-0558`. `uefi-arm64` is a release target carrying the
+  generic driver set; the records state it as fact and keep the qualification
+  where it is, QEMU `virt` only. Left in this round: `mica-build`'s renamed
+  products and their first scoped releases, which are its own to cut.
