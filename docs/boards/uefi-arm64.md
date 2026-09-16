@@ -1,11 +1,12 @@
 # Board dossier: uefi-arm64
 
 `uefi-arm64` is the generic arm64 UEFI system: one image for machines whose
-firmware is UEFI with ACPI. All of its evidence so far is the QEMU aarch64
-`virt` machine, so it describes emulated boot and services and qualifies no
-physical arm64 machine. It is not a release target yet
-(`BOARD_RELEASE_TARGET=0`); making it one, with a driver set beyond virtio, is
-`mica-boards`' work under `docs/task/20260916-0040-uefi-board-names.md`.
+firmware is UEFI with ACPI. It is a release target since 2026-09-16
+(`BOARD_RELEASE_TARGET=1`, released as `uefi-arm64.20260916-0744` from
+`mica-boards` `65c25c8`) and carries a generic hardware driver set beyond
+virtio. All of its evidence is still the QEMU aarch64 `virt` machine: it
+describes emulated boot and services and qualifies no physical arm64 machine.
+**Carrying a driver is not evidence that a machine boots.**
 
 ## Identity
 
@@ -75,7 +76,20 @@ health gate confirms. Exhaustion stops without refilling counters.
 
 ## Storage media and layout
 
-Virtio block storage; current layout version 3 has exactly ESP, SYSTEM and DATA.
+Virtio block storage in the evidence, and generic storage controllers in the
+kernel: AHCI (`SATA_AHCI`, `SATA_AHCI_PLATFORM`), NVMe (`NVME_CORE`,
+`BLK_DEV_NVME`), USB mass storage over xHCI and EHCI (`USB_XHCI_HCD`,
+`USB_XHCI_PCI`, `USB_XHCI_PLATFORM`, `USB_EHCI_HCD`, `USB_EHCI_PCI`,
+`USB_STORAGE`) and SCSI (`SCSI`, `BLK_DEV_SD`, `SCSI_VIRTIO`), all built in
+because a dm-verity root has no initramfs and nothing can load before the root
+is mounted.
+
+**SD and eMMC are deliberately absent — no MMC at all. A machine that boots
+from a platform MMC controller is a hardware board of its own, not this
+image.** That is the line between the two board classes
+([naming](../decisions/2026-09-16-board-and-product-naming.md)).
+
+Current layout version 3 has exactly ESP, SYSTEM and DATA.
 `boards/uefi-arm64/board.env` is the geometry source. Root/support components are
 immutable files on SYSTEM; UKIs are on ESP. DATA alone grows on first boot and
 backs explicitly allowed writable leaves. `/var` and its parent skeleton remain
@@ -95,7 +109,24 @@ read-only. Identity is created on DATA before services and retained across updat
 
 ## Peripherals
 
-- Network: virtio-net over PCIe. Nothing else.
+- Network: virtio-net over PCIe in the evidence. The generic NICs are carried
+  **as modules**, because networking is not on the path to the root and a
+  module loads from the signed support image: `E1000`, `E1000E`, `IGB`, `IGC`,
+  `IXGBE`, `R8169`, `TIGON3`, `MLX5_CORE`, `AQTION`, with `PHYLIB`,
+  `FIXED_PHY` and the Realtek, Marvell, Micrel and Broadcom PHY drivers.
+- Platform: ACPI, DMI, PCI with `PCI_HOST_GENERIC` and `PCIEPORTBUS`, the
+  PL011 UART with its console, and RTC through `RTC_DRV_PL031` and
+  `RTC_DRV_EFI`, all built in; `EFI`, `EFI_STUB`, `EFIVAR_FS` and
+  `EFI_PARTITION` likewise. Input is `HID`, `HID_GENERIC`, `USB_HID` and
+  `INPUT_EVDEV`.
+- The set is enforced, not hoped for: `kernel/config/uefi-arm64.required`
+  holds 122 symbols — `mica-build`'s list as builtin, the hardware set above,
+  and the 17 netavark symbols as runtime — and the kernel configuration test
+  fails the build if the resolved configuration drops one.
+- Measured cost of carrying it: the resolved configuration goes from 1319
+  built-in and 75 module symbols to 1568 and 240; the kernel ships 232 modules
+  instead of 71; the `Image` is 24.5 MB; the CI kernel job goes from 330 s to
+  718 s, and from 70 s to 96 s on a 32-core workstation.
 - Radios: **none.** `BOARD_FEATURES` names no radio; the image ships no bluez, no
   wpasupplicant, no hostapd.
 - Hardware init: **none.** `BOARD_HWINIT_CONFS=""` — no CAN, no USB gadget, no
@@ -125,6 +156,10 @@ partition model identifies a current image.
 
 - ARM64 guests run under TCG on the current amd64 test host. Timings describe
   that executor, not a physical ARM64 system.
+- The generic hardware drivers are **carried, not qualified**: the
+  qualification is QEMU `virt` only, exactly as `uefi-x64` claims, and
+  `evidence.json` says so. No AHCI, NVMe, USB or NIC listed above has been
+  exercised on a physical machine.
 - The QEMU `virt` model exercises the common OS and management plane; it does
   not establish cx3576 peripheral, eMMC power-loss or board watchdog behavior.
 - Development Secure Boot enrollment is confined to disposable AAVMF variables.

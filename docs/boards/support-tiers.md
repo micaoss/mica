@@ -94,12 +94,17 @@ physical qualification row.
 | Board | SoC / boot | Disk layout | Release target | Build | Acceptance on file | Tier today |
 |---|---|---|---|---|---|---|
 | `uefi-x64` | generic amd64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU lifecycle: API, power actions, reboot, runtime, updates and reset | bring-up (QEMU baseline) |
-| `uefi-arm64` | generic arm64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | not yet | complete image | QEMU API, update, fault and reboot rows — [uefi-arm64.md](uefi-arm64.md) | bring-up (QEMU reference) |
+| `uefi-arm64` | generic arm64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU API, update, fault and reboot rows — [uefi-arm64.md](uefi-arm64.md) | bring-up (QEMU reference) |
 | `cx3576` | Rockchip RK3576, U-Boot with a signed FIT | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | physical rows not tested — [cx3576.md](cx3576.md) | bring-up |
 | `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | no | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
 
 "Release target" is `BOARD_RELEASE_TARGET` in the board's `board.env`.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
+
+`uefi-arm64` became a release target on 2026-09-16 and carries a generic
+hardware driver set (AHCI, NVMe, USB storage, the common NICs as modules; no
+MMC). Its qualification is unchanged: QEMU `virt` only. Carrying a driver is
+not evidence that a machine boots.
 
 `uefi-x64` and `uefi-arm64` are **generic systems**, named for the firmware
 class that starts them rather than for a machine; `cx3576` and `s905x5m` are
