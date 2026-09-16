@@ -72,6 +72,14 @@ describe('downloadsFromIndex', () => {
     expect(entries).toEqual([])
   })
 
+  it('reads the stamp whichever separator the scope uses', () => {
+    for (const release of ['cx3576/20260915-2230', 'uefi-x64.20260916-0845']) {
+      const [entry] = downloadsFromIndex({ products: [{ ...INDEX.products![0], release }] })
+      expect(entry.version).toMatch(/^\d{8}-\d{4}$/)
+      expect(entry.releasedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    }
+  })
+
   it('skips a product whose release stamp is not a date it can read', () => {
     expect(downloadsFromIndex({
       products: [{ ...INDEX.products![0], release: 'cx3576/nightly' }],

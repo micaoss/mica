@@ -40,15 +40,19 @@ export interface MicaIndex {
 
 const UPDATE_VARIANTS: DownloadVariant[] = ['full', 'root', 'kernel']
 
-/** `cx3576/20260915-2230` -> `20260915-2230`; a release without a scope is its own stamp. */
-function stamp(release: string): string {
-  const slash = release.indexOf('/')
-  return slash === -1 ? release : release.slice(slash + 1)
+/**
+ * The stamp a release ends with: `uefi-x64.20260916-0845` and the earlier
+ * `cx3576/20260915-2230` both end in a UTC-minute `YYYYMMDD-HHMM`. The separator
+ * between scope and stamp has changed once already, so the stamp is matched
+ * rather than split out.
+ */
+function stamp(release: string): string | null {
+  return /(\d{8}-\d{4})$/.exec(release)?.[1] ?? null
 }
 
 /** `20260915-2230` -> `2026-09-15`. The stamp is a UTC minute, so the date is its prefix. */
 function releasedAt(release: string): string | null {
-  const match = /^(\d{4})(\d{2})(\d{2})-\d{4}$/.exec(stamp(release))
+  const match = /^(\d{4})(\d{2})(\d{2})-\d{4}$/.exec(stamp(release) ?? '')
   return match ? `${match[1]}-${match[2]}-${match[3]}` : null
 }
 
@@ -67,7 +71,7 @@ function entry(
     profile: product.profile,
     kind,
     ...(variant ? { variant } : {}),
-    version: stamp(product.release),
+    version: stamp(product.release) ?? product.release,
     deploymentId: product.deployment,
     releasedAt: date,
     bytes: asset.size,

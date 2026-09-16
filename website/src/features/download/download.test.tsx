@@ -22,10 +22,10 @@ function download(partial: Partial<Download>): Download {
   }
 }
 
-const NEWEST = download({ version: '2026.09-2', deploymentId: 'dep-new', releasedAt: '2026-09-10' })
-const OLDER = download({ version: '2026.08-1', deploymentId: 'dep-old', releasedAt: '2026-08-01' })
-const UPDATE = download({ kind: 'update', deploymentId: 'dep-upd', releasedAt: '2026-09-08', filename: 'x64.micaupd' })
-const OTHER_BOARD = download({ board: 'cx3576', profile: 'prod', deploymentId: 'dep-cx', releasedAt: '2026-09-05' })
+const NEWEST = download({ version: '2026.09-2', deploymentId: 'dep-new', releasedAt: '2026-09-10', href: 'https://example.invalid/new.img' })
+const OLDER = download({ version: '2026.08-1', deploymentId: 'dep-old', releasedAt: '2026-08-01', href: 'https://example.invalid/old.img' })
+const UPDATE = download({ kind: 'update', variant: 'full', deploymentId: 'dep-upd', releasedAt: '2026-09-08', filename: 'x64.micaupd', href: 'https://example.invalid/x64.micaupd' })
+const OTHER_BOARD = download({ board: 'cx3576', profile: 'prod', deploymentId: 'dep-cx', releasedAt: '2026-09-05', href: 'https://example.invalid/cx.img' })
 const SAMPLE = [OLDER, NEWEST, UPDATE, OTHER_BOARD]
 
 describe('filterDownloads', () => {

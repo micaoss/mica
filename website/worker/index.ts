@@ -42,15 +42,17 @@ const CACHE_SECONDS = 300
 /**
  * A sample, and labelled as one everywhere it surfaces. Nothing here is a
  * release; it exists so the filters and the history control can be seen working
- * where no catalogue is stored.
+ * where no catalogue is stored. Every row needs its own href: the table keys on
+ * it, and rows sharing one would reproduce the stale-list bug the key fixed.
  */
 const SAMPLE: Download[] = [
-  { board: 'x64', profile: 'dev', kind: 'image', version: '20260915-1458', deploymentId: 'sample-x64-dev', releasedAt: '2026-09-15', bytes: 1_881_145_344, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260915-1458.img' },
-  { board: 'x64', profile: 'dev', kind: 'update', version: '20260915-1458', deploymentId: 'sample-x64-dev', releasedAt: '2026-09-15', bytes: 81_425_461, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260915-1458.micaupd' },
-  { board: 'x64', profile: 'minimal', kind: 'image', version: '20260915-1458', deploymentId: 'sample-x64-minimal', releasedAt: '2026-09-15', bytes: 1_881_145_344, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-minimal-20260915-1458.img' },
-  { board: 'x64', profile: 'dev', kind: 'image', version: '20260901-1200', deploymentId: 'sample-x64-dev-old', releasedAt: '2026-09-01', bytes: 1_870_000_000, digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-x64-dev-20260901-1200.img' },
-  { board: 'cx3576', profile: 'dev', kind: 'image', version: '20260915-1515', deploymentId: 'sample-cx3576-dev', releasedAt: '2026-09-15', bytes: 1_362_100_224, digest: 'sha256:4444444444444444444444444444444444444444444444444444444444444444', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-cx3576-dev-20260915-1515.img' },
-  { board: 'cx3576', profile: 'dev', kind: 'update', version: '20260915-1515', deploymentId: 'sample-cx3576-dev', releasedAt: '2026-09-15', bytes: 84_986_579, digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555', href: 'https://micaos.dev/docs/user/download/', filename: 'mica-cx3576-dev-20260915-1515.micaupd' },
+  { board: 'uefi-x64', profile: 'dev', kind: 'image', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 82000000, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/#mica-uefi-x64-dev-20260916-0845.img.gz', filename: 'mica-uefi-x64-dev-20260916-0845.img.gz' },
+  { board: 'uefi-x64', profile: 'dev', kind: 'update', variant: 'full', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 81000000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/#mica-uefi-x64-dev-20260916-0845.micaupd', filename: 'mica-uefi-x64-dev-20260916-0845.micaupd' },
+  { board: 'uefi-x64', profile: 'dev', kind: 'update', variant: 'kernel', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 16000000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/#mica-uefi-x64-dev-20260916-0845.kernel.micaupd', filename: 'mica-uefi-x64-dev-20260916-0845.kernel.micaupd' },
+  { board: 'uefi-x64', profile: 'dev', kind: 'update', variant: 'root', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 65000000, digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333', href: 'https://micaos.dev/docs/user/download/#mica-uefi-x64-dev-20260916-0845.root.micaupd', filename: 'mica-uefi-x64-dev-20260916-0845.root.micaupd' },
+  { board: 'uefi-x64', profile: 'dev', kind: 'image', version: '20260915-2230', deploymentId: 'sample-uefi-x64-dev-20260915-2230', releasedAt: '2026-09-15', bytes: 82000000, digest: 'sha256:4444444444444444444444444444444444444444444444444444444444444444', href: 'https://micaos.dev/docs/user/download/#mica-uefi-x64-dev-20260915-2230.img.gz', filename: 'mica-uefi-x64-dev-20260915-2230.img.gz' },
+  { board: 'cx3576', profile: 'dev', kind: 'image', version: '20260916-0845', deploymentId: 'sample-cx3576-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 86000000, digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555', href: 'https://micaos.dev/docs/user/download/#mica-cx3576-dev-20260916-0845.img.gz', filename: 'mica-cx3576-dev-20260916-0845.img.gz' },
+  { board: 'cx3576', profile: 'dev', kind: 'update', variant: 'full', version: '20260916-0845', deploymentId: 'sample-cx3576-dev-20260916-0845', releasedAt: '2026-09-16', bytes: 85000000, digest: 'sha256:6666666666666666666666666666666666666666666666666666666666666666', href: 'https://micaos.dev/docs/user/download/#mica-cx3576-dev-20260916-0845.micaupd', filename: 'mica-cx3576-dev-20260916-0845.micaupd' },
 ]
 
 function json(body: unknown, seconds: number): Response {
@@ -102,8 +104,18 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
   if (!index.ok)
     throw new Error(`${INDEX_ASSET} answered ${index.status}`)
 
+  const downloads = downloadsFromIndex(await index.json())
+  // An index that names products but parses to nothing means the shape moved
+  // under the parser, not that everything was unpublished. Keep what is stored:
+  // an empty write would blank every board page until someone noticed.
+  if (downloads.length === 0) {
+    const previous = await env.KV.get<StoredCatalogue>(KEY, 'json')
+    if (previous && previous.downloads.length > 0)
+      throw new Error(`${release.tag_name} parsed to no downloads; keeping ${previous.latestRelease}`)
+  }
+
   const stored: StoredCatalogue = {
-    downloads: downloadsFromIndex(await index.json()),
+    downloads,
     refreshedAt: new Date().toISOString(),
     latestRelease: release.tag_name,
   }
@@ -138,10 +150,14 @@ async function manualRefresh(request: Request, env: Env): Promise<Response> {
 
   try {
     const stored = await refresh(env)
-    return json({ refreshedAt: stored.refreshedAt, downloads: stored.downloads.length }, 0)
+    return json({ refreshedAt: stored.refreshedAt, downloads: stored.downloads.length, release: stored.latestRelease }, 0)
   }
   catch (error) {
-    return json({ error: (error as Error).message }, 0)
+    // A failed refresh has to look failed to whoever called it.
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
+      status: 502,
+      headers: { 'content-type': 'application/json; charset=utf-8' },
+    })
   }
 }
 
