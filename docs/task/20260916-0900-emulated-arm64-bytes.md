@@ -20,9 +20,21 @@ produced exactly the same arm64 bytes, all six still unlike the published ones.
 So the executor is the difference, not the toolchain move.
 
 Scope: diff one binary from a released arm64 `.deb` against its emulated build
-and name the cause. It decides whether the difference is removable (a stamp we
-control) or inherent (codegen under emulation), which in turn decides whether
-an offline build on an amd64 station could ever produce the published bytes.
+and name the cause.
+
+**What makes it decidable.** Three of the four candidate causes — a build id,
+an embedded path, timestamp ordering — are stamps this project controls and
+could pin, so finding one of them means emulated arm64 bytes can be made to
+match. The fourth, code generation differing under emulation, is not something
+we can fix; it can only be avoided by building natively. So the answer decides
+the property, not just the defect: whether byte-identical builds on a foreign
+architecture are achievable at all, or whether a native build is a hard
+requirement of byte-identical reproduction.
+
+That is also why the answer matters more than any fix that follows it. Until
+it is known, `docs/design/release-lock.md` section 5 states the bound as
+measured — byte-identical on the same architecture natively — rather than
+guessing which way it will fall.
 
 ## ActiveForm
 
@@ -35,6 +47,9 @@ Not started
 
 ## Notes
 
+- 2026-09-16: owner deliberately unassigned while the release round runs. The
+  coordinator assigns it when the round is done; `mica-core` is the natural
+  owner, having both halves measured and the station set up, and is mid-release.
 - 2026-09-16: opened from the coordinator's dispatch. Recorded in
   `docs/design/build-harness.md` section 4, `docs/design/build.md` and
   `docs/design/release-lock.md` section 5, and in `docs/user/build.md` for the
