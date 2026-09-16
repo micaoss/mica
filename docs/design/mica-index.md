@@ -104,6 +104,14 @@ digests are lowercase hex.
   entry equal to `url`, which is not a mirror but the source the reader
   already has; and an entry that `verify-index` cannot re-derive from the
   base, scope, stamp and file name.
+- **Reachability is a fact about a network, not about the design.**
+  `res.micaos.dev` is proven to serve GitHub runners, and on 2026-09-16 it was
+  measured **unreachable from this workstation's network** — IPv4 times out,
+  IPv6 has no route, while `www.cloudflare.com` answers in 0.14 s from the
+  same host. So no page here may say that a local or offline build fetches
+  from the mirror until that is measured again. It is a routing question that
+  is with the user; `url` is unaffected, which is the point of `mirrors` being
+  advice.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,

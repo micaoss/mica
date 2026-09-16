@@ -184,6 +184,18 @@ bash "$REPO/build/run.sh" --release gate --dir "$RELEASE" --public-key "$METADAT
 ```
 <!-- release-verify-test:end -->
 
+**Reading a digest a remote computes after it acknowledges the write.** GitHub
+returns from an asset upload before it has computed that asset's digest, so a
+reader that asks immediately gets a placeholder rather than a value. On
+2026-09-16 `mica-build` read it once, got nothing, and concluded the lock did
+not carry the asset's digest — failing an index job on a correct file. The fix
+is to distinguish *not yet* from *wrong*: wait for a digest to appear, and
+refuse only a digest that **differs** from the file. The general shape is
+worth carrying beyond this API: where a value is computed asynchronously after
+the write is acknowledged, the read succeeds, returns something, and the code
+concludes something false. An absent value and a wrong value are not the same
+finding.
+
 `manifest.json`, notes, SBOM and factory-image checksums are an unsigned integrity
 record. An attacker replacing that entire unsigned record can replace the image
 and prose; the authenticated update/firmware checks do not authenticate arbitrary

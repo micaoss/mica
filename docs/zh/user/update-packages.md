@@ -23,7 +23,9 @@ Mica OS 的发布在镜像旁边同时发布更新归档。本页说明哪个归
 | `root` | `mica-<product>-<stamp>.root.micaupd` | 相对该产品上一个发布，kernel 标识未变 |
 | `kernel` | `mica-<product>-<stamp>.kernel.micaupd` | rootfs 标识未变 |
 
-两者都变时只发布 `full`。`root` 归档携带 rootfs 对象，`kernel` 归档携带启动产物以及
+两者都变时只发布 `full`。`root` 这条路径在 2026-09-16 第一次跑在真实发布上，一次覆盖
+全部六个产品，并且面对的是真实存在的设备
+（[记录](../../task/20260916-1653-root-only-archive.md)）。`root` 归档携带 rootfs 对象，`kernel` 归档携带启动产物以及
 带模块和固件的 support 镜像；它们略去的对象必须已经在设备上，所以每个归档都声明自己
 要求什么。更新归档不压缩。后缀是生产侧的命名约定——客户端读的是 `MICAUPD1` 头部，
 不是文件名。

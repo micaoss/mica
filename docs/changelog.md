@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-16 17:25 [finding]
+
+Two facts from the same round that belong in the design pages rather than in a
+release note.
+
+**A remote may compute a value after acknowledging the write.** GitHub
+computes a release asset's digest asynchronously, after the upload call
+returns; `mica-build` read it once, got a placeholder, and concluded the lock
+did not carry the asset's digest — failing an index job on a correct file. The
+fix distinguishes *not yet* from *wrong*: wait for a digest to appear, and
+refuse only one that differs from the file. The general shape is recorded in
+`docs/design/release-artifacts.md` section 5, because it recurs outside this
+API: an absent value and a wrong value are not the same finding, and code that
+treats them alike reports a defect where there is none.
+
+**The mirror's reachability is a network fact, stated where the mirror is
+described.** `res.micaos.dev` is proven to serve GitHub runners and was
+measured unreachable from this workstation's network on 2026-09-16 — IPv4
+times out, IPv6 has no route, `www.cloudflare.com` answers in 0.14 s from the
+same host. `docs/design/mica-index.md` 3.1 now says so beside the `mirrors`
+member, and no page claims that a local or offline build here fetches from the
+mirror. It is a routing question with the user, and `url` is unaffected, which
+is exactly why `mirrors` is advice rather than a source of truth.
+
 ## 2026-09-16 17:15 [milestone]
 
 The **root-only update archive ran for the first time**, on real releases and
