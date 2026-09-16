@@ -38,6 +38,11 @@ All three, with no divergence. Releases `uefi-x64.20260916-1653`,
   archive applies strictly below itself. For `cx3576` that also means the
   archives refuse the generation-2 rows of the defective `cx3576.20260916-0847`
   without anyone having to remember that release is bad — the counter does it.
+  That release is still published, by decision and not by oversight: this round
+  re-cut every scope at the corrected generations, so a separate re-cut was
+  cancelled, and `mica.20260916-0858` references `0847`, so deleting it would
+  leave a published index that can never verify `--full` again
+  (`docs/design/mica-index.md` section 5).
 
 ## Why this is a measurement and not a release that looked right
 

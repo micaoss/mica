@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-16 17:40 [decision]
+
+The separate `cx3576` re-cut was cancelled, and the defective release stays
+published — both by decision. By the time a re-cut would have happened all
+four producers had released, so the re-pin round re-cut every scope at the
+corrected generations anyway: `cx3576.20260916-1653` **is** that release.
+Nothing was deleted, because `mica.20260916-0858` references
+`cx3576.20260916-0847` and its byte-identical rebuild was verified; deleting
+the release would leave a published index that can never verify `--full`
+again, trading a defect for a permanently unverifiable record.
+
+The general rule is now in `docs/design/mica-index.md` section 5 rather than
+only in this entry: a release an index references is not deleted, even when it
+is defective, and a bad release is withdrawn by superseding it. The instance
+is named there and in `docs/task/20260916-1653-root-only-archive.md`, so a
+reader who finds a defective release still published learns it was a decision
+rather than an oversight — and that the generation counter is what protects
+devices from it.
+
 ## 2026-09-16 17:25 [finding]
 
 Two facts from the same round that belong in the design pages rather than in a

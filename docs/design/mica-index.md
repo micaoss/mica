@@ -176,3 +176,15 @@ rules; the checks across releases are done at the cut and by the verifier:
   the asset's own scope, stamp and file name, and refuses one it cannot
   re-derive. Without that check a `mirrors` member would be the one part of
   the index that an emitter could put anything into and still verify.
+
+**A release an index references is not deleted, even when it is defective**
+*(fixed here, 2026-09-16)*. `--full` rebuilds the index from the releases it
+names, so deleting one leaves a published index that can never verify again —
+the defect would be traded for a permanently unverifiable record. Withdraw a
+bad release by superseding it: cut the corrected one, let the index move on,
+and leave the old release and the index that referenced it in place as
+history. The instance: `cx3576.20260916-0847` published a wrong product
+generation and stays published, with `mica.20260916-0858` which references it;
+`cx3576.20260916-1653` supersedes it at the corrected generations, and the
+generation counter makes devices refuse the bad rows without anyone having to
+remember which release was bad.
