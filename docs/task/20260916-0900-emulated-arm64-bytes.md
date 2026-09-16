@@ -5,7 +5,7 @@
 > and the title is the corrected one. Emulation was the first hypothesis and
 > was overturned on 2026-09-16 by the repository that raised it.
 
-- **status**: pending
+- **status**: completed
 - **priority**: P2
 - **owner**: `mica-core` (vtv87o8e), assigned 2026-09-16
 - **createdAt**: 2026-09-16 09:00
@@ -60,9 +60,40 @@ it is known, `docs/design/release-lock.md` section 5 states the bound as
 measured — byte-identical on the same architecture natively — rather than
 guessing which way it will fall.
 
+## Answer
+
+Stamps and linker layout, not machine code (`mica-core`, 2026-09-16, with
+`-C metadata` forced constant).
+
+- The `.text` delta of 12 096 bytes is accounted for: 12 224 bytes of it are
+  padding, alignment and linker glue, and the three missing function bodies are
+  three missing linker erratum stubs.
+- Function content itself differs by **128 bytes in 5.07 MB**. Those 128 bytes
+  are left unattributed rather than explained away.
+- The hypothesis that the cross package contributes different `crt` and
+  `libgcc` objects is **refuted by its author**: the 278 non-Rust `FUNC`
+  symbols are the same names at the same sizes on both sides, 8 696 bytes each.
+
+**The bound is provisional, not permanent.** What closes it is running
+`mica-core`'s build container on the target platform, so host equals target —
+the configuration `mica-podman` measured reproducing with Rust. It is deferred
+because it costs seven version bumps and changes no shipped byte: a
+configuration not yet paid for, with the price named, rather than a limitation
+of the design.
+
+**The 128 bytes get no follow-up record**, deliberately. They cannot be
+attributed while the disambiguator perturbs every symbol, and pinning the
+disambiguator costs the same seven bumps as the real fix while answering less.
+Closed rather than forgotten.
+
+**Nothing about these packages is unstable.** The native build reproduced
+itself exactly across a build-env move: twelve of twelve reused at their
+published sha256, including the arm64 hashes a local cross build cannot
+produce. The local toolchain path simply is not the published one.
+
 ## ActiveForm
 
-Not started
+Closed
 
 ## Dependencies
 
@@ -138,3 +169,8 @@ Is the local build the same build as the CI one?
   nothing measured here says emulation changes bytes — for any language. The
   sorting question is answered per artifact: `mica-boards` holds all three
   answers in one tree.
+- 2026-09-16: closed with an answer. The rule it produced — a byte comparison
+  of two Rust artifacts built with different `-C metadata` is not evidence of a
+  code difference — is recorded as a rule in `docs/design/build-harness.md`
+  section 4, beside the control procedure, because that is the page read at the
+  moment of deciding whether to bump.

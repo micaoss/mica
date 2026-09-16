@@ -526,8 +526,12 @@ platform, or on the host with a cross toolchain?
 - On the host with a cross toolchain, while CI builds natively on a runner of
   that architecture, the two halves come out of **different toolchains**.
   `mica-core` is this shape: its arm64 packages are cross-built locally and
-  native in CI, and all six differ. A local arm64 archive from an amd64
-  station there is a valid archive and is not the published one.
+  native in CI, and all six differ — in stamps and linker layout, not in
+  machine code (`docs/task/20260916-0900-emulated-arm64-bytes.md`). A local arm64
+  archive from an amd64 station there is a valid archive and is not the
+  published one. The gap is pinnable in principle: running that container on
+  the target platform would close it, and the reason it has not been done is
+  price, not design.
 
 **Nothing measured here says emulation changes bytes** — not for C, make,
 meson, ninja or data packaging, and not for Rust. What changes bytes is a

@@ -263,7 +263,8 @@ container runs on the target platform differs from CI only by emulation, which
 reproduces (measured 2026-09-16: `mica-system-base`'s eight archives, and
 `mica-podman` three times on three trees, its Rust stage included), while a
 stage that runs on the host with a cross toolchain against a natively built CI
-is two different builds, which differ (`mica-core`, six Rust packages of six).
+is two different builds, which differ (`mica-core`, six Rust packages of six —
+measured to be stamps and linker layout rather than machine code).
 Rust built on target reproduces, measured; C cross-built would be expected to
 differ the same way `mica-core` does. The language is not the test. A local arm64 rebuild that differs from a release is
 therefore not evidence of a changed input until the control has been run, and

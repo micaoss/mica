@@ -110,6 +110,19 @@ rather than in an input (`docs/task/20260916-0900-emulated-arm64-bytes.md`) —
 and that is a reason to look, not a reason to stop looking: a real change hides
 in exactly the same shape.
 
+**Rust: hold `-C metadata` constant before you diff.** A byte comparison of two
+Rust artifacts built with different `-C metadata` is **not evidence of a code
+difference**. The `rustc` host triple feeds the disambiguator, so a cross build
+and a native build differ in it by construction, and `mica-core` measured what
+that alone does: two local cross builds differing *only* in the metadata
+string moved twelve shared function names in size against five, moved function
+counts, duplicated `drop_glue` differently and moved linker erratum stubs —
+noisier than the cross-versus-native difference it was investigating, which
+sits below that noise floor. So hold the disambiguator constant first; if you
+cannot, the only honest statement available is that the difference is below the
+noise floor. Reporting codegen without doing this is how someone eventually
+reports a compiler bug that is not there.
+
 Use the native pinned Rust builder's `aarch64-linux-gnu-gcc` for cross C test
 helpers on an x86-64 host. The C-only builder is native-only. Use QEMU full-system
 acceptance for the target kernel and service behavior. A qemu-user smoke

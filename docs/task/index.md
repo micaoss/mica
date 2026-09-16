@@ -79,4 +79,4 @@ Each task is a single line linking to its detail file. All detailed information 
 - [-] [**20260915-0316-docs-multi-repo-ownership Restate the documentation system for seven repositories**](20260915-0316-docs-multi-repo-ownership.md) `P1`
 - [-] [**20260915-2327-product-guides Complete the product documentation: overview, build, porting, flashing, updates and releasing**](20260915-2327-product-guides.md) `P1`
 - [-] [**20260916-0040-uefi-board-names Rename the generic systems to uefi-x64 and uefi-arm64**](20260916-0040-uefi-board-names.md) `P1`
-- [ ] [**20260916-0900-emulated-arm64-bytes Identify what differs inside an emulated arm64 archive**](20260916-0900-emulated-arm64-bytes.md) `P3`
+- [x] [**20260916-0900-emulated-arm64-bytes Identify what differs inside an emulated arm64 archive**](20260916-0900-emulated-arm64-bytes.md) `P3`

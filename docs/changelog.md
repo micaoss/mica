@@ -1,5 +1,43 @@
 # Changelog
 
+## 2026-09-16 12:30 [finding]
+
+The cross-compiled arm64 investigation is closed with an answer: the
+difference is **stamps and linker layout, not machine code** (`mica-core`,
+with `-C metadata` forced constant). The `.text` delta of 12 096 bytes is
+accounted for — 12 224 bytes of padding, alignment and linker glue, and three
+missing function bodies that are three missing linker erratum stubs — leaving
+128 bytes of function content in 5.07 MB, which are recorded as unattributed
+rather than explained away. The hypothesis that the cross package contributes
+different `crt` and `libgcc` objects was refuted by its own author: the 278
+non-Rust `FUNC` symbols are the same names at the same sizes on both sides.
+
+**The rule it produced is recorded as a rule**, in
+`docs/design/build-harness.md` section 4 beside the control procedure: a byte
+comparison of two Rust artifacts built with different `-C metadata` is not
+evidence of a code difference. `mica-core` built that control too — two local
+cross builds differing only in the metadata string — and it is noisier than
+the phenomenon: twelve shared function names differing in size against five,
+function counts moving, `drop_glue` duplicating differently, erratum stubs
+moving. Cross versus native sits below that noise floor. Hold the
+disambiguator constant before diffing Rust; where that is impossible, the only
+honest statement is that the difference is below the noise floor.
+
+The bound is **provisional**: running `mica-core`'s container on the target
+platform would close it — the configuration `mica-podman` measured reproducing
+with Rust — and it is deferred because it costs seven version bumps and
+changes no shipped byte. A configuration not yet paid for, with the price
+named, not a limitation of the design.
+
+No follow-up record for the 128 bytes, deliberately: they cannot be attributed
+while the disambiguator perturbs every symbol, and pinning it costs the same
+seven bumps as the real fix while answering less. Recorded as closed so nobody
+reopens it thinking it was forgotten. And the closing fact, which is the one
+that matters for trust: nothing about these packages is unstable — the native
+build reproduced itself exactly across a build-env move, twelve of twelve
+reused at their published sha256, including the arm64 hashes a local cross
+build cannot produce. The local toolchain path simply is not the published one.
+
 ## 2026-09-16 12:05 [spec]
 
 `mica/index/v1` gains an optional `mirrors` member on every `images` and
