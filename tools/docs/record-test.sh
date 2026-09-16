@@ -34,7 +34,11 @@ git branch -M main
 # Test the script as it is in the working tree, not as it was last committed.
 cp "$REPO/tools/docs/record.sh" tools/docs/record.sh
 git add tools/docs/record.sh
-git -c user.name=test -c user.email=test@example.invalid commit -q -m 'fixture: the script under test'
+# Only a working-tree edit needs a fixture commit; normally the clone already
+# carries the committed script and there is nothing to commit here.
+git diff --cached --quiet \
+    || git -c user.name=test -c user.email=test@example.invalid \
+           commit -q -m 'fixture: the script under test'
 git push -q origin main
 BASE=$(git rev-parse HEAD)
 
