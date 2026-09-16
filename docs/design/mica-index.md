@@ -104,7 +104,7 @@ measured 1.9 KB per product. Both the member and the threshold are proposals.
 
 ## 4. Generation
 
-- The previous index is the newest `mica/*` tag; the first index is built in
+- The previous index is the newest `mica.*` tag; the first index is built in
   full.
 - A later index is incremental. It reads only the previous index's three
   files and the scoped release just published. `SHA256SUMS` must list exactly
@@ -129,5 +129,5 @@ rules; the checks across releases are done at the cut and by the verifier:
 - `verify-index <tag> --full` rebuilds every entry from its sources and
   publishes nothing.
 - `mica-build`'s `ci.yml` job `release-index` runs `--full` against the
-  newest `mica/*` index on pushes to `main`, and `index --dry-run` before the
+  newest `mica.*` index on pushes to `main`, and `index --dry-run` before the
   first index exists.

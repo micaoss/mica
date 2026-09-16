@@ -120,7 +120,7 @@ A Mica version is the index release `mica/<YYYYMMDD-HHMM>`, cut automatically
 after every successful scoped release: it carries only `mica-build.lock`,
 `mica-index.json` and `SHA256SUMS`, references the newest scoped release of
 every published product, and is the GitHub latest release, so the greatest
-`mica/*` tag is the newest version (`docs/decisions/2026-09-15-mica-version-index.md`,
+`mica.*` tag is the newest version (`docs/decisions/2026-09-15-mica-version-index.md`,
 `docs/design/mica-index.md`). The first indexes are `mica/20260915-2240`, built
 in full, and `mica/20260915-2242`, the first incremental one, over the scoped
 releases `x64/20260915-2230` and `cx3576/20260915-2230`, where every product
