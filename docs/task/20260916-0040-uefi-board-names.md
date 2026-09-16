@@ -67,3 +67,9 @@ Renaming the generic systems in the records
   pushed first. `tools/docs/record-test.sh` proves each refusal in a
   throw-away clone and runs in `make docs-verify-test` (6/6). There is no
   hand-assembled chain left to forget.
+- 2026-09-16: `PUBLISH` settled (`1300e41`). It goes with the minimal
+  products; the index catalogue's `publish` field is redefined as "the
+  product's board is a release target", which reproduces today's output. No
+  page documents `PUBLISH` as a product key any more. Nothing is open on this
+  repository's side; the remaining wait is the `uefi-arm64` symbol list, which
+  arrives with `mica-boards`' release.
