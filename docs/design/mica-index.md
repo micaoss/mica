@@ -91,14 +91,19 @@ digests are lowercase hex.
   a mirror verifies them exactly as it would from `url`. `url` keeps its form
   and meaning — the release's own URL — so a pruned or unreachable mirror
   costs a reader nothing that the release still has.
-- Each entry is **derived, never looked up**: `<base>/d/mica/<scope>/<stamp>/<file>`,
-  with the scope and stamp of the release the asset belongs to and the file
-  name unchanged (today `https://res.micaos.dev` is the base). The base is a
-  **committed value in `mica-build`**, not an environment variable *(fixed
-  here)*: an index that had to ask a mirror what it holds, or whose member
-  depended on a runner's configuration, would stop rebuilding identically from
-  a clean checkout, and that property is not negotiable. An emitter with no
-  committed base omits the member.
+- Each entry is **derived, never looked up**:
+  `<base>/d/mica/<scope>/<stamp>/<file>`, with the scope and stamp of the
+  release the asset belongs to and the file name unchanged.
+- The bases are a **committed file in `mica-build`**, `mirrors.list`: one
+  absolute `https` base per line, **in preference order**, today one line,
+  `https://res.micaos.dev`. Each base derives one entry, and the entries
+  appear **in the file's order** — the array's order is the file's order, and
+  an emitter that sorts either is wrong (the sort-order paragraph below says
+  why). A committed file rather than an environment variable *(fixed here)*:
+  an index that had to ask a mirror what it holds, or whose member depended on
+  a runner's configuration, would stop rebuilding identically from a clean
+  checkout, and that property is not negotiable. No file, or an empty one, and
+  the member is omitted.
 - Refused: an entry that is not an absolute `https` URL; an empty `mirrors`
   array, which is omitted instead; a duplicate entry within one array; an
   entry equal to `url`, which is not a mirror but the source the reader

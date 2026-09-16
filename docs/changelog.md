@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-16 19:25 [spec]
+
+`docs/design/mica-index.md` 3.1 now names the committed bases the way
+`mica-build` implemented them, in the same words: `mirrors.list`, one absolute
+`https` base per line in preference order, each base deriving one entry and
+the entries appearing in the file's order, with an emitter that sorts either
+being wrong. Today the file has one line. The removal case needs no special
+rule: no file, or an empty one, and the member is omitted — which is what
+omission already meant.
+
+Still open, and deliberately not written yet: whether section 4's remedy for a
+changed base — a full rebuild — should become "state the invariant, and let
+the emitter satisfy it by re-derivation on carry or by a full rebuild". The
+invariant is not in dispute: every `mirrors` member in an index is derived
+from the bases committed at that index's own commit. The question is whether
+`mica-build`'s re-derivation on carry covers **every** carried entry,
+including entries carried from an index cut before `mirrors.list` existed and
+the case where the previous index carries no `mirrors` at all. If it does, the
+spec should mandate the property and not the mechanism; if any path lets an
+old member survive, the full rebuild stays. That answer is `mica-build`'s to
+give, and the wording waits for it.
+
 ## 2026-09-16 19:05 [spec]
 
 Answered ahead of the question, because it is the spec's to answer: **what
