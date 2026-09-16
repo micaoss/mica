@@ -8,7 +8,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 
 - [`architecture.md`](../architecture.md) — 系统架构总览与组件地图（从这里开始）
 - [板卡状态表](../boards/support-tiers.md#current-boards) — 各板卡的构建、验收与支持层级
-- `user/` — 用户文档（已覆盖 17 篇，含文档契约本身）
+- `user/` — 用户文档（已覆盖 18 篇，含文档契约本身）
   - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 x64 基线
   - [`download.md`](user/download.md) — 发布版组成与镜像获取
   - [`install.md`](user/install.md) — 安装的操作顺序：从选镜像到首次启动
@@ -18,6 +18,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`configuration.md`](user/configuration.md) — 配置模型与所有受支持的修改方式
   - [`applications.md`](user/applications.md) — 原生软件包与容器两条交付路径
   - [`update-rollback.md`](user/update-rollback.md) — A/B 更新、健康门与回滚
+  - [`update-packages.md`](user/update-packages.md) — 该用哪个更新归档、设备如何接收它、以及每一种拒绝
   - [`recovery.md`](user/recovery.md) — 从自动回退到整盘重刷的恢复阶梯
   - [`storage.md`](user/storage.md) — 分区、DATA 命名空间与数据归属规则
   - [`troubleshooting.md`](user/troubleshooting.md) — 诊断顺序：访问、识别、证据
@@ -48,7 +49,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 |---|---|---|
 | `../user/build.md` | b43ed6fd | not-translated |
 | `../user/flashing.md` | 97fbfcbc | current |
-| `../user/update-packages.md` | c7780c15 | not-translated |
+| `../user/update-packages.md` | e707e9e3 | current |
 | `../user/releasing.md` | aa9e6a86 | not-translated |
 | `../user/overview.md` | 1cddbe2d | not-translated |
 | `../user/api.md` | db66fc02 | current |
