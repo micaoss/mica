@@ -512,7 +512,7 @@ cable/connector, image and boot ID. D5 is not a prerequisite for this or any
 following stage; handle it only as the optional review in step 5:
 
 1. Boot with HDMI connected. Capture the connector status, EDID modes and fb0
-   state, and visually record one centered **YBO - Hub OS** logo with its
+   state, and visually record one centered **Mica OS** icon-and-wordmark logo with its
    approved gradient through the 180-second window. No normal login prompt may
    replace it.
 2. With a USB keyboard, use Alt+F2 and Ctrl+Alt+F2 in separate attempts. tty2
@@ -920,7 +920,7 @@ Only observed hardware outcomes belong in physical qualification rows.
 
 ## 10. Display evidence boundary
 
-The shipped software contract is one centered **YBO - Hub OS** logo with the
+The shipped software contract is one centered **Mica OS** icon-and-wordmark logo with the
 approved gradient, an idle tty1, and an authenticated tty2 selected by
 Alt+F2/Ctrl+Alt+F2 with no autologin. Static artwork, cmdline and QEMU tty2
 checks support that contract, but do not show the board's pixels or complete a

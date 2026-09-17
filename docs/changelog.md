@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-17 09:37 [progress]
+
+The CX3576 boot logo is the **Mica OS** icon above its wordmark: `docs/design/display.md`
+section 4 and `docs/boards/cx3576-bench.md` no longer name the retired
+**YBO - Hub OS** artwork. The master is still
+`mica-boards:boards/cx3576/flash/assets/splash.png`, now rendered from
+`mica-res:mica/brand/logo/mica-os-icon-dark.svg` and
+`mica-os-wordmark-dark.svg`.
+
 ## 2026-09-16 19:25 [spec]
 
 `docs/design/mica-index.md` 3.1 now names the committed bases the way
