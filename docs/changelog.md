@@ -4294,3 +4294,14 @@ because an exhausted anonymous limit and a permission refusal are both 403.
 The likely cause is the anonymous GitHub limit — 60 calls an hour per egress IP, and the
 Worker's egress is shared — but that is inference. The next failing cron will say. Covered by
 `worker/index.test.ts`, the first tests the Worker has had.
+
+## 2026-09-17 08:01 [progress]
+
+The first recorded cron refresh settled the cause: `github answered 403 (rate limit remaining
+0)` at 08:00:43, five minutes after a manual refresh through the same Worker had succeeded.
+The cron and request paths leave through different, shared egress addresses, and the
+anonymous API allowance on the cron's was already spent.
+
+The API call exists only to find the latest release. `https://github.com/<repo>/releases/
+latest/download/mica-index.json` answers 302 to the latest release's asset without touching
+the API or its limits, which would make a token unnecessary rather than merely helpful.
