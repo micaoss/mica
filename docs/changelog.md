@@ -4314,3 +4314,16 @@ anonymous API allowance on the cron's was already spent.
 The API call exists only to find the latest release. `https://github.com/<repo>/releases/
 latest/download/mica-index.json` answers 302 to the latest release's asset without touching
 the API or its limits, which would make a token unnecessary rather than merely helpful.
+
+## 2026-09-17 08:15 [progress]
+
+The catalogue refresh no longer calls the GitHub API. It fetches
+`https://github.com/micaoss/mica-build/releases/latest/download/mica-index.json` with
+`redirect: 'manual'`, reads the release name from the redirect's location, then fetches the
+asset. That URL is outside the API, so the anonymous rate limit that the cron's shared egress
+address had exhausted does not apply, and no token is needed — `GITHUB_TOKEN` is gone from the
+Worker's environment and from the index check's workflow step.
+
+`bun run check:index` reads the same URL, so the hourly CI check now exercises the path
+production takes rather than a neighbouring one. A 404 there says the latest release carries
+no index; any other non-redirect answer is named with its status.

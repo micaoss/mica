@@ -32,20 +32,29 @@ const INDEX = {
   }],
 }
 
-function githubAnswering(latest: Response) {
+const INDEX_URL = 'https://github.com/micaoss/mica-build/releases/latest/download/mica-index.json'
+
+/**
+ * GitHub as the Worker now meets it: the latest-download URL answers a redirect
+ * to the latest release's asset, and that asset answers the index. No call goes
+ * to api.github.com.
+ */
+function githubAnswering(first: Response) {
   return vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input)
-    if (url.includes('/releases/latest'))
-      return latest.clone()
+    if (url.startsWith('https://api.github.com'))
+      throw new Error(`unexpected API call: ${url}`)
+    if (url === INDEX_URL)
+      return first.clone()
     return new Response(JSON.stringify(INDEX))
   })
 }
 
-function LATEST() {
-  return new Response(JSON.stringify({
-    tag_name: 'mica.20260916-1709',
-    assets: [{ name: 'mica-index.json', browser_download_url: 'https://github.invalid/mica-index.json' }],
-  }))
+function REDIRECT(tag = 'mica.20260916-1709') {
+  return new Response(null, {
+    status: 302,
+    headers: { location: `https://github.com/micaoss/mica-build/releases/download/${encodeURIComponent(tag)}/mica-index.json` },
+  })
 }
 
 describe('recordedRefresh', () => {
@@ -55,22 +64,40 @@ describe('recordedRefresh', () => {
     vi.unstubAllGlobals()
   })
 
-  it('records why a refresh failed, including the rate limit, and leaves the catalogue alone', async () => {
+  it('records why a refresh failed and leaves the catalogue alone', async () => {
     const { kv, store } = fakeKv()
     store.set('catalog', JSON.stringify({ downloads: [{}], refreshedAt: '2026-09-16T19:30:38Z' }))
-    vi.stubGlobal('fetch', githubAnswering(new Response('rate limited', {
-      status: 403,
-      headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': '1789628400' },
-    })))
+    vi.stubGlobal('fetch', githubAnswering(new Response('', { status: 404 })))
 
-    await expect(recordedRefresh({ KV: kv }, 'cron')).rejects.toThrow('403')
+    await expect(recordedRefresh({ KV: kv }, 'cron')).rejects.toThrow('404')
 
     const status = JSON.parse(store.get('catalog-status')!)
     expect(status.lastAttemptAt).toBe('2026-09-17T06:00:00.000Z')
     expect(status.trigger).toBe('cron')
-    expect(status.lastError.message).toContain('403')
-    expect(status.lastError.message).toContain('rate limit remaining 0')
+    expect(status.lastError.message).toContain('the latest release carries no mica-index.json')
     expect(JSON.parse(store.get('catalog')!).refreshedAt).toBe('2026-09-16T19:30:38Z')
+  })
+
+  it('reads the release from the redirect and never calls the API', async () => {
+    const { kv, store } = fakeKv()
+    const fetchMock = githubAnswering(REDIRECT())
+    vi.stubGlobal('fetch', fetchMock)
+
+    const stored = await recordedRefresh({ KV: kv }, 'cron')
+
+    expect(stored.latestRelease).toBe('mica.20260916-1709')
+    expect(stored.downloads).toHaveLength(1)
+    expect(fetchMock.mock.calls.every(([url]) => !String(url).startsWith('https://api.github.com'))).toBe(true)
+    expect(JSON.parse(store.get('catalog-status')!).lastError).toBeNull()
+  })
+
+  it('decodes a release tag written with a slash', async () => {
+    const { kv } = fakeKv()
+    vi.stubGlobal('fetch', githubAnswering(REDIRECT('mica/20260915-2242')))
+
+    const stored = await recordedRefresh({ KV: kv }, 'manual')
+
+    expect(stored.latestRelease).toBe('mica/20260915-2242')
   })
 
   it('clears the error on the next success and keeps when it last succeeded', async () => {
@@ -81,7 +108,7 @@ describe('recordedRefresh', () => {
       trigger: 'cron',
       lastError: { at: '2026-09-17T05:30:00.000Z', message: 'github answered 403' },
     }))
-    vi.stubGlobal('fetch', githubAnswering(LATEST()))
+    vi.stubGlobal('fetch', githubAnswering(REDIRECT()))
 
     await recordedRefresh({ KV: kv }, 'manual')
 

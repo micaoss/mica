@@ -15,8 +15,6 @@ export interface Env {
   KV: KVNamespace
   /** `owner/repo` whose releases are parsed. */
   CATALOG_REPO?: string
-  /** Read-only GitHub token; without one the API allows 60 calls an hour per IP. */
-  GITHUB_TOKEN?: string
   /** Bearer token the manual refresh requires. */
   REFRESH_TOKEN?: string
   /** `1` answers the sample catalogue instead of reading KV. */
@@ -85,54 +83,35 @@ function json(body: unknown, seconds: number): Response {
 }
 
 /**
- * GitHub answers a rate-limited anonymous call with 403, the same status as a
- * permission refusal. The rate-limit headers are what tell the two apart.
- */
-function githubFailure(response: Response): string {
-  const remaining = response.headers.get('x-ratelimit-remaining')
-  const reset = Number(response.headers.get('x-ratelimit-reset'))
-  const limit = remaining === null
-    ? ''
-    : ` (rate limit remaining ${remaining}${reset ? `, resets ${new Date(reset * 1000).toISOString()}` : ''})`
-  return `github answered ${response.status}${limit}`
-}
-
-interface GithubRelease {
-  tag_name: string
-  assets: { name: string, browser_download_url: string }[]
-}
-
-/**
  * Reads `mica-index.json` from the repository's latest release and stores what
  * it names.
  *
  * The index release is the one GitHub marks latest, cut automatically after a
  * scoped release, and it is the documented entry point: one file names every
  * current product with its files, sizes and hashes
- * (`mica:docs/design/mica-index.md`). Walking the release list and parsing file
- * names would reconstruct less, and reconstruct it worse.
+ * (`mica:docs/design/mica-index.md`).
+ *
+ * It is reached through `releases/latest/download/<asset>`, which GitHub answers
+ * with a redirect to that asset on the latest release. That URL is not the API:
+ * the API's anonymous allowance is 60 calls an hour per egress address, the
+ * Worker's egress is shared, and the cron's refreshes were failing with 403
+ * because someone else had spent it. The release name comes from the redirect.
  */
 async function refresh(env: Env): Promise<StoredCatalogue> {
   const repo = env.CATALOG_REPO ?? DEFAULT_REPO
-  const headers: Record<string, string> = {
-    'accept': 'application/vnd.github+json',
-    'user-agent': 'micaos.dev',
-  }
-  if (env.GITHUB_TOKEN)
-    headers.authorization = `Bearer ${env.GITHUB_TOKEN}`
+  const entry = `https://github.com/${repo}/releases/latest/download/${INDEX_ASSET}`
 
-  const latest = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers })
-  if (!latest.ok)
-    throw new Error(githubFailure(latest))
+  const redirect = await fetch(entry, { redirect: 'manual' })
+  const location = redirect.headers.get('location')
+  if (redirect.status === 404)
+    throw new Error(`${entry} answered 404: the latest release carries no ${INDEX_ASSET}`)
+  if (redirect.status < 300 || redirect.status >= 400 || !location)
+    throw new Error(`${entry} answered ${redirect.status}, not a redirect to the asset`)
 
-  const release = (await latest.json()) as GithubRelease
-  const asset = release.assets.find(candidate => candidate.name === INDEX_ASSET)
-  if (!asset)
-    throw new Error(`${release.tag_name} carries no ${INDEX_ASSET}`)
-
-  const index = await fetch(asset.browser_download_url, { headers: { accept: 'application/json' } })
+  const tag = releaseTag(location)
+  const index = await fetch(location, { headers: { accept: 'application/json' } })
   if (!index.ok)
-    throw new Error(`${INDEX_ASSET} answered ${index.status}`)
+    throw new Error(`${INDEX_ASSET} of ${tag} answered ${index.status}`)
 
   const downloads = downloadsFromIndex(await index.json())
   // An index that names products but parses to nothing means the shape moved
@@ -141,13 +120,13 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
   if (downloads.length === 0) {
     const previous = await env.KV.get<StoredCatalogue>(KEY, 'json')
     if (previous && previous.downloads.length > 0)
-      throw new Error(`${release.tag_name} parsed to no downloads; keeping ${previous.latestRelease}`)
+      throw new Error(`${tag} parsed to no downloads; keeping ${previous.latestRelease}`)
   }
 
   const stored: StoredCatalogue = {
     downloads,
     refreshedAt: new Date().toISOString(),
-    latestRelease: release.tag_name,
+    latestRelease: tag,
   }
 
   await env.KV.put(KEY, JSON.stringify(stored))
@@ -159,6 +138,12 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
  * started it, and why it failed. Before this, the cron swallowed its errors and
  * a catalogue could go stale for hours with nothing to say why.
  */
+/** `…/releases/download/mica.20260916-1709/mica-index.json` -> `mica.20260916-1709`. */
+function releaseTag(location: string): string {
+  const match = /\/releases\/download\/([^/]+)\//.exec(new URL(location).pathname)
+  return match ? decodeURIComponent(match[1]) : location
+}
+
 export async function recordedRefresh(env: Env, trigger: RefreshTrigger): Promise<StoredCatalogue> {
   const now = new Date().toISOString()
   const previous = (await env.KV.get<RefreshStatus>(STATUS_KEY, 'json')) ?? {}

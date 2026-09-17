@@ -92,7 +92,7 @@ parser does not know is skipped rather than shown as a plain update.
     "lastSuccessAt": "2026-09-16T19:30:38.632Z",
     "lastError": {
       "at": "2026-09-17T08:00:03.120Z",
-      "message": "github answered 403 (rate limit remaining 0, resets 2026-09-17T08:41:12.000Z)"
+      "message": "mica-index.json of mica.20260916-1709 answered 503"
     }
   }
 }
@@ -101,9 +101,10 @@ parser does not know is skipped rather than shown as a plain update.
 Every refresh — the cron, `POST /api/catalog/refresh`, or the background fill of an empty
 store — records when it ran, what started it, and why it failed; a success clears
 `lastError` and moves `lastSuccessAt`. The status is its own KV key, so a failed attempt is
-recorded without touching the rows the pages read. A GitHub 403 carries the rate-limit
-headers in its message, because anonymous rate limiting and a permission refusal share the
-status code.
+recorded without touching the rows the pages read. No GitHub API call is involved: the index
+is read from `releases/latest/download/mica-index.json`, which redirects to the latest
+release's asset, so the API's anonymous rate limit — which the cron's shared egress address
+had exhausted — does not apply.
 
 ### Checking the live index
 
@@ -124,15 +125,13 @@ The KV namespace and the cron are configured. Nothing else is required: a reques
 no stored catalogue fills it in the background, so the first deployment is current within a
 request or two, and the cron keeps it so.
 
-Two secrets are optional and worth setting:
+One secret is optional and worth setting:
 
 - `REFRESH_TOKEN` — the bearer token `POST /api/catalog/refresh` requires. It is a GitHub
   secret of this repository and the deploy workflow binds it to the Worker, so rotating it
   is `gh secret set REFRESH_TOKEN` and a deploy. Without it the endpoint answers 401 to
   everyone and refreshing waits for the cron; a refresh anyone can trigger is a way to spend
   the upstream rate limit.
-- `wrangler secret put GITHUB_TOKEN` — a read-only token. The anonymous API allows 60 calls
-  an hour per IP and the Worker's egress is shared.
 
 `CATALOG_REPO` selects the repository, defaulting to `micaoss/mica-build`. Setting
 `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.

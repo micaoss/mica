@@ -56,8 +56,6 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: bun run check:index
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     if: github.event_name == 'workflow_dispatch'
