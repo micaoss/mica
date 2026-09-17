@@ -10,7 +10,7 @@ import { downloadsFromIndex } from '../src/features/download/mica-index'
  * answer rather than a broken page.
  */
 
-interface Env {
+export interface Env {
   /** Stores the parsed catalogue. */
   KV: KVNamespace
   /** `owner/repo` whose releases are parsed. */
@@ -31,9 +31,26 @@ interface StoredCatalogue {
   latestRelease?: string
 }
 
+/** What started a refresh; recorded so a stale catalogue says whose attempt failed. */
+export type RefreshTrigger = 'cron' | 'manual' | 'fill'
+
+export interface RefreshStatus {
+  lastAttemptAt?: string
+  trigger?: RefreshTrigger
+  /** The last attempt that stored a catalogue. */
+  lastSuccessAt?: string
+  /** Why the last attempt failed; null once one succeeds again. */
+  lastError?: { at: string, message: string } | null
+}
+
 const CATALOG_PATH = '/api/catalog'
 const REFRESH_PATH = '/api/catalog/refresh'
 const KEY = 'catalog'
+/**
+ * Kept apart from the catalogue so a failed attempt is recorded without
+ * rewriting what the pages read.
+ */
+const STATUS_KEY = 'catalog-status'
 const DEFAULT_REPO = 'micaoss/mica-build'
 const INDEX_ASSET = 'mica-index.json'
 /** Long enough to stay cheap, short enough that a refresh surfaces quickly. */
@@ -67,6 +84,19 @@ function json(body: unknown, seconds: number): Response {
   })
 }
 
+/**
+ * GitHub answers a rate-limited anonymous call with 403, the same status as a
+ * permission refusal. The rate-limit headers are what tell the two apart.
+ */
+function githubFailure(response: Response): string {
+  const remaining = response.headers.get('x-ratelimit-remaining')
+  const reset = Number(response.headers.get('x-ratelimit-reset'))
+  const limit = remaining === null
+    ? ''
+    : ` (rate limit remaining ${remaining}${reset ? `, resets ${new Date(reset * 1000).toISOString()}` : ''})`
+  return `github answered ${response.status}${limit}`
+}
+
 interface GithubRelease {
   tag_name: string
   assets: { name: string, browser_download_url: string }[]
@@ -93,7 +123,7 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
 
   const latest = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers })
   if (!latest.ok)
-    throw new Error(`github answered ${latest.status}`)
+    throw new Error(githubFailure(latest))
 
   const release = (await latest.json()) as GithubRelease
   const asset = release.assets.find(candidate => candidate.name === INDEX_ASSET)
@@ -124,20 +154,50 @@ async function refresh(env: Env): Promise<StoredCatalogue> {
   return stored
 }
 
+/**
+ * Every refresh goes through here, so each attempt leaves a trace: when, what
+ * started it, and why it failed. Before this, the cron swallowed its errors and
+ * a catalogue could go stale for hours with nothing to say why.
+ */
+export async function recordedRefresh(env: Env, trigger: RefreshTrigger): Promise<StoredCatalogue> {
+  const now = new Date().toISOString()
+  const previous = (await env.KV.get<RefreshStatus>(STATUS_KEY, 'json')) ?? {}
+
+  try {
+    const stored = await refresh(env)
+    const status: RefreshStatus = { lastAttemptAt: now, trigger, lastSuccessAt: now, lastError: null }
+    await env.KV.put(STATUS_KEY, JSON.stringify(status))
+    return stored
+  }
+  catch (error) {
+    const status: RefreshStatus = {
+      lastAttemptAt: now,
+      trigger,
+      lastSuccessAt: previous.lastSuccessAt,
+      lastError: { at: now, message: (error as Error).message },
+    }
+    await env.KV.put(STATUS_KEY, JSON.stringify(status))
+    throw error
+  }
+}
+
 async function catalogue(env: Env, ctx: ExecutionContext): Promise<Response> {
   if (env.CATALOG_DEMO === '1')
     return json({ downloads: SAMPLE, sample: true, refreshedAt: null }, CACHE_SECONDS)
 
-  const stored = await env.KV.get<StoredCatalogue>(KEY, 'json')
+  const [stored, status] = await Promise.all([
+    env.KV.get<StoredCatalogue>(KEY, 'json'),
+    env.KV.get<RefreshStatus>(STATUS_KEY, 'json'),
+  ])
   if (!stored) {
     // Nothing stored yet — a fresh deployment, before the first cron. Fill it in
     // the background rather than making this request wait on GitHub, and hold
     // the empty answer briefly so the next request finds the catalogue.
-    ctx.waitUntil(refresh(env).catch(() => {}))
-    return json({ downloads: [], refreshedAt: null }, 60)
+    ctx.waitUntil(recordedRefresh(env, 'fill').catch(() => {}))
+    return json({ downloads: [], refreshedAt: null, status }, 60)
   }
 
-  return json(stored, CACHE_SECONDS)
+  return json({ ...stored, status }, CACHE_SECONDS)
 }
 
 async function manualRefresh(request: Request, env: Env): Promise<Response> {
@@ -149,7 +209,7 @@ async function manualRefresh(request: Request, env: Env): Promise<Response> {
     return new Response('unauthorized', { status: 401 })
 
   try {
-    const stored = await refresh(env)
+    const stored = await recordedRefresh(env, 'manual')
     return json({ refreshedAt: stored.refreshedAt, downloads: stored.downloads.length, release: stored.latestRelease }, 0)
   }
   catch (error) {
@@ -179,8 +239,8 @@ export default {
     return catalogue(env, ctx)
   },
 
-  /** The cron trigger; a failure leaves the stored copy standing. */
+  /** The cron trigger; a failure leaves the stored copy standing and is recorded. */
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(refresh(env).catch(() => {}))
+    ctx.waitUntil(recordedRefresh(env, 'cron').catch(() => {}))
   },
 }

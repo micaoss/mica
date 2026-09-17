@@ -80,6 +80,31 @@ A product absent from `products` is absent on purpose: the catalogue lists it wi
 `publish: false`, which is how the `-minimal` products stay off the site. An archive kind the
 parser does not know is skipped rather than shown as a plain update.
 
+### When the catalogue goes stale
+
+`GET /api/catalog` answers a `status` beside the rows:
+
+```json
+{
+  "status": {
+    "lastAttemptAt": "2026-09-17T08:00:03.120Z",
+    "trigger": "cron",
+    "lastSuccessAt": "2026-09-16T19:30:38.632Z",
+    "lastError": {
+      "at": "2026-09-17T08:00:03.120Z",
+      "message": "github answered 403 (rate limit remaining 0, resets 2026-09-17T08:41:12.000Z)"
+    }
+  }
+}
+```
+
+Every refresh — the cron, `POST /api/catalog/refresh`, or the background fill of an empty
+store — records when it ran, what started it, and why it failed; a success clears
+`lastError` and moves `lastSuccessAt`. The status is its own KV key, so a failed attempt is
+recorded without touching the rows the pages read. A GitHub 403 carries the rate-limit
+headers in its message, because anonymous rate limiting and a permission refusal share the
+status code.
+
 ### Checking the live index
 
 `bun run check:index` reads the live `mica-index.json` and fails if a published product

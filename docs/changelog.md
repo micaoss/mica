@@ -4275,3 +4275,22 @@ board`, which is the check this morning's rename needed.
 It runs in the website workflow on push and on an hourly schedule, because `mica-build`
 publishes on its own clock and nothing there triggers a build in this repository. The full
 lint/test/build job is skipped on the schedule; it has nothing new to check.
+
+## 2026-09-17 07:55 [progress]
+
+The download catalogue's `refreshedAt` stood at 2026-09-16 19:30:38 the next morning: one
+cron refresh had succeeded, and roughly twenty since had not, with nothing anywhere to say
+why. `scheduled()` swallowed its errors, and there is no Cloudflare access from here to read
+cron logs. A manual refresh at 05:21 succeeded, so neither the parser nor the source was
+broken.
+
+Every refresh now goes through `recordedRefresh`, which writes a `catalog-status` key: when
+the attempt ran, whether the cron, a manual refresh or the empty-store fill started it, when
+one last succeeded, and the error of the last failure — cleared by the next success.
+`GET /api/catalog` answers it as `status`. It is a separate key so a failed attempt never
+rewrites the rows the pages read. A GitHub failure message carries the rate-limit headers,
+because an exhausted anonymous limit and a permission refusal are both 403.
+
+The likely cause is the anonymous GitHub limit — 60 calls an hour per egress IP, and the
+Worker's egress is shared — but that is inference. The next failing cron will say. Covered by
+`worker/index.test.ts`, the first tests the Worker has had.
