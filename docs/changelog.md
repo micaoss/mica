@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-09-20 [finding]
+## 2026-09-19 22:08 [finding]
 
 **Nothing in CI or in a release has ever booted an image**, in any repository
 here (`mica-build`, from its own workflows, 2026-09-19). Recorded in
@@ -38,7 +38,7 @@ board vocabulary and has `mica-build` assert it equals the board rows it pins,
 so renaming a board turns a gate red in the repository that renamed it, on the
 same push.
 
-## 2026-09-20 [finding]
+## 2026-09-19 21:48 [finding]
 
 The loader question is answered from `mica-build`'s code rather than from
 design intent, and the answer is larger than the question: **archive kinds are
@@ -71,7 +71,7 @@ field by any current mechanism, changing that would change the format, and
 what to do about it is with the user. It is written as a long-standing fact
 rather than a new one, so a reader meeting it does not read a regression.
 
-## 2026-09-19 23:40 [finding]
+## 2026-09-19 21:46 [finding]
 
 The two-directional audit is in, and it is the third fact of the restoration —
 kept apart from the other two because it answers a third question.
@@ -107,7 +107,7 @@ your model is worth more than the explanation that makes it go away.** The
 explanation here was coherent and arithmetically correct about digests, and it
 dismissed the defect it was explaining.
 
-## 2026-09-19 23:10 [finding]
+## 2026-09-19 21:44 [finding]
 
 A correction that narrows a claim rather than reversing it, and it was the
 coordinator's claim rather than a measurement: **reuse is decided by inputs,
@@ -143,7 +143,7 @@ first, on the `cx3576` model that states its own pending physical rows.
 document is where "a release target is not a hardware claim" gets stated for
 this board.
 
-## 2026-09-19 22:45 [progress]
+## 2026-09-19 21:42 [progress]
 
 The summary sentence is a class, not an incident, so it was hunted where the
 lists change most — the board table, the product catalogue and the release
@@ -167,7 +167,7 @@ which a lexical flag cannot judge; such a flag would fire on every dated
 measurement, and a gate whose findings a person dismisses every run is worse
 than the rare, cheap defect it catches.
 
-## 2026-09-19 22:15 [decision]
+## 2026-09-19 21:40 [decision]
 
 `s905x5m` is opened as a release target (user, 2026-09-19): `mica-boards` sets
 `BOARD_RELEASE_TARGET=1` and cuts a release, `mica-build` re-pins and
