@@ -209,8 +209,9 @@ prerequisites without booting (`MICA_PRODUCT=<name>`). `make lifecycle-uefi
 PRODUCT=<name>` (`tests/lifecycle-uefi/run.sh`) assembles the acceptance disk
 out of the built product, boots it for the runtime and shutdown evidence,
 then runs the update and fault stages; the privileged lane
-(`.github/workflows/privileged.yml`) builds, verifies, gates, smoke-breaks
-and repart-tests every product under `products/`. Tests under `tests/lifecycle-uefi/` cover both UEFI
+(`.github/workflows/privileged.yml`) is written to build, verify, gate,
+smoke-break and repart-test every product under `products/`, and has never
+run (section 4). Tests under `tests/lifecycle-uefi/` cover both UEFI
 architectures, full services, updates, interruption, fallback and shutdown.
 
 The API harness does not build its input image. Missing images, signing inputs
