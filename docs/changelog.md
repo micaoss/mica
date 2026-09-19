@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-19 23:40 [finding]
+
+The two-directional audit is in, and it is the third fact of the restoration —
+kept apart from the other two because it answers a third question.
+
+**Both directions, against the final catalogue:** 508 keys in the catalogue
+and in the locks (492 before the 21:03 releases), 0 in the locks and missing,
+0 in the catalogue named by no lock, 0 with the same key and a different
+digest; 896 public objects audited with digests verified, 0 problems; 31
+declared pack chunks, 0 problems; 16 index URLs verified by digest, 0
+problems. Forward, everything the locks name is present; reverse, everything
+held is named by a lock or derived from a commit a lock pins, and nothing
+else. The reverse column reads 0 because the arithmetic closes exactly.
+
+**Two numbers with two units, both true of the same mirror on the same
+evening.** The contract requires 44 keys — 13 manifests plus 31 chunk names —
+and the bucket stores 43 byte strings, because one 64 MiB chunk coincides
+between the two `uefi` packs. 492 + 44 = 536 answers *what must resolve*;
+492 + 43 = 535 answers *how many distinct objects exist*. `docs/user/doc-contract.md`
+gains the rule in both languages: state the unit with the number.
+
+**And the gap was a defect.** `uefi-x64-kernel` pack chunk 00 existed under
+the `arm64` name only, so a consumer following the contract would fail on the
+first chunk of the largest tree `mica-boards` pulls — while the audit and the
+reconciliation both read clean, because both are about the object *set* and
+neither was about the *contract over names*. Repaired, independently verified,
+and `mica-res` built the check that sees the class: every chunk a manifest
+declares must resolve under that manifest's own name.
+
+`mica-res`' sentence is recorded in `docs/design/build-harness.md` section 4,
+beside the control procedure and the noise-floor rule, because it belongs to
+the same family — how to read a measurement: **a number that disagrees with
+your model is worth more than the explanation that makes it go away.** The
+explanation here was coherent and arithmetically correct about digests, and it
+dismissed the defect it was explaining.
+
 ## 2026-09-19 23:10 [finding]
 
 A correction that narrows a claim rather than reversing it, and it was the

@@ -200,12 +200,35 @@ digests are lowercase hex.
   resolves, the redirect contract works as specified, and the mirror serves
   the bytes a producer lock pins. That same digest answered `404` in the
   evening's earlier probe.
-- **What that does not establish:** it is **one** object, not 536 — a spot
-  check, not an audit. `mica-res` still owes the audit in both directions,
-  and only that answers whether the service holds everything it should and
-  nothing it should not. The check above is also from the coordinator's
-  container reaching the zone through the user-supplied address mapping, so
-  it carries that scope like every other measurement here.
+- **What that check did not establish, and what the audit then did.** The
+  digest check above was one object, not the whole set: a spot check. The
+  audit that answers the set ran the same evening, in **both directions**
+  against the final catalogue — 508 keys in the catalogue and in the locks
+  (492 before the 21:03 releases), **0** in the locks and missing, **0** in
+  the catalogue named by no lock, **0** with the same key and a different
+  digest; 896 public objects audited with digests verified, 0 problems; 31
+  declared pack chunks, 0 problems; 16 index URLs verified by digest, 0
+  problems. Forward: everything the locks name is present. Reverse:
+  everything held is named by a lock or derived from a commit a lock pins,
+  and nothing else. The reverse column reads 0 because the arithmetic closes
+  exactly, not because nothing was checked.
+- **Two numbers, two units, and the reason to carry both.** The contract
+  requires **44 keys** — 13 manifests plus 31 chunk names — while the bucket
+  stores **43 byte strings**, because one 64 MiB chunk coincides between the
+  two `uefi` packs. So 492 + 44 = 536 answers *what must resolve* and
+  492 + 43 = 535 answers *how many distinct objects exist*; a bare number is
+  wrong for whichever question its reader is not asking. State the unit with
+  the number.
+- **The gap was a defect, not a rounding difference.** `uefi-x64-kernel` pack
+  chunk 00 existed as an object under the `arm64` name only, so a consumer
+  following the contract failed on the first chunk of the largest tree
+  `mica-boards` pulls — **while the audit and the reconciliation both read
+  clean**, because both are about the object *set* and neither was about the
+  *contract over names*. It is repaired and independently verified (both names
+  answer, both serve bytes hashing to the declared digest), and the check that
+  can see the class now exists: every chunk a manifest declares must resolve
+  under that manifest's own name, 31 walked, exactly one such case ever
+  existed.
 - **Reachability is measured per environment, and the scope of a measurement
   is part of it.** The `res.micaos.dev` zone serves CI and the developer
   machine normally. What was measured unreachable on 2026-09-16 is **the agent

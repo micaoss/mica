@@ -145,6 +145,10 @@ English source.
   scripts they name.
 - User pages do not narrate implementation. The design record owns the why;
   these pages own what an operator or integrator can do today.
+- **State the unit with the number.** 536 and 535 were both true of the same
+  mirror on the same evening — one counts the keys a contract requires, the
+  other the distinct byte strings stored — and a bare number is wrong for
+  whichever question its reader is not asking.
 - **A sentence that counts or quantifies a list beside it is rewritten with
   that list.** "All four boards", "nothing on this list is waiting", "the only
   one that" — each is true when written and false the moment the list changes,

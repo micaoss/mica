@@ -110,6 +110,17 @@ rather than in an input (`docs/task/20260916-0900-emulated-arm64-bytes.md`) —
 and that is a reason to look, not a reason to stop looking: a real change hides
 in exactly the same shape.
 
+**A number that disagrees with your model is worth more than the explanation
+that makes it go away.** On 2026-09-19 a one-object gap between a contract's
+44 required keys and a bucket's 43 stored digests was explained as a counting
+difference — coherent, arithmetically correct, and it dismissed the defect it
+was explaining: a pack chunk stored under the wrong board's name, which no
+audit over the object set could see because the fault was in the contract over
+names. The rule that follows is cheap: when a count disagrees with the model,
+find the object the disagreement points at before writing the explanation, and
+if the explanation arrives first, treat it as a hypothesis with a name
+attached rather than as a resolution.
+
 **Rust: hold `-C metadata` constant before you diff.** A byte comparison of two
 Rust artifacts built with different `-C metadata` is **not evidence of a code
 difference**. The `rustc` host triple feeds the disambiguator, so a cross build
