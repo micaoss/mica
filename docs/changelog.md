@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-09-19 17:00 [spec]
+
+Three changes to `docs/design/mica-index.md` 3.1, one of them a ruling against
+what I wrote yesterday.
+
+**The whole prefix is the committed value.** A mirror entry is
+`<prefix>/<scope>/<stamp>/<file>`, `mirrors.list` holds one absolute `https`
+prefix per line, and today's line — `https://dl.res.micaos.dev/mica` — is an
+example rather than the rule. My version put `/mica/` in the spec, which made
+the 2026-09-18 move a change in `mica-build` *and* a change here; as a prefix
+it is one committed line in one repository and this document names no path
+shape of another service at all. It is the rule I wrote two days ago —
+mandate the property, not the mechanism — applied to the thing I wrote it
+about, and I did not apply it. What `mica-res` serves is kept, moved into its
+own bullet, because that is a fact a reader needs rather than a derivation the
+emitter follows.
+
+**The `/d/` dispute is settled, and not by the probe that was planned.**
+`mica-boards`' CI prints whether each fetch was mirrored, and ran the same
+command twice from GitHub runners: `35207062715` (2026-09-17 09:47) mirrored
+all eleven fetches, `35454561921` (2026-09-19 16:19) mirrored none and fell
+back on all eleven, with `MICA_MIRROR` unchanged since 2026-09-16. The old
+paths stopped answering on or before 2026-09-19 16:19 with no consumer having
+landed, so the failing sync was right and the migration notice described a
+plan that was not followed. Two dated runs of one command with one variable
+changed beat a probe, and nothing broke — the fallback is the designed
+behaviour, which is the property recorded yesterday doing its work a second
+time.
+
+**`/blob/<aa>/<sha256>` takes the disputed slot:** it stopped working in the
+same interval while `mica-res` says the shape is unchanged and now answers by
+redirect, so whether it stopped answering or the client does not follow the
+redirect is open, and is recorded as open.
+
+And a second reachability measurement, with its own scope and beside the first
+rather than replacing it: from an agent container on this host on 2026-09-19,
+`dl.res.micaos.dev` (`188.114.97.5`), `s3.res.micaos.dev` (`188.114.96.5`) and
+`res.micaos.dev` (`188.114.97.5`) all time out on 443 while
+`www.cloudflare.com` answers in 0.14 s. The new download host is in the same
+unreachable range as the old one from that vantage, and that says nothing
+about runners or the user's machine — where `mica-boards`' mirrored fetches
+are the evidence.
+
 ## 2026-09-19 [spec]
 
 `mica-res` became a general resource publishing service (user decision

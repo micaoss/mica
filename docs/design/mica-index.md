@@ -92,28 +92,31 @@ digests are lowercase hex.
   and meaning — the release's own URL — so a pruned or unreachable mirror
   costs a reader nothing that the release still has.
 - Each entry is **derived, never looked up**:
-  `<base>/mica/<scope>/<stamp>/<file>`, with the scope and stamp of the
-  release the asset belongs to and the file name unchanged. Since 2026-09-18
-  the base is the download host and the key has no `/d/` prefix, so a mirror
-  URL reads
-  `https://dl.res.micaos.dev/mica/<scope>/<stamp>/<file>` *(fixed here)*.
-  `mica-res` now serves three hosts — `dl.res.micaos.dev` for the files,
+  `<prefix>/<scope>/<stamp>/<file>`, with the scope and stamp of the release
+  the asset belongs to and the file name unchanged *(fixed here, 2026-09-19)*.
+  The **whole prefix** is the committed value, so this document names no path
+  shape of another service: when a host or a layout moves, one line moves in
+  one repository and this rule does not change. Today that line is
+  `https://dl.res.micaos.dev/mica`, which is an example of the prefix and not
+  the rule.
+- The prefixes are a **committed file in `mica-build`**, `mirrors.list`: one
+  absolute `https` prefix per line, **in preference order**. Each prefix
+  derives one entry, and the entries appear **in the file's order** — the
+  array's order is the file's order, and an emitter that sorts either is wrong
+  (the sort-order paragraph below says why). A committed file read at the
+  index's own commit, never an environment variable and never a lookup
+  *(fixed here)*: an index that had to ask a mirror what it holds, or whose
+  member depended on a runner's configuration, would stop rebuilding
+  identically from a clean checkout, and that property is not negotiable. No
+  file, or an empty one, and the member is omitted.
+- What `mica-res` serves is a fact a reader needs, and is not part of the
+  derivation above: three hosts — `dl.res.micaos.dev` for the files,
   `res.micaos.dev` for directory listings, `/blob/<aa>/<sha256>`, the `/v2`
-  registry and the console, and `s3.res.micaos.dev` for the S3 read API — and
-  the rule for the move is one sentence: the new key is the old readable name
-  with the `/d/` prefix dropped. `/blob/` and `/v2` are unchanged, `/blob/`
-  now answering by redirect to the download host, and the v1 `/index/`
-  documents are frozen.
-- The bases are a **committed file in `mica-build`**, `mirrors.list`: one
-  absolute `https` base per line, **in preference order**, today one line,
-  `https://dl.res.micaos.dev`. Each base derives one entry, and the entries
-  appear **in the file's order** — the array's order is the file's order, and
-  an emitter that sorts either is wrong (the sort-order paragraph below says
-  why). A committed file rather than an environment variable *(fixed here)*:
-  an index that had to ask a mirror what it holds, or whose member depended on
-  a runner's configuration, would stop rebuilding identically from a clean
-  checkout, and that property is not negotiable. No file, or an empty one, and
-  the member is omitted.
+  registry and the console, and `s3.res.micaos.dev` for the S3 read API. The
+  2026-09-18 move was one sentence — the new key is the old readable name with
+  the `/d/` prefix dropped — with `/blob/` and `/v2` unchanged, `/blob/`
+  answering by redirect to the download host, and the v1 `/index/` documents
+  frozen.
 - Refused: an entry that is not an absolute `https` URL; an empty `mirrors`
   array, which is omitted instead; a duplicate entry within one array; an
   entry equal to `url`, which is not a mirror but the source the reader
@@ -128,15 +131,21 @@ digests are lowercase hex.
   The host moved and nothing had to be reissued — that is what "a mirror is a
   source, never a trust anchor" buys, and it is the strongest argument this
   design has produced so far.
-- **Disputed, and recorded as disputed:** whether the old `/d/` URLs still
-  answer today. `mica-res`' migration notice says the old paths are removed
-  only once all four consumers have landed and not before 2026-10-02, while
-  its own sync has been failing since 2026-09-19 08:46 because its git pack
-  lookups at `/d/…` find nothing. `mica-res` is settling it with a probe from
-  a runner, since neither it nor the coordinator can reach the zone from a
-  container on this host. Neither version is written here as fact until that
-  probe reports: a claim about what a host serves is not established until
-  someone who can reach the host says so.
+- **Settled, by two dated runs rather than a probe:** the old `/d/` paths
+  stopped answering on or before 2026-09-19 16:19, with no consumer having
+  landed. `mica-boards`' CI prints whether each fetch was mirrored, and it ran
+  the same command twice from GitHub runners, which do reach the zone: run
+  `35207062715` (2026-09-17 09:47) had all eleven fetches mirrored, run
+  `35454561921` (2026-09-19 16:19) had none — all eleven fell back — with
+  `MICA_MIRROR` unchanged since 2026-09-16. So the side that was right is the
+  failing sync, and `mica-res`' migration notice, which said the old paths
+  survive until 2026-10-02, describes a plan that was not followed. Nothing
+  broke: the fallback is the designed behaviour.
+- **Disputed in its place:** the archive lookups at `/blob/<aa>/<sha256>`
+  stopped working in the same interval, and `mica-res` says that shape is
+  unchanged and now answers by redirect. Whether it stopped answering, or
+  whether the client does not follow the redirect, is open with `mica-res`.
+  Neither version is written here as fact.
 - **Reachability is measured per environment, and the scope of a measurement
   is part of it.** The `res.micaos.dev` zone serves CI and the developer
   machine normally. What was measured unreachable on 2026-09-16 is **the agent
@@ -145,9 +154,17 @@ digests are lowercase hex.
   `1.1.1.1` open instantly, with no proxy variables and a plain docker bridge
   route — container egress, almost certainly host-side routing that does not
   cover the bridge. It is neither a property of the mirror nor of the
-  development network. Nobody has yet measured a fetch through the mirror
-  hook, so no page claims one either way; `url` is unaffected regardless,
-  which is the point of `mirrors` being advice.
+  development network. `url` is unaffected regardless, which is the point of
+  `mirrors` being advice.
+- **A second measurement, with its own scope** (2026-09-19, from an agent
+  container on this host): `dl.res.micaos.dev` resolves to `188.114.97.5`,
+  `s3.res.micaos.dev` to `188.114.96.5` and `res.micaos.dev` to
+  `188.114.97.5`, and all three time out on 443 from that container while
+  `www.cloudflare.com` answers in 0.14 s from the same place. The new download
+  host is in the same unreachable range as the old one, from that vantage.
+  This does not update the measurement above; it sits beside it, and it says
+  nothing about runners or the user's machine, where the zone is reachable —
+  `mica-boards`' mirrored fetches of 2026-09-17 are that side's evidence.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,
