@@ -242,6 +242,12 @@ a pool whose packages did not change is byte-identical across releases: its
 new `pool.<...>.<release>` tag is a new tag on the same digest (user,
 2026-09-15, `docs/decisions/2026-09-15-package-versions.md`).
 
+Tags cut before the board rename of 2026-09-16 keep the old board and product
+names and are not rewritten — 22 of them today, 18 in `mica-boards` and 4 in
+`mica-build` — for the same reason the slash-form release tags keep theirs:
+they are named by the locks of releases that still exist, and a tag that a
+published lock names is not rewritten or deleted (2.1).
+
 ### 1.4 Order
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,

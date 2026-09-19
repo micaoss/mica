@@ -1,6 +1,6 @@
 # 20260913-1700-registry-migration Move the pinned artifacts to GHCR and bump every consumer
 
-- **status**: pending
+- **status**: completed (the outcome holds; the mechanism was superseded, see the 2026-09-19 note)
 - **priority**: P1
 - **owner**: (unassigned)
 - **createdAt**: 2026-09-13 17:00
@@ -176,3 +176,27 @@ history (its history is squashed into the root `4d63430`, user); the current
 Base is `20260915-1102` at `3ae160d`, whose release carries only
 `mica-system-base.lock` and `SHA256SUMS`
 (`docs/task/20260914-2042-release-lock-offline-build.md`).
+
+2026-09-19: **closed.** Checked against this runbook's own goal rather than
+against an impression: every repository publishes to its own package under
+`ghcr.io/micaoss`, every package is public and read anonymously — this week's
+index verifications pull manifests and layers with no token, from a fresh
+clone — publication is CI's alone, and every consumer pins by digest through
+its lock. That is what steps 1 to 6 were for, so the task is done.
+
+It was **not** done by executing these steps, and the record should say so:
+the release-lock migration (`docs/task/20260914-2042-release-lock-offline-build.md`)
+replaced the mechanism underneath them. `deps.sh`, `make deps-bump` and
+`deps/boards/*.json` gave way to `locks/<repository>.lock` with
+`locks/pins/<repository>.pin`; the `build-<commit12>` tag grammar gave way to
+`<kind>[.<name>]*.<release>`, where no tag carries a commit at all
+(`docs/decisions/2026-09-15-oci-tags-follow-release-version.md`); and the
+retired `mica-debian`, `mica-system` and `mica-boot` steps died with those
+repositories. Steps 3 to 5 therefore describe files that no longer exist, and
+are kept as written because they are the record of what was planned on
+2026-09-13, not instructions anyone should follow now.
+
+The one clause of step 6 that outlived the rest — remove the GitHub Releases
+from the documents once no consumer reads them — was answered the other way:
+a release *is* the GitHub Release, and the packages hold the artifacts it
+names. `docs/design/release-lock.md` is where that settled.

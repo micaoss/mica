@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-19 21:00 [progress]
+
+Three items from the workspace audit, all in `docs/`.
+
+**The `add-endpoint` row is the format specimen, not a live task** — it sits
+under *Format* in `docs/task/index.md` and its detail file deliberately does
+not exist. It is now fenced, so it cannot be read as an open P1 at the top of
+the index by a person or by a tool; being read that way in the audit is the
+argument for fencing it, and the reason is written beside it. `mica-res` has
+the same residue and it is theirs to judge — reported, not edited.
+
+**`20260913-1700-registry-migration` is closed**, checked against its own goal
+rather than against an impression: every repository publishes to its own
+package under `ghcr.io/micaoss`, every package is public and read
+anonymously — this week's index verifications pull manifests and layers with
+no token from a fresh clone — publication is CI's alone, and every consumer
+pins by digest through its lock. The record says plainly that this was *not*
+done by executing its steps: the release-lock migration replaced the mechanism
+underneath them, `deps.sh` and `deps/boards/*.json` giving way to `locks/`
+with pins, and the `build-<commit12>` tag grammar to
+`<kind>[.<name>]*.<release>`, where no tag carries a commit at all. Steps 3 to
+5 describe files that no longer exist and are kept as the record of what was
+planned, not as instructions.
+
+**Pre-rename tags keep their names**, stated in `docs/design/release-lock.md`
+1.3 where the tag vocabulary is: 22 today, 18 in `mica-boards` and 4 in
+`mica-build`, all from before 2026-09-16 and all named by locks of releases
+that still exist — so 2.1 already forbids touching them, and this is the same
+treatment the slash-form release tags have.
+
 ## 2026-09-19 20:15 [finding]
 
 The empty mirror is confirmed from a third vantage by a second method, and the

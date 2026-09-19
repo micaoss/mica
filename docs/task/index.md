@@ -8,7 +8,13 @@ Each task is a single line linking to its detail file. All detailed information 
 
 ### Format
 
+A row looks like this. It is a specimen, not a task: it is fenced so that it
+cannot be read — by a person or by a tool — as an open P1 at the top of the
+index, which is how it was read in the workspace audit of 2026-09-19.
+
+```text
 - [ ] [**20260907-1428-add-endpoint Add endpoint**](20260907-1428-add-endpoint.md) `P1`
+```
 
 ### Status Markers
 
@@ -69,7 +75,7 @@ Each task is a single line linking to its detail file. All detailed information 
 - [-] [**20260913-0416-board-product-build-architecture Define the board/profile/product build architecture for the assembly**](20260913-0416-board-product-build-architecture.md) `P1`
 - [ ] [**20260913-0440-micad-product-defaults Product defaults layer, validator CLI and a bluetooth section in micad**](20260913-0440-micad-product-defaults.md) `P2`
 - [ ] [**20260913-0755-s905x5m-build-determinism The s905x5m kernel Image and U-Boot are not byte-reproducible**](20260913-0755-s905x5m-build-determinism.md) `P3`
-- [ ] [**20260913-1700-registry-migration Move the pinned artifacts to GHCR and bump every consumer**](20260913-1700-registry-migration.md) `P1`
+- [x] [**20260913-1700-registry-migration Move the pinned artifacts to GHCR and bump every consumer**](20260913-1700-registry-migration.md) `P1`
 - [x] [**20260913-1730-board-repository-layout A board is a data directory: the layout of mica-boards**](20260913-1730-board-repository-layout.md) `P1`
 - [ ] [**20260913-1735-lifecycle-uefi-micad-config-mount micad refuses to start on the lifecycle suite's acceptance disk: /mica is not mounted**](20260913-1735-lifecycle-uefi-micad-config-mount.md) `P2`
 - [x] [**20260914-0021-workspace-agents-file Keep agent instructions only in the workspace AGENTS.md**](20260914-0021-workspace-agents-file.md) `P2`
