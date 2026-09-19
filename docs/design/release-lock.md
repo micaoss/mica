@@ -248,6 +248,19 @@ names and are not rewritten — 22 of them today, 18 in `mica-boards` and 4 in
 they are named by the locks of releases that still exist, and a tag that a
 published lock names is not rewritten or deleted (2.1).
 
+**So anything that enumerates releases or tags here matches both separators**
+— `mica[./]`, not the `mica.` prefix — **or says in the query why it excludes
+one** *(2026-09-19)*. Both forms are published and neither is going away, so a
+filter that encodes the current convention returns a population that stops at
+the cut-over, and silence from a filter looks exactly like absence in the
+registry. It has happened in both directions: `mica-res`'s mirror reader
+followed the spec's slash form and silently ignored every dot-form release,
+mirroring nothing while releases existed; and the index count in
+[mica-index](mica-index.md) was first taken with a `mica.` prefix test, which
+could not match `mica/20260915-2242` and returned nine of ten. The character
+class is four characters longer than the prefix test and was the difference
+between nine and ten.
+
 ### 1.4 Order
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,

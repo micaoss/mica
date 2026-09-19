@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-09-19 22:24 [finding]
+
+**Nine was ten, and the count is replaced by a boundary sentence.** There are
+ten index releases in `mica-build`, not nine: the slash-form
+`mica/20260915-2242` predates the separator cut-over, and my query tested for
+the `mica.` prefix, so it could not have matched it. Read directly, that index
+names `cx3576/20260915-2230` and `x64/20260915-2230` and is clean for the
+reason that confirms the diagnosis — the board names of its era are the ones
+the client of its era matched. `docs/design/mica-index.md` now states the fact
+being claimed instead of a population: **every index cut since the rename
+references at least one of the six non-booting releases, and the one cut
+before it references none.** Deleting the six would take all nine post-rename
+indexes as `--full` casualties and leave that single pre-rename index the only
+verifiable one in the repository — and the index history becomes evidence for
+the diagnosis rather than a casualty of it. Classification unchanged and
+heavier: non-functional, not unsafe; supersede, delete nothing.
+
+**The filter lesson is recorded as a rule, not named as a class.** In
+`docs/design/release-lock.md` section 1.3, where the two tag forms are
+defined: anything enumerating releases or tags here matches both separators —
+`mica[./]` — or says in the query why it excludes one, because both forms stay
+published and silence from a filter looks exactly like absence in the
+registry. It has two instances, one in each direction: `mica-res`'s reader
+followed the slash form and ignored every dot-form release; this count
+followed the dot form and dropped the slash-form index.
+
+It stays a rule because of a threshold written beside the class it would
+otherwise join, in `docs/user/doc-contract.md` section 6 and its Chinese page:
+**an instance counted in two classes inflates both.** The fixture pair is
+already assigned to *two correct things whose relationship is wrong* — two
+artefacts checked only against each other — so it cannot also be the filter
+observation's third instance. A taxonomy whose classes each have three
+instances and share all of them says nothing. If the filter rule earns a third
+instance it owns, it can be named then.
+
 ## 2026-09-19 22:22 [finding]
 
 The nine-index measurement has an independent read: two of the nine,

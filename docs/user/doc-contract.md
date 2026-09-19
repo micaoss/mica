@@ -170,3 +170,13 @@ English source.
   and where two artefacts are only checked against each other, one of them
   must also be checked against the world. *A boundary stated in one section
   and contradicted two screens later is not stated.*
+- **An instance counted in two classes inflates both.** The fixture pair above
+  belongs to that class — two artefacts checked only against each other — so
+  it does not also count towards the observation that a filter encoding one
+  naming convention silently drops everything under the other
+  ([release-lock](../design/release-lock.md) section 1.3), which keeps two
+  instances of its own and stays a rule rather than a class until it earns a
+  third that it owns. A taxonomy whose classes each have three instances and
+  share all of them says nothing; the threshold above guards against naming a
+  class too early, and this guards against the same instances being spent
+  twice.

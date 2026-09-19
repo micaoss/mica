@@ -363,23 +363,33 @@ down at 1.7 seconds ([harness](build-harness.md) section 4). The recommended
 remedy is the rule's: **supersede, do not delete.** A non-booting image is
 non-functional, not unsafe; it sits on a disk doing nothing and a reflash
 recovers the unit, so it does not reach the withdrawal exception below, which
-is about bytes that must not remain fetchable. The measured cost of deleting
-instead: **every `mica.*` index that exists** — all nine, `mica.20260916-0852`
-through `mica.20260919-2115`, measured by reading each published index on
-2026-09-19 — references at least one of the six, so deletion would make the
-entire published index history permanently unverifiable by `--full`. That is
-exactly the trade this rule refuses. What to do with the published releases is
-a user decision and is with them; nothing is deleted and no published release
-is edited while it is.
+is about bytes that must not remain fetchable.
 
-The count that was circulating was **three**, and it came from a repository
-record and was forwarded without being counted. Two indexes have since been
-read independently — `mica.20260919-2115` and `mica.20260919-2110`, both
-naming broken releases and matching the per-index list above — which is a spot
-check confirming the reading, not a second audit of all nine. What is worth
-keeping is not the corrected number: it is that a figure this cheap to check
-travelled on sounding right, and the difference between three and nine is the
-difference between a bounded loss and the whole published index history.
+The cost of deleting instead is a boundary rather than a count *(read on
+2026-09-19)*: **every index cut since the rename references at least one of
+the six, and the one cut before it references none.** Ten index releases
+exist — nine `mica.<stamp>` from `mica.20260916-0852` to `mica.20260919-2115`,
+and the slash-form `mica/20260915-2242` that predates the cut-over. The tenth
+is clean for the reason that confirms the diagnosis: it names
+`cx3576/20260915-2230` and `x64/20260915-2230`, the board names the client of
+that era matched. So deleting the six would take all nine post-rename indexes
+with it as `--full` casualties and leave that single pre-rename index the only
+verifiable one in the repository — and the index history becomes evidence for
+the diagnosis instead of a casualty of it. That is exactly the trade this rule
+refuses. What to do with the published releases is a user decision and is with
+them; nothing is deleted and no published release is edited while it is.
+
+Two corrections stand behind that sentence, and the second is the instructive
+one. The figure first circulating was **three**, taken from one release round
+and written as though it were the population. The correction to nine was read
+index by index here, and two of those nine were later re-read elsewhere and
+matched — a spot check confirming the reading, not a second audit. But nine
+was itself short by one: the query tested for the `mica.` prefix and therefore
+could not match the slash-form index at all, so it returned nine of ten while
+reporting a population. Enumerating releases here matches both separators
+([release-lock](release-lock.md) section 1.3). What is worth keeping is not
+any of the numbers: it is that each was one query away, and that a boundary
+sentence would have been checkable in a way none of the counts were.
 
 **The one exception, named so that it is not taken silently: withdrawal for
 safety.** The rule above is about a defect in *content*, where a superseding
