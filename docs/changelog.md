@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-19 22:15 [decision]
+
+`s905x5m` is opened as a release target (user, 2026-09-19): `mica-boards` sets
+`BOARD_RELEASE_TARGET=1` and cuts a release, `mica-build` re-pins and
+publishes its products. **Its tier does not move** — it stays bring-up, with
+the same evidence column, four physical rows untested and `RFCT-922` open.
+
+That is not a contradiction, and `docs/boards/support-tiers.md` now says why
+rather than leaving a reader to reconstruct it: **being a release target has
+never meant being qualified on hardware here.** It says the board's images are
+built and published and its products appear in the index; the dossier is where
+the claim about hardware lives. `cx3576` has published images at the bring-up
+tier, with the same "physical rows not tested", since before the rename —
+`s905x5m` was the outlier and the table gave no reason for it, so the decision
+removes an inconsistency rather than lowering a bar.
+
+`docs/user/overview.md`, `download.md` and `flashing.md` follow with their
+Chinese pages. The flashing guide keeps the distinction that matters there:
+publishing changes what exists to download, not what can be written — the
+`s905x5m` image still installs no bootloader, because U-Boot runs from eMMC
+boot0 outside it.
+
+**Recorded as open, beside the archive rules rather than in the board's
+page:** `s905x5m`'s U-Boot cannot be reused byte-identically while the vendor
+signing is non-deterministic, confirmed twice by `mica-boards`, so from its
+second release on the loader moves every time. Whether that alone forces a
+`full` archive, or whether the kinds are computed over the root and kernel
+identities with the loader riding along, is `mica-build`'s to answer from its
+code and its first two releases. It sits beside the rules because it is the
+first case where a board property may constrain an archive kind, and the
+answer is about kinds rather than about that board.
+
 ## 2026-09-19 21:40 [finding]
 
 The mirror serves again, and the restoration is recorded as **two facts**

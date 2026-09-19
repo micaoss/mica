@@ -69,9 +69,11 @@ packer is implemented. What differs is where the bootloader lives.
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
 `uefi-x64`, `uefi-arm64` and `cx3576` are release targets, and all three have
-published images since `20260916-1653`; `s905x5m` is not. There is no A/B
-partition pair to choose between and no conversion from an older layout: a
-write is a full write.
+published images since `20260916-1653`; `s905x5m` was opened as one on
+2026-09-19 and publishes from its first release on — which changes what exists
+to download, not what can be written: its image still installs no bootloader,
+for the reason in section 6. There is no A/B partition pair to choose between
+and no conversion from an older layout: a write is a full write.
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
@@ -297,9 +299,11 @@ none), and any SD-card boot fallback.
 
 ## 6. s905x5m
 
-There is no supported way to put Mica OS on a blank s905x5m today, and no
-release carries it: `BOARD_RELEASE_TARGET=0` and the board's physical
-qualification is pending.
+There is no supported way to put Mica OS on a blank s905x5m today. The board
+was opened as a release target on 2026-09-19, so its images will be published
+like any other board's — and that changes nothing here: being published is not
+being installable, the board's physical qualification is still pending, and
+the paragraphs below are why.
 
 The reason is where the firmware lives. Mica OS U-Boot (`u-boot.bin.signed`)
 executes from the eMMC boot0 area, behind a target-generated 512-byte Amlogic

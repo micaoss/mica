@@ -58,8 +58,9 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 | `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在镜像之外 | 没有受支持的路径 |
 
 `uefi-x64`、`uefi-arm64` 和 `cx3576` 是发布目标，三者自 `20260916-1653` 起都有已发布
-的镜像；`s905x5m` 不是。没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘
-写入。
+的镜像；`s905x5m` 于 2026-09-19 被开放为发布目标，自其首个发布起开始发布——这改变的
+是“有什么可下载”，不是“能写入什么”：它的镜像仍然不会装上任何引导器，理由见第 6 节。
+没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
 
@@ -262,8 +263,9 @@ loader 处、20 MiB 处和接近末尾处各损坏一个字节都能被发现并
 
 ## 6. s905x5m
 
-今天没有任何受支持的办法把 Mica OS 装进一块空的 s905x5m，也没有任何发布携带它：
-`BOARD_RELEASE_TARGET=0`，这块板的实机合格认证尚未完成。
+今天没有任何受支持的办法把 Mica OS 装进一块空的 s905x5m。这块板已于 2026-09-19 被
+开放为发布目标，因此它的镜像会像其它板一样被发布——而这在这里什么也不改变：**被发布
+不等于可安装**，它的实机合格认证仍未完成，下面几段就是原因。
 
 原因在于固件放在哪里。Mica OS 的 U-Boot（`u-boot.bin.signed`）从 eMMC boot0 区域
 执行，前面是目标端生成的 512 字节 Amlogic 头；当来源不是 boot0 时，loader 拒绝自动

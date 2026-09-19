@@ -38,6 +38,16 @@ the device, which is why each states what it requires. Update archives are not
 compressed. The suffixes are a naming convention of the producing side — the
 client reads the `MICAUPD1` header, not the file name.
 
+**Open, and the first case where a board property may constrain an archive
+kind:** `s905x5m`'s U-Boot cannot be reused byte-identically while the vendor
+signing is non-deterministic, which `mica-boards` has confirmed twice, so from
+that board's second release on the loader moves every time. Whether that alone
+forces a `full` archive, or whether the kinds are computed over the root and
+kernel identities with the loader riding along, is `mica-build`'s to answer
+from its code and its first two releases — not from design intent, and not
+here. It is recorded beside the rules rather than in the board's page because
+the answer is about archive kinds, not about that board.
+
 > status: shipped — evidence: `docs/decisions/2026-09-15-update-packages.md`, `docs/design/release-signing.md`, `mica-core:crates/mica-deploy`
 
 ## 2. Which archive applies

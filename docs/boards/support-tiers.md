@@ -96,9 +96,23 @@ physical qualification row.
 | `uefi-x64` | generic amd64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU lifecycle: API, power actions, reboot, runtime, updates and reset | bring-up (QEMU baseline) |
 | `uefi-arm64` | generic arm64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU API, update, fault and reboot rows — [uefi-arm64.md](uefi-arm64.md) | bring-up (QEMU reference) |
 | `cx3576` | Rockchip RK3576, U-Boot with a signed FIT | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | physical rows not tested — [cx3576.md](cx3576.md) | bring-up |
-| `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | no | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
+| `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | yes, decided 2026-09-19 | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
 
-"Release target" is `BOARD_RELEASE_TARGET` in the board's `board.env`.
+"Release target" is `BOARD_RELEASE_TARGET` in the board's `board.env`. It
+says that the board's images are built and published and that its products
+appear in the version index. **It is not a claim that the board boots on
+hardware** — that claim lives in the dossier, and for `s905x5m` the dossier
+still says four physical rows untested with `RFCT-922` open.
+
+`s905x5m` was opened as a release target by user decision on 2026-09-19, and
+its tier does not move: it stays bring-up with the same evidence column.
+That combination is not a contradiction, because being a release target has
+never meant being qualified on hardware here — `cx3576` has published images
+at the bring-up tier, with the same "physical rows not tested", since before
+the rename. `s905x5m` was the outlier and this table gave no reason for it, so
+the decision removes an inconsistency rather than lowering a bar. The flag in
+`board.env` and the first release follow from `mica-boards`, and `mica-build`
+re-pins and publishes its products after that.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
 
 `uefi-arm64` became a release target on 2026-09-16 and carries a generic

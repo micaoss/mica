@@ -83,9 +83,13 @@ machine of that class; or a **hardware board**, named for the hardware
 another image kind is
 [the naming rules](../decisions/2026-09-16-board-and-product-naming.md).
 
-`uefi-x64`, `uefi-arm64` and `cx3576` are release targets; `s905x5m` is built
-and tested but not released. `uefi-arm64` became one on 2026-09-16 and carries
-generic hardware drivers, while its qualification stays QEMU-only. The product set is `uefi-x64-dev`,
+All four boards are release targets: `uefi-x64`, `uefi-arm64` and `cx3576`,
+and `s905x5m` since the user decision of 2026-09-19, whose flag and first
+release follow. Being a release target means the board's images are published
+and its products are indexed; it is not a claim that the board boots on
+hardware — `uefi-arm64`'s qualification stays QEMU-only, and `s905x5m` stays
+at the bring-up tier with its physical rows untested
+([support tiers](../boards/support-tiers.md#current-boards)). The product set is `uefi-x64-dev`,
 `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`, `cx3576-dev`,
 `cx3576-prod` and `s905x5m-dev`: a `dev` product for every board and a `prod`
 product where the board has one. There are no minimal products
@@ -118,8 +122,9 @@ checked before and after decompressing.
 - Board-specific flashing formats (a Rockchip `update.img`, an Amlogic burn
   image) are designed but not implemented: every board declares only the
   `disk` image kind today.
-- `s905x5m` is not a release target, so it publishes no images.
-- Nothing on this list is waiting for a release any more: `uefi-arm64`'s
-  product images exist, from `uefi-arm64.20260916-1653` on.
+- `s905x5m` publishes no images **yet**: it was opened as a release target on
+  2026-09-19 and its first release follows.
+- `uefi-arm64` is no longer on this list: its product images exist, from
+  `uefi-arm64.20260916-1653` on.
 
 > status: unsupported

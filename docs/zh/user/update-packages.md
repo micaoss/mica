@@ -30,6 +30,13 @@ Mica OS 的发布在镜像旁边同时发布更新归档。本页说明哪个归
 要求什么。更新归档不压缩。后缀是生产侧的命名约定——客户端读的是 `MICAUPD1` 头部，
 不是文件名。
 
+**开放问题，也是第一个“板卡属性可能约束归档类型”的案例**：只要厂商签名仍是不确定性
+的，`s905x5m` 的 U-Boot 就无法逐字节复用——`mica-boards` 已两次确认——因此从该板的第二
+个发布起，loader 每次都会变。这是否单独就迫使必须发 `full` 归档，还是说归档类型只按
+root 与 kernel 标识计算、loader 随行，由 `mica-build` 依据它的代码和前两个发布来回答，
+而不是依据设计意图，也不在这里回答。它记在规则旁边而不是那块板的页面里，因为答案关乎
+归档类型，而不关乎那块板。
+
 > status: shipped — evidence: `docs/decisions/2026-09-15-update-packages.md`, `docs/design/release-signing.md`, `mica-core:crates/mica-deploy`
 
 ## 2. 哪个归档适用
