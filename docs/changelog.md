@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-19 22:20 [finding]
+
+**The summary-sentence defect is named as a class at its third instance**, in
+`docs/user/doc-contract.md` section 6 and its Chinese page: *two correct
+things whose relationship is wrong*. The three, each already in these records:
+a summary and the list beside it (three of those, fixed 2026-09-19); a
+boundary written in `build-harness.md` section 4 while section 5 still
+described `privileged.yml` in the present tense, of something that has never
+run; and two copies of a shared fixture diffed against each other, both saying
+`x64`, the check passing. The threshold held on purpose — a claim about the
+world waits for a third instance, a rule about writing does not — so the
+counting rule was written from two instances this afternoon and the class was
+not.
+
+No gate. Each piece is defensible alone, so a lexical flag would fire on every
+dated measurement and be dismissed every run. The control is procedural and
+stated as one sentence to apply while writing: a claim about other text — a
+count, a boundary, a negation — is not finished until you have read the text
+it ranges over; and where two artefacts are only checked against each other,
+one of them must also be checked against the world. The verbatim form is
+*a boundary stated in one section and contradicted two screens later is not
+stated.* `build-harness.md` points at the class from the fixture case, which
+is the same shape outside prose.
+
 ## 2026-09-19 22:16 [finding]
 
 **The published `uefi` images do not boot; they power down.** `mica-build`

@@ -47,7 +47,10 @@ two copies proves they match each other and says nothing about whether either
 matches the world. The agreed fix makes the fixture state the board
 **vocabulary**, and has `mica-build` assert that vocabulary equals the board
 rows it pins, so renaming a board turns a gate red in the repository that
-renamed it, on the same push.
+renamed it, on the same push. The shape — two correct things whose
+relationship is wrong — is named with its other instances in
+[doc-contract](../user/doc-contract.md) section 6; this is that shape outside
+prose.
 
 The update-server command runs in its pinned Bun environment. Consult
 `.github/workflows/check.yml` for the full CI gate set. Local success and remote

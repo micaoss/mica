@@ -156,3 +156,17 @@ English source.
   their own and only their relationship is wrong. Prefer a form that does not
   count (*every board*, naming them), and where a count is the point, date it
   so it reads as a measurement rather than as a standing claim.
+- **The class it belongs to, named at its third instance (2026-09-19): two
+  correct things whose relationship is wrong.** A summary and the list beside
+  it; a boundary in one section and a present-tense description of the same
+  thing two sections later (`docs/design/build-harness.md` recorded that
+  `privileged.yml` has never run, and two screens on still said the lane
+  builds, verifies, gates and repart-tests every product); two copies of a
+  shared fixture diffed against each other, both saying `x64`, the check
+  passing ([harness](../design/build-harness.md) section 4). Each piece is
+  defensible alone, which is why no lexical gate can judge the pair, so the
+  check is procedural: **a claim about other text — a count, a boundary, a
+  negation — is not finished until you have read the text it ranges over**,
+  and where two artefacts are only checked against each other, one of them
+  must also be checked against the world. *A boundary stated in one section
+  and contradicted two screens later is not stated.*
