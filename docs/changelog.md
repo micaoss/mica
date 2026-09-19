@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-19 17:30 [spec]
+
+Two artefacts here are called an index and both carry a `YYYYMMDD-HHMM` stamp:
+this repository's version index, a published `mica-build` release verified by
+byte-identical rebuild, and `mica-res`' bucket catalog, a snapshot of what a
+bucket holds verified by an audit against it. `docs/design/mica-index.md` now
+opens with a table distinguishing them and one convention that costs nothing:
+**the version index is written with its tag, `mica.<stamp>`, never as a bare
+stamp.**
+
+The evidence for bothering is in the entry: the two were conflated within
+minutes of reading both reports on 2026-09-16, and the failure that matters is
+not a confusing sentence but verifying the wrong artefact and calling it
+healthy.
+
+A rename is `mica-res`' call and not needed for this to be unambiguous here.
+
 ## 2026-09-19 17:00 [spec]
 
 Three changes to `docs/design/mica-index.md` 3.1, one of them a ruling against

@@ -9,6 +9,23 @@ asset, `mica-index.json`, from which an external reader reconstructs the
 complete state (the boards, the products, their artifacts and their board and
 base inputs) without reading anything else first.
 
+**Which index a bare stamp means** *(2026-09-19)*. Two artefacts in this
+workspace are called an index and both are stamped `YYYYMMDD-HHMM`, so a bare
+stamp names neither of them:
+
+| | This document | `mica-res`' bucket catalog |
+|---|---|---|
+| What it is | a published `mica-build` release naming scoped releases | a snapshot of what a bucket holds |
+| Written as | `mica.<YYYYMMDD-HHMM>`, the release tag | `mica-res`' own form |
+| Verified by | byte-identical rebuild from the releases it names | an audit against the bucket |
+| Answerable by | `mica-build` | `mica-res` |
+
+They can disagree, and the failure that matters is not a confusing sentence:
+it is verifying the wrong artefact and reporting it healthy. So **the version
+index is written with its tag, `mica.<stamp>`, never as a bare stamp** —
+the coordinator conflated the two within minutes of reading both reports on
+2026-09-16, which is how cheap the mistake is.
+
 This is the shape `mica-build` emits at `main` `9c2f399e` (`release-test`
 43/43).
 
