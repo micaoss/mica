@@ -38,28 +38,27 @@ the device, which is why each states what it requires. Update archives are not
 compressed. The suffixes are a naming convention of the producing side — the
 client reads the `MICAUPD1` header, not the file name.
 
-**Open, and the first case where a board property may constrain an archive
-kind.** Reuse is decided by **inputs, not by bytes**: `mica-boards` compares a
-component's `mica.inputs` against the board's latest release, so a release
-whose loader inputs did not move republishes the same digest without
-rebuilding, and nothing differs. The narrow statement, which is the permanent
-one: **a release whose loader inputs did move rebuilds it, and that rebuild is
-never byte-identical**, because the `s905x5m` vendor signing is
-non-deterministic. Its inputs are the board's `loader/`, `bsp.env`, the board
-`Makefile`, `common/uboot`, `common/scripts`, `common/trust`, the two vendor
-git rows, the toolchain source rows, the `bsp` image digest and the boot
-certificate; the cost when it happens is four files of twelve, 16.13 MiB; and
-the frequency follows the loader rather than the calendar — three times in the
-week of 2026-09-16, none in a week that does not touch it.
+**Answered: the kinds are computed over the root and kernel identities only,
+and the bootloader is in no archive kind at all.** An archive packs a signed
+descriptor and exactly two object families — the kernel (`boot.efi` or
+`boot.itb`, `support.img`, `support.roothash.p7s`) and the root (`rootfs.img`,
+`rootfs.roothash.p7s`). `full` is both, `root` omits the kernel objects,
+`kernel` omits the root objects, and there is no third family. The firmware is
+not a member of the deployment descriptor and enters the **factory image**
+only, so a moved U-Boot changes no archive byte, can never force a `full`
+archive, and cannot suppress a `root` or a `kernel` package.
 
-So the open question is smaller than it first looked: whether a moved loader
-alone forces a `full` archive, or whether the kinds are computed over the root
-and kernel identities with the loader riding along, decides the cost of the
-releases that rebuild the loader — not of every release, and `s905x5m` is not
-structurally barred from partial updates. `mica-build` answers it from its code
-and its first two releases, not from design intent and not here. It is recorded
-beside the rules rather than in the board's page because the answer is about
-archive kinds, not about that board.
+That settles the `s905x5m` worry: it ships partial updates exactly as the
+other three boards do, from its second release on, non-deterministic vendor
+signing and all. Reuse there is decided by **inputs, not by bytes** —
+`mica-boards` compares a component's `mica.inputs` against the board's latest
+release — and the permanent statement is only this: a release whose loader
+inputs did move rebuilds it, and that rebuild is never byte-identical. Two
+measurements are in play and they count different things: **16.13 MiB** of
+*component* bytes differ when the loader rebuilds (four files of twelve, on
+the releases whose loader inputs moved), and **3.17 MiB** is
+`u-boot.bin.signed` inside *every* published factory image, compressed with
+it — present every release, in the `.img.gz`, never in a `.micaupd`.
 
 > status: shipped — evidence: `docs/decisions/2026-09-15-update-packages.md`, `docs/design/release-signing.md`, `mica-core:crates/mica-deploy`
 
@@ -344,6 +343,15 @@ procedure are unverified.
 
 ## 13. Limits
 
+- **No device on any board receives a new bootloader through an update
+  archive.** The format carries the root and the kernel; firmware moves
+  offline only — the guest stopped, or the board owned over RockUSB — per the
+  firmware-maintenance contract. This has been true since the format existed,
+  on `uefi-x64`, `uefi-arm64` and `cx3576` as much as on `s905x5m`; it became
+  visible only when someone asked what a moving loader costs on one board. It
+  is stated here as **an open product question**, not a defect: the bootloader
+  is not updatable in the field by any current mechanism, and changing that
+  would be a change to the format. What to do about it is with the user.
 - There is no firmware-only archive: firmware maintenance is separate, and a
   `firmware` update kind is refused.
 - A kernel package is not published across a change of the verity trust

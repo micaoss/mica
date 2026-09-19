@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-20 [finding]
+
+The loader question is answered from `mica-build`'s code rather than from
+design intent, and the answer is larger than the question: **archive kinds are
+computed over the root and kernel identities only, and the bootloader is in no
+archive kind at all — not even `full`.** An archive packs a signed descriptor
+and exactly two object families, the kernel and the root; the firmware is not
+a member of the deployment descriptor and enters the factory image only. A
+moved U-Boot therefore changes no archive byte, cannot force a `full` archive
+and cannot suppress a `root` or a `kernel` package.
+
+That kills the worry it was asked about: `s905x5m` ships partial updates
+exactly as the other three boards do, from its second release on,
+non-deterministic vendor signing and all. Two measurements stay in play and
+they count different things, so both are recorded with their units: **16.13
+MiB** of component bytes differ when the loader rebuilds, on the releases
+whose loader inputs moved; **3.17 MiB** is `u-boot.bin.signed` inside every
+published factory image, present in every `.img.gz` and never in a
+`.micaupd`.
+
+**The corollary is the part that matters, and it is not a property of that
+board:** no device on any board receives a new bootloader through an update
+archive. Firmware moves offline only — the guest stopped, or the board owned
+over RockUSB — per the firmware-maintenance contract. That has been true since
+the format existed, on `uefi-x64`, `uefi-arm64` and `cx3576` as much as on
+`s905x5m`, and nobody had stated it; it became visible only because someone
+asked what a moving loader costs on one board. `docs/user/update-packages.md`
+records it beside the archive-kind rules, with its Chinese page, as **an open
+product question and not a defect** — the bootloader is not updatable in the
+field by any current mechanism, changing that would change the format, and
+what to do about it is with the user. It is written as a long-standing fact
+rather than a new one, so a reader meeting it does not read a regression.
+
 ## 2026-09-19 23:40 [finding]
 
 The two-directional audit is in, and it is the third fact of the restoration —
