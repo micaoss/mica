@@ -17,7 +17,11 @@ procedure yet.
 No Mica OS image has been written to a USB stick, a SATA disk, an NVMe drive
 or an eMMC, and no physical board has booted one. The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
-where they are not verified.
+where they are not verified. Those QEMU boots are also dated: the newest is
+2026-09-15 20:17 UTC, before the board rename, and the `uefi` images published
+after it power the machine down at PID 1 instead of booting
+([download](download.md) section 1). Writing one to a board today produces a
+unit that starts the kernel and switches off.
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 

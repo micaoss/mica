@@ -12,6 +12,10 @@
 **已合格到什么程度，这里只说一次。** 这里的人见过的每一次启动都是 QEMU。没有任何
 Mica OS 镜像被写进过 U 盘、SATA 硬盘、NVMe 或 eMMC，也没有任何实体板卡从中启动过。
 下面的 QEMU 小节是实际跑过的；硬件小节是从仓库里读出来的，未验证之处都有标注。
+这些 QEMU 启动也是有日期的：最近一次是 2026-09-15 20:17 UTC，在板卡改名之前，而在
+那之后发布的 `uefi` 镜像不会启动，而是在 PID 1 把机器关掉
+（[获取发布版](download.md) 第 1 节）。今天把它写进板卡，得到的是一台起了内核随即
+断电的机器。
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
