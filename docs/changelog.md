@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-19 22:45 [progress]
+
+The summary sentence is a class, not an incident, so it was hunted where the
+lists change most — the board table, the product catalogue and the release
+status paragraphs — and there were **three**, all now fixed: the one found
+last night in `docs/user/overview.md` section 5, "All four boards are release
+targets" in section 3, and "all three have published images" in
+`docs/user/flashing.md`, with their Chinese pages. Each was true when written
+and false the moment `s905x5m` joined the list.
+
+Everything else that counts in these pages is a **dated measurement** — eight
+archives rebuilt, six packages differing, three hosts timing out, eight
+repositories green — and those do not decay, because they describe a moment
+rather than a standing state. That is the distinction the fix rests on.
+
+The control is a rule rather than a gate, in `docs/user/doc-contract.md`
+section 6 and its Chinese page: a sentence that counts or quantifies a list
+beside it is rewritten with that list; prefer a form that does not count, and
+where a count is the point, date it. **No gate was added deliberately.** The
+defect is a relationship between two individually correct pieces of text,
+which a lexical flag cannot judge; such a flag would fire on every dated
+measurement, and a gate whose findings a person dismisses every run is worse
+than the rare, cheap defect it catches.
+
 ## 2026-09-19 22:15 [decision]
 
 `s905x5m` is opened as a release target (user, 2026-09-19): `mica-boards` sets

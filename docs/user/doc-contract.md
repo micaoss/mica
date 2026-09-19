@@ -145,3 +145,10 @@ English source.
   scripts they name.
 - User pages do not narrate implementation. The design record owns the why;
   these pages own what an operator or integrator can do today.
+- **A sentence that counts or quantifies a list beside it is rewritten with
+  that list.** "All four boards", "nothing on this list is waiting", "the only
+  one that" — each is true when written and false the moment the list changes,
+  and no gate can catch it: the sentence and the list are both correct on
+  their own and only their relationship is wrong. Prefer a form that does not
+  count (*every board*, naming them), and where a count is the point, date it
+  so it reads as a measurement rather than as a standing claim.

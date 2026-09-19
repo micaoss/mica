@@ -68,8 +68,8 @@ packer is implemented. What differs is where the bootloader lives.
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
 
-`uefi-x64`, `uefi-arm64` and `cx3576` are release targets, and all three have
-published images since `20260916-1653`; `s905x5m` was opened as one on
+`uefi-x64`, `uefi-arm64` and `cx3576` have published images since
+`20260916-1653`; `s905x5m` was opened as a release target on
 2026-09-19 and publishes from its first release on — which changes what exists
 to download, not what can be written: its image still installs no bootloader,
 for the reason in section 6. There is no A/B partition pair to choose between

@@ -83,9 +83,9 @@ machine of that class; or a **hardware board**, named for the hardware
 another image kind is
 [the naming rules](../decisions/2026-09-16-board-and-product-naming.md).
 
-All four boards are release targets: `uefi-x64`, `uefi-arm64` and `cx3576`,
-and `s905x5m` since the user decision of 2026-09-19, whose flag and first
-release follow. Being a release target means the board's images are published
+Every board is a release target: `uefi-x64`, `uefi-arm64` and `cx3576`, and
+`s905x5m` since the user decision of 2026-09-19, whose flag and first release
+follow. Being a release target means the board's images are published
 and its products are indexed; it is not a claim that the board boots on
 hardware — `uefi-arm64`'s qualification stays QEMU-only, and `s905x5m` stays
 at the bring-up tier with its physical rows untested
