@@ -30,6 +30,15 @@ a `dev` or `prod` product; the minimal products were removed on 2026-09-16
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
 releases cut before that date keep their minimal assets.
 
+**The published `uefi` images do not boot** *(2026-09-19)*. Every `uefi-x64`
+and `uefi-arm64` image in `20260916-0845`, `20260916-1653` and
+`20260919-2103` refuses the board name in its own signed identity at PID 1 and
+powers the machine down at 1.7 seconds: the boards were renamed while the
+pinned client that reads that name was not. `cx3576` is unaffected — its name
+did not change. Nothing is deleted; a corrected release supersedes them, and
+this page names it when it exists. Until then those files download and do not
+run ([harness](../design/build-harness.md) section 4).
+
 Per product a release carries:
 
 - `mica-<product>-<release>.img.gz` — the factory disk image, gzip-compressed.

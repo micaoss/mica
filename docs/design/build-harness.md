@@ -192,8 +192,55 @@ PID 1.
 So a reader can sort claims about a product: *the image is assembled to its
 contract and its binaries execute* is evidence-backed; *the product boots and
 reaches its services* is inference from the last hand-run suite, and carries
-that suite's date. Whether CI should boot a guest is a user decision and is
-with them; this section states today's boundary rather than a plan.
+that suite's date.
+
+#### What the boundary was hiding, and the console that showed it
+
+The same day the boundary was written, `mica-build` booted one of the
+published images. **The device does not boot; it powers down.** That is the
+phrase to use — not "updates break", which describes a working device that
+refuses an archive. The guest starts the kernel, brings up verity signature
+policy, refuses the board name in its *own* signed identity at PID 1
+(`mica-init: boot refused: unsupported boot backend board`) and powers itself
+off at **1.7 seconds**.
+
+The message is the bail arm of the pinned `BootKind::for_board` reached from
+`mica-runkit`, while the image's `kernel/boot.json` says `uefi-x64`. Both ends
+of the pipeline now agree from opposite directions: the signed envelope of a
+published `.micaupd`, decoded, reads `uefi-x64`, and the image built from the
+same pins refuses that name at PID 1. Every `uefi` image published since the
+rename carries it — `uefi-x64` and `uefi-arm64` at `20260916-0845`,
+`20260916-1653` and `20260919-2103`.
+
+**Why nobody noticed is the part that stops this reading as carelessness.**
+`cx3576` and `s905x5m` are untouched: their names did not change, so their
+arms still match. The two boards anyone would have put on a bench still work,
+and the break is precisely in the two products nobody has hardware for — the
+products where this harness is the only thing that ever runs them.
+
+#### The boot gate, authorised 2026-09-19
+
+One `uefi` lifecycle boot in `ci.yml`, on the amd64 runner, over the product
+that job already builds: one product, one boot, no fault stages, landing with
+`mica-build`'s re-pin round. Two constraints, because a gate that is skipped
+is worse than no gate:
+
+- it **fails** the job rather than warning — no pass marker, red push;
+- it is conditional on nothing a person can forget: no path filter, no opt-in
+  variable. This break arrived through a rename that touched code and locks,
+  and a path filter would have skipped it again.
+
+The earlier line here — that whether CI boots a guest is a user decision — was
+superseded on the measurement: four minutes on a push is not a cost worth
+sending anywhere as a decision, against three days of green CI over an image
+that powers itself off. The fallback, if those four minutes ever become a real
+problem, is to make `privileged.yml` actually run and put the suite there,
+trading same-push detection for weekly detection — and only against a
+measurement showing the cost, not in advance.
+
+What closes this is the guest reaching `FILE_AB_RUNTIME_PASS` after the pin
+moves, not the diff. A rename verified by reading the diff is what produced
+the break.
 
 ## 5. Complete-image acceptance
 

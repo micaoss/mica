@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-09-19 22:16 [finding]
+
+**The published `uefi` images do not boot; they power down.** `mica-build`
+booted one: the kernel starts, verity signature policy comes up, PID 1 refuses
+the board name in the image's own signed identity
+(`mica-init: boot refused: unsupported boot backend board`, the bail arm of
+the pinned `BootKind::for_board` reached from `mica-runkit`, against a
+`kernel/boot.json` that says `uefi-x64`) and the guest powers off at 1.7
+seconds. Both ends of the pipeline agree from opposite directions — a
+published `.micaupd`'s signed envelope decodes to `uefi-x64`, and the image
+built from the same pins refuses it. Six releases carry it: `uefi-x64` and
+`uefi-arm64` at `20260916-0845`, `20260916-1653` and `20260919-2103`.
+`cx3576` and `s905x5m` are untouched, their names never having changed, so the
+two boards anyone would have put on a bench still work and the break is
+exactly where the harness is the only thing that runs. Recorded in
+`docs/design/build-harness.md` section 4 with the console, in
+`docs/boards/support-tiers.md` as a date bound on the QEMU rows, and in
+`docs/user/download.md` and its Chinese page where someone would fetch one.
+
+**The boot gate is authorised** (2026-09-19, by the coordinator, not put to
+the user): one `uefi` lifecycle boot in `ci.yml` on the amd64 runner over the
+product that job already builds — one product, one boot, no fault stages — and
+it must fail the job rather than warn, and be conditional on nothing a person
+can forget, since this break arrived through a rename that a path filter would
+have skipped. That supersedes the line written here earlier the same day,
+which said whether CI boots a guest was with the user; four minutes on a push
+stopped being a decision worth forwarding once three days of green CI over a
+non-booting image were the alternative. What closes it is the guest reaching
+`FILE_AB_RUNTIME_PASS` after the pin moves, not the diff: a rename verified by
+reading the diff is what produced the break.
+
+**Supersede, not delete**, recorded as the second and harder instance of that
+rule in `docs/design/mica-index.md`. A non-booting image is non-functional,
+not unsafe — it does nothing on a disk and a reflash recovers the unit — so it
+does not reach the withdrawal exception. Measured cost of the alternative:
+**every `mica.*` index that exists**, all nine from `mica.20260916-0852` to
+`mica.20260919-2115`, references at least one of the six releases, so deleting
+them would make the entire published index history permanently unverifiable by
+`--full`. The coordinator forwarded three; reading all nine published indexes
+gave nine. What happens to the published releases is a user decision and is
+with them; nothing is deleted and no published release is edited meanwhile.
+
 ## 2026-09-19 22:08 [finding]
 
 **Nothing in CI or in a release has ever booted an image**, in any repository

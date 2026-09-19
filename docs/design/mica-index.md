@@ -355,6 +355,23 @@ generation and stays published, with `mica.20260916-0858` which references it;
 generation counter makes devices refuse the bad rows without anyone having to
 remember which release was bad.
 
+The second instance is larger and tests the rule properly *(2026-09-19)*.
+Six releases — `uefi-x64` and `uefi-arm64` at `20260916-0845`,
+`20260916-1653` and `20260919-2103` — carry images that do not boot: PID 1
+refuses the board name in the image's own signed identity and the guest powers
+down at 1.7 seconds ([harness](build-harness.md) section 4). The recommended
+remedy is the rule's: **supersede, do not delete.** A non-booting image is
+non-functional, not unsafe; it sits on a disk doing nothing and a reflash
+recovers the unit, so it does not reach the withdrawal exception below, which
+is about bytes that must not remain fetchable. The measured cost of deleting
+instead: **every `mica.*` index that exists** — all nine, `mica.20260916-0852`
+through `mica.20260919-2115`, measured by reading each published index on
+2026-09-19 — references at least one of the six, so deletion would make the
+entire published index history permanently unverifiable by `--full`. That is
+exactly the trade this rule refuses. What to do with the published releases is
+a user decision and is with them; nothing is deleted and no published release
+is edited while it is.
+
 **The one exception, named so that it is not taken silently: withdrawal for
 safety.** The rule above is about a defect in *content*, where a superseding
 release is the whole remedy and the counter protects devices. It does not
