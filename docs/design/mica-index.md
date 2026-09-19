@@ -184,10 +184,28 @@ digests are lowercase hex.
   **the service is up, its structure is correct, its routes work, and it holds
   nothing**. The lesson for the next reader who meets `404`s from a mirror:
   look at the listing before concluding the path is wrong. A full re-publish from the producers' locks is
-  running — from the **pins**, not the v1 import, which would reconstruct from
-  a snapshot of the service being retired; where the two disagree the locks
-  win. The restoration is `mica-res`' audit reporting green against the new
-  service, and is not recorded here until it does.
+  ran — from the **pins**, not the v1 import, which would reconstruct from a
+  snapshot of the service being retired; where the two disagree the locks win.
+- **The mirror serves again, and the two facts about that are kept apart**
+  *(2026-09-19 evening)*. `/upstream/` and `/mica/` render directory rows
+  instead of empty tables — `upstream/debian/`, `upstream/git/`,
+  `upstream/source/`, `mica/cx3576/`, `mica/uefi-x64/` — with namespace counts
+  `upstream` 390, `oci` 115, `mica` 30, `status` 315. **And a party outside
+  the service checked one object against a lock that neither the mirror nor
+  its own audit produced**: `alsa-utils` `amd64` `1.2.14-1`, sha256
+  `1e2b5f31fc826e1af25e2a12e37cd8d361ff25feaf224c6bbef3cc5d6cd2596b` in the
+  `mica-system-base` `20260919-1959` lock, fetched from
+  `/blob/1e/1e2b5f31…2596b` — `200` after one redirect, 1 140 648 bytes in
+  0.48 s, and the received bytes hash to that digest. So the digest route
+  resolves, the redirect contract works as specified, and the mirror serves
+  the bytes a producer lock pins. That same digest answered `404` in the
+  evening's earlier probe.
+- **What that does not establish:** it is **one** object, not 536 — a spot
+  check, not an audit. `mica-res` still owes the audit in both directions,
+  and only that answers whether the service holds everything it should and
+  nothing it should not. The check above is also from the coordinator's
+  container reaching the zone through the user-supplied address mapping, so
+  it carries that scope like every other measurement here.
 - **Reachability is measured per environment, and the scope of a measurement
   is part of it.** The `res.micaos.dev` zone serves CI and the developer
   machine normally. What was measured unreachable on 2026-09-16 is **the agent
@@ -217,13 +235,15 @@ digests are lowercase hex.
   answers `302`, and `/blob/<aa>/<sha256>` for an object the locks pin,
   `/upstream/debian/`, the legacy `/d/upstream/debian/` and
   `/status/current.json` all answer `404`.
-- **Open, and not this document's to answer:** `/status/current.json` is
-  `404` on the `res` host as well. Whether the collector's status pointer
-  moved to the download host and is well, or whether the status namespace went
-  the way of everything else, is with `mica-res`; the collector has been
-  running every thirty minutes throughout, so where its writes are landing is
-  the question. It is named here because it is a second thing the re-publish
-  does not cover.
+- **Settled the same evening:** the `status` namespace had gone with
+  everything else and is back. The collector published with its new token —
+  `status` went from 0 to 315 objects, `/status/current.json` and
+  `/status/health.json` both answer `200`, and `health.json` at
+  `generatedAt` `2026-09-19T20:37:56Z` reports `green` for all eight
+  repositories with `runsSince` 0. It is the same verdict a person reached by
+  hand an hour earlier, now computed and republished every thirty minutes by
+  something that does not depend on anyone looking, which is the difference
+  between a status page and a status check.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,

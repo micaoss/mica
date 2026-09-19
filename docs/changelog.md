@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-19 21:40 [finding]
+
+The mirror serves again, and the restoration is recorded as **two facts**
+rather than one, because they answer different questions.
+
+**The service holds objects.** `/upstream/` and `/mica/` render directory rows
+where they rendered empty tables this afternoon — `upstream/debian/`,
+`upstream/git/`, `upstream/source/`, `mica/cx3576/`, `mica/uefi-x64/` — with
+namespace counts `upstream` 390, `oci` 115, `mica` 30, `status` 315. The
+re-publish ran from the pins rather than the v1 import, as decided.
+
+**And a party outside the service verified one object against a lock that
+neither the mirror nor its own audit produced.** `alsa-utils` `amd64`
+`1.2.14-1`, sha256 `1e2b5f31…2596b` in the `mica-system-base` `20260919-1959`
+lock, fetched from `/blob/1e/1e2b5f31…2596b`: `200` after one redirect,
+1 140 648 bytes in 0.48 s, received bytes hashing to that digest. The digest
+route resolves, the redirect contract works as `mica-res` specified it, and
+the mirror serves the bytes a producer lock pins. The same digest answered
+`404` in the earlier probe of the same evening.
+
+That second fact is the one that makes the first credible: an audit reports
+what a service believes about itself, while an outside check against an
+independent lock reports what it actually serves. Recording them apart was
+worth doing before either existed.
+
+**What is not established, stated with them:** one object, not 536 — a spot
+check, not an audit, which `mica-res` still owes in both directions; and the
+measurement carries the coordinator container's scope, the zone reached
+through a user-supplied address mapping.
+
+**`/status/` is settled too**: the namespace had gone with everything else and
+is back, 0 to 315 objects, `/status/current.json` and `/status/health.json`
+both `200`, and `health.json` at `2026-09-19T20:37:56Z` reporting `green` for
+all eight repositories with `runsSince` 0 — the same verdict a person reached
+by hand an hour earlier, now recomputed every thirty minutes by something that
+does not depend on anyone looking.
+
 ## 2026-09-19 21:00 [progress]
 
 Three items from the workspace audit, all in `docs/`.
