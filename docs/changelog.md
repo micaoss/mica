@@ -2,6 +2,44 @@
 
 ## 2026-09-20 [finding]
 
+**Nothing in CI or in a release has ever booted an image**, in any repository
+here (`mica-build`, from its own workflows, 2026-09-19). Recorded in
+`docs/design/build-harness.md` section 4 where the gates are described, with
+both halves: what the automated gates *do* prove — a static read-back of the
+assembled image against its contract, a container smoke over the shipped
+binaries, the package, lock and reuse gates, the docs gates — and the one
+thing none of them does, which is start the guest. The three suites that boot
+one are `make` targets run by hand, and `privileged.yml`, the workflow that
+would have covered it, has never run: `workflow_dispatch` plus a Monday cron
+that has not fired.
+
+The dates make it checkable: the newest lifecycle evidence is 2026-09-15
+20:17 UTC and the rename landed 2026-09-16 08:05 UTC, so the last boot of a
+product precedes the rename by twelve hours — which is how three days of green
+CI coexisted with published `uefi` images whose signed board name the pinned
+client refuses at PID 1. A reader can now sort the claims: *assembled to its
+contract, binaries execute* is evidence-backed; *boots and reaches its
+services* is inference carrying the date of the last hand-run suite.
+`docs/user/build.md` and its Chinese page say the same in one clause where the
+suite is named. Whether CI should boot a guest is with the user; no plan is
+written here.
+
+**Two method rules from the same investigation.** *String absence in a
+stripped Rust binary is not evidence of a missing match arm*: a 3 to 10 byte
+literal compiles into an immediate comparison and never reaches `.rodata`,
+while the bail messages of those same matches are present — a binary answers
+"is this string stored", not "does this code compare against it". It sits
+beside the noise-floor rule, same family. And *identical wrong bytes are a
+pass*: the shared component-contract fixtures are diffed byte for byte between
+the two repositories, both said `x64`, and the check passed. A byte-equality
+check between two copies proves they match each other and says nothing about
+whether either matches the world. The agreed fix makes the fixture state the
+board vocabulary and has `mica-build` assert it equals the board rows it pins,
+so renaming a board turns a gate red in the repository that renamed it, on the
+same push.
+
+## 2026-09-20 [finding]
+
 The loader question is answered from `mica-build`'s code rather than from
 design intent, and the answer is larger than the question: **archive kinds are
 computed over the root and kernel identities only, and the bootloader is in no

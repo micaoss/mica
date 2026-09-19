@@ -35,7 +35,19 @@ host: use the actual host project path and mount only required directories.
 | API contract expectations | `make os-apid-api-spec-pins` |
 | Update server | `bun run --cwd update-server check` |
 | Documentation | `make docs-verify docs-verify-test` |
+| Shared component contract | the fixtures, diffed byte for byte between the two repositories |
 | Host/toolchain boundaries | `make os-host-toolchain-lint os-host-toolchain-lint-test` |
+
+**Identical wrong bytes are a pass.** The shared component-contract fixtures
+are diffed byte for byte between `mica-core` and `mica-build`; on the board
+rename both sides said `x64`, they agreed exactly, and the check passed. That
+was not a failure to follow the contract — the reasoning about it was correct
+— it is a hole in what the contract is *about*: a byte-equality check between
+two copies proves they match each other and says nothing about whether either
+matches the world. The agreed fix makes the fixture state the board
+**vocabulary**, and has `mica-build` assert that vocabulary equals the board
+rows it pins, so renaming a board turns a gate red in the repository that
+renamed it, on the same push.
 
 The update-server command runs in its pinned Bun environment. Consult
 `.github/workflows/check.yml` for the full CI gate set. Local success and remote
@@ -110,6 +122,16 @@ rather than in an input (`docs/task/20260916-0900-emulated-arm64-bytes.md`) —
 and that is a reason to look, not a reason to stop looking: a real change hides
 in exactly the same shape.
 
+**String absence in a stripped Rust binary is not evidence of a missing match
+arm.** Scanning the shipped `mica-deploy` and `mica-runkit` for the old board
+literals found none — not because the vocabulary is absent, but because a 3
+to 10 byte literal compiles into an immediate comparison and never reaches
+`.rodata`, while the *bail messages* of those same matches are present in both
+binaries. Read naively, the scan says the pinned client has no board
+vocabulary, and an investigation closed on it would have closed with the wrong
+answer. A binary answers "is this string stored", not "does this code compare
+against it".
+
 **A number that disagrees with your model is worth more than the explanation
 that makes it go away.** On 2026-09-19 a one-object gap between a contract's
 44 required keys and a bucket's 43 stored digests was explained as a counting
@@ -139,6 +161,39 @@ helpers on an x86-64 host. The C-only builder is native-only. Use QEMU full-syst
 acceptance for the target kernel and service behavior. A qemu-user smoke
 limitation, such as crun execution, is reported explicitly and does not become
 a skipped full-system requirement.
+
+### What no gate does: start the guest
+
+**Nothing in CI or in a release has ever booted an image**, in any repository
+here *(established 2026-09-19 from `mica-build`'s workflows)*. That is a
+boundary, not a verdict on the gates, so take both halves together.
+
+What the automated gates *do* prove, and they have caught real defects this
+month: `--verify` is a static read-back of the assembled image against its
+contract — geometry, signed objects, roothashes, the firmware receipt; the
+products job runs a **container** smoke over the shipped binaries in the root
+that ships; the package, lock and reuse gates prove what a release may
+contain; and the docs gates prove the records. The only QEMU in the tree that
+CI touches is `binfmt`, so that amd64 packaging tools run on an arm64 runner.
+
+What none of them does is start the guest. The three suites that boot one —
+`lifecycle-uefi`, `lifecycle-uboot-fit` and the `apid-api` harness — are
+`make` targets run by hand. `privileged.yml`, the one workflow that would
+cover it, **has never run**: it is `workflow_dispatch` plus a Monday cron that
+has not fired since it was written.
+
+The consequence, dated so it can be checked: the newest lifecycle evidence
+directory is **2026-09-15 20:17 UTC** and the board rename landed
+**2026-09-16 08:05 UTC**, so the last time anything booted a product precedes
+the rename by twelve hours. That is how three days of green CI coexisted with
+published `uefi` images whose signed board name the pinned client refuses at
+PID 1.
+
+So a reader can sort claims about a product: *the image is assembled to its
+contract and its binaries execute* is evidence-backed; *the product boots and
+reaches its services* is inference from the last hand-run suite, and carries
+that suite's date. Whether CI should boot a guest is a user decision and is
+with them; this section states today's boundary rather than a plan.
 
 ## 5. Complete-image acceptance
 

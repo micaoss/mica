@@ -119,7 +119,10 @@ for its release while developing, instead of the pinned release.
   execute the shipped binaries in the root that ships and prove the negative
   cases fire.
 - `make lifecycle-uefi PRODUCT=<name>` runs the QEMU lifecycle suite (boot,
-  runtime, updates, faults, reset, shutdown) over a UEFI product.
+  runtime, updates, faults, reset, shutdown) over a UEFI product. **It is run
+  by hand**: no CI job and no release boots an image, so a claim that a
+  product boots carries the date of the last time someone ran this
+  ([harness](../design/build-harness.md)).
 - `make os-repart-test` proves first-boot growth, and `make os-layout-lint`
   the partition contracts.
 
