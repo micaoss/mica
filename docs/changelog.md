@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-19 20:15 [finding]
+
+The empty mirror is confirmed from a third vantage by a second method, and the
+evidence is better than the `404`s that started it. From the agent container
+on this host, reaching the zone through a container-local address mapping the
+user supplied (`104.19.151.13 res.micaos.dev`, after which it answers in
+0.09 s): `/` and `/v2/` answer `200`, **`/upstream/` and `/mica/` render their
+namespace listings with the table body empty**, `/index/current.json` answers
+`302`, and `/blob/<aa>/<sha256>` for an object the locks pin, plus
+`/upstream/debian/`, the legacy `/d/upstream/debian/` and
+`/status/current.json`, all answer `404`.
+
+**Why the empty listing is the better evidence**, and it is now the sentence
+in the spec: a `404` is consistent with a moved path, a wrong key or a route
+that was never wired, while a listing page that renders its title, its
+description and its headers with no rows says the service is up, its structure
+is correct, its routes work, and it holds nothing. That closes the last
+reading in which any of this was a path problem, and two vantages by two
+methods now agree. The lesson is recorded for the next reader who meets `404`s
+from a mirror: look at the listing before concluding the path is wrong.
+
+The measurement is recorded with its scope as the third of three, replacing
+neither of the others: it is a fact about that container, which could not
+reach the zone at all this afternoon, and not about the zone or about DNS.
+
+One thing it surfaced is open and is `mica-res`': `/status/current.json` is
+`404` on the `res` host too. The collector has been running every thirty
+minutes throughout, so whether its status pointer moved to the download host
+and is well, or whether the status namespace went with everything else, is the
+question — and it is a second thing the re-publish does not cover.
+
 ## 2026-09-19 18:10 [finding]
 
 The `/blob/` question is settled, and the answer is bigger than the question:

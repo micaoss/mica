@@ -175,7 +175,15 @@ digests are lowercase hex.
   answered `404`; only `/index/current.json` answered at all, with a `302`.
   The v1 import never ran after the 2026-09-18 cutover, so the service has
   held none of the 486 objects and 8.2 GB since then: the mirror was empty for
-  about a day and a half. A full re-publish from the producers' locks is
+  about a day and a half. Confirmed from a second vantage by a second method
+  on 2026-09-19 — and by better evidence than a `404`: `/upstream/` and
+  `/mica/` answer `200` and **render their namespace listings with the table
+  body empty**. A `404` is consistent with a moved path, a wrong key or a
+  route that was never wired; a listing page that renders its title, its
+  description and its headers with no rows says something narrower and final —
+  **the service is up, its structure is correct, its routes work, and it holds
+  nothing**. The lesson for the next reader who meets `404`s from a mirror:
+  look at the listing before concluding the path is wrong. A full re-publish from the producers' locks is
   running — from the **pins**, not the v1 import, which would reconstruct from
   a snapshot of the service being retired; where the two disagree the locks
   win. The restoration is `mica-res`' audit reporting green against the new
@@ -199,6 +207,23 @@ digests are lowercase hex.
   This does not update the measurement above; it sits beside it, and it says
   nothing about runners or the user's machine, where the zone is reachable —
   `mica-boards`' mirrored fetches of 2026-09-17 are that side's evidence.
+- **A third measurement, also with its own scope** (2026-09-19 20:0x UTC, the
+  agent container on this host, reaching the zone through a container-local
+  address mapping the user supplied, `104.19.151.13 res.micaos.dev`; the host
+  then answers in 0.09 s). It is a fact about that container, not about the
+  zone or about DNS, and it replaces neither measurement above. What it adds
+  is the evidence quoted in the settled bullet: `/` and `/v2/` answer `200`,
+  `/upstream/` and `/mica/` render empty listings, `/index/current.json`
+  answers `302`, and `/blob/<aa>/<sha256>` for an object the locks pin,
+  `/upstream/debian/`, the legacy `/d/upstream/debian/` and
+  `/status/current.json` all answer `404`.
+- **Open, and not this document's to answer:** `/status/current.json` is
+  `404` on the `res` host as well. Whether the collector's status pointer
+  moved to the download host and is well, or whether the status namespace went
+  the way of everything else, is with `mica-res`; the collector has been
+  running every thirty minutes throughout, so where its writes are landing is
+  the question. It is named here because it is a second thing the re-publish
+  does not cover.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,
