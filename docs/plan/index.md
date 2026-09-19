@@ -8,7 +8,13 @@ Each plan is a single line linking to its detail file. All detailed information 
 
 ### Format
 
+A row looks like this. It is a specimen, not a plan: fenced for the same
+reason as the one in `docs/task/index.md`, so that a mechanical read of this
+file cannot take it for an open row.
+
+```text
 - [ ] [**20260907-1440-add-endpoint Add endpoint**](20260907-1440-add-endpoint.md) `YYYY-MM-DD`
+```
 
 ### Status Markers
 
