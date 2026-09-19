@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-19 22:22 [finding]
+
+The nine-index measurement has an independent read: two of the nine,
+`mica.20260919-2115` and `mica.20260919-2110`, were re-read elsewhere and
+matched the per-index list, and the earlier figure of three is confirmed to
+have come from a repository record that nobody counted. Recorded in
+`docs/design/mica-index.md` beside the measurement, marked as a **spot check
+confirming the reading, not a second audit** of all nine — the same
+distinction kept when the mirror came back. The classification survives the
+correction and is what the rule was tested on: a non-booting image is
+non-functional, not unsafe, so it does not reach the withdrawal exception, and
+the measured count makes the case stronger than the rule needed. What the
+record keeps is not the corrected number but why a figure that cheap to check
+travelled on sounding right.
+
 ## 2026-09-19 22:20 [finding]
 
 **The summary-sentence defect is named as a class at its third instance**, in

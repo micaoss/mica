@@ -372,6 +372,15 @@ exactly the trade this rule refuses. What to do with the published releases is
 a user decision and is with them; nothing is deleted and no published release
 is edited while it is.
 
+The count that was circulating was **three**, and it came from a repository
+record and was forwarded without being counted. Two indexes have since been
+read independently — `mica.20260919-2115` and `mica.20260919-2110`, both
+naming broken releases and matching the per-index list above — which is a spot
+check confirming the reading, not a second audit of all nine. What is worth
+keeping is not the corrected number: it is that a figure this cheap to check
+travelled on sounding right, and the difference between three and nine is the
+difference between a bounded loss and the whole published index history.
+
 **The one exception, named so that it is not taken silently: withdrawal for
 safety.** The rule above is about a defect in *content*, where a superseding
 release is the whole remedy and the counter protects devices. It does not
