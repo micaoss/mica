@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-19 [spec]
+
+`mica-res` became a general resource publishing service (user decision
+2026-09-17; the Worker is gone, three hosts now: `dl.res.micaos.dev` for
+files, `res.micaos.dev` for listings, `/blob/`, `/v2` and the console,
+`s3.res.micaos.dev` for the S3 read API). The rule for the move is one
+sentence — the new key is the old readable name with the `/d/` prefix dropped
+— with `/blob/` and `/v2` unchanged, `/blob/` answering by redirect to the
+download host, and the v1 `/index/` documents frozen.
+
+So `docs/design/mica-index.md` 3.1 derives a mirror entry as
+`https://dl.res.micaos.dev/mica/<scope>/<stamp>/<file>`, and `mirrors.list`
+carries that host. `mica-build` makes the matching change to the file and its
+derivation in the same round.
+
+**The part worth more than the edit: already-published indexes are not broken
+and are not republished.** They carry the old URLs, those URLs may stop
+answering, and that is the designed behaviour — a mirror that does not answer
+is the next URL, and the last URL is the release's own, so a reader falls back
+to GitHub and gets the same bytes against the same `sha256`. The host moved
+and nothing had to be reissued. This is the first time the property carried
+weight, and it is what "a mirror is a source, never a trust anchor" buys.
+
+Recorded as **disputed**, not resolved: whether the old `/d/` URLs still
+answer today. `mica-res`' migration notice says the old paths go only once all
+four consumers have landed and not before 2026-10-02, while its own sync has
+been failing since 2026-09-19 08:46 because its git pack lookups at `/d/…`
+find nothing. A probe from a runner settles it, because neither `mica-res` nor
+the coordinator can reach the zone from a container on this host. The scope
+rule in its second form: a claim about what a host serves is not established
+until someone who can reach the host says so.
+
 ## 2026-09-17 09:37 [progress]
 
 The CX3576 boot logo is the **Mica OS** icon above its wordmark: `docs/design/display.md`

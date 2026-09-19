@@ -92,11 +92,21 @@ digests are lowercase hex.
   and meaning — the release's own URL — so a pruned or unreachable mirror
   costs a reader nothing that the release still has.
 - Each entry is **derived, never looked up**:
-  `<base>/d/mica/<scope>/<stamp>/<file>`, with the scope and stamp of the
-  release the asset belongs to and the file name unchanged.
+  `<base>/mica/<scope>/<stamp>/<file>`, with the scope and stamp of the
+  release the asset belongs to and the file name unchanged. Since 2026-09-18
+  the base is the download host and the key has no `/d/` prefix, so a mirror
+  URL reads
+  `https://dl.res.micaos.dev/mica/<scope>/<stamp>/<file>` *(fixed here)*.
+  `mica-res` now serves three hosts — `dl.res.micaos.dev` for the files,
+  `res.micaos.dev` for directory listings, `/blob/<aa>/<sha256>`, the `/v2`
+  registry and the console, and `s3.res.micaos.dev` for the S3 read API — and
+  the rule for the move is one sentence: the new key is the old readable name
+  with the `/d/` prefix dropped. `/blob/` and `/v2` are unchanged, `/blob/`
+  now answering by redirect to the download host, and the v1 `/index/`
+  documents are frozen.
 - The bases are a **committed file in `mica-build`**, `mirrors.list`: one
   absolute `https` base per line, **in preference order**, today one line,
-  `https://res.micaos.dev`. Each base derives one entry, and the entries
+  `https://dl.res.micaos.dev`. Each base derives one entry, and the entries
   appear **in the file's order** — the array's order is the file's order, and
   an emitter that sorts either is wrong (the sort-order paragraph below says
   why). A committed file rather than an environment variable *(fixed here)*:
@@ -109,9 +119,27 @@ digests are lowercase hex.
   entry equal to `url`, which is not a mirror but the source the reader
   already has; and an entry that `verify-index` cannot re-derive from the
   base, scope, stamp and file name.
+- **Already-published indexes are not broken by a mirror move, and are never
+  republished for one** *(2026-09-18, the first time this property carried
+  weight)*. They carry the old URLs, those URLs may stop answering, and that
+  is the designed behaviour rather than damage: a mirror that does not answer
+  is the next URL, and the last URL is `url`, the release's own. A reader
+  falls back to GitHub and gets the same bytes, proven by the same `sha256`.
+  The host moved and nothing had to be reissued — that is what "a mirror is a
+  source, never a trust anchor" buys, and it is the strongest argument this
+  design has produced so far.
+- **Disputed, and recorded as disputed:** whether the old `/d/` URLs still
+  answer today. `mica-res`' migration notice says the old paths are removed
+  only once all four consumers have landed and not before 2026-10-02, while
+  its own sync has been failing since 2026-09-19 08:46 because its git pack
+  lookups at `/d/…` find nothing. `mica-res` is settling it with a probe from
+  a runner, since neither it nor the coordinator can reach the zone from a
+  container on this host. Neither version is written here as fact until that
+  probe reports: a claim about what a host serves is not established until
+  someone who can reach the host says so.
 - **Reachability is measured per environment, and the scope of a measurement
-  is part of it.** `res.micaos.dev` serves CI and the developer machine
-  normally. What was measured unreachable on 2026-09-16 is **the agent
+  is part of it.** The `res.micaos.dev` zone serves CI and the developer
+  machine normally. What was measured unreachable on 2026-09-16 is **the agent
   containers on one host**: from inside a container `188.114.96.5`,
   `188.114.97.5` and `172.67.0.1` time out while `104.16.123.96` and
   `1.1.1.1` open instantly, with no proxy variables and a plain docker bridge
