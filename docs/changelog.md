@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-19 18:10 [finding]
+
+The `/blob/` question is settled, and the answer is bigger than the question:
+**nothing resolves on the mirror, because the mirror is empty.** Measured by
+`mica-res` from a runner on 2026-09-19 with redirects not followed — the
+legacy `/d/upstream/git/…` and `/d/mica/…` paths, the current
+`/upstream/git/…` and `/mica/…` keys, the same keys on `dl.res.micaos.dev`
+and the digest lookup `/blob/<aa>/<sha256>` all answer `404`, with only
+`/index/current.json` answering at all, a `302`. The cause is not a path
+change and not a redirect the client fails to follow: the v1 import never ran
+after the 2026-09-18 cutover, so the service has held none of the 486 objects
+and 8.2 GB since then. The redirect-following hypothesis is dead and the
+disputed slot in `docs/design/mica-index.md` 3.1 is now empty.
+
+**And the thing that did not happen, which is the whole argument for the
+design.** The mirror held nothing for about a day and a half and no repository
+noticed in its results: every consumer treated the non-answering mirror as the
+next URL and fell back upstream, every run stayed green, and the only effect
+was slower fetches. That property has now been paid out twice in three days —
+once for a host move, once for an empty service — and the second is the larger
+payout, because a service holding nothing is the worst case the design was
+written against.
+
+A full re-publish from the producers' locks is running, from the pins rather
+than the v1 import: the import would reconstruct from a snapshot of the
+service being retired, and where the two disagree the locks win. The
+restoration is `mica-res`' audit reporting green against the new service, and
+it is not recorded until it does.
+
 ## 2026-09-19 17:30 [spec]
 
 Two artefacts here are called an index and both carry a `YYYYMMDD-HHMM` stamp:

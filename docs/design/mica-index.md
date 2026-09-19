@@ -148,6 +148,13 @@ digests are lowercase hex.
   The host moved and nothing had to be reissued — that is what "a mirror is a
   source, never a trust anchor" buys, and it is the strongest argument this
   design has produced so far.
+- **It has now been paid out twice in three days**, and the second time is the
+  larger one: the mirror held *nothing at all* for about a day and a half
+  (2026-09-18 to 2026-09-19), and no repository noticed in its results. Every
+  consumer treated the non-answering mirror as the next URL and fell back
+  upstream, every run stayed green, and the only effect was slower fetches. A
+  resource service can be empty without any of this breaking, which is the
+  property being load-bearing rather than merely stated.
 - **Settled, by two dated runs rather than a probe:** the old `/d/` paths
   stopped answering on or before 2026-09-19 16:19, with no consumer having
   landed. `mica-boards`' CI prints whether each fetch was mirrored, and it ran
@@ -158,11 +165,21 @@ digests are lowercase hex.
   failing sync, and `mica-res`' migration notice, which said the old paths
   survive until 2026-10-02, describes a plan that was not followed. Nothing
   broke: the fallback is the designed behaviour.
-- **Disputed in its place:** the archive lookups at `/blob/<aa>/<sha256>`
-  stopped working in the same interval, and `mica-res` says that shape is
-  unchanged and now answers by redirect. Whether it stopped answering, or
-  whether the client does not follow the redirect, is open with `mica-res`.
-  Neither version is written here as fact.
+- **Settled, and nothing is disputed here any more:** `/blob/<aa>/<sha256>`
+  did not stop answering because of a path change or a redirect the client
+  does not follow — **there was nothing behind it to answer**. Measured by
+  `mica-res` from a runner on 2026-09-19, with redirects not followed: the
+  legacy `/d/upstream/git/…` and `/d/mica/…` paths, the current
+  `/upstream/git/…` and `/mica/…` keys, the same keys on
+  `dl.res.micaos.dev`, and the digest lookup `/blob/<aa>/<sha256>` all
+  answered `404`; only `/index/current.json` answered at all, with a `302`.
+  The v1 import never ran after the 2026-09-18 cutover, so the service has
+  held none of the 486 objects and 8.2 GB since then: the mirror was empty for
+  about a day and a half. A full re-publish from the producers' locks is
+  running — from the **pins**, not the v1 import, which would reconstruct from
+  a snapshot of the service being retired; where the two disagree the locks
+  win. The restoration is `mica-res`' audit reporting green against the new
+  service, and is not recorded here until it does.
 - **Reachability is measured per environment, and the scope of a measurement
   is part of it.** The `res.micaos.dev` zone serves CI and the developer
   machine normally. What was measured unreachable on 2026-09-16 is **the agent
