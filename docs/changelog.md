@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-19 23:10 [finding]
+
+A correction that narrows a claim rather than reversing it, and it was the
+coordinator's claim rather than a measurement: **reuse is decided by inputs,
+not by bytes.** `mica-boards` compares a component's `mica.inputs` against the
+board's latest release, so an `s905x5m` release whose loader inputs did not
+move republishes the same digest without rebuilding. The loader does not move
+every release; it moves when its inputs move.
+
+The permanent statement is the narrow one: **a release whose loader inputs did
+move rebuilds it, and that rebuild is never byte-identical**, because the
+vendor signing is non-deterministic. The inputs are the board's `loader/`,
+`bsp.env`, the board `Makefile`, `common/uboot`, `common/scripts`,
+`common/trust`, the two vendor git rows, the toolchain source rows, the `bsp`
+image digest and the boot certificate. Cost when it happens: four files of
+twelve, 16.13 MiB. Frequency follows the loader rather than the calendar —
+three times in the week of 2026-09-16, none in a week that does not touch it.
+
+So the question recorded beside the archive-kind rules keeps its place and its
+openness, with a smaller premise: whether a moved loader alone forces a `full`
+archive decides the cost of the releases that rebuild the loader, not of every
+release, and `s905x5m` is not structurally barred from partial updates.
+`docs/user/update-packages.md` and its Chinese page carry the corrected
+framing.
+
+**And the reason the release-target flag has not been flipped yet**, which is
+a better answer than "not yet": the board has no `evidence.json`, and
+`mica-build`'s release manifest requires one — `schemaVersion` 2, the board
+name, a known `bootAssurance`, a non-empty qualification, at least one
+`evidenceRef` and `physicalBoundaries`. Flipping today would produce a product
+whose release manifest cannot be built, so `mica-boards` writes the document
+first, on the `cx3576` model that states its own pending physical rows.
+`docs/boards/support-tiers.md` records that beside the decision, because that
+document is where "a release target is not a hardware claim" gets stated for
+this board.
+
 ## 2026-09-19 22:45 [progress]
 
 The summary sentence is a class, not an incident, so it was hunted where the

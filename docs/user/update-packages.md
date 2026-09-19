@@ -39,14 +39,27 @@ compressed. The suffixes are a naming convention of the producing side — the
 client reads the `MICAUPD1` header, not the file name.
 
 **Open, and the first case where a board property may constrain an archive
-kind:** `s905x5m`'s U-Boot cannot be reused byte-identically while the vendor
-signing is non-deterministic, which `mica-boards` has confirmed twice, so from
-that board's second release on the loader moves every time. Whether that alone
-forces a `full` archive, or whether the kinds are computed over the root and
-kernel identities with the loader riding along, is `mica-build`'s to answer
-from its code and its first two releases — not from design intent, and not
-here. It is recorded beside the rules rather than in the board's page because
-the answer is about archive kinds, not about that board.
+kind.** Reuse is decided by **inputs, not by bytes**: `mica-boards` compares a
+component's `mica.inputs` against the board's latest release, so a release
+whose loader inputs did not move republishes the same digest without
+rebuilding, and nothing differs. The narrow statement, which is the permanent
+one: **a release whose loader inputs did move rebuilds it, and that rebuild is
+never byte-identical**, because the `s905x5m` vendor signing is
+non-deterministic. Its inputs are the board's `loader/`, `bsp.env`, the board
+`Makefile`, `common/uboot`, `common/scripts`, `common/trust`, the two vendor
+git rows, the toolchain source rows, the `bsp` image digest and the boot
+certificate; the cost when it happens is four files of twelve, 16.13 MiB; and
+the frequency follows the loader rather than the calendar — three times in the
+week of 2026-09-16, none in a week that does not touch it.
+
+So the open question is smaller than it first looked: whether a moved loader
+alone forces a `full` archive, or whether the kinds are computed over the root
+and kernel identities with the loader riding along, decides the cost of the
+releases that rebuild the loader — not of every release, and `s905x5m` is not
+structurally barred from partial updates. `mica-build` answers it from its code
+and its first two releases, not from design intent and not here. It is recorded
+beside the rules rather than in the board's page because the answer is about
+archive kinds, not about that board.
 
 > status: shipped — evidence: `docs/decisions/2026-09-15-update-packages.md`, `docs/design/release-signing.md`, `mica-core:crates/mica-deploy`
 

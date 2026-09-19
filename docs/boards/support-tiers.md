@@ -113,6 +113,16 @@ the rename. `s905x5m` was the outlier and this table gave no reason for it, so
 the decision removes an inconsistency rather than lowering a bar. The flag in
 `board.env` and the first release follow from `mica-boards`, and `mica-build`
 re-pins and publishes its products after that.
+
+The flag has not been flipped yet, and the reason is worth reading: **the
+board has no `evidence.json`**, and `mica-build`'s release manifest requires
+one — `schemaVersion` 2, the board name, a known `bootAssurance`, a non-empty
+qualification, at least one `evidenceRef` and `physicalBoundaries`. Flipping
+today would produce a product whose release manifest cannot be built, so
+`mica-boards` writes the document first, on the `cx3576` model that states its
+own pending physical rows. That document is where the distinction this table
+draws — a release target is not a hardware claim — gets stated for this
+board.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
 
 `uefi-arm64` became a release target on 2026-09-16 and carries a generic
