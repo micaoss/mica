@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 00:18 [finding]
+
+**Correction, twenty minutes old: a release does boot an image, and my query
+was narrower than my claim.** The entry above said the boundary still stood
+because `ci.yml` at `f46b64a6` carries no lifecycle job. The gate is not in
+`ci.yml`: it is a step of `release-product.yml`, `Boot it, one runtime stage,
+no faults`, running `tests/lifecycle-uefi/run.sh <product> --runtime-only`.
+Read back from the three release runs of the `20260919-2356` round, it ran and
+**passed for both `uefi-x64` products** — the first boot of an image here
+outside a hand run — and was **skipped** for both `uefi-arm64` and both
+`cx3576` products, the step being `if: inputs.arch == 'amd64'`.
+
+The pages now say that with its coverage attached: `build-harness.md` section
+4 records the move, the three red runs it took to land (every one a harness
+defect, none an image), and what the gate does not cover — no fault stages, no
+updates, nothing on a push to `main`, and `mica-deploy`'s `BOOTAA64.EFI` arm
+would pass it green. `docs/user/download.md`, `docs/user/flashing.md`,
+`docs/boards/support-tiers.md`, `docs/user/build.md` and the Chinese pages are
+corrected the same way, including the tier rows, where the evidence is now
+uneven between `uefi-x64` and `uefi-arm64` rather than merely dated.
+
+**The rule the mistake earns, beside the other two on reading evidence:** *a
+query's aperture must be at least as wide as the claim built on it.* Three
+instances, all this week: `mica-res`'s reader followed the slash form and
+ignored every dot-form release; the index count used a `mica.` prefix test and
+returned nine of ten; and this one grepped `ci.yml` for a claim about anything
+in CI **or release**. A query returns *nothing found*, never *nothing exists*,
+and the two are indistinguishable from its output — so the aperture belongs in
+the sentence the result becomes. The instance in `doc-contract.md` about
+fixtures stays where it is; this rule is carried by three instances of its
+own.
+
 ## 2026-09-20 00:16 [progress]
 
 **The corrected round is published and the non-booting note resolves.**

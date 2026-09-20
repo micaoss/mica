@@ -38,6 +38,17 @@ host: use the actual host project path and mount only required directories.
 | Shared component contract | the fixtures, diffed byte for byte between the two repositories |
 | Host/toolchain boundaries | `make os-host-toolchain-lint os-host-toolchain-lint-test` |
 
+**A query's aperture must be at least as wide as the claim built on it.**
+Three times now a narrow query has been read as a fact about the world:
+`mica-res`'s reader followed the spec's slash form and silently ignored every
+dot-form release; the index count was taken with a `mica.` prefix test that
+could not match the slash-form index and returned nine of ten; and the boot
+gate was declared absent from this repository after grepping `ci.yml` alone,
+when it is a step of `release-product.yml` — the claim was about *anything in
+CI or release*, the query covered one file. A query returns nothing found, not
+nothing exists, and the two are indistinguishable from the output alone. State
+the aperture in the sentence the result becomes, or widen it until it matches.
+
 **Identical wrong bytes are a pass.** The shared component-contract fixtures
 are diffed byte for byte between `mica-core` and `mica-build`; on the board
 rename both sides said `x64`, they agreed exactly, and the check passed. That
@@ -245,16 +256,26 @@ What closes this is the guest reaching `FILE_AB_RUNTIME_PASS` after the pin
 moves, not the diff. A rename verified by reading the diff is what produced
 the break.
 
-**The boundary still stands on 2026-09-20, after the re-pin round shipped.**
-The gate was landed and taken back out twice while it was being made to pass
-as a non-root user (`mica-build` `bc5e400`, `c8eb64d`), and at `f46b64a6` —
-the commit the corrected releases are built from — `ci.yml` carries no
-lifecycle job; its `ci` run has nineteen jobs and none of them boots a guest.
-So the corrected images are backed by a source fact (the client they pin
-matches the current board names) and by whatever hand run produced the pass
-marker, not by a CI boot. The sorting sentence above is the one to apply, and
-it is now the second time the same week that a boot claim has needed the
-distinction.
+**The boundary moved on 2026-09-19 at 23:56 UTC, and it moved in the release
+path rather than in `ci.yml`.** The gate is a step of `release-product.yml`,
+`Boot it, one runtime stage, no faults`, running
+`tests/lifecycle-uefi/run.sh <product> --runtime-only` after the image is
+built and statically verified; it took three red runs to land, every one of
+them a defect in the harness — container-made root-owned files touched from
+the host, fine on the root host the suite had only ever run on — and none in
+an image. In the `20260919-2356` round it ran and passed for both `uefi-x64`
+products, which is the first time anything here booted an image outside a
+hand run.
+
+**Its coverage, stated so nobody trusts it for more:** the step is
+`if: inputs.arch == 'amd64'`, so it booted `uefi-x64-dev` and
+`uefi-x64-prod` and was **skipped** for both `uefi-arm64` products and both
+`cx3576` products in the same round — read back from the three release runs.
+It covers the UEFI amd64 path, one runtime stage, no fault stages, no updates;
+`mica-deploy`'s arm64 arm (the `BOOTAA64.EFI` target) would pass this green if
+it broke. A push to `main` still boots nothing: `ci.yml` carries no lifecycle
+job, so between pushing and releasing, the sorting sentence above is still the
+one that applies.
 
 ## 5. Complete-image acceptance
 

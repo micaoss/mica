@@ -17,12 +17,12 @@ procedure yet.
 No Mica OS image has been written to a USB stick, a SATA disk, an NVMe drive
 or an eMMC, and no physical board has booted one. The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
-where they are not verified. Those QEMU boots are also dated, and the date
-matters: the newest one recorded here is 2026-09-15 20:17 UTC, before the
-board rename, and the three `uefi` rounds published after it
-(`20260916-0845`, `20260916-1653`, `20260919-2103`) power the machine down at
-PID 1 instead of booting. Take an image from `20260919-2356` or later, which
-ships the client that accepts the current board names
+where they are not verified. The dates matter: the three `uefi` rounds
+published between the board rename and 2026-09-19 (`20260916-0845`,
+`20260916-1653`, `20260919-2103`) power the machine down at PID 1 instead of
+booting. Take an image from `20260919-2356` or later; every amd64 product has
+been booted in its own release run since that round, while an `arm64` or
+`cx3576` image is built and verified but not started by anything automatic
 ([download](download.md) section 1).
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`

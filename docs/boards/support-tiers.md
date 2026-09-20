@@ -124,12 +124,14 @@ own pending physical rows. That document is where the distinction this table
 draws — a release target is not a hardware claim — gets stated for this
 board.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
-It is also dated evidence: the newest lifecycle run recorded here is
-2026-09-15 20:17 UTC, before the rename, and the three `uefi` rounds published
-after it fail at PID 1 and power down, while `20260919-2356` ships the client
-that accepts the current names ([harness](../design/build-harness.md) section
-4). These rows describe what the boards were qualified to do, not what any
-particular published image does.
+It is also dated evidence, and it is now uneven between the two: since
+2026-09-19 23:56 UTC every amd64 product is booted in its own release run, so
+`uefi-x64` carries a boot per release, while `uefi-arm64` carries none — the
+gate's boot step is amd64-only and was skipped for both its products in that
+round ([harness](../design/build-harness.md) section 4). The three `uefi`
+rounds published before it fail at PID 1 and power down. These rows describe
+what the boards were qualified to do, not what any particular published image
+does.
 
 `uefi-arm64` became a release target on 2026-09-16 and carries a generic
 hardware driver set (AHCI, NVMe, USB storage, the common NICs as modules; no

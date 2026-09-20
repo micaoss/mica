@@ -43,8 +43,10 @@ release, not a deletion.
 with the index `mica.20260920-0008`, all built from `f46b64a6`. The client it
 ships accepts the current names: the `mica-core` release it pins,
 `20260919-2226`, matches `uefi-x64` and `uefi-arm64` in the board arm whose
-absence produced the refusal. That is a source fact about the arm; *that a
-product boots* is a separate claim and carries the date of a run
+absence produced the refusal. Both `uefi-x64` products of that round were
+**booted in their release run** and reached the guest's own pass marker. The
+boot step is amd64-only, so the `uefi-arm64` and `cx3576` products of the same
+round were built and statically verified but not started
 ([harness](../design/build-harness.md) section 4).
 
 Per product a release carries:
