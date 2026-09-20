@@ -432,9 +432,10 @@ about a board.** Two measurements of these controllers disagreed on
 carry `MEMCG` and `CFS_BANDWIDTH` on all four boards since `04e0fae`
 (08:35:36Z, *the floor carries the container limits*), while `mica-build`'s
 table — read from `_out/boards/<board>/kernel/config`, the kernel in the
-products it builds — describes the board releases it **pins**:
-`uefi-x64`, `uefi-arm64` and `s905x5m` at `20260916-0857`, `cx3576` at
-`20260917-1007`, all cut before that commit. **One describes what `main`
+products it builds — describes the board releases it **pins** — read from
+`mica-build:locks/pins/` rather than relayed: `uefi-x64` and `uefi-arm64` at
+`20260916-0857`, `cx3576` at `20260917-1007`, `s905x5m` at `20260919-2259`,
+all cut before that commit. **One describes what `main`
 builds, the other what ships today, and the gap between them is exactly one
 re-pin.** A reader given both without their dates concludes one is wrong, so
 each column names the release it was measured from.

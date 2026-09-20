@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-20 14:42 [finding]
+
+**One more relayed number was wrong, and I had already copied it into the
+page.** `s905x5m` is pinned at **`20260919-2259`**, not `20260916-0857` —
+read from `mica-build:locks/pins/` rather than from the message. The
+conclusion survives (that release is still older than `04e0fae`, so the gap is
+still one re-pin), but the fact in section 8 was wrong for an hour because I
+took a list of four pins on trust after measuring everything else in the same
+paragraph.
+
+**And the other side of the gap is now watched too**: four world rows naming
+the board release each `mica-build` pin holds. The kernel-config rows say what
+the **next** board release will carry; these say what the products being built
+carry **today**. **A re-pin flips these and not those**, which is exactly the
+distinction a capability measured from a build output needs — and it means
+neither half of section 8 can go stale without a job going red.
+
 ## 2026-09-20 14:40 [finding]
 
 **Two measurements disagreed and neither was stale: they were about different

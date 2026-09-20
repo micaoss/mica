@@ -64,3 +64,12 @@ io-throttling-absent.cx3576	line	micaoss/mica-boards:boards/cx3576/kernel/config
 io-throttling-absent.s905x5m	line	micaoss/mica-boards:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
 memcg.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_MEMCG=y	docs/design/containers.md
 cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CFS_BANDWIDTH=y	docs/design/containers.md
+#
+# And the other side of the same gap: the board releases mica-build pins. The
+# rows above say what the next board release will carry; these say what the
+# products being built carry today. A re-pin flips these and not those, which is
+# the distinction a capability measured from a build output needs.
+board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260916-0857	docs/design/containers.md
+board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260916-0857	docs/design/containers.md
+board-pin.cx3576	line	micaoss/mica-build:locks/pins/mica-boards.cx3576.pin	RELEASE=20260917-1007	docs/design/containers.md
+board-pin.s905x5m	line	micaoss/mica-build:locks/pins/mica-boards.s905x5m.pin	RELEASE=20260919-2259	docs/design/containers.md
