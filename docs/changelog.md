@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-20 16:29 [finding]
+
+**The last unexercised row of the prediction table fired: `board-pin.*` red,
+`board-release.*` green — at the re-pin and not at the release.** All four
+pins moved to `20260920-1536` at 16:28. Every row of that table has now been
+exercised by the event it predicts, and none of them needed an investigation
+to read.
+
+**And the paragraph it corrects was true when it was written, four minutes
+earlier.** At 16:24 the re-pin answered 422 at `origin` and the pins still
+named the old four; the push landed in between. Both readings were right of
+their moment, which makes this **the third resolution of one question in a
+single evening — working tree versus commit, commit versus `origin`, local
+branch versus `origin`.** The rule is not *check whether it is pushed*: **a
+claim's subject has a location, and the location is part of the claim.**
+
+**The detail that would have been dropped as housekeeping is the one that
+mattered**: the release configs were read **after deleting `_out/` and
+re-fetching**. Without it the number is a reading of a build tree that was
+already there — the stale-`_out` hazard, quoted as proof that the hazard was
+repaired. **A number whose method is dropped can reproduce the defect the
+number was proving fixed.**
+
 ## 2026-09-20 16:26 [finding]
 
 **Landed: never quote a check you have not seen fail**, with five instances

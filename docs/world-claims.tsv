@@ -90,6 +90,14 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/ue
 # products being built carry today. A re-pin flips these and not those, which is
 # the distinction a capability measured from a build output needs.
 #
+# THEY FLIPPED AT 16:28 ON 2026-09-20, WHICH WAS THE LAST UNEXERCISED ROW OF THE
+# PREDICTION TABLE IN containers.md 8: all four went red at 20260920-1536 while
+# the board-release rows stayed green -- at the re-pin and not at the release,
+# exactly as written. Four minutes earlier the pins at origin still named the
+# old four and the re-pin commit answered 422; the push landed in between, so a
+# paragraph written from that reading was true when written and stale by the
+# next CI run. The expectations are moved.
+#
 # AND THE STEP BETWEEN THEM, WHICH NOTHING WATCHED. The config rows flip when
 # mica-boards records a symbol; the pin rows flip when mica-build moves to a
 # release that carries it. THE RELEASE ITSELF IS A THIRD STEP and it moved
@@ -157,7 +165,7 @@ taskstats-floor-off	line	micaoss/mica-boards:common/kernel/mica-required.fragmen
 # repair: the floor names the SELECTOR off, because a selected symbol cannot be
 # switched off directly, and a red here is a regression in the normal sense.
 net-classid-selector-off	line	micaoss/mica-boards:common/kernel/mica-required.fragment	# CONFIG_NET_CLS_CGROUP is not set	docs/design/containers.md
-board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260916-0857	docs/design/containers.md
-board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260916-0857	docs/design/containers.md
-board-pin.cx3576	line	micaoss/mica-build:locks/pins/mica-boards.cx3576.pin	RELEASE=20260917-1007	docs/design/containers.md
-board-pin.s905x5m	line	micaoss/mica-build:locks/pins/mica-boards.s905x5m.pin	RELEASE=20260919-2259	docs/design/containers.md
+board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260920-1536	docs/design/containers.md
+board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260920-1536	docs/design/containers.md
+board-pin.cx3576	line	micaoss/mica-build:locks/pins/mica-boards.cx3576.pin	RELEASE=20260920-1536	docs/design/containers.md
+board-pin.s905x5m	line	micaoss/mica-build:locks/pins/mica-boards.s905x5m.pin	RELEASE=20260920-1536	docs/design/containers.md

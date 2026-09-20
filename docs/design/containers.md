@@ -752,14 +752,16 @@ rather than of a build tree that was already there. **Nothing is claimed here
 about `cpu.max` or `io.max` from the product side**: that reading does not
 exist, and the two that were offered for it were both about something else.
 
-*(The subject of that measurement is a pin this repository cannot see yet. The
-re-pin is recorded at `mica-build` `49c7aed6`, which answers **422** at
-`origin`, and `locks/pins/` at `origin` still names `20260916-0857`,
-`20260916-0857`, `20260917-1007` and `20260919-2259` — so the `board-pin.*`
-rows are green and **correct**, and the prediction table's third row has not
-fired. A measurement taken against an unpushed pin is true of the machine that
-took it and not reproducible from `origin`, which is the same distinction as a
-working tree read as a commit, one step further out.)*
+*(The subject of that measurement had a location before it had a value, and
+the location moved while this paragraph was being written. At 16:24 the re-pin
+`49c7aed6` answered **422** at `origin` and `locks/pins/` still named the old
+four, so the reading was true of the machine that took it and not reproducible
+from `origin`; by 16:28 the push had landed and all four pins read
+`20260920-1536`. Both sentences were right when written, four minutes apart —
+which is the third resolution of one question in a single evening: **working
+tree versus commit, commit versus `origin`, local branch versus `origin`.**
+The rule is not *check whether it is pushed*; it is that **a claim's subject
+has a location, and the location is part of the claim.**)*
 
 **What the earlier mistake does not touch is what the table rests on.** The
 kernel-config measurements were read from
@@ -830,7 +832,13 @@ is released. And if two of these columns ever go red on the same run,
 something moved that no row of this table predicts, which is an investigation
 rather than an edit.
 
-**That middle row fired twenty minutes after it was written**, which is the
+**The last row fired too, at 16:28 on the same day**: the four `board-pin.*`
+rows went red at `20260920-1536` while the `board-release.*` rows stayed green
+— **at the re-pin and not at the release**, which is the distinction the two
+groups were written to draw. Every row of this table has now been exercised by
+the event it predicts, and none of them needed an investigation to read.
+
+**The middle row fired twenty minutes after it was written**, which is the
 only test a prediction has: the four boards were released at
 `20260920-1536`, those rows went red naming the new tags, and the
 `board-pin.*` rows stayed green — at this step and not at the next one,
