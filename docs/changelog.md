@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 00:55 [finding]
+
+**Unstarted, not unrun — and the distinction is load-bearing.** `ci.yml` runs
+`make os-fit-records-test` on every push and the FIT suite covers firmware IO,
+signatures, trust and record logic, so the FIT side is attended by checks that
+never start the thing. "Nothing runs for FIT" would be false and would invite
+the wrong repair: more host-side checks and a feeling of coverage. The
+sentence the records carry is that **nothing starts a FIT image**.
+
+**It is explicit in the tree, not inferred from an absence.** Both suites that
+start a guest refuse a FIT board by name — `tests/apid-api/src/qemu.ts` throws
+`<board> boots a FIT; QEMU acceptance boots UEFI boards`, and
+`tests/lifecycle-uefi/product-inputs.sh` refuses the same case in shell (read
+at `e92dc5d`). So the scoping answer is in the record before the question is
+asked: **a FIT boot suite is a new suite, not the unblocking of an existing
+one.**
+
+**Where my wrong belief came from, found by looking for a source rather than
+assuming carelessness.** `product-inputs.sh` refuses with *this suite boots
+UEFI boards (`tests/lifecycle-uboot-fit` for the other)*, and "for the other"
+reads as though a FIT image were booted somewhere. A written source, sitting
+at the point of use, wrong in the direction that manufactures a capability. It
+is the fourth instance of a wrong version of a rule where the right one
+belongs, and the first that cost a **claim** rather than a measurement: the
+other three were wrong descriptions of code that was right, this one had me
+assert a capability three times. It had a natural point of use after all, so
+the condition for naming the class and giving it a home is still unmet and no
+abstract rule is written here.
+
 ## 2026-09-20 00:53 [finding]
 
 **No suite boots a FIT image, so half the published catalogue has never been

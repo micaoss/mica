@@ -316,13 +316,33 @@ evidence of two different ages: `uefi-x64` from the CI gate, per push and per
 release since 2026-09-19, and `uefi-arm64` from hand-run QEMU rows that
 predate the rename.
 
+**Unrun is not the word; unstarted is.** The FIT side is attended: `ci.yml`
+runs `make os-fit-records-test` on every push, and the FIT suite's own checks
+cover firmware IO, signatures, trust and the record logic. What none of them
+does is start the image. Saying "nothing runs for FIT" would be false and
+would invite the wrong repair — more host-side checks, and a feeling of
+coverage. The true sentence is that **nothing starts a FIT image**.
+
+**And it is explicit in the tree, not inferred from an absence.** Both suites
+that do start a guest refuse a FIT board by name:
+`tests/apid-api/src/qemu.ts` throws
+`<board> boots a FIT; QEMU acceptance boots UEFI boards`, and
+`tests/lifecycle-uefi/product-inputs.sh` refuses the same case in shell. So
+the position is stated in three places — two refusals and a FIT suite that
+boots nothing — and the consequence for anyone scoping the work is that **a
+FIT boot suite is a new suite, not the unblocking of an existing one**.
+
 **Why the mistake was easy, which is the part worth keeping.** The suite is
 named `lifecycle-uboot-fit`, it sits beside `lifecycle-uefi`, and it tests the
 FIT boot *path* — firmware IO, signatures, trust. Everything about the name
-and the neighbourhood says the FIT one boots too. A name that parallels a
-booting suite without booting is the same shape as a comment asserting what
-the code does not do: **a name is not evidence of behaviour**, and the check
-is one `grep` for the machinery, not a reading of the directory listing.
+and the neighbourhood says the FIT one boots too, and the refusal message says
+it outright: *this suite boots UEFI boards (`tests/lifecycle-uboot-fit` for
+the other)*. **For the other** reads as though a FIT image were booted
+somewhere. That is where the belief came from — a written source, at the point
+of use, wrong in the direction that manufactures a capability — and it is
+worth looking for such a source before concluding that a wrong belief was
+simply careless. A name is not evidence of behaviour either: the check is one
+`grep` for the machinery, not a reading of the directory listing.
 
 This is consistent with the decision that a release target publishes images
 and asserts nothing about hardware
