@@ -412,18 +412,37 @@ the board is a line systemd logs and then skips — the unit starts, unlimited,
 and the only evidence is in the journal. `/dev/mmcblk0` is the eMMC on the
 cx3576; check the board before copying it.
 
-**A ceiling is only a kernel controller if the controller is compiled in, and
-one of these is not** *(measured 2026-09-20 in the four committed kernel
-configs at `mica-boards` `main`)*. `MEMCG`, `CFS_BANDWIDTH` and `CGROUP_PIDS`
-are set on **all four boards**, so `memory.high`, `memory.max`, `cpu.max` and
-`pids.max` are real there. **`BLK_DEV_THROTTLING` is set on none of them**, so
-`io.max` does not exist and the two `IO*` keys above bound nothing on any Mica
-board today.
+**A ceiling is only a kernel controller if the controller is compiled in.**
+`MEMCG`, `CFS_BANDWIDTH` and `CGROUP_PIDS` are set on **all four boards**, so
+`memory.high`, `memory.max`, `cpu.max` and `pids.max` are real there.
+`BLK_DEV_THROTTLING` was set on **none** of them when this paragraph was first
+written that morning, which made `io.max` the one ceiling of the table
+available nowhere; `mica-boards` `3970753b` (2026-09-20 14:45Z, *io.max exists
+on no board: `BLK_DEV_THROTTLING` joins the floor*) put it in
+`common/kernel/mica-required.fragment`, the board-independent baseline every
+board merges and asserts against its final `.config`.
+
+**And the same symbol now has three different answers depending on which
+artefact you read**, which is the pin-and-tree distinction below at a third
+resolution:
+
+| Artefact | What it is | `BLK_DEV_THROTTLING` today |
+|---|---|---|
+| `common/kernel/mica-required.fragment` | the **requirement**, asserted at every board build | set, for all four boards |
+| `boards/<board>/kernel/config/…` | the **last build's output**, committed | set on `uefi-x64` and `uefi-arm64`, both re-recorded in that commit; the two FIT boards are not re-recorded yet |
+| the board releases `mica-build` pins | what **ships today** | set on none |
+
+None of the three is stale and none contradicts another: a symbol added to the
+floor is true for every board at its next build, visible in the boards
+re-recorded since, and absent from everything already released. **A reader who
+takes any one of the three for the others gets a defensible wrong answer**, so
+the question *does this board have `io.max`* is not well posed without naming
+the artefact.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but
-the reason IO is unlimited here is that the **controller is absent**, which
-produces no journal line at all. A correct warning about the near cause is
+the reason IO was unlimited on every board this morning is that the
+**controller was absent**, which produces no journal line at all. A correct warning about the near cause is
 exactly what stops the next reader from looking for the far one.
 
 **A capability measured from a build output is a statement about a pin, not
@@ -441,11 +460,22 @@ re-pin.** A reader given both without their dates concludes one is wrong, so
 each column names the release it was measured from.
 
 *(The configs are the input; a published kernel carries what the release that
-built it carried. `mica-boards` has a ruling to set the missing symbol on all
-four boards under the user's decision that container behaviour is uniform
-unless the kernel cannot support it — and the kernel supports it everywhere;
-it was never set. This section's promise becomes true as written when that
-lands.)*
+built it carried. The ruling to set the missing symbol on all four boards —
+the user's decision that container behaviour is uniform unless the kernel
+cannot support it — landed in `mica-boards` at 14:45Z on 2026-09-20 and is
+what the table above records. This section's promise becomes true as written
+for a given board when a release built after it is pinned.)*
+
+**Four hours is how long the dated sentence lasted, and it did not go stale
+quietly.** The six claims this section was given in `docs/world-claims.tsv`
+that morning were written *expecting* to flip, and two of them flipped the
+same afternoon: the `world` job went red on the commit that happened to be
+pushed after `3970753b`, naming both boards and the exact line. **The gap
+between a document being wrong and somebody noticing was one CI run**, against
+four days for the last defect this corpus found by hand — and the neighbouring
+`board-pin.*` rows stayed green throughout, correctly, because nothing about
+what ships had changed. A claim written to fail is worth more than a claim
+written to hold.
 
 **And the section does not distinguish what is measured from what was
 assumed, so it does here**: *a container runs with no flag* is **measured** —

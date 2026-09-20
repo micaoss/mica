@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 14:53 [finding]
+
+**The claims written to fail flipped four hours after they were written, and
+the `world` job is how this page found out.** `mica-boards` `3970753b`
+(14:45Z, *io.max exists on no board: `BLK_DEV_THROTTLING` joins the floor*) put
+the missing controller in `common/kernel/mica-required.fragment` and
+re-recorded both UEFI configs; the next push here went red naming both boards
+and the exact line. **The gap between a document being wrong and somebody
+noticing was one CI run** — against four days for the last defect this corpus
+found by hand. The `board-pin.*` rows stayed green throughout, correctly,
+because nothing about what ships had changed.
+
+**And the symbol now has three answers depending on which artefact is read**,
+which is the pin-and-tree distinction at a third resolution: the **fragment**
+(the requirement, asserted at every board build) has it for all four boards;
+the **committed configs** (the last build's output) have it on the two boards
+re-recorded in that commit and not on the two FIT boards; the **board releases
+`mica-build` pins** have it nowhere. None is stale, none contradicts another,
+and a reader who takes one for another gets a defensible wrong answer — so
+`containers.md` section 8 now answers *does this board have `io.max`* with a
+table of artefacts rather than a sentence.
+
 ## 2026-09-20 14:50 [finding]
 
 **The negative-vector audit finished, and the definition it was built on tests

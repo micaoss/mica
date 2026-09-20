@@ -58,10 +58,16 @@ logo-policy-is-cx3576s	line	micaoss/mica-boards:boards/cx3576/package/overlay/et
 # expected to FLIP when the authorised repair lands: a red world job then means
 # the section's dated note is stale and the capability text replaces it, which is
 # the gate doing its job rather than a regression.
-io-throttling-absent.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-io-throttling-absent.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/kernel/config/uefi-arm64.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-io-throttling-absent.cx3576	line	micaoss/mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-io-throttling-absent.s905x5m	line	micaoss/mica-boards:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+io-throttling.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
+io-throttling.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/kernel/config/uefi-arm64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
+io-throttling-unrecorded.cx3576	line	micaoss/mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+io-throttling-unrecorded.s905x5m	line	micaoss/mica-boards:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+# The floor itself, which is the requirement rather than a build's output:
+# every board merges this fragment and asserts each =y line against its final
+# .config, so this row and the two unrecorded rows below are the same symbol
+# read at two resolutions, and they are meant to disagree until the FIT
+# configs are re-recorded.
+io-throttling-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
 memcg.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_MEMCG=y	docs/design/containers.md
 cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CFS_BANDWIDTH=y	docs/design/containers.md
 #
