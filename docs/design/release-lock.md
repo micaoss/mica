@@ -844,8 +844,8 @@ The vectors are files every repository copies into its own tests:
   references), `mica-build.uefi-x64.lock` (a scoped `mica-build` lock: `input`,
   `product`, `bundle`, `asset` rows, a `root` update beside `full`),
   `mica-build.mica.lock` (an index lock over two scoped releases).
-- `lock/refused/`: one lock per refusal rule of 1.5, each a minimal edit of a
-  valid lock; the image refusals are `image-source.lock` (a repository source
+- `lock/refused/`: one lock per refusal rule of 1.5, each written against a
+  valid lock and **declaring which one** in `derived-from.tsv` (9.3); the image refusals are `image-source.lock` (a repository source
   other than the release row's), `image-source-reference.lock`
   (`reference-repository`, a reference outside the source's repository),
   `image-registry.lock` (`reference-registry`),
@@ -960,6 +960,28 @@ downstream accepts.** So the rule reads: **what you pin, plus what you
 produce, plus the vectors that say what your own forms may not be** — and that
 is the minimum. A floor stated as a ceiling is how a correct rule produces a
 worse tree.
+
+### 9.3 `derived-from.tsv`: which valid vector a refused one is written against
+
+Every refused lock vector declares its sibling, because the intent existed
+only in whoever wrote the fixture — the same category as a provenance line,
+and the same argument for writing it down. Rows are
+`<refused vector>\t<relation>\t<valid vector>`:
+
+- **`edit-of`** — a small edit of that vector: **at most two changed lines**,
+  and not identical. 44 of the 48 refused lock vectors are these.
+- **`minimal-of`** — an independently written minimal lock of the same shape,
+  so no line bound applies and the sibling names the **shape** rather than the
+  source text. Four are these: `column-count`, `image-platform`,
+  `package-without-pool` and `unsorted`, which was worth measuring because
+  this section used to say *each a minimal edit of a valid lock* and four
+  vectors were never that.
+
+**The pairing is declared rather than derived**, because deriving it by
+smallest diff matched `image-platform.lock`, a `mica-build-env` shape, against
+`offline-mica-core.lock`. `make docs-verify` asserts every refused vector has
+a row, every sibling exists and is itself a listed vector, no vector is
+identical to its sibling, and the `edit-of` line bound.
 
 ### 9.2 `vectors.pin`: the pin a gate reads
 

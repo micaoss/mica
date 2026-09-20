@@ -67,9 +67,11 @@ is wrong returns a tidy answer about nothing.
 
 So the harness needs a fixture-format change rather than a script:
 
-1. each refused vector **declares the valid vector it was derived from** — one
-   more column in `expected.tsv`, and with it *the refused vector differs from
-   its sibling by exactly the rows the defect needs* becomes checkable;
+1. ~~each refused vector **declares the valid vector it was derived from**~~ —
+   **done 2026-09-20** as `vectors/derived-from.tsv` (9.3) rather than a fifth
+   column in `expected.tsv`, which five repositories parse and would have had
+   to tolerate. The gate asserts the pairing, the sibling's existence and the
+   `edit-of` line bound;
 2. and for the two-rule property proper, either each vector **declares its
    repair**, or the reference checker gains a mode that reports **every** rule
    a file breaks rather than the first. The second is the honest one and the

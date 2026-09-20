@@ -58,6 +58,42 @@ while IFS= read -r vector; do
     is_listed "$vector" || fail "$vector is not listed in expected.tsv"
 done < <(cd "$V" && { find lock upstream -name '*.lock'; find vectors-pin -name '*.pin'; find pins -mindepth 2 -maxdepth 2 -type d; find repos -mindepth 1 -maxdepth 1 -type d; } | sort)
 
+# 9.3: every refused lock vector declares the valid vector it is written
+# against. The relation decides what can be asserted: `edit-of` is a small edit
+# and carries a line bound, `minimal-of` is an independently written lock of the
+# same shape and carries none. The pairing is DECLARED rather than derived
+# because deriving it by smallest diff picked a mica-build-env shape against an
+# offline mica-core lock (2026-09-20).
+DERIV="$V/derived-from.tsv"
+[ -s "$DERIV" ] || fail "$DERIV is missing or empty"
+declared=()
+while IFS=$'\t' read -r vector relation sibling; do
+    case "$vector" in '#'*|'') continue ;; esac
+    declared+=("$vector")
+    CHECKS=$((CHECKS + 1))
+    [ -f "$V/$vector" ] || fail "derived-from.tsv names $vector, which does not exist"
+    [ -f "$V/$sibling" ] || fail "$vector: sibling $sibling does not exist"
+    is_listed "$sibling" || fail "$vector: sibling $sibling is not a listed vector"
+    changed=$(diff <(cat "$V/$sibling") <(cat "$V/$vector") | grep -c '^[<>]' || true)
+    case "$relation" in
+        edit-of)
+            [ "$changed" -gt 0 ] || fail "$vector: identical to its sibling $sibling"
+            [ "$changed" -le 2 ] || fail "$vector: $changed changed lines against $sibling, more than an edit-of allows" ;;
+        minimal-of)
+            [ "$changed" -gt 0 ] || fail "$vector: identical to its sibling $sibling" ;;
+        *) fail "$vector: unknown relation '$relation'" ;;
+    esac
+done <"$DERIV"
+
+while IFS= read -r vector; do
+    CHECKS=$((CHECKS + 1))
+    listed_in_derivation=1
+    for candidate in "${declared[@]}"; do
+        [ "$candidate" = "$vector" ] && listed_in_derivation=0
+    done
+    [ "$listed_in_derivation" = 0 ] || fail "$vector declares no derivation in derived-from.tsv"
+done < <(cd "$V" && find lock/refused -name '*.lock' | sort)
+
 if [ "$FAIL" -gt 0 ]; then
     echo "tools/docs/verify-release-lock.sh: $FAIL FAILED, $((CHECKS - FAIL)) passed" >&2
     exit 1

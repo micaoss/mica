@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-20 14:05 [spec]
+
+**The cheap first part is done: every refused vector now declares the valid
+one it is written against**, in `vectors/derived-from.tsv` (`release-lock.md`
+9.3) — **not** as a fifth column in `expected.tsv`, which five repositories
+parse and would have had to tolerate on the morning they were told to pin it.
+The gate asserts that every refused lock vector has a row, that each sibling
+exists and is itself a listed vector, that none is identical to its sibling,
+and the `edit-of` line bound.
+
+**And writing it down corrected this section's own claim.** It said *each a
+minimal edit of a valid lock*; measured, **four of the 48 are not edits at
+all** — `column-count`, `image-platform`, `package-without-pool` and
+`unsorted` are independently written minimal locks of the same shape. They now
+declare `minimal-of`, where the sibling names the **shape** rather than the
+source text and no line bound applies; the other 44 declare `edit-of` with a
+bound of two changed lines.
+
+The pairing is **declared rather than derived** for the reason measured an
+hour ago: deriving it by smallest diff matched a `mica-build-env` shape
+against an offline `mica-core` lock. A fixture's intent lives only in whoever
+wrote it, which is the same category as a provenance line and the same
+argument for writing it down.
+
 ## 2026-09-20 14:01 [progress]
 
 **The remaining half of the vector audit has a shape now, measured rather than
