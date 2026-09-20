@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-20 08:09 [finding]
+
+**The third acceptance clause is not unproven, it is FALSE as of 2026-09-20.**
+B ran end to end for the first time and failed: the three producers build from
+source in 589, 589 and 653 seconds — eleven minutes, the good news — and then
+`tools/local-pins.sh` cannot pin what they built,
+`FileNotFoundError: mica-boards/_out/boards/cx3576/outputs.tsv`. A **contract
+mismatch**, not a bug in either tool: `local-pins.sh` expects the layout an
+assembled, fetched bundle has; `mica-boards`' `make offline` produces
+component trees with no `outputs.tsv`, because there it is a *source* file
+travelling inside the board component. Both internally consistent, **the same
+path describing different things, and nothing comparing them.**
+
+**So the record carries a third state and the word matters.** *Pending* reads
+as *it will close itself*; *open because* reads as *it works and lacks a
+proof*; neither is true of a tool that cannot produce a product. **B is
+answered and negative** — nobody records *the offline chain works* on any
+reading today — and **A is unreachable rather than unverified**, since a
+workspace cloned at the release commits fails at the same seam: the seam has
+nothing to do with which commits the checkouts hold.
+
+**And the part that belongs to these records: `make os-offline-chain-test`
+runs on every push and passes, over a fixture workspace that does not reach
+the seam.** A suite named after the offline chain was green while the offline
+chain could not complete. In `mica-build`'s words, kept verbatim: **a test
+over a fixture that does not reach the seam is the same shape as a gate that
+never boots an image — it proves the parts and not the join, and the join is
+where the defect lives.**
+
+**Second instance of *a name is an aperture*, recorded beside the first**, and
+the pair says what neither says alone: the FIT-lifecycle suite that boots
+nothing and the offline-chain test that never runs the chain are **both suites
+nobody had run to the end**. The name was not merely a bad aperture — **it is
+what made running the thing feel unnecessary.** One was found by reading and
+one by failing, which makes them a hypothesis and an observation rather than
+two of a kind.
+
 ## 2026-09-20 08:06 [decision]
 
 **A justification is removed and no check is** *(user, 2026-09-20)*:

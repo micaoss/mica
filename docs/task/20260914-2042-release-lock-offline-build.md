@@ -31,6 +31,35 @@ Moving the repositories to the release lock format
 
 ## Notes
 
+- 2026-09-20, later: **the clause is not unproven, it is FALSE.** B ran to the
+  end for the first time and failed. The three producers build from source in
+  589, 589 and 653 seconds — eleven minutes, and that is the good news — and
+  then `tools/local-pins.sh` cannot pin what they built:
+  `FileNotFoundError: mica-boards/_out/boards/cx3576/outputs.tsv`.
+
+  **A contract mismatch rather than a bug in either tool**, with both sides
+  read rather than one inferred from the other: `local-pins.sh` expects the
+  layout an **assembled, fetched** board bundle has, and `mica-boards`'
+  `make offline` produces **component trees** with no `outputs.tsv`, because
+  there `outputs.tsv` is a *source* file that travels inside the board
+  component. Both internally consistent, **describing different things by the
+  same path, and nothing compares them.**
+
+  So the states, in the words that distinguish them: **B is answered and
+  negative** — nobody records *the offline chain works*, on any reading, as of
+  today. **A is not merely unverified, it is unreachable**: a workspace cloned
+  at the release commits fails at the same seam, because the seam has nothing
+  to do with which commits the checkouts hold. A cannot be scheduled until the
+  seam is repaired, and the ruled direction is that `mica-boards`' offline
+  build assembles a bundle **the way a release does**, so the offline artefact
+  is the same *shape* as what a consumer fetches — otherwise A compares two
+  differently-shaped things and is unstateable.
+
+  *Open* would have been the wrong word here, and this is the third state:
+  *pending* reads as *it will close itself*, *open because* reads as *it works
+  and lacks a proof*, and neither is true of a tool that cannot produce a
+  product.
+
 - 2026-09-20: **the third acceptance clause is open because the tool does one
   thing and the clause says another**, which is a different state from
   *waiting for a run*. `mica-build:tools/offline-chain.sh` builds each

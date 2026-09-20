@@ -156,6 +156,23 @@ established by reading every suite, not by trusting the one named for it. A
 negative claim inherits the aperture of the query that produced it, whether
 the aperture was a filter, a file or a name.
 
+**A name is an aperture, and the second instance says what the first could
+not** *(2026-09-20, `mica-build`, reached from a failure rather than from this
+record)*. `make os-offline-chain-test` runs in `ci.yml` on every push and
+passes, over a **fixture workspace that does not reach the seam** — so a suite
+named after the offline chain was green while the offline chain could not
+complete. Its general form, which is worth keeping in its words: **a test over
+a fixture that does not reach the seam is the same shape as a gate that never
+boots an image — it proves the parts and not the join, and the join is where
+the defect lives.**
+
+What the pair says that neither says alone: **both suites named after the
+thing they did not do are suites nobody had run to the end.** The name was not
+merely a bad aperture — **it is what made running the thing feel
+unnecessary.** One of the two was found by reading and one by failing, which
+by the pairing rule is a hypothesis and an observation rather than two of a
+kind ([doc-contract](../user/doc-contract.md) section 6).
+
 **Identical wrong bytes are a pass.** The shared component-contract fixtures
 are diffed byte for byte between `mica-core` and `mica-build`; on the board
 rename both sides said `x64`, they agreed exactly, and the check passed. That
