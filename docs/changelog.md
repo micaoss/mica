@@ -2,6 +2,40 @@
 
 ## 2026-09-20 07:52 [decision]
 
+**Three more user answers recorded, each where it changes something.**
+
+**Container features — the rule is uniform behaviour.** *"需要加上完善容器的特性，
+除非内核不支持，不然要统一行为"*: the gaps are **closed rather than declared** —
+`MEMCG` on `uefi-x64`, `CFS_BANDWIDTH` on both UEFI boards, `IOSCHED_BFQ`
+where missing — and that settles the ordering question the
+feature-declaration task was holding: **the refusal goes in after the gaps
+close, when it blocks nothing.** A gate turned on against a clean tree is a
+gate nobody argues about; one turned on against a tree it fails is a
+negotiation about exceptions, and the exceptions outlive the negotiation.
+
+**Mirroring the locks — approved, and recorded as a scope amendment rather
+than as a recommendation.** *"按你推荐处理，可以加"* reverses the 2026-09-16
+scope **for locks only**: locks and `SHA256SUMS` move into the mirror, and
+**the pools, the board components and the device update service do not**. The
+price keeps its limit in the same paragraph — under 5 MB against 1.8 GB, 150
+to 250 lines inside the existing `sync.yml`, and **the chain from the mirror
+ends at the lock, whose `package` rows point into pools nothing mirrors: it
+makes the binding survivable, not the packages.** The hold's condition is
+unblocked in one direction only and still cannot collapse to one row.
+
+**`uefi-arm64` gets a framebuffer back**, *"arm64也加回去framebuffer"* — and
+`docs/design/access.md` is **not edited yet**, deliberately.
+`docs/task/20260920-0752-uefi-arm64-framebuffer.md` carries the pending edit:
+`mica-boards` is pricing display **and** input together, because a logo nobody
+can type under is half a decision and the +6.8% was the display half alone.
+When it lands the claim changes from *cannot, by construction* to *can, as of
+`<release>`*, and the clean case — a capability absent and a declaration
+absent, agreeing — is **marked as having been one rather than deleted**: it
+stopped being an example because the capability came back, not because the
+reasoning was wrong.
+
+## 2026-09-20 07:52 [decision]
+
 **Release deletion is answered, and the answer is usable because the question
 was.** The user allowed it on 2026-09-20 — *"可以删除，现在还是开发阶段"* — for
 two cases: a release whose assets are absent because its workflow failed, and

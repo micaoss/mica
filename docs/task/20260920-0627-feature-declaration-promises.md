@@ -32,6 +32,21 @@ Whether it belongs in `docs/design/` beside the build contract or in a
 decision with the mapping's own shape is decided when the proposal exists.
 Nothing is pre-empted here, and no mapping is written in this repository.
 
+## Answered: the rule is uniform behaviour
+
+*"需要加上完善容器的特性，除非内核不支持，不然要统一行为"* (user, 2026-09-20):
+**the container features are completed, and behaviour is uniform across boards
+unless a kernel cannot support it.** So the gaps found by measuring are
+**closed rather than declared**: `MEMCG` on `uefi-x64`, `CFS_BANDWIDTH` on
+both UEFI boards, `IOSCHED_BFQ` where it is missing. `mica-boards` has that
+round.
+
+That also settles the order of the mechanism this task is about. **The
+refusal goes in after the gaps close, when it blocks nothing.** A gate turned
+on against a clean tree is a gate nobody has to argue about; one turned on
+against a tree it fails is a negotiation about exceptions, and the exceptions
+outlive the negotiation.
+
 ## The limit the mechanism states about itself
 
 `mica-boards` wrote the limit of its own capability mechanism into the

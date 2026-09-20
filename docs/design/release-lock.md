@@ -492,6 +492,20 @@ counts, not which repository produced it.
 about the version index: the published `mica.20260920-0636` index carries no
 `mirrors` member at all. The numbers above come from the mirror's catalogue.)*
 
+**Scope amended for locks only** *(user, 2026-09-20: "按你推荐处理，可以加")*.
+The accepted scope of 2026-09-16 put release locks and `SHA256SUMS` *out of
+scope and not to be re-added*; that part is reversed and they move into the
+mirror. **What did not move: the pools, the board components and the device
+update service.** So the table above changes in exactly one row when the work
+lands, and the two `NOTHING` rows that matter for retention stay as they are.
+
+The price, with its limit in the same paragraph because the price is what
+makes someone want to say yes quickly: under **5 MB** against the 1.8 GB
+already held, and 150 to 250 lines with tests inside the existing `sync.yml`,
+no new workflow and no new credential — and **the chain from the mirror ends
+at the lock, whose `package` rows point into pools nothing mirrors. It makes
+the binding survivable, not the packages.**
+
 So the current state, with its condition stated rather than left open-ended:
 `20260915-0138` stays and nothing is pruned; its images become prunable once
 they are mirrored **and** a consumer has been shown to read them from the

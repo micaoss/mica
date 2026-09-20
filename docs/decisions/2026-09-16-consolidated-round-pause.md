@@ -72,8 +72,15 @@ board components and the locks *out of scope and not to be re-added*
 pools are never pruned while nothing mirrors them, or that scope is changed
 and the condition waits on the mirroring.
 
-**Mirroring the locks is priced, and it is a scope reversal rather than a
-recommendation anyone can act on**: under 5 MB against the 1.8 GB already
+**Mirroring the locks was approved by the user on 2026-09-20** ("按你推荐处理,
+可以加"), which reverses the 2026-09-16 scope **for locks only** — the pools,
+the board components and the device update service stay out. It does not
+unblock the hold's condition: locks become mirrored and **pools do not**, so
+the per-artefact condition still cannot collapse into one row
+([release-lock](../design/release-lock.md) 2.1).
+
+**The price, and it was a scope reversal rather than a recommendation anyone
+could act on**: under 5 MB against the 1.8 GB already
 held, and 150 to 250 lines with tests inside the existing `sync.yml` — no new
 workflow, no new credential, since the enumerator already downloads every
 producer lock it reads, and the `mica-pin v1` digest makes publishing a
