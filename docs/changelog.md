@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-20 16:36 [finding]
+
+**A reading that is the arithmetic consequence of its input carries its own
+corroboration.** `--memory=64m` producing `memory.max=67108864` and
+`--cpus=0.5` producing `cpu.max=50000 100000` are one fact checked twice: a
+number no instrument could have guessed from outside cannot be produced by an
+instrument that is not looking at the thing. That is *what would this print if
+the claim were false* answered **inside one measurement** rather than across
+two — which is why a single run of the third version is stronger evidence than
+two earlier versions were in an evening of agreeing with the configs. **Prefer
+an output derived from its input over a state word**: `absent`, `present` and
+`ok` are producible by an instrument pointed at nothing.
+
+**And the reason these records keep both timestamps rather than the current
+state**: a page rewritten to the later fact teaches the next reader nothing,
+while a page that shows a sentence being true and then not true in four
+minutes teaches them to put a time on theirs. **The first is a correct page;
+the second is a page that changes behaviour.** Both sentences had been said in
+messages and neither was in a record, which is the day's own rule turned on
+itself — a sentence that lives in a message is not an instrument.
+
 ## 2026-09-20 16:33 [finding]
 
 **Three of the five ceilings are enforced, measured inside a running

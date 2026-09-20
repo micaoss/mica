@@ -258,6 +258,17 @@ English source.
   measurement usually stops**, so the question to ask of an arriving rule is
   the one you would ask of your own: how many instances, and did any of them
   come from somewhere that could have disagreed?
+- **Do not rewrite a page to the later fact when the earlier one taught
+  something** *(2026-09-20)*. A claim was published at 16:24 with its subject
+  named — a re-pin that answered 422 at `origin` — and by 16:28 the push had
+  landed and the same sentence was stale. The page keeps **both timestamps**
+  rather than the current state alone, and the reason is not only honesty: **a
+  page rewritten to the later fact teaches the next reader nothing, while a
+  page that shows a sentence being true and then not true in four minutes
+  teaches them to put a time on theirs.** The first is a correct page; the
+  second is a page that changes behaviour. Where the superseded reading
+  carried no lesson, drop it and date the new one — this is not an argument
+  for keeping every stale sentence.
 - **Where no instrument exists, a named person with a deadline is the
   substitute — and the failure mode to avoid is neither** *(2026-09-20)*: a
   page waiting on a repair nobody promised. Today produced four instruments

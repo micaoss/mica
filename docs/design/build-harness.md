@@ -49,6 +49,19 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**A reading that is the arithmetic consequence of its input carries its own
+corroboration** *(2026-09-20)*. `--memory=64m` producing `memory.max=67108864`
+and `--cpus=0.5` producing `cpu.max=50000 100000` are not two facts; they are
+one fact checked twice, because **a number no instrument could have guessed
+from the outside cannot be produced by an instrument that is not looking at
+the thing**. That is the falsifiability question — *what would this print if
+the claim were false* — answered **inside a single measurement** rather than
+across two, and it is why that one reading is stronger evidence than two
+earlier versions of the same check were in an evening of agreeing with the
+configs. **Prefer a check whose output is derived from its input over one
+whose output is a state word**: `absent`, `present` and `ok` are producible by
+an instrument pointed at nothing.
+
 **Print what the verdict depends on, beside the verdict** *(2026-09-20)*. A
 product probe reported `cpu.max absent` from a cgroup where the file exists
 only if delegation has been asked for; the same output also printed
