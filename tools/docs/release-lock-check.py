@@ -34,7 +34,9 @@ class Refused(Exception):
 # collection and the caller says so -- because a mode that hunts extra rules
 # must never be able to invent one.
 SUPPRESS = set()
-STRUCTURAL = {"header", "encoding", "kind-unknown", "column-count"}
+# `release-row` joins them because everything after it reads rows[0] as the
+# release: suppressing it does not leave a readable file either.
+STRUCTURAL = {"header", "encoding", "kind-unknown", "column-count", "release-row"}
 
 
 def refuse(rule):

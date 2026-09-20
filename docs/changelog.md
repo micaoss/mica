@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-20 14:26 [progress]
+
+**Two of the seven unknowns were a misclassification, not a limit: 45
+isolating, 6 pairs, 5 unknown.** `release-row` belongs with the structural
+refusals — everything after it reads `rows[0]` as the release, so suppressing
+it leaves no readable file, exactly like a bad header or a wrong column count.
+Classified, the two vectors that had stopped early now report their single
+rule cleanly.
+
+The five that remain stop for the reason the mode exists to respect:
+suppression walks into code the skipped check was protecting — a reference
+whose registry is wrong, an index row source, a digestless reference, an
+update kind. They are still reported as **unknown rather than clean**, which
+is the property that made the first run trustworthy.
+
 ## 2026-09-20 14:25 [spec]
 
 **The multiset argument is stated as its author states it — a theorem about

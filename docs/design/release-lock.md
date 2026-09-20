@@ -1199,13 +1199,16 @@ must never be able to invent one — and the default single-rule path is
 untouched, which the 298 existing checks prove.
 
 The first pass over the 56 refused vectors found **40 isolating the rule they
-name, 9 breaking more than one and 7 stopping early**. Three of the nine were
+name, 9 breaking more than one and 7 stopping early**; classifying
+`release-row` as structural — everything after it reads `rows[0]` as the
+release, so suppressing it leaves no readable file either — turned two of
+those stops into clean single-rule reports, and the set stands at **45
+isolating, 6 pairs, 5 unknown**. Three of the nine were
 **consequential** — changing a field that is part of the sort key moved the
 row out of order, so `sort-order` fired as well, which the named defect never
 required. All three are repaired (`lock/refused/image-source`,
 `lock/refused/image-source-reference`, `upstream/refused/repository-source`),
-each still refusing the rule it names, and the set now stands at **43
-isolating, 6 pairs, 7 unknown**.
+each still refusing the rule it names.
 
 The six that remain are **inherent pairs**, and the record is the pair rather
 than a repair:
