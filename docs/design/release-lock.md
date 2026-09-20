@@ -977,6 +977,26 @@ and the same argument for writing it down. Rows are
   this section used to say *each a minimal edit of a valid lock* and four
   vectors were never that.
 
+**Minimality is measured rather than assumed, in one set.**
+`mica-system-base` ran the procedure over all 56 of its `refused/` fixtures
+and proved that **each is one hunk from a valid file** — *not* that each tests
+the rule it names, since reverting a single hunk returns the valid file and
+re-parsing it cannot fail. What it does establish is the precondition this
+section exists to record: **no vector in that set carries incidental
+differences beyond its defect**, so a declaration here records something true
+rather than aspirational.
+
+**And where the row multiset is identical, order is the only rule a vector can
+break** — an argument about what *cannot* differ rather than about what a
+re-parse returns, and the only form that reaches the ambiguity question
+without a report-every-rule mode. Measured here: `lock/refused/unsorted.lock`
+and `lock/refused/release-not-first.lock` hold exactly their sibling's rows in
+a different order, so each is **provably single-rule**. Applying it to
+`upstream/refused/unsorted.lock` found the opposite and fixed it: it was
+missing a **comment line** its sibling carries — an incidental difference,
+breaking no rule and breaking the argument. With the comment restored its
+multiset matches and it, too, can only be refused for order.
+
 **The pairing is declared rather than derived**, because deriving it by
 smallest diff matched `image-platform.lock`, a `mica-build-env` shape, against
 `offline-mica-core.lock`. `make docs-verify` asserts every refused vector has
@@ -1005,6 +1025,17 @@ CR, not UTF-8), `pin-format` (any other key set or order) and `field-value`
 (a repository name or commit outside its form). Six vectors under
 `vectors-pin/` prove them.
 
+**Do not pin a known defect *silently*** *(`mica-system-base`, 2026-09-20,
+correcting *do not pin a commit that contains one*)*. Removing the pin does
+not remove the artefact — the copy carries those bytes either way, and
+unpinned it carries them **unverifiably** — and moving a pin is a one-line
+change, which is the same argument the uniform basename rests on. So a
+repository that must pin a commit carrying a known defect **names the defect
+in the pin file, above the keys**, with the mechanism a later reader needs:
+**a pin is a statement about one commit and never about the newest one, so the
+gate will not notice the repair on its own.** **A named defect under a gate
+beats an unnamed one under nothing.**
+
 **The basename is uniform and the directory is not**, which is the whole point
 of fixing it: finding each reader's copy was named as the hard part of ever
 gating this, and a uniform basename makes that **one command per repository**
@@ -1032,6 +1063,11 @@ because something did — read out of two files, a check that was impossible
 that morning. `mica-system-base` went further and wrote the defect into its
 pin's own comment, so its pin records *why* it is at that commit rather than
 only which.
+
+**Why one row of the pair was hit and the other was not, which is invisible
+until stated**: the `arm64` row beside it is `bun-linux-aarch64.zip` and is
+**correct**, because *aarch64* contains no *x64* substring. One sweep, one
+line caught, one missed, for a reason nobody could see by reading the result.
 
 It survived four days for a structural reason rather than a careless one: **a
 vector's URL is inert by design.** Nothing downloads it, so no gate can

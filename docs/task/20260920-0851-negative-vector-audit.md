@@ -79,6 +79,20 @@ So the harness needs a fixture-format change rather than a script:
    earlier ones passed, and a half-converted version would report rule pairs
    that are artefacts of its own ordering — the false-alarm shape.
 
+**And a third technique reaches part of the question with no harness at all**:
+argue about **what cannot differ**. Where a refused vector's row multiset
+equals its sibling's, order is the only rule it can break, so it is provably
+single-rule — true of `lock/refused/unsorted.lock` and
+`lock/refused/release-not-first.lock`, and made true of
+`upstream/refused/unsorted.lock` by restoring a comment line it was missing.
+The same shape covers any rule whose inputs are a property of the row set.
+
+**The signal the harness would automate is not *repair → valid*, it is *a
+second rule surviving the repair*.** `mica-core`'s `other-kind.lock` is the
+proof and it needs no re-parse: two repositories hold the same fixture, one
+with `pool.amd64.x`, and **that one would still have been refused after the
+same repair**. Same fixture, two trees, one of them testing nothing.
+
 Neither is an afternoon, and neither is blocked. What is done is the cheap
 half, which found a real gap.
 

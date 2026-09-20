@@ -1,5 +1,43 @@
 # Changelog
 
+## 2026-09-20 14:10 [finding]
+
+**A technique borrowed, applied, and it found something in the canonical
+set.** `mica-system-base`'s argument — where a refused vector's **row multiset
+equals its sibling's, order is the only rule it can break** — is about what
+*cannot* differ rather than about what a re-parse returns, and it is the only
+form that reaches the ambiguity question without a report-every-rule mode. Run
+here: `lock/refused/unsorted.lock` and `lock/refused/release-not-first.lock`
+are provably single-rule. `upstream/refused/unsorted.lock` was **not**, and
+the reason was an incidental difference — it was missing a **comment line**
+its sibling carries. Restored; its multiset now matches and it too can only be
+refused for order.
+
+**The pin rule is corrected to `mica-system-base`'s, which is better than the
+one it replaces**: **do not pin a known defect *silently*.** Removing a pin
+does not remove the artefact — the copy carries those bytes either way and
+**unpinned it carries them unverifiably** — and moving a pin is a one-line
+change. So the defect is named in the pin file above the keys, with the
+mechanism a reader needs: **a pin is a statement about one commit and never
+about the newest one**, so the gate will not notice the repair on its own. **A
+named defect under a gate beats an unnamed one under nothing.**
+
+**And the asymmetry nobody had explained is in beside the `bun` paragraph**:
+the `arm64` row was never hit because **`aarch64` contains no `x64`
+substring**. One sweep, one line caught, one missed, for a reason invisible
+until stated.
+
+**What `mica-system-base`'s 56-of-56 pass does and does not prove** is
+recorded with the distinction rather than the headline: it proved **each
+fixture is one hunk from a valid file**, not that each tests the rule it
+names, since reverting one hunk returns the valid file and the re-parse cannot
+fail. What it establishes is the **precondition** `derived-from.tsv` exists to
+record — no incidental differences beyond the defect — so the declaration
+records something true rather than aspirational. And the signal a harness
+would automate is now stated correctly: **not *repair → valid*, but *a second
+rule surviving the repair***, which `mica-core`'s two copies of one fixture
+demonstrate without any re-parse.
+
 ## 2026-09-20 14:08 [finding]
 
 **A line in these records was wrong and is corrected: the fix did not beat the
