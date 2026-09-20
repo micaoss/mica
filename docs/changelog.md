@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-20 16:07 [finding]
+
+**The row written so that green is the defect and red is the fix went red four
+minutes later, and the reader of the red deleted it.** `mica-boards` `8e6c3ba`
+(16:04Z) repaired the denied request while the CI run that reported it was
+still going: `uefi-x64`'s recorded config now carries both symbols off, and
+the floor names the **selector** — `# CONFIG_NET_CLS_CGROUP is not set` —
+because a selected symbol cannot be switched off directly. The claims file
+keeps a plain row guarding that line, where a red means a regression in the
+ordinary sense, and records the four-minute life of the inverted one.
+
+**The missing loop landed with the repair, and two of its choices are worth
+copying.** For every `# CONFIG_X is not set` line in either fragment, the
+board's kernel build refuses if the resolved config holds any `CONFIG_X=`
+line — **and refuses again if it read zero off-lines**, so a loop that asserts
+nothing cannot pass. And it asserts *no line turns it on* rather than
+requiring the literal `is not set`, because a symbol whose dependencies are
+unmet does not appear in a resolved config at all: **absence and an explicit
+off are both off, and only one of them is a line.**
+
+**What survives the repair is the finding, not the symbol.** A floor that
+never asserted its negative lines was right eight times out of nine by luck,
+and nothing in the output distinguished the eight from the one. The nineteen
+requests `uefi-arm64` carried were deleted rather than restated in the same
+commit, on the same ground: a request a file cannot grant is not a record of a
+decision.
+
 ## 2026-09-20 16:04 [finding]
 
 **A fourth subject, and it is the one that cannot carry its own name: the

@@ -597,14 +597,13 @@ whichever way the symbol goes, because nobody chose it.
 request and not a fact.** kconfig turns a symbol back on the moment something
 enabled `select`s it, and the floor's **positive** lines are asserted against
 the resolved config while its **negative** lines were never asserted against
-anything, on any board. Measured here across the two boards whose resolved
-output is recorded: of the nine symbols the floor asks to be off, **eight are
-off on both and one is not** — `uefi-x64` ships `CONFIG_CGROUP_NET_CLASSID=y`,
-because `CONFIG_NET_CLS_CGROUP=y` in the x86_64 defconfig selects it and the
-arm64 defconfig does not have it. **Two boards, one floor line, and the answer
-differs because of a file neither repository wrote** — nothing in the floor
-mentions `NET_CLS_CGROUP` at all, verified at `mica-boards` `f3ff004`, which
-is that repository's `main` as this is written.
+anything, on any board. Measured here at 16:00 on 2026-09-20, across the two
+boards whose resolved output is recorded: of the nine symbols the floor asked
+to be off, **eight were off on both and one was not** — `uefi-x64` carried
+`CONFIG_CGROUP_NET_CLASSID=y`, because `CONFIG_NET_CLS_CGROUP=y` in the x86_64
+defconfig selects it and the arm64 defconfig does not have it, while nothing
+in the floor mentioned `NET_CLS_CGROUP` at all. **Two boards, one floor line,
+and the answer differed because of a file neither repository wrote.**
 
 **And the result is the eight rather than the one.** A floor that never
 asserted its negative lines was **right eight times out of nine by luck**, and
@@ -620,22 +619,32 @@ asserted against the resolved config, `is not set` was a line in an input that
 nothing checked. That is the input-versus-output distinction this section
 draws twice already, arriving a third time **inside a single file**.
 
-*(The exposure is the claim rather than the behaviour: `CGROUP_NET_CLASSID` is
-cgroup v1 `net_cls`, which a v2-only system cannot reach — compiled in and
-unreachable. And the repair is a loop `mica-boards` is writing, refusing when
-the resolved config carries any `CONFIG_X=` line for a symbol the floor asks
-to be off, held until the selector is turned off because the assertion would
-turn CI red on both UEFI boards, correctly.)*
+*(The exposure was the claim rather than the behaviour: `CGROUP_NET_CLASSID`
+is cgroup v1 `net_cls`, which a v2-only system cannot reach — compiled in and
+unreachable.)*
+
+**Repaired at `mica-boards` `8e6c3ba` (2026-09-20 16:04Z), four minutes after
+this was written, and the repair is the mechanism rather than the symbol**:
+the floor now names the **selector** off — `# CONFIG_NET_CLS_CGROUP is not
+set` — because a selected symbol cannot be switched off directly, and
+`uefi-x64`'s recorded config carries both off. The missing loop landed with
+it: for every `# CONFIG_X is not set` line in either fragment, the board's
+kernel build refuses if the resolved config holds any `CONFIG_X=` line, **and
+refuses again if it read zero off-lines**, so a loop that asserts nothing
+cannot pass. Its own precision is worth copying: it asserts *no line turns it
+on* rather than requiring the literal `is not set`, because a symbol whose
+dependencies are unmet does not appear in a resolved config at all — **absence
+and an explicit off are both off, and only one of them is a line.**
 
 **A line that reads as a decision and is not granted cannot be wrong in a way
 anybody notices**, which is the same shape as a citation nobody can resolve
 and an assurance nobody can test, now in kconfig. `uefi-arm64`'s board
-fragment carries nineteen more of them — the display-trim helpers `DRM_PANEL`,
+fragment held nineteen more of them — the display-trim helpers `DRM_PANEL`,
 `DRM_BRIDGE`, `EXTCON`, `NVMEM`, the PHYs — left behind after that board
 learned the mechanism the expensive way: **a helper cannot be switched off,
-you have to name off the drivers that select it**. They are being deleted
-rather than restated, because a request a file cannot grant is not a record of
-a decision.
+you have to name off the drivers that select it**. Deleted rather than
+restated in the same commit, because a request a file cannot grant is not a
+record of a decision.
 
 **And the floor states the distinction this section needs everywhere:
 `PSI` on is the capability; running `systemd-oomd` and setting those keys is a
