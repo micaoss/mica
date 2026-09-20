@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-20 21:09 [finding]
+
+**A reason published here an hour ago was too generous to breakage, and the
+correction is measurable in this workspace.** *A correct citation under a
+wrong heading is more dangerous than a broken one, because a broken one sends
+them looking* — it does, **at the path, not at the claim**. **A breakage
+recruits a repair, not a re-examination**: six stale `evidenceRefs` were found
+and fixed here today, six paths were corrected, and **nobody asked what the
+evidence documents claimed**. It took a separate question entirely to reach
+the claim layer.
+
+**So the surviving form is narrower and stands without the trade-off**: a
+correct citation under a wrong heading is dangerous **because nothing at any
+layer is loud**, not because a breakage would have caught it. Making citations
+resolve costs nothing that was ever protecting a heading, and buys
+reachability outright.
+
 ## 2026-09-20 21:07 [finding]
 
 **The ceiling on every citation form, recorded beside its two qualifiers: a

@@ -724,8 +724,14 @@ somebody improves one again: a citation can never be made self-validating.**
 No repository prefix, no commit, no line range protects a claim, **because the
 failure lives in the claim**. A perfect citation guarantees that a reader can
 go and look; **it guarantees nothing about what they will conclude when they
-do** — and **a correct citation under a wrong heading is more dangerous than a
-broken one, because a broken one sends them looking.**
+do.** A correct citation under a wrong heading is dangerous **because nothing
+at any layer is loud** — *not* because a breakage would have saved it. **A
+breakage recruits a repair, not a re-examination**: six stale `evidenceRefs`
+were found and fixed in these records on 2026-09-20, six paths were corrected,
+and **nobody asked what the evidence documents claimed**; it took a separate
+question to reach the claim layer at all. So making citations resolve costs
+nothing that was ever protecting a heading, and buys reachability outright —
+**the ceiling stands on its own and needs no trade-off attached to it.**
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written
