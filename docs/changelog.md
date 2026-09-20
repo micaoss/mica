@@ -1,5 +1,43 @@
 # Changelog
 
+## 2026-09-20 17:07 [finding]
+
+**The sweep rule landed an hour ago was incomplete in this tree, and the
+qualifier is what keeps it from becoming a demand for guesses: a sweep
+requires a key.** The rename defect had one — the string `x64`, and one `grep`
+found eight siblings. *Which incidental property of a valid example is
+somebody treating as required* is **not a query**, so *sweep the rest* means
+guess eight times. **This sweep should have happened** and **this sweep is not
+available** are two different statements, and a rule that cannot tell them
+apart arrives as a process instead of as a class.
+
+**What replaces it is a habit with a trigger, and the inversion is the useful
+part: the invention is the specification for the fixture that disproves it.**
+A reader who invents a rule has done the hard half — they have named precisely
+which incidental property looked required — and the fixture costs two rows.
+**A defect that specifies its own repair is the cheapest kind there is**, and
+that specification cannot be obtained any other way, because nobody can
+enumerate in advance what a future reader will over-read.
+
+## 2026-09-20 17:07 [finding]
+
+**The sweep rule landed an hour ago was incomplete in this tree, and the
+qualifier is the half that keeps it from becoming a demand for guesses: a
+sweep requires a key.** The rename defect had one — the string `x64`, and one
+`grep` found eight siblings. *Which incidental property of a valid example is
+somebody treating as required* is **not a query**, so *sweep the rest* means
+guess eight times. **This sweep should have happened** and **this sweep is not
+available** are two different statements, and a rule that cannot tell them
+apart arrives as a process instead of as a class.
+
+**What replaces it is a habit with a trigger, and the inversion is the useful
+part: the invention is the specification for the fixture that disproves it.**
+A reader who invents a rule has done the hard half — they have named precisely
+which incidental property looked required — and the fixture costs two rows.
+**A defect that specifies its own repair is the cheapest kind there is**, and
+that specification cannot be obtained any other way, because nobody can
+enumerate in advance what a future reader will over-read.
+
 ## 2026-09-20 17:05 [finding]
 
 **Two independent readers got the `data` row wrong in opposite directions,

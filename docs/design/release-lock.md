@@ -249,7 +249,13 @@ this corpus with no defence against being generalised from, which is why
 `lock/valid/data-file-form.lock` now carries `data` files named nothing like
 their keys — one fixture makes that invention impossible. *(The same argument
 reaches every valid vector here, and widening it is a design question rather
-than this section's fix.)* The instance it was approved for is
+than this section's fix — nobody can enumerate in advance what a future reader
+will over-read. What replaces a sweep is a **habit with a trigger**: **the
+invention is the specification for the fixture that disproves it.** A reader
+who invents a rule has done the hard half — they have named precisely which
+incidental property looked required — and the fixture costs two rows. **A
+defect that specifies its own repair is the cheapest kind there is**, and that
+specification cannot be obtained any other way.)* The instance it was approved for is
 `mica-system-base`'s list of the paths in its root that no package owns, each
 with its writer named — data a consumer needs and cannot derive.
 

@@ -217,6 +217,15 @@ English source.
   is why the sweep has to be booked at the moment of the find rather than
   after it. Third time in one day that a class was mistaken for its first
   member.
+- **And a sweep requires a key** *(2026-09-20, the qualifier the rule above
+  needs)*. The rename defect had one — the string `x64`, and one `grep` found
+  eight siblings. Where the question is *which incidental property of a valid
+  example is somebody treating as required*, **there is no query**, and
+  *sweep the rest* means **guess eight times**. So the two statements are
+  separate: *this sweep should have happened* and *this sweep is not
+  available*. Without the qualifier the rule is a demand for guesses, which is
+  the over-reach this page warns about arriving as a **process** instead of as
+  a class.
 - **A third guard, pointing the other way from those two** *(2026-09-20)*.
   The threshold and the double-counting rule both guard against **evidence
   that under-reaches** — too few instances, or the same ones spent twice.
