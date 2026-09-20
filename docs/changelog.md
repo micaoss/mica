@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 07:14 [finding]
+
+**Why `record.sh` gates after the rebase is now written in `record.sh`**, in
+its header and beside the push itself, because *gate, then push* is the
+simplification someone will make on a quiet afternoon and it would look like
+tidying. **A gate run before a rebase validates a tree that is not the tree
+you push**: the rebase replays the commit onto another session's, and the
+result is a tree nothing has checked.
+
+It is the same shape as every defect these records carry — a declaration
+proved against an **input** while nothing compares it to the **output**:
+paths in a composer, a committed kernel config against the shipped one, four
+readings of a tree before anyone read a root. This is the one place where the
+tooling already had it right before anyone had a name for the mistake, and the
+note exists so the next reader does not remove the second gate as redundant.
+
+Twice tonight a push collided with another session's, and both were harmless
+for that reason. The fact about the workspace worth keeping with it: `mica`
+has more than one writer at this hour, and what made the collisions safe was a
+gate that **distrusts its own earlier result once the tree moves underneath
+it.**
+
 ## 2026-09-20 07:11 [decision]
 
 **Why the threshold exists is now written beside the threshold**, in

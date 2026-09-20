@@ -29,6 +29,23 @@
 #   6. the commit message file is non-empty and carries no attribution line.
 # Then it commits, and pushes -- rebasing once onto origin/main and re-running
 # the gate if another session pushed first, which is the normal case here.
+#
+# THE ORDER OF THE LAST TWO STEPS IS THE POINT, NOT AN ACCIDENT: THE GATE RUNS
+# AGAIN AFTER THE REBASE. A gate run before a rebase validated a tree that is
+# not the tree being pushed -- the rebase replays the commit onto someone
+# else's, and the result is a tree nothing has checked. It is the same shape as
+# every defect these records carry: a declaration proved against an input while
+# nothing compares it to the output. `gate, then push` is the simplification
+# someone will make on a quiet afternoon because it looks like tidying; it
+# would leave every collided push unchecked, and collisions are the normal case
+# in this repository.
+#
+# THIS SCRIPT CANNOT EDIT ITSELF THROUGH `--edit`. bash reads a script
+# incrementally by byte offset, so rewriting this file while it runs shifts the
+# ground under the interpreter and the run dies with a syntax error partway
+# through (seen 2026-09-20, editing this very comment). To change this file,
+# apply the edit first and then run the `edits already made` form, which
+# rewrites nothing during the run.
 set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -93,7 +110,9 @@ done
 git add -- "${PATHS[@]}"
 git diff --cached --quiet && die "nothing staged after git add; check the paths"
 
-# 6. commit, then push, rebasing once if another session pushed first
+# 6. commit, then push. On a rejection: rebase, GATE AGAIN, push. The second
+# `make docs-verify` is over the rebased tree, which is the one that reaches
+# origin; the first proved a tree that no longer exists.
 git commit -q -F "$MESSAGE"
 if ! git push -q origin main 2>/dev/null; then
     echo "record.sh: push rejected, rebasing onto origin/main and re-running the gate" >&2
