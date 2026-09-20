@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-20 15:20 [finding]
+
+**A count that travelled out of these records and came back wrong, measured to
+the commit.** Five `upstream/refused/` fixtures were missing their sibling's
+comment line — one repaired in `0a4a13f`, four in `c4efe00`, and the third
+repair commit is a different fix (one insertion *and* one deletion per file is
+a changed value, not a restored comment line). The double count entered where
+nothing checks a number: `c4efe00`'s title says **five more** while it
+repaired **four** in that directory, and this spec gave *half of it* beside
+*five of the eight* in one sentence. **A count in a commit message is prose
+nothing checks**, and it is the form most likely to be quoted, because a title
+reads like a summary of a diff and is written before anybody reads one. The
+paragraph now names the split and the commits; `git show --stat` settled it in
+one command.
+
+**And a relayed routing was stale in the other direction**: `IOWeight=` was
+reported as reaching `io.weight` *rather than* iocost, with the io neighbours
+uniformly off. `mica-boards`' floor says the opposite and shows its work —
+`io.weight` is registered by `blk-iocost`, `io.latency` by the iolatency
+policy, `io.prio` by nothing a product can set — so `BLK_CGROUP_IOCOST` and
+`BLK_CGROUP_IOLATENCY` are on for all four boards and `IOPRIO` is off. Section
+8 said the right thing already because it was written from the fragment rather
+than from the message; it now names `io.latency` too. **The form that survived
+this is the one that states both readings and names the test**: a scatter in
+the pinned releases, a decision at `main`.
+
+**The rule it leaves behind is about the reversal, not the symbol**: a
+measurement that has been passed on is already in somebody else's page, so
+withdrawing it privately leaves everyone holding it on your authority, and
+they will not re-measure because you answered. Recorded in the documentation
+contract — **a reversal costs one sentence and is the only part of
+re-measuring that other people can act on.**
+
 ## 2026-09-20 15:17 [finding]
 
 ***Dropped* is not one mechanism, and the artefact that explains one cannot

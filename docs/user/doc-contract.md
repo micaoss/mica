@@ -231,6 +231,16 @@ English source.
   measurement usually stops**, so the question to ask of an arriving rule is
   the one you would ask of your own: how many instances, and did any of them
   come from somewhere that could have disagreed?
+- **And say so when you reverse an answer you have already given**
+  *(2026-09-20)*. Re-measuring and correcting yourself is the behaviour these
+  rules want; not announcing it is what makes the correction private. A
+  measurement that has been passed on is **already in somebody else's page**,
+  so the moment it is withdrawn, everyone still holding it is holding it on
+  your authority — and they will not re-measure, because you answered. The
+  instance: a kernel symbol's routing was reversed by a second measurement,
+  correctly, without a word, and the superseded version reached two more
+  repositories before the tree was read. **A reversal costs one sentence and
+  is the only part of re-measuring that other people can act on.**
 - **The strongest pair is one instance hypothesised and one observed**, and
   that is a better reason to keep both than *two is not three*. A rule
   designed in guards against a failure someone imagined; a rule extracted from

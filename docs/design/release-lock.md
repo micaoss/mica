@@ -1036,11 +1036,23 @@ the three `minimal-of` vectors differ by **rows**, so their reachable set is
 not a singleton by inspection, and they need the collect mode. Measured here: `lock/refused/unsorted.lock`
 and `lock/refused/release-not-first.lock` hold exactly their sibling's rows in
 a different order, so each is **provably single-rule**. Applying it to the `upstream/refused/`
-set found the opposite in **half of it**: five of the eight were missing the
-same **comment line** their sibling carries — an incidental difference,
-breaking no rule and breaking the argument, and present since those fixtures
-were written. All five are repaired, each still refuses the rule it names, and
-`upstream/refused/unsorted.lock` can now only be refused for order.
+set found the opposite in **five of the eight**, which were missing the same
+**comment line** their sibling carries — an incidental difference, breaking no
+rule and breaking the argument, and present since those fixtures were written.
+All five are repaired and each still refuses the rule it names: one in
+`0a4a13f` (`unsorted.lock`, which can now only be refused for order) and four
+in `c4efe00`. The third repair commit, `653f641`, is a different fix — one
+insertion and one deletion per file is a changed value, not a restored comment
+line.
+
+*(The split is spelled out because a count went travelling from here. This
+paragraph once gave two numbers for one set — *half of it* beside *five of the
+eight* — and `c4efe00`'s own title says **five more** while it repaired
+**four** in this directory, so the fifth was added twice and a relayed **six**
+came back a day later. **A count in a commit message is prose that nothing
+checks**, and it is the form most likely to be quoted, because a title looks
+like a summary of a diff and is written before anyone reads one. The diff is
+the measurement; `git show --stat` settled this in one command.)*
 
 **Two assertions keep it that way**, and both were proven against mutated
 copies before being trusted: a `reorder-of` whose rows differ from its sibling

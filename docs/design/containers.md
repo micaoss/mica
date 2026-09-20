@@ -511,8 +511,9 @@ another — the defconfigs differed. At `main` it is no longer a scatter but a
 decision, taken by asking of each symbol **whether a unit key a product can
 set, or a podman flag, reaches the file it creates**: `ManagedOOMSwap=` and
 `ManagedOOMMemoryPressure=` reach `/proc/pressure`, so `PSI` is on for all
-four; `IOWeight=` reaches `io.weight`, which `blk-iocost` registers, so
-`BLK_CGROUP_IOCOST` is on for all four; nothing a product can set reaches
+four; `IOWeight=` reaches `io.weight`, which `blk-iocost` registers, and
+`IODeviceLatencyTargetSec=` reaches `io.latency`, so `BLK_CGROUP_IOCOST` and
+`BLK_CGROUP_IOLATENCY` are on for all four; nothing a product can set reaches
 `io.prio`, `hugetlb.*`, `rdma.max`, `misc.max`, `net_prio.ifpriomap`,
 `net_cls.classid`, delay accounting or a `perf_event` cgroup, so those eight
 are off uniformly **with the reason recorded beside them** rather than left
