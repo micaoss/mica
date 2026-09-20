@@ -1,5 +1,54 @@
 # Changelog
 
+## 2026-09-20 15:24 [finding]
+
+**Section 8's artefact table conflated two kinds of file, and the ladder is
+four rungs rather than three.** Verified in `mica-boards`' tree: `uefi-x64`
+and `uefi-arm64` have a `make kernel-config` target that **re-records** the
+committed config from the build, so theirs is a recorded resolved output;
+`cx3576` and `s905x5m` have no such target, so theirs is a **vendor input**
+the floor is merged into at build time — **there is nothing to re-record**,
+and *not re-recorded yet* was a framing this page had taken on trust and
+published. The proof is in the file: `cx3576`'s committed config says
+`# CONFIG_SECURITY is not set` while the kernel it ships has it on, which is
+normal for an input and would be the defect the `uefi` gate catches for a
+recording.
+
+**And the rung below has a staleness hazard the measurement was taken from.**
+`_out/boards/<board>/kernel/` is an input to image assembly, so a tree that
+already exists is not rebuilt and its gates do not run: `mica-boards` measured
+an `Image` from 2026-08-31 riding every image built for the following week
+while the fragment gained dm-crypt, the eBPF/firewall/bridge floor and two
+`NF_*` symbols. Section 8 now names which instrument reads which rung, and
+records that the instrument named for the shipped `/boot/config-*` —
+`mica-build:verify/src/checks-kernel.ts` — **does not resolve at that
+repository's `main` today**.
+
+**The two world rows are renamed to what they measure**:
+`io-throttling-vendor-input.{cx3576,s905x5m}`. Calling them *unrecorded*
+implied a recording that does not exist, and the prediction table no longer
+predicts an event that will never happen.
+
+**A hazard recorded in a comment in one repository is invisible to the
+repository that will hit it.** `mica-boards` had the stale-build-tree hazard
+written in a header weeks ago; `mica-build` met it in its own tree this
+afternoon and built a guard, neither knowing of the other. That is what
+*constraints live in records* is for, and the cost of getting it wrong is that
+the second repository pays the discovery again.
+
+**Two smaller rules, both from testing a candidate rather than accepting it.**
+A matcher comparing unit patterns literally — `disable getty@.service` never
+matching `getty@tty1.service` — was offered as a third instance of *a set that
+cannot see outside its own scope*. It is not: the consequence is identical, an
+exclusion read as an absence, but the repair is not, because a matcher is a
+**bug** fixable inside the artefact while a set defining its own completeness
+or membership is **correct behaviour inside a stated scope**. So the
+documentation contract now says to sort by whatever determines the action —
+consequence for a triage, repair for a class — which is what two rules written
+the same day were doing without saying so. And, with it: **where no instrument
+exists, a named person with a deadline is the substitute, and the failure mode
+to avoid is neither.**
+
 ## 2026-09-20 15:20 [finding]
 
 **A count that travelled out of these records and came back wrong, measured to

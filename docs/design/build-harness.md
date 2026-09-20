@@ -190,6 +190,18 @@ bytes, with 3.7 MB of differing content.** A size comparison would have passed
 and recorded a no-op that was not one — neither truncated nor misaimed, just
 too coarse to see what it was asked about.
 
+**A hazard recorded in a comment in one repository is invisible to the
+repository that will hit it** *(2026-09-20)*. `mica-boards` wrote the stale
+build-tree hazard into `common/kernel/kernel-config-test.sh`'s header weeks
+ago — a `_out/` kernel tree that already exists is not rebuilt, so the gates
+over it do not run and stay green over a kernel older than the fragment they
+check — and `mica-build` met the same hazard in its own tree this afternoon
+and built a guard for it, without either knowing about the other. Two
+repositories, one hazard, one of them holding a written account of it the
+whole time. That is what *constraints live in records* is for, and the cost of
+getting it wrong is not a repeated discussion: it is that the second
+repository pays the discovery again, at whatever hour it happens to be.
+
 **And there is a kind none of these are: no aperture at all in the direction
 that mattered** *(2026-09-20, `mica-build`)*. Its copy of the
 release-lock vectors held **127 files where `mica` held 143** — sixteen

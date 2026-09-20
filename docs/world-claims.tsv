@@ -60,13 +60,22 @@ logo-policy-is-cx3576s	line	micaoss/mica-boards:boards/cx3576/package/overlay/et
 # the gate doing its job rather than a regression.
 io-throttling.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
 io-throttling.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/kernel/config/uefi-arm64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
-io-throttling-unrecorded.cx3576	line	micaoss/mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-io-throttling-unrecorded.s905x5m	line	micaoss/mica-boards:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-# The floor itself, which is the requirement rather than a build's output:
+# AND THESE TWO ARE A DIFFERENT KIND OF FILE, WHICH THEIR OLD NAME DENIED.
+# uefi-x64 and uefi-arm64 have a `make kernel-config` target that RE-RECORDS
+# the committed config from the build, so their rows above read a recorded
+# output. cx3576 and s905x5m have no such target: the file is a VENDOR INPUT
+# the floor is merged into at build time, so it is not expected to carry the
+# symbol and nothing will ever re-record it. The rows are kept because the
+# vendor input is still a fact worth watching -- if one of them starts
+# carrying it, the input changed -- but they are not the other half of the
+# rows above, and calling them "unrecorded" implied a recording that does not
+# exist.
+io-throttling-vendor-input.cx3576	line	micaoss/mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+io-throttling-vendor-input.s905x5m	line	micaoss/mica-boards:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+# The floor itself, which is the requirement rather than any build's output:
 # every board merges this fragment and asserts each =y line against its final
-# .config, so this row and the two unrecorded rows below are the same symbol
-# read at two resolutions, and they are meant to disagree until the FIT
-# configs are re-recorded.
+# .config, so this row and the two vendor-input rows above are the same symbol
+# read at two rungs of a four-rung ladder, and they are meant to disagree.
 io-throttling-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
 memcg.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_MEMCG=y	docs/design/containers.md
 cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CFS_BANDWIDTH=y	docs/design/containers.md

@@ -462,20 +462,52 @@ of every board is exactly what `locks/` names, so there is nothing to re-pin
 to, and the chain is *four board releases, then a re-pin, then a product that
 carries `memory.max`*.
 
-**So the same symbol has three answers depending on which artefact is read**,
-which is the pin-and-tree distinction at a third resolution:
+**So the same symbol has a different answer at every rung of the ladder
+between the requirement and the running kernel**, and there are four rungs,
+not two:
 
-| Artefact | What it is | `BLK_DEV_THROTTLING` today |
+| Rung | What it is | `BLK_DEV_THROTTLING` today |
 |---|---|---|
-| `common/kernel/mica-required.fragment` | the **requirement**, asserted at every board build | set, for all four boards |
-| `boards/<board>/kernel/config/…` | the **last build's output**, committed | set on `uefi-x64` and `uefi-arm64`, re-recorded with the floor; the two FIT boards are not re-recorded yet |
-| the board releases `mica-build` pins | what **ships today** | set on none |
+| `common/kernel/mica-required.fragment` | the **requirement**: merged into every board's config at build time, and every `=y` line asserted against the resolved config afterwards | set, for all four boards |
+| `boards/uefi-x64,uefi-arm64/kernel/config/…` | a **recorded resolved output** — those two boards have a `make kernel-config` target that re-records the file from the build, so a divergence is a defect their gate catches | set, re-recorded with the floor |
+| `boards/cx3576,s905x5m/kernel/config/…` | a **vendor input** — no such target exists; the file is a starting point the floor is merged into, and there is nothing to re-record | not set, and it is not expected to be |
+| `_out/boards/<board>/kernel/`, then the `/boot/config-*` the image ships | the **build tree and the shipped artefact** | absent from every board release pinned today |
 
-None of the three is stale and none contradicts another, so **every wrong
-answer a reader takes from them is defensible** — which is worse than a stale
-number, because a stale number can be caught by a date and a defensible wrong
-answer can be caught by nothing except naming the artefact. The question *does
-this board have `io.max`* is not well posed without one.
+**The two middle rungs are not comparable objects, and a reader who compares
+them cell by cell gets a defensible wrong answer** — which is the exact
+failure this table exists to prevent. The proof is in the file: `cx3576`'s
+committed config says `# CONFIG_SECURITY is not set` while the kernel it ships
+has it on. For a **vendor input** that is normal, because the floor and the
+board's own configure step run after it; for a **recorded output** the same
+line would be the defect the `uefi` gate exists to catch.
+
+**And the last rung has a staleness hazard the third one hides**, measured in
+`mica-boards` and written into `common/kernel/kernel-config-test.sh`:
+`_out/boards/<board>/kernel/` is an *input* to image assembly, so a tree that
+already holds one is not rebuilt, neither the config test nor the
+post-`olddefconfig` loops run, and both stay green over a kernel compiled
+before the fragment they are checking — *an `Image` from 2026-08-31 rode every
+image built for the following week while the fragment gained dm-crypt, the
+eBPF, firewall and bridge floor and two `NF_*` symbols*. The table above was
+measured at that third rung, which is the right one for *what does the product
+being built contain* and the wrong one for *what does the requirement
+promise*.
+
+None of the four is stale and none contradicts another, so **every wrong
+answer a reader takes from them is defensible** — worse than a stale number,
+because a stale number can be caught by a date and a defensible wrong answer
+can be caught by nothing except naming the artefact. The question *does this
+board have `io.max`* is not well posed without naming the rung.
+
+**Which instrument reads which rung** is the other half, since an instrument
+reading rung one says nothing about rung four: `docs/world-claims.tsv` reads
+rungs one and two and `mica-build`'s pins; `mica-build`'s own table was read
+from the build tree; the session probe reads the running kernel's behaviour,
+which is downstream of the shipped artefact. The instrument for the shipped
+`/boot/config-*` is named in `mica-boards`' test header as
+`mica-build:verify/src/checks-kernel.ts` — **a path that does not resolve at
+`mica-build` `main` today** (checked 2026-09-20), so that rung's instrument is
+named here and locatable by its own repository rather than by this page.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but
@@ -594,7 +626,7 @@ what lets a red be read without an investigation:
 
 | What moves next | `io-throttling*`, `memcg*` | `board-release.*` | `board-pin.*` | the session probe |
 |---|---|---|---|---|
-| `mica-boards` re-records the two FIT kernel configs | the `-unrecorded` rows go red | green | green | unchanged |
+| a board's committed config changes | the row for that board goes red | green | green | unchanged |
 | the four board releases are cut | green | **red** | green | unchanged |
 | `mica-build` re-pins the boards | green | green | **red** | unchanged until a product is rebuilt |
 | a product built from those pins is booted | green | green | green | its absent branches stop being reached |

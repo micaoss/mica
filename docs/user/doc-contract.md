@@ -231,6 +231,28 @@ English source.
   measurement usually stops**, so the question to ask of an arriving rule is
   the one you would ask of your own: how many instances, and did any of them
   come from somewhere that could have disagreed?
+- **Where no instrument exists, a named person with a deadline is the
+  substitute — and the failure mode to avoid is neither** *(2026-09-20)*: a
+  page waiting on a repair nobody promised. Today produced four instruments
+  and two things that needed a person, and saying which is which is what stops
+  the next reader assuming the instruments cover everything. A held sentence
+  with an owner is a decision; a held sentence with nobody attached is a
+  sentence that will be found stale by whoever trips over it.
+- **Sort by whatever determines the action, which is not always the same
+  property** *(2026-09-20, from two rules written the same day that look like
+  they disagree)*. A triage of dropped files sorts by **consequence**, because
+  the consequence is what you do about the file
+  ([harness](../design/build-harness.md) section 7). A class of defects sorts
+  by **repair**, because two defects with the same symptom and different
+  repairs are two classes. The test case: a matcher comparing unit patterns
+  literally, so `disable getty@.service` never matched `getty@tty1.service`
+  and a decision was reported as an absence. Its *consequence* is identical to
+  a set that cannot see outside its own scope — an exclusion read as an
+  absence — but its *repair* is not: the matcher is a **bug**, fixable inside
+  the artefact, while a set defining its own completeness or membership is
+  **correct behaviour inside a stated scope** and can only be answered by a
+  second artefact or by asking the question per item. So it is not a third
+  instance, and saying so is worth more than the instance would have been.
 - **And say so when you reverse an answer you have already given**
   *(2026-09-20)*. Re-measuring and correcting yourself is the behaviour these
   rules want; not announcing it is what makes the correction private. A
