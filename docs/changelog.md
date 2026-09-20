@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-20 16:38 [finding]
+
+**Six offered rules, four homes, and the set is the widening.** A day's
+coordination rules were offered as a page; counted against where each one
+actually belongs, they are not one class. **Three have owners here and are
+landed**: *a record may not drive the artefact it describes* — a release cut
+to feed a check nobody has written, or a push made so a page reads as current,
+is the tail wagging a product people run — and *ask the membership question
+from both sides*, because a count taken from one side is a sample that reads
+as a census, both in the documentation contract beside the rules they qualify;
+and *a pin move is one line only where nothing is pinned to it*, which is a
+fact about pins rather than about coordination, beside the one-line argument
+it corrects in the lock spec.
+
+**Three are coordination itself and already have a record that owns them** —
+`decisions/2026-09-20-coordination-state-is-a-record.md`, whose owner is
+*whoever coordinates*: a conditional ruling is not a ruling when the condition
+is itself work; route techniques, not conclusions; send a correction to the
+repository about to act **before** it acts. They are its instances, not a new
+page, and they should arrive in their author's words the way the other two
+handed-over texts did.
+
+**The reason it is not a page is the day's own membership test**: the six
+share a *day*, not a repair. Calling them *the coordination rules* would have
+put a fact about pins and a rule about what a record may cause inside a class
+that cannot repair either.
+
 ## 2026-09-20 16:36 [finding]
 
 **A reading that is the arithmetic consequence of its input carries its own

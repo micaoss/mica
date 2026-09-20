@@ -258,6 +258,23 @@ English source.
   measurement usually stops**, so the question to ask of an arriving rule is
   the one you would ask of your own: how many instances, and did any of them
   come from somewhere that could have disagreed?
+- **A record may not drive the artefact it describes** *(2026-09-20)*. A
+  release cut to feed a check nobody has written, or a push made so that a
+  page reads as current, is the page driving the artefact — the tail of these
+  records wagging a product that people run. The instruments here are written
+  to **go red and wait**, not to be satisfied: a claims row that is red
+  because the world moved is doing its job, and the repair is a measurement or
+  an edit, never an artefact cut to turn it green. *(This is why a prediction
+  table is worth more than an alert: it says which red means "go and change
+  the page", and none of them means "go and change the world".)*
+- **Ask the membership question from both sides** *(2026-09-20)*. The third
+  guard says to enumerate the instances and test each against the class; this
+  is its other half, because **a count taken from one side is a sample that
+  reads as a census**. Today: the vector copy's suite counted the vectors it
+  held (81) and the source held 143; a floor counted the lines it asked for
+  and not the outcomes they produced. Where two independent measurements agree
+  on a count, the class is closed; where only one exists, say which side it
+  was taken from.
 - **Do not rewrite a page to the later fact when the earlier one taught
   something** *(2026-09-20)*. A claim was published at 16:24 with its subject
   named — a re-pin that answered 422 at `origin` — and by 16:28 the push had

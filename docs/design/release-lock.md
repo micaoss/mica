@@ -1103,6 +1103,15 @@ in the pin file, above the keys**, with the mechanism a later reader needs:
 gate will not notice the repair on its own.** **A named defect under a gate
 beats an unnamed one under nothing.**
 
+*(One qualification on the cost, from a day of moving pins: **a pin move is
+one line only where nothing is pinned to it.** Editing the file is one line;
+what it costs is whatever downstream of it has to be re-fetched, rebuilt,
+re-recorded or re-measured — the board re-pin of 2026-09-20 was four such
+lines and required four board releases before it and a product rebuild after,
+and moving a vectors pin means re-syncing the copy it names. The one-line
+argument holds for the **edit**, and a reader deciding whether a move is cheap
+has to count the things the pin holds up, not the lines it occupies.)*
+
 **The basename is uniform and the directory is not**, which is the whole point
 of fixing it: finding each reader's copy was named as the hard part of ever
 gating this, and a uniform basename makes that **one command per repository**
