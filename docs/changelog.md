@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 21:07 [finding]
+
+**The ceiling on every citation form, recorded beside its two qualifiers: a
+citation can never be made self-validating.** No repository prefix, no commit,
+no line range protects a claim, **because the failure lives in the claim**. A
+perfect citation guarantees a reader can go and look and **guarantees nothing
+about what they will conclude** — and **a correct citation under a wrong
+heading is more dangerous than a broken one, because a broken one sends them
+looking.** An evening spent tightening citation forms across four repositories
+ends at that wall, and the next person to improve one should know what
+improving it cannot buy.
+
+**A table's heading is load-bearing and is the least-read part of a table.**
+The same row is correct under *call sites of this key* and misleading under
+*cases that are exercised*, and nothing in the row distinguishes them — so a
+table that could be read either way says which it is **inside the table**,
+because a note above it is read by somebody who is reading notes.
+
+**And an impression in that plan is replaced by a measurement**: the uncalled
+scripts *read as gaps* is out; **none of the ten can be run standalone.** They
+are **stages whose drivers do not invoke them** — inner container scripts,
+stages expecting a runner to hand them a composed root and a kernel directory,
+a guest-side helper. **Whole and unreachable rather than dead**, which is what
+makes dropping the row the wrong repair rather than a tidy one.
+
 ## 2026-09-20 21:04 [finding]
 
 **A valid citation whose premise is false.** A plan table here cites

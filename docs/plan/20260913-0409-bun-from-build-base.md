@@ -49,9 +49,12 @@ is exactly what a key survey must catch. **For a reader looking for coverage
 it changes everything**, and this table cannot tell them: a file is listed
 here because it *mentions the key*, never because it runs. Whether that
 instrument is dead or merely unwired is `mica-build`'s question and it is
-open; nine other uncalled scripts there are named `reset`, `large-root`,
-`dirty-system`, `read-system` and so on, which read as gaps rather than as
-dead code.
+open — and measured since: **none of the ten uncalled scripts can be run
+standalone.** They are not tests nobody runs; they are **stages whose drivers
+do not invoke them** — inner container scripts, stages expecting a runner to
+hand them a composed root and a kernel directory, a guest-side helper.
+**Whole and unreachable rather than dead**, which is what makes dropping the
+row the wrong repair rather than a tidy one.
 
 Why not the local tag (revision 1 of this plan): a `LOCAL_` key resolves only
 from the local store, so CI and every fresh host would have to build the base

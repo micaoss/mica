@@ -437,6 +437,14 @@ English source.
   practice above — a tree, a comment, a report, a unit of work, and now a
   clause. The five share a repair and not a failure mode, so it stays a
   practice.)*
+- **A table's heading is load-bearing, and it is the least-read part of a
+  table** *(2026-09-20)*. The same row — a repository-qualified path to a real
+  file — is **correct** under *call sites of this key* and **misleading**
+  under *cases that are exercised*, and **nothing in the row distinguishes
+  them**. A reader scanning for coverage meets a citation that resolves and
+  has every reason to believe what they conclude. So a table that could be
+  read either way says which it is **inside the table**, not in a note above
+  it: a note is read by somebody who is reading notes.
 - **A status line is a cached summary of the notes below it, and nothing in
   the file says which was updated last** *(2026-09-20)*. A record can change
   **in the note** while the status reads the same: the offline-build task's

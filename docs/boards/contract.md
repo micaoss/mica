@@ -717,7 +717,15 @@ path resolves and the file is real — **and nothing in that repository calls
 it**. **A valid citation whose premise is false gives its reader no reason to
 doubt**, because the citation is correct; what is absent is the only property
 that made citing it worth doing, and the repair is not in the citation but in
-**the sentence the citation supports**.*
+**the sentence the citation supports**.
+
+**And that is the ceiling on every citation form, worth knowing before
+somebody improves one again: a citation can never be made self-validating.**
+No repository prefix, no commit, no line range protects a claim, **because the
+failure lives in the claim**. A perfect citation guarantees that a reader can
+go and look; **it guarantees nothing about what they will conclude when they
+do** — and **a correct citation under a wrong heading is more dangerous than a
+broken one, because a broken one sends them looking.**
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written
