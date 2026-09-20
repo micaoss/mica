@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 16:23 [finding]
+
+**`memory.max` is present in a running product — the far end of a chain that
+started at 08:35.** Fragment, four board releases at `20260920-1536`, a
+re-pin, an artefact, a running `uefi-x64-prod` guest, measured at the last
+step rather than inferred, with the release configs read after deleting and
+re-fetching the build tree. **Nothing is claimed for `cpu.max` or `io.max`
+from the product side**: that reading does not exist.
+
+**And the subject of that measurement is a pin `origin` does not have.** The
+re-pin is `mica-build` `49c7aed6`, which answers 422 here, and `locks/pins/`
+at `origin` still names the old four — so the `board-pin.*` rows are green and
+**correct**, and the prediction table's third row has not fired. A measurement
+taken against an unpushed pin is true of the machine that took it and not
+reproducible from `origin`.
+
+**Three versions of one probe in one evening, and the third is different in
+kind.** Version 1 read a file that can never exist; version 2 read one that
+exists only if delegation was already asked for — `cgroup.controllers` saying
+`cpuset cpu io memory pids` against `subtree_control` saying `memory pids`, so
+a kernel with `CFS_BANDWIDTH` looks identical to one without. **Both checked a
+proxy for the promise.** Version 3 checks the promise: `podman run
+--memory=64m --cpus=0.5 --pids-limit=42`, then ask the container what it got.
+**A proxy can be wrong in ways the promise cannot, and both wrong versions
+were wrong in exactly that gap.**
+
+**What caught version 2 was the output, not a reader**: it printed
+`cgroup.controllers` and `subtree_control` beside the verdict, so the
+contradiction was legible inside the round that introduced it. **Print what
+the verdict depends on, beside the verdict** — the cheapest form of every rule
+in the harness, because a rule spends attention at read time and a format
+spends none. With its author's sentence for the pair: **a repair landing while
+a measurement stays still is a finding about the measurement.**
+
 ## 2026-09-20 16:20 [finding]
 
 **The candidate rule *never quote a check you have not seen fail* was offered

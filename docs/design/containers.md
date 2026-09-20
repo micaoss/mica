@@ -741,7 +741,27 @@ finds one instrument and assumes it covers the other gets the wrong answer in
 both directions, and here the second instrument was not covering its own
 question either.
 
-**What the mistake does not touch is what the table rests on.** The
+**And the product column has an answer for one of the three files.**
+`mica-build` reports, from a running `uefi-x64-prod` guest, that
+**`memory.max` is present** — the far end of a chain that began at 08:35 the
+same day: the fragment, four board releases at `20260920-1536`, a re-pin, an
+artefact, a running product. The releases were read from
+`_out/boards/<board>/kernel/config` **after deleting the directory and
+re-fetching**, which is what makes it a measurement of the released artefact
+rather than of a build tree that was already there. **Nothing is claimed here
+about `cpu.max` or `io.max` from the product side**: that reading does not
+exist, and the two that were offered for it were both about something else.
+
+*(The subject of that measurement is a pin this repository cannot see yet. The
+re-pin is recorded at `mica-build` `49c7aed6`, which answers **422** at
+`origin`, and `locks/pins/` at `origin` still names `20260916-0857`,
+`20260916-0857`, `20260917-1007` and `20260919-2259` — so the `board-pin.*`
+rows are green and **correct**, and the prediction table's third row has not
+fired. A measurement taken against an unpushed pin is true of the machine that
+took it and not reproducible from `origin`, which is the same distinction as a
+working tree read as a commit, one step further out.)*
+
+**What the earlier mistake does not touch is what the table rests on.** The
 kernel-config measurements were read from
 `mica-build:_out/boards/<board>/kernel/config` and were never the probe's:
 `uefi-x64` genuinely had no `MEMCG` and genuinely has it at `main` now. The
@@ -768,11 +788,29 @@ where it was looking. **A reader who sees somebody thinking carefully about
 one trap has no reason to check for another**, which is a cost of a good
 comment that these records had not priced.
 
-The repair keeps the shape and moves the subject: ask inside `system.slice`,
-where systemd has delegated what it manages, and print `cgroup.subtree_control`
-and `cgroup.controllers` beside the three files, so **the controller is
-available** and **the file exists** are two visible facts rather than one
-collapsed one.
+**The repair took three versions in one evening, and the third is different in
+kind.** Version 1 read `/sys/fs/cgroup/cpu.max` — a file that can **never**
+exist. Version 2 moved into `system.slice`, where systemd delegates what it
+manages, and read a file that exists **only if somebody already asked**:
+`cgroup.controllers` said `cpuset cpu io memory pids` while
+`subtree_control` said `memory pids`, so a kernel with `CFS_BANDWIDTH` looks
+identical to one without it at that path, and it would have reported
+`cpu.max absent` a second time. **Both versions checked a proxy for the
+promise. Version 3 checks the promise**: it runs `podman run --memory=64m
+--cpus=0.5 --pids-limit=42` and asks the container what it got —
+`memory.max=67108864`, `cpu.max=50000 100000`, answers only a kernel with
+`MEMCG` and `CFS_BANDWIDTH` can give, with podman arranging whatever
+delegation it needs on the way. **A proxy can be wrong in ways the promise
+cannot, and both wrong versions were wrong in exactly that gap.**
+
+**And what caught version 2 was the output rather than a reader**: it printed
+`cgroup.controllers` and `subtree_control` **beside** the verdict, so *the
+controller is available* and *the file exists* were two visible facts instead
+of one collapsed one, and the contradiction was legible inside the round that
+introduced it. An instrument that prints what its verdict depends on does not
+need the next reader to be more careful. Its author's rule for the pair is the
+durable part: **a repair landing while a measurement stays still is a finding
+about the measurement.**
 
 **And each instrument says in advance which way it will go red**, which is
 what lets a red be read without an investigation:

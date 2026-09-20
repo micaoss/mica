@@ -49,6 +49,26 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**Print what the verdict depends on, beside the verdict** *(2026-09-20)*. A
+product probe reported `cpu.max absent` from a cgroup where the file exists
+only if delegation has been asked for; the same output also printed
+`cgroup.controllers` and `cgroup.subtree_control`, so *the controller is
+available* and *the file exists* stood side by side and the contradiction was
+legible **inside the round that introduced it**. Nobody had to be more careful.
+That is the cheapest form of every rule on this page: **a rule spends the
+reader's attention at read time and a format spends nothing**, so where a rule
+can be replaced by an output, the rule is the fallback and the output is the
+fix.
+
+**And check the promise rather than a proxy for it.** The same probe took
+three versions in one evening: one read a file that can never exist, one read
+a file that exists only if somebody already asked, and the third ran
+`podman run --memory=64m --cpus=0.5` and asked the container what it got. The
+first two were proxies and were wrong in the gap a proxy has; the third can
+only be answered by a kernel that has the controller. **A proxy can be wrong
+in ways the promise cannot**, and the promise is usually one command further
+on.
+
 **A tightened check is verified by showing it would now refuse what it used to
 accept** *(2026-09-20)*. The session probe's identity test was a `Mica OS *`
 prefix match, which a component's banner satisfies; the anchored version
