@@ -259,6 +259,30 @@ as exercised was exercised against the four vectors it happened to hold, and
 the five written for that row had never run there. They pass now, 88 of 88 —
 **the implementation was right and the evidence was weaker than it believed.**
 
+**An empty result whose bound is invisible**, which is a rule rather than a
+class and has its two instances *(2026-09-20)*. A **partial listing**: the
+contents API paginated, about half of 61 files were quoted as the directory,
+and the negative claim built on it was wrong. A **rooted history**: `git log`
+over a path in `mica-build` returns nothing for anything before `a5f1e36`, a
+parentless commit of 2026-09-14, so *the path has no history in that
+repository* was true of `origin` and false of the clone that holds the
+deletion. In both, the instrument answers with a boundary it does not mention,
+and the answer is **the same empty result** either way.
+
+The operational form is a question to ask before the claim, not a habit of
+care: **before asserting that a path has no history, check whether the
+repository's history is rooted and compare the root's date to the period you
+care about** — and for a directory, enumerate the tree rather than quoting a
+listing, with the count in the sentence. *(A 422 explained is evidence; a 422
+observed is a dead end that reads as a refutation.)*
+
+It is deliberately **not** filed with *a set that defines its own
+completeness* above, though the symptom is identical — an exclusion reading as
+an absence. The repair differs, which is what decides membership: these two
+are answered by **asking the instrument for its bound**, inside the same
+query; that one can only be answered **from outside the artefact**, because
+the artefact is behaving correctly within a scope it states.
+
 **A drift gate diffs where a release gate digests.** The repair
 (`mica-build:tests/vectors-pin-check.sh`) pins the copy to a `mica` commit and
 compares the trees with `diff -r` and not a digest, *"because a digest says

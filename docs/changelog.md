@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-20 15:57 [finding]
+
+**An empty result whose bound is invisible**, recorded with its two instances
+and its operational form. A **partial listing**: a paginated contents API
+quoted as the directory. A **rooted history**: `git log` over a path returns
+nothing for everything before a parentless root, so *no history in that
+repository* is true of `origin` and false of the clone. The instrument answers
+with a boundary it does not mention, and **the empty result is the same either
+way**. So: before asserting that a path has no history, check whether the
+history is rooted and compare the root's date to the period in question; for a
+directory, enumerate the tree and put the count in the sentence.
+
+**It is deliberately not filed with *a set that defines its own
+completeness***, although the symptom is identical. The repair decides
+membership, as the contract now says: these two are answered by asking the
+instrument for its bound, inside the same query; that one can only be answered
+from outside the artefact, which is behaving correctly inside a scope it
+states. Two instances and a use make a rule, not a class.
+
 ## 2026-09-20 15:54 [finding]
 
 **The unguarded rung is a regression, not a gap nobody filled, and that reads
