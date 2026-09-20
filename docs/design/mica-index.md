@@ -264,9 +264,13 @@ digests are lowercase hex.
   `/status/health.json` both answer `200`, and `health.json` at
   `generatedAt` `2026-09-19T20:37:56Z` reports `green` for all eight
   repositories with `runsSince` 0. It is the same verdict a person reached by
-  hand an hour earlier, now computed and republished every thirty minutes by
-  something that does not depend on anyone looking, which is the difference
-  between a status page and a status check.
+  hand an hour earlier, now computed and republished by something that does
+  not depend on anyone looking, which is the difference between a status page
+  and a status check. **Its cadence is not what its crontab says**
+  *(measured 2026-09-20)*: the `*/30` schedule fires every **two to five
+  hours**, because GitHub deprioritises scheduled runs, and the workflow is
+  active. A schedule is a request, not a fact — worth knowing for anyone who
+  reads the crontab and takes thirty minutes for a measurement.
 - `catalogue` is read from the index commit's tree and is never part of the
   lock: every board with its architecture, whether it is a release target
   and the boards release it is pinned to, and every product with its board,

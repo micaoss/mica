@@ -39,4 +39,22 @@ workflow run is deleted in any repository until the collector's snapshots are
 in the bucket and a retention policy is agreed. It was placed with the pause
 but does not end with it, and it is the clause most likely to be assumed
 spent by someone who hears only that the pause is over. Its own end is a
-separate decision and will be recorded as one.
+separate decision and will be recorded here, in this file, rather than in a
+new one.
+
+**The end condition as written above measures one instrument and the hold
+covers two artefacts** *(`mica-res`, 2026-09-20)*. The collector snapshots
+Actions runs and jobs; **it does not snapshot `ghcr` package versions**, so
+its output protects workflow-run history and nothing of image history
+([release-lock](../design/release-lock.md) 2.1, where what does protect an
+image version — the mirror holding its bytes under a content-addressed key
+with the index naming it — is already stated). A retention discussion that
+reads *the snapshots are in the bucket* as cover for pruning `ghcr` packages
+would be ending the hold on **half an argument**, with the wrong instrument
+for the half it did not measure.
+
+So the hold does not end on the snapshots alone, and the corrected condition
+must name both artefacts with their own instruments. It is **not written here
+yet**: the division is being confirmed by the repository that measured it
+rather than restated from an account of it, and this paragraph exists so that
+nothing ends the hold in the meantime.

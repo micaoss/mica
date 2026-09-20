@@ -1,5 +1,43 @@
 # Changelog
 
+## 2026-09-20 06:43 [finding]
+
+**The retention hold's end condition measures one instrument while the hold
+covers two artefacts**, so the pause record now says the hold cannot end on
+the snapshots alone. The collector snapshots Actions runs and jobs and **not**
+`ghcr` package versions (`mica-res`, 2026-09-20), which `release-lock.md` 2.1
+already said from the other direction: what protects an image version is the
+mirror holding its bytes under a content-addressed key with the index naming
+it. A retention discussion reading *the snapshots are in the bucket* as cover
+for pruning `ghcr` packages would end the hold on half an argument. The
+corrected two-instrument condition is **deliberately not written yet** — it is
+being confirmed by the repository that measured it rather than restated from
+an account of it — and the paragraph exists so nothing ends the hold in the
+meantime.
+
+**A cadence corrected where it is described**: the collector's `*/30` schedule
+fires every **two to five hours**, not every thirty minutes, because GitHub
+deprioritises scheduled runs. `docs/design/mica-index.md` said thirty minutes
+on the strength of the crontab. **A schedule is a request, not a fact**, and
+the line is there for the next person who reads the crontab and takes it for a
+measurement.
+
+**The sixth aperture instance gets `mica-boards`' formulation, which is a
+procedure where the earlier one was a warning**: *a uniform answer from a
+query that names something is the shape to re-ask with a looser key, because a
+wrong key returns exactly that.* It also disowned the trigger it had actually
+used — the uniform `ABSENT` looked *too tidy* — because "too tidy" is a weak
+signal to depend on, and **uniformity is the checkable version of that
+instinct**. Attributed to the repository that found it.
+
+**And one sentence placed at its point of use rather than promoted**, in
+`docs/task/20260920-0627-feature-declaration-promises.md`: *a capability row
+is a necessary condition, not a proof of function*, `uefi-x64` as the worked
+example, written by `mica-boards` into its own mechanism before anyone could
+hit it — *if that sentence is not in the mechanism from the start, the first
+surprise will be read as the check lying.* One instance, so it stays where it
+applies.
+
 ## 2026-09-20 06:40 [finding]
 
 **The VT question closed within the hour, and not by a decision: by a policy

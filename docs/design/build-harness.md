@@ -87,9 +87,14 @@ narrow; this one points at nothing at all, and it is the most dangerous
 variant **because it returns a uniform answer, and a uniform answer reads as a
 finding rather than as an error**. It was caught by grepping
 case-insensitively for `bfq` instead of for the symbol that had been handed
-over — that is, by distrusting the **key** rather than the result. When a
-result is suspiciously tidy, re-ask the question with a looser key before
-believing it.
+over — that is, by distrusting the **key** rather than the result. The
+durable form is `mica-boards`', which found it: **a uniform answer from a
+query that names something is the shape to re-ask with a looser key, because
+a wrong key returns exactly that.** It disowned the trigger it had actually
+used — the uniform `ABSENT` *looked too tidy* — on the ground that "too tidy"
+is a weak signal to depend on, and **uniformity is the checkable version of
+that instinct**, which is what turns an instance into something a person can
+follow.
 
 The fifth came from the opposite direction and is the reason this is stated
 once rather than twice: a suite named for FIT lifecycle tests the FIT boot

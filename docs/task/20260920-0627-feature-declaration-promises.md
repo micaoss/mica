@@ -32,6 +32,20 @@ Whether it belongs in `docs/design/` beside the build contract or in a
 decision with the mapping's own shape is decided when the proposal exists.
 Nothing is pre-empted here, and no mapping is written in this repository.
 
+## The limit the mechanism states about itself
+
+`mica-boards` wrote the limit of its own capability mechanism into the
+proposal before anyone could hit it: **a capability row is a necessary
+condition, not a proof of function.** `uefi-x64` is the worked example — the
+symbols for a framebuffer console are set and it still may not render on real
+hardware, because `DRM_FBDEV_EMULATION` is absent while `i915` is built in.
+Its reason is the general one and is about checks rather than about kernels:
+*if that sentence is not in the mechanism from the start, the first surprise
+will be read as the check lying.*
+
+One instance so far, so it lives here at its point of use rather than as a
+rule of its own. If a second arrives, that is when to look for the third.
+
 ## Dependencies
 
 - **blocked by**: the three-repository proposal
