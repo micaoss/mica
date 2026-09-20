@@ -237,7 +237,14 @@ English source.
   and two things that needed a person, and saying which is which is what stops
   the next reader assuming the instruments cover everything. A held sentence
   with an owner is a decision; a held sentence with nobody attached is a
-  sentence that will be found stale by whoever trips over it.
+  sentence that will be found stale by whoever trips over it. **And there is a
+  third form, which is the one that gets mistaken for the first two**: a claim
+  neither an instrument nor a person can hold — *a shipped artefact is
+  asserted against the floor* is not expressible as a line in a file — and it
+  is carried by the record alone, which then has to **say that it is**. An
+  instrument whose limits are unwritten becomes the next false assurance: the
+  row that watches one path reads as coverage of the question that path was
+  cited for.
 - **Sort by whatever determines the action, which is not always the same
   property** *(2026-09-20, from two rules written the same day that look like
   they disagree)*. A triage of dropped files sorts by **consequence**, because

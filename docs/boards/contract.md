@@ -639,12 +639,9 @@ service-namespace and shutdown checks.
 *Written by `mica-boards`, landed here verbatim so the measurement lives in a
 record rather than in a file header. One paragraph, about which instrument
 reads the shipped `/boot/config-*`, was withheld by the coordinator pending a
-`mica-build` answer; the answer came back as a measured absence, so that
-paragraph is **withdrawn rather than pending** and its author has replaced it
-in `mica-boards` `f3ff004`. The state it leaves behind is in
-[containers.md](../design/containers.md) section 8: no gate in either
-repository asserts a container-limit or netavark symbol against a shipped
-artefact, so for those symbols the committed inputs are the only end. Checked here
+`mica-build` answer; the answer came back as a **measured absence**, that
+paragraph was withdrawn rather than restored, and its author's replacement —
+`mica-boards` `f3ff004` — is the closing section below. Checked here
 before landing: the fragment's contents and the two FIT boards' lack of a
 `kernel-config` target, read at `mica-boards` `main`; the `# CONFIG_SECURITY
 is not set` line in `cx3576`'s committed config, read at the pinned release.
@@ -679,6 +676,34 @@ assume the other**: a `_out/.../kernel/` in `mica-boards` can be stale
 relative to a FRAGMENT, because that repository builds from one. The
 identically named tree in `mica-build` is fetched from a PINNED BOARD RELEASE,
 so its staleness is the PIN's. Same path, different question.
+
+**What reads a shipped kernel configuration, and what does not.** In its
+author's words, where *this file* is
+`mica-boards:common/kernel/kernel-config-test.sh`:
+
+> NOTHING CATCHES THAT FOR THESE SYMBOLS. Measured against `mica-build` at
+> `77a124b`: two places read a shipped kernel configuration, and neither reads
+> this list. `build/src/kernel-package.ts` lines 141-149 read the `config`
+> file of the board's kernel component and refuse a kernel missing `RD_ZSTD`,
+> `BLK_DEV_LOOP`, `BLK_DEV_DM`, `DM_VERITY`,
+> `DM_VERITY_VERIFY_ROOTHASH_SIG`, `SYSTEM_TRUSTED_KEYRING`, `EXT4_FS`,
+> `SQUASHFS`, `WATCHDOG_NOWAYOUT` and the per-family boot symbols, plus the
+> embedded trust anchor and, on a FIT board, `CONFIG_CMDLINE` equal to the
+> packaged command line; `rootfs/compose/compose-install.sh` lines 203-207
+> re-read `/boot/config-<release>` in the composed root for `DM_INIT`,
+> `BLK_DEV_DM`, `DM_VERITY` and `SQUASHFS`. Both lists are about boot and
+> verity, `verify/` there contains no reference to `/boot/` at all, and no
+> gate in either repository asserts a netavark symbol or the mica-required
+> floor against a shipped artefact. So this file and the post-olddefconfig
+> loops are not one of two ends: for these symbols they are the **only** end,
+> which is exactly why a stale `_out/boards/<board>/kernel/` escapes
+> everything.
+
+*Re-measured here before landing: both readers at their lines, and the
+negative by enumerating the tree and fetching every one of the 61 files under
+`verify/src/` — none mentions `/boot/`. The citation form is the author's and
+is the one to copy for anything crossing a repository boundary: a line number
+and a commit, so a reader can check it and it goes stale visibly.*
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written

@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 15:46 [finding]
+
+**The withheld paragraph is replaced rather than restored, in its author's
+words**, as the closing part of `docs/boards/contract.md` section 4.6: two
+places read a shipped kernel configuration, both about boot and verity, and
+for the container-limit and netavark symbols *this file and the
+post-olddefconfig loops are the only end, which is exactly why a stale
+`_out/boards/<board>/kernel/` escapes everything*. Re-measured here before
+landing — both readers at their lines, and the negative by enumerating the
+tree and fetching every one of the 61 files under `verify/src/`.
+
+**And the citation form it arrives in is the one to copy across a repository
+boundary: a line number and a commit.** `build/src/kernel-package.ts` lines
+141-149, measured against `mica-build` at `77a124b`. It can be checked, and
+when it moves it goes stale **visibly** — which is the whole difference from
+the citation this replaces, a bare path that asserted a check nobody could
+find.
+
+**The allocation rule gains its third form, which is the one that gets
+mistaken for the other two.** A claim an instrument can hold; a claim only a
+person can carry, with an owner and a deadline; and **a claim neither can
+hold** — *a shipped artefact is asserted against the floor* is not expressible
+as a line in a file — which is carried by the record alone and must **say that
+it is**. An instrument whose limits are unwritten becomes the next false
+assurance: a row watching one path reads as coverage of the question that path
+was cited for.
+
+**And the correction that produced the sharpest formulation of the day was
+about a listing.** A directory listing that paginated was quoted as the set
+itself, by the reader who had recommended it as the stronger instrument. Every
+other aperture today announced itself as a query — a grep, a filter, a glob, a
+name. **A partial listing is an aperture that looks like a directory**, which
+is why it stops the looking rather than prompting it.
+
 ## 2026-09-20 15:44 [finding]
 
 **The held sentence was not a bad citation, it was a false assurance, and the
