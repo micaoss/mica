@@ -75,6 +75,15 @@ never heard of that evening. Counting them as one kind records this workspace
 as **half protected** when it is **a quarter protected and a quarter lucky** —
 and the quarter that is load-bearing is the format.
 
+**And the test for which column a save belongs in is whether the reading was
+optional**, demonstrated the same day on the author of a format: a status line
+that must carry the date it was decided was filled in from the rhythm of the
+round — `17:41` — and `date -u` said `19:54`. **The format made the reading
+mandatory**; nobody remembered to check the clock, the field simply could not
+be filled without it. A habit would have had to fire; this could not fail to.
+Nothing downstream would have failed on `17:41` either, and nobody reading it
+would have known to doubt it.
+
 **And the honest boundary of all of this, found the day it was argued: some
 false results are distinguishable only by somebody who knows what they did,
 and no format reaches them** *(2026-09-20)*. In the same round, two results

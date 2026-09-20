@@ -32,6 +32,35 @@ Moving the repositories to the release lock format
 
 ## Notes
 
+- 2026-09-20, later still: **the keyless-fingerprint number is not a zero, and
+  the comparison point turns out to be published already.** Measured by
+  `mica-build` out of a built product and not re-measured here: the deployment
+  record is a **signed envelope whose payload is base64 and decodes with no
+  key** (`mica/update-envelope/v1`), and those envelopes travel **inside the
+  published `.micaupd` archives** — so **nothing has to be added to the
+  release format** for the achievable half of clause A to be checkable by
+  anyone.
+
+  | Keyless, over content, pre-signature | Not keyless — over a signed thing |
+  |---|---|
+  | `rootfs.content.image`, `rootfs.content.rootHash` | `kernel.boot.artifact` (the signed UKI) |
+  | `kernel.support.image`, `kernel.support.rootHash` | `rootfs.content.signature`, `kernel.support.signature`, the firmware envelope over the signed `BOOTX64.EFI` |
+
+  **Two of four components: not nothing, and not the product.** The keyless
+  fingerprint reaches further than the root and still not to the UKI, the
+  firmware, the ESP or the assembled image.
+
+  **The restatement is still held, on one word.** The report says the UKI and
+  firmware **cannot** have keyless fingerprints, because signing *is part of
+  producing them* rather than a wrapper around them. A UKI is a PE binary and
+  an Authenticode signature is appended in a certificate table — the unsigned
+  PE exists while `ukify` assembles it and the signer runs on it, so **the
+  object may be transient rather than absent**. The open measurement is
+  exactly that: *does an unsigned UKI exist as a file at any point in `boot/`,
+  even for one step.* If it does, keyless content coverage is four of four and
+  only the signatures stay permanently out of reach; if it does not, the
+  sentence is right **and it will be right because somebody looked**.
+
 - 2026-09-20, later: **clause A is not unproven. Its byte-equality form is
   unachievable by everybody except the release job, and that is the trust
   model working rather than a gap.** Verified here at `origin` rather than

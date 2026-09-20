@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-09-20 20:00 [finding]
+
+**The keyless-fingerprint number is not a zero, and the comparison point was
+already published.** The deployment record is a signed envelope whose payload
+is base64 and **decodes with no key**, and those envelopes travel inside the
+published `.micaupd` archives — so **nothing has to be added to the release
+format** for clause A's achievable half to be checkable. Keyless and over
+content: `rootfs.content.image`, `rootfs.content.rootHash`,
+`kernel.support.image`, `kernel.support.rootHash`. Not keyless: the signed
+UKI, the signatures, the firmware envelope. **Two of four components — not
+nothing, and not the product.**
+
+**The restatement is still held, on one word.** The report says the UKI and
+firmware *cannot* have keyless fingerprints; a UKI is a PE binary whose
+signature is appended in a certificate table, so the unsigned object may be
+**transient rather than absent**. The open measurement is whether an unsigned
+UKI exists as a file at any point, even for one step.
+
+**And the rule arrived inside the sentence meant to replace the clause it came
+from**: a statement that cannot distinguish *not yet done* from *cannot be
+done* is read as **the stronger claim when it suits the writer and the weaker
+one when it suits the reader**. Neither reading is a lie and the text supports
+both, so **the word has to be earned by a measurement before it is written**.
+
+**A ratio needs a denominator somebody would defend.** *65 MB of a 1.8 GB
+artefact* is a byte ratio over mostly slack, padding and ESP; **3.6%
+understates as badly as *covers the image* would overstate**, and it is harder
+to refuse **because it reads as modesty** — an overstatement invites
+challenge, an understatement invites agreement.
+
+**And the save table gets its test**: whether the reading was optional. A
+status line that must carry the date it was decided was filled in from the
+rhythm of the round — `17:41` — and `date -u` said `19:54`. **The format made
+the reading mandatory**, on the author of the format, the same day.
+
 ## 2026-09-20 19:58 [finding]
 
 **Before calling a drop a defect, ask whether the rest of the feature is also

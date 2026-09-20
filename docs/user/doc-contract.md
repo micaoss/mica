@@ -155,6 +155,15 @@ English source.
   as an identifier was `process.pid`. **The value looked like the thing it was
   not, and nothing about its appearance was wrong.** Before citing a number as
   a decision, find who wrote it.
+- **A ratio needs a denominator somebody would defend, and a modest-sounding
+  one is the hardest error to refuse** *(2026-09-20)*. *The root hash covers
+  65 MB of a 1.8 GB artefact* is a **byte** ratio, and the 1.8 GB is mostly
+  filesystem slack, partition padding and the ESP — nobody fears the padding
+  differing. **3.6% understates the coverage as badly as *covers the image*
+  would overstate it**, and it is harder to catch **because it reads as
+  modesty**: an overstatement invites challenge and an understatement invites
+  agreement. State coverage in the units the claim is about — here, **the
+  components that carry code and data onto the device**.
 - **State the unit with the number.** 536 and 535 were both true of the same
   mirror on the same evening — one counts the keys a contract requires, the
   other the distinct byte strings stored — and a bare number is wrong for
@@ -361,7 +370,13 @@ English source.
   keys that only the release job holds. **And what distinguished the two was
   not a better reading of the clause; it was somebody grepping for where a
   value comes from.** So a clause states which kind of obstacle it faces, or
-  it will be read as the kind that effort removes. *(Fifth subject for the
+  it will be read as the kind that effort removes. **And the sharper form,
+  which arrived inside the sentence meant to replace that very clause: such a
+  statement is read as the stronger claim when it suits the writer and the
+  weaker one when it suits the reader.** *Cannot* closes a gap for whoever is
+  tired of it; *not yet* keeps it open for whoever is not. Neither reading is
+  a lie and the text supports both, which is why **the word has to be earned
+  by a measurement before it is written**. *(Fifth subject for the
   practice above — a tree, a comment, a report, a unit of work, and now a
   clause. The five share a repair and not a failure mode, so it stays a
   practice.)*
