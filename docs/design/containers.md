@@ -588,10 +588,44 @@ four; `IOWeight=` reaches `io.weight`, which `blk-iocost` registers, and
 `IODeviceLatencyTargetSec=` reaches `io.latency`, so `BLK_CGROUP_IOCOST` and
 `BLK_CGROUP_IOLATENCY` are on for all four; nothing a product can set reaches
 `io.prio`, `hugetlb.*`, `rdma.max`, `misc.max`, `net_prio.ifpriomap`,
-`net_cls.classid`, delay accounting or a `perf_event` cgroup, so those eight
-are off uniformly **with the reason recorded beside them** rather than left
-`y` on two boards by accident. An arbitrary per-board split is the one answer
-that is wrong whichever way the symbol goes, because nobody chose it.
+`net_cls.classid`, delay accounting or a `perf_event` cgroup, so the floor
+**asks** for those to be off rather than leaving them `y` on two boards by
+accident. An arbitrary per-board split is the one answer that is wrong
+whichever way the symbol goes, because nobody chose it.
+
+**And *asks* is the word, because a fragment's `# CONFIG_X is not set` is a
+request and not a fact.** kconfig turns a symbol back on the moment something
+enabled `select`s it, and the floor's **positive** lines are asserted against
+the resolved config while its **negative** lines were never asserted against
+anything, on any board. Measured here across the two boards whose resolved
+output is recorded: of the nine symbols the floor asks to be off, **eight are
+off on both and one is not** — `uefi-x64` ships `CONFIG_CGROUP_NET_CLASSID=y`,
+because `CONFIG_NET_CLS_CGROUP=y` in the x86_64 defconfig selects it and the
+arm64 defconfig does not have it. **Two boards, one floor line, and the answer
+differs because of a file neither repository wrote.**
+
+So **every *off* in this section is a different kind of claim from every
+*on***, and the page had been presenting them as the same kind: `y` was
+asserted against the resolved config, `is not set` was a line in an input that
+nothing checked. That is the input-versus-output distinction this section
+draws twice already, arriving a third time **inside a single file**.
+
+*(The exposure is the claim rather than the behaviour: `CGROUP_NET_CLASSID` is
+cgroup v1 `net_cls`, which a v2-only system cannot reach — compiled in and
+unreachable. And the repair is a loop `mica-boards` is writing, refusing when
+the resolved config carries any `CONFIG_X=` line for a symbol the floor asks
+to be off, held until the selector is turned off because the assertion would
+turn CI red on both UEFI boards, correctly.)*
+
+**A line that reads as a decision and is not granted cannot be wrong in a way
+anybody notices**, which is the same shape as a citation nobody can resolve
+and an assurance nobody can test, now in kconfig. `uefi-arm64`'s board
+fragment carries nineteen more of them — the display-trim helpers `DRM_PANEL`,
+`DRM_BRIDGE`, `EXTCON`, `NVMEM`, the PHYs — left behind after that board
+learned the mechanism the expensive way: **a helper cannot be switched off,
+you have to name off the drivers that select it**. They are being deleted
+rather than restated, because a request a file cannot grant is not a record of
+a decision.
 
 **And the floor states the distinction this section needs everywhere:
 `PSI` on is the capability; running `systemd-oomd` and setting those keys is a

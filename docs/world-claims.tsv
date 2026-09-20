@@ -110,11 +110,17 @@ board-release.uefi-arm64	newest-tag	micaoss/mica-boards:uefi-arm64	^uefi-arm64[.
 board-release.cx3576	newest-tag	micaoss/mica-boards:cx3576	^cx3576[.]20260920-1536$	docs/design/containers.md
 board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260920-1536$	docs/design/containers.md
 #
-# The floor itself is now more than one symbol, and these three are the shape
-# of the decision rather than of a scatter: PSI and IOCOST are ON for every
-# board because a unit key a product can set reaches the file they create, and
-# TASKSTATS is OFF for every board because nothing does. A defconfig bump that
-# re-scatters any of them turns this red.
+# The floor itself is now more than one symbol, and these rows are the shape of
+# the decision rather than of a scatter: PSI and IOCOST are ON for every board
+# because a unit key a product can set reaches the file they create, and
+# TASKSTATS is asked OFF for every board because nothing does. A defconfig bump
+# that re-scatters any of them turns this red.
+#
+# READ THE THIRD ONE FOR WHAT IT IS: an `is not set` line in the FLOOR is a
+# REQUEST, not a fact. kconfig grants it unless something enabled selects the
+# symbol, and until 2026-09-20 nothing asserted the floor's negative lines
+# against any resolved config. The row below watches the request; the row
+# after it watches the one place the request was DENIED.
 #
 # AND ONE ROW FOR A DELETED CHECK. mica-boards' kernel config test names
 # mica-build:verify/src/checks-kernel.ts as the half that reads the
@@ -141,6 +147,14 @@ shipped-config-check	no-path	micaoss/mica-build:verify/src/checks-kernel.ts	abse
 psi-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/design/containers.md
 iocost-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/design/containers.md
 taskstats-floor-off	line	micaoss/mica-boards:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/design/containers.md
+#
+# THE DENIED REQUEST, WRITTEN TO FLIP. uefi-x64's recorded resolved config
+# carries CONFIG_CGROUP_NET_CLASSID=y although the floor asks for it off,
+# because CONFIG_NET_CLS_CGROUP=y in the x86_64 defconfig selects it. This row
+# states today's denial and goes GREEN-TO-RED when mica-boards turns the
+# selector off, which is the repair -- so a red here is the repair landing and
+# not a regression, and the row is deleted in the same edit that reads it.
+net-classid-denied.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CGROUP_NET_CLASSID=y	docs/design/containers.md
 board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260916-0857	docs/design/containers.md
 board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260916-0857	docs/design/containers.md
 board-pin.cx3576	line	micaoss/mica-build:locks/pins/mica-boards.cx3576.pin	RELEASE=20260917-1007	docs/design/containers.md

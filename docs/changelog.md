@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 16:00 [finding]
+
+**A fragment's `# CONFIG_X is not set` is a request, not a fact, and section 8
+had been reading nine of them as facts.** kconfig turns a symbol back on the
+moment something enabled `select`s it, and the floor's **positive** lines are
+asserted against the resolved config while its **negative** lines were never
+asserted against anything, on any board. Measured here across the two boards
+whose resolved output is recorded: of the nine symbols the floor asks to be
+off, **eight are off on both and one is not** — `uefi-x64` carries
+`CONFIG_CGROUP_NET_CLASSID=y`, because `CONFIG_NET_CLS_CGROUP=y` in the x86_64
+defconfig selects it and the arm64 defconfig does not have it. **Two boards,
+one floor line, and the answer differs because of a file neither repository
+wrote.**
+
+**So every *off* in that section is a different kind of claim from every
+*on*** — `y` asserted against the resolved config, `is not set` a line in an
+input nothing checked — which is the input-versus-output distinction the
+section already draws twice, arriving a third time **inside a single file**.
+The exposure is the claim and not the behaviour: `CGROUP_NET_CLASSID` is
+cgroup v1 `net_cls`, unreachable on a v2-only system. Compiled in and
+unreachable.
+
+**A line that reads as a decision and is not granted cannot be wrong in a way
+anybody notices** — the same shape as a citation nobody can resolve and an
+assurance nobody can test, now in kconfig. `uefi-arm64` carries nineteen more,
+the display-trim helpers left behind after that board learned that **a helper
+cannot be switched off, you have to name off the drivers that select it**;
+they are being deleted rather than restated.
+
+**And the denial is now a row written to flip**:
+`net-classid-denied.uefi-x64` states today's `=y` and goes red when the
+selector is turned off, so a red there is the repair landing rather than a
+regression, and the row is deleted by whoever reads it. 26 of 26.
+
 ## 2026-09-20 15:57 [finding]
 
 **An empty result whose bound is invisible**, recorded with its two instances
