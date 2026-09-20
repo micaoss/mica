@@ -1,5 +1,50 @@
 # Changelog
 
+## 2026-09-20 15:28 [finding]
+
+**A paragraph published here four hours ago rested on an inference I had
+passed along, and the correction is narrower and better.** The four dropped
+Debian drop-ins are package-owned, and the triage that reported them **had
+already sorted them that way** — the buckets were right. What is wrong is one
+directory: the rule claiming `systemd`'s resources enumerates
+`/usr/lib/systemd/system/*`, `/usr/lib/tmpfiles.d/*.conf`,
+`/usr/lib/udev/rules.d/*.rules` and more, **and no `*.conf.d/*.conf`**. The
+reason is right and the membership is one directory short — the
+correct-class-short-membership defect a fourth time, and the first arriving
+through an **enumeration inside a tool** rather than a person's list: nobody
+decided those paths did not matter, a glob did not reach them, and everyone
+downstream was right to trust the rule inside its scope.
+
+**And one of the four narrows rather than closes.** With `resolved`'s drop-in
+gone the compiled-in default returns: `MulticastDNS` is globally `yes` on a
+booted `uefi-x64-prod`, and `eth0` says `no` only because `80-dhcp.network`'s
+`Name=eth*` matches it — `sit0` says `yes`. **Closed for `eth*`, untested for
+every other interface name, and the mechanism that makes it safe is a match
+pattern rather than a decision about mDNS.**
+
+**The `_out` staleness hazard is located rather than general, and it took a
+run rather than a reading**: `mica-boards`' run `35500637534` on `58dee40`
+failed at the recorded-config gate with the prefix cache warm, because the
+fragment is not in the cache key and does not need to be — the config stage
+`COPY`s it and BuildKit's content addressing keys that layer on its bytes. The
+hazard needs a tree that persists across a fragment change and is consumed
+rather than rebuilt: image assembly, and a developer's working tree.
+
+**Same path, two hazards, different repairs**, which is what a reader who
+learns one will get wrong about the other: `mica-boards`'
+`_out/boards/<board>/kernel/` can be stale against a **fragment**, because
+that repository builds from one; `mica-build`'s is fetched from a **pinned
+board release**, so its staleness is the pin's. BuildKit's content addressing
+answers one; comparing a report's mtime against the signed root it describes
+answers the other. Both are called *the `_out` problem* by anybody describing
+them quickly.
+
+**And the general rule is `mica-boards`' and better than the one it
+replaces**: *a constraint in a header warns whoever is already reading that
+file, which is nobody who needs it.* Not that comments decay — that **a
+comment's audience is selected by the one property that excludes the person at
+risk**, having the file open.
+
 ## 2026-09-20 15:24 [finding]
 
 **Section 8's artefact table conflated two kinds of file, and the ladder is

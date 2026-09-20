@@ -190,17 +190,39 @@ bytes, with 3.7 MB of differing content.** A size comparison would have passed
 and recorded a no-op that was not one — neither truncated nor misaimed, just
 too coarse to see what it was asked about.
 
-**A hazard recorded in a comment in one repository is invisible to the
-repository that will hit it** *(2026-09-20)*. `mica-boards` wrote the stale
-build-tree hazard into `common/kernel/kernel-config-test.sh`'s header weeks
-ago — a `_out/` kernel tree that already exists is not rebuilt, so the gates
-over it do not run and stay green over a kernel older than the fragment they
-check — and `mica-build` met the same hazard in its own tree this afternoon
-and built a guard for it, without either knowing about the other. Two
-repositories, one hazard, one of them holding a written account of it the
-whole time. That is what *constraints live in records* is for, and the cost of
-getting it wrong is not a repeated discussion: it is that the second
-repository pays the discovery again, at whatever hour it happens to be.
+**A constraint in a header warns whoever is already reading that file, which
+is nobody who needs it** *(2026-09-20, `mica-boards`' formulation and better
+than the one it replaces)*. The point is not that comments decay: it is that
+**a comment's audience is selected by the one property that excludes the
+person at risk** — having the file open. `mica-boards` had measured the stale
+build-tree hazard and written it into `common/kernel/kernel-config-test.sh`'s
+header weeks ago; `mica-build` met the same shape in its own tree at 14:06
+today, read neither the file nor the comment, and built a guard. The cost of
+getting this wrong is not a repeated discussion, it is that **the second
+repository pays the discovery again**, at whatever hour it lands.
+
+**And the hazard is located rather than general, which took a run rather than
+a reading.** In `mica-boards`' CI it does not occur: run `35500637534` on
+`58dee40` failed inside the kernel job at the recorded-config gate **with the
+prefix cache warm from the previous push** — the config stage ran anyway and
+refused. The mechanism is worth the line, because it is a correctness property
+taken from the build tool rather than from a hand-maintained key: the fragment
+is **not** in the cache key and does not need to be, since the config stage
+`COPY`s it and BuildKit's content addressing then keys that layer on the
+fragment's bytes, so a fragment change misses from the `COPY` forward. What
+the hazard needs is an `_out/boards/<board>/kernel/` that **persists across a
+fragment change and is consumed as an input rather than rebuilt** — the
+image-assembly side, and a developer's working tree.
+
+**Same path, two hazards, different repairs**, which is the part a reader who
+learns one will get wrong about the other: `mica-boards`'
+`_out/boards/<board>/kernel/` can be stale relative to a **fragment**, because
+that repository builds from one; `mica-build`'s is **fetched from a pinned
+board release**, so its staleness is the **pin's** and not the fragment's. One
+is answered by BuildKit's content addressing, the other by comparing a
+report's mtime against the signed root it claims to describe. Neither would
+have helped the other, and both are called *the `_out` problem* by anybody
+describing them quickly.
 
 **And there is a kind none of these are: no aperture at all in the direction
 that mattered** *(2026-09-20, `mica-build`)*. Its copy of the
@@ -743,20 +765,39 @@ sharing its shape — a correct class with a hand-enumerated membership is the
 defect this page names above, and sorting a triage by shape is how it is
 produced.
 
-**And *dropped* is not one mechanism either, which matters because the
-artefact that explains one of them cannot see the other** *(2026-09-20,
-reported by another repository and stated here for the shape)*. The composer's
+**And *dropped* is not one mechanism** *(2026-09-20)*. The composer's
 unowned-path account explains the `tty1` symlink exactly: nothing claimed it,
-so nothing carried it. It does not reach the four dropped Debian drop-ins at
-all — those are **package-owned**, by `systemd` and `systemd-resolved`, so
-some other rule took them, and which rule is an open question at the time of
-writing. **An artefact listing what no package claims cannot report a
-package-owned drop by construction**: the same shape as a suite walking its
-own `expected.tsv`, one level down — a filter that defines its own scope is
-silent about everything outside it, and its silence reads as absence. Two true
-drops, two mechanisms, and the second is visible only to somebody who asks
-*why was this dropped* per path rather than reading the list that answers for
-the first.
+so nothing carried it. The four dropped Debian drop-ins are **package-owned**,
+by `systemd` and `systemd-resolved`, and the triage that reported them had
+already put them in its `owned` bucket — **the buckets were right**, and the
+first version of this paragraph, which said the account could not see them and
+left the rule that took them open, was an inference passed along rather than a
+reading of the report. Corrected here rather than quietly, because it was
+published.
+
+What is actually wrong is narrower and sharper: **the rule that claims
+`systemd`'s resources enumerates `/usr/lib/systemd/system/*`,
+`/usr/lib/tmpfiles.d/*.conf`, `/usr/lib/udev/rules.d/*.rules` and more, and no
+`*.conf.d/*.conf`** — the reason is right and the membership is one directory
+short. That is the correct-class-short-membership defect a fourth time, and
+the first arriving through an **enumeration inside a tool** rather than
+through a person's list: nobody wrote those four paths down and decided they
+did not matter; a glob simply did not reach them, and everyone downstream was
+right to trust the rule inside its scope. What survives of the structural
+point is the narrower half — **a list defined as *what no package claims* is
+silent about a package-owned drop by construction**, so quoting that list as
+the account of these four would have been quoting the wrong bucket.
+
+**And the consequence of one of the four narrows rather than closes.** With
+`resolved`'s drop-in gone the compiled-in default returns, and on a booted
+`uefi-x64-prod` `MulticastDNS` is globally `yes`. `eth0` reports `no` — but
+only because it is matched by `80-dhcp.network`'s `Name=eth*`, and anything
+that does not match falls back to the global: `sit0` reports `yes`. So it is
+**closed for `eth*`, untested for every other interface name, and the
+mechanism that makes it safe on `eth0` is a match pattern rather than a
+decision about mDNS** (`wlan0` does not match either and cannot be tested in
+QEMU). Another instance of a mechanism that looks like it serves a reason it
+does not serve, and the reason to write what a mechanism is for beside it.
 
 Each acceptance round uses one immutable candidate image:
 

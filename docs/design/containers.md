@@ -488,10 +488,13 @@ already holds one is not rebuilt, neither the config test nor the
 post-`olddefconfig` loops run, and both stay green over a kernel compiled
 before the fragment they are checking — *an `Image` from 2026-08-31 rode every
 image built for the following week while the fragment gained dm-crypt, the
-eBPF, firewall and bridge floor and two `NF_*` symbols*. The table above was
-measured at that third rung, which is the right one for *what does the product
-being built contain* and the wrong one for *what does the requirement
-promise*.
+eBPF, firewall and bridge floor and two `NF_*` symbols*. Where that bites was
+then measured rather than reasoned: not in `mica-boards`' CI, where a run with
+a warm cache still ran the config stage and refused, but wherever such a tree
+**persists across a fragment change and is consumed rather than rebuilt** —
+image assembly, and a developer's working tree. The table above was measured
+at that third rung, which is the right one for *what does the product being
+built contain* and the wrong one for *what does the requirement promise*.
 
 None of the four is stale and none contradicts another, so **every wrong
 answer a reader takes from them is defensible** — worse than a stale number,
