@@ -63,7 +63,7 @@ restating it.
 | `plan/`, `task/` | `/pma` tracking: proposals, open work and acceptance evidence | permanent contracts |
 | `decisions/` | dated decisions and skill divergences with a sunset | design detail |
 | `changelog.md` | the history of changes to code and records | current behaviour |
-| `zh/` | Chinese user guides and explicitly requested Chinese briefs | engineering translations |
+| `zh/` | Chinese user guides, the Chinese hardware list under `zh/hardware/`, and explicitly requested Chinese briefs | engineering translations |
 
 The generated OpenAPI file owns route and schema detail. Permanent documents
 describe the current system only: history lives in the changelog and Git, and
@@ -154,7 +154,10 @@ work in progress lives in `plan/` and `task/`.
   - `venus-gui-v2.md` — Venus OS gui-v2 functional reference, mapped to apid and dashboard owners
 - `plan/`, `task/` — `/pma` tracking with status indexes
 - `decisions/` — dated decisions with review sunsets
-- `zh/` — Chinese user guides
+- `zh/` — Chinese user guides, and `zh/hardware/` — the Chinese hardware list: one
+  page per board, each with its feature and verification state, flashing, update
+  and recovery route. It is a dated snapshot for a Chinese reader;
+  `boards/support-tiers.md` stays the authoritative status table.
 
 `make docs-verify` checks catalog membership in both directions, internal
 links, truth-status evidence, board dossiers, Chinese coverage and the

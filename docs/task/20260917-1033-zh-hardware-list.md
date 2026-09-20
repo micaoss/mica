@@ -1,6 +1,6 @@
 # 20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board
 
-- **status**: in_progress
+- **status**: completed
 - **priority**: P2
 - **owner**: session-zh-hardware
 - **createdAt**: 2026-09-17 10:33
@@ -31,3 +31,5 @@ Writing the Chinese hardware list and per-board pages
 ## Notes
 
 Plan: `docs/plan/20260917-1033-zh-hardware-list.md`.
+
+- complete: zh/hardware written, READMEs corrected, docs-verify passes

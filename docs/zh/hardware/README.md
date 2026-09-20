@@ -13,7 +13,7 @@
 |---|---|---|---|---|---|---|
 | [`uefi-x64`](uefi-x64.md) | 通用 amd64 机器（UEFI + ACPI） | amd64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU 基线） | 无 |
 | [`uefi-arm64`](uefi-arm64.md) | 通用 arm64 机器（UEFI + ACPI） | arm64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU 参考） | 无 |
-| [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot，签名 FIT | 是 | bring-up | 无 |
+| [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot，签名 FIT | 是 | bring-up | 有一条用户报告，无证据行 |
 | [`s905x5m`](s905x5m.md) | BM201 / Amlogic S905X5M（S7D） | arm64 | U-Boot，签名 FIT，从 SD 启动 | 是 | bring-up | 无 |
 
 没有任何板卡达到 `mica-qualified`：没有任何板卡档案里有一条注明日期的实机合格行。
@@ -35,10 +35,13 @@
 |---|---|---|
 | 每次推送与每次发布都自动启动 | `uefi-x64` | 自 2026-09-19 起，amd64 产品在 QEMU 里被真的启动到 guest 自己的通过标记 |
 | 只构建与静态校验，有过手工 QEMU 记录 | `uefi-arm64` | 自动启动步骤只跑 amd64，所以它没有自动启动记录；已有的 QEMU 证据早于板卡改名 |
-| 从未被任何东西启动过 | `cx3576`、`s905x5m` | 没有任何套件会启动 FIT 镜像——FIT 那套跑在宿主机上、不带 QEMU，两套会启动 guest 的套件按名字拒绝 FIT 板卡 |
+| 没有任何自动流程会启动 | `cx3576`、`s905x5m` | 没有任何套件会启动 FIT 镜像——FIT 那套跑在宿主机上、不带 QEMU，两套会启动 guest 的套件按名字拒绝 FIT 板卡 |
 
-**没有任何一块实体板卡启动过 Mica OS。**也没有任何 Mica OS 镜像被写进过 U 盘、
-SATA、NVMe 或 eMMC。凡是本目录里写到实机步骤的地方，都标了“未验证”。
+**没有任何实机启动拥有证据行。**也没有任何把 Mica OS 镜像写进 U 盘、SATA、NVMe 或
+eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动成功——那是一条报告，
+没有附带产物，因此不是合格行，层级表里也没有任何一行因此移动
+（[支持层级](../../boards/support-tiers.md)）。凡是本目录里写到实机步骤的地方，
+都标了“未验证”。
 
 **有三轮 `uefi` 发布不会启动，必须避开。**`20260916-0845`、`20260916-1653` 和
 `20260919-2103` 里的 `uefi-x64`、`uefi-arm64` 镜像会在 PID 1 拒绝镜像自己签名身份里

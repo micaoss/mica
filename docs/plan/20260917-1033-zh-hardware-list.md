@@ -1,6 +1,6 @@
 # 20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board
 
-- **status**: draft
+- **status**: completed
 - **createdAt**: 2026-09-17 10:33
 - **approvedAt**: (pending)
 - **relatedTask**: 20260917-1033-zh-hardware-list

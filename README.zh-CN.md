@@ -26,17 +26,19 @@
 
 ## 项目状态
 
-Mica OS 处于活跃开发中，尚无公开发布。
+Mica OS 处于活跃开发中。下面每块板都是发布目标：镜像会被构建、签名、发布，产品会
+进入版本索引——这并不意味着它能在实机上启动。
 
-| 板卡 | 硬件 | 状态 |
+| 板卡 | 硬件 | 状态（2026-09-20） |
 |---|---|---|
-| `x64` | 通用 x86_64，UEFI | bring-up，已在 QEMU 验证 |
-| `virt-arm64` | QEMU ARM64，UEFI | bring-up，QEMU 参考 |
-| `cx3576` | Rockchip RK3576 | bring-up，镜像可构建，实机测试待做 |
-| `s905x5m` | Amlogic S7D（BM201） | bring-up，镜像可构建，实机测试待做 |
+| `uefi-x64` | 通用 amd64，UEFI | bring-up，QEMU 基线；每次推送与每次发布都自动启动 |
+| `uefi-arm64` | 通用 arm64，UEFI | bring-up，QEMU 参考；只构建与校验，没有自动启动 |
+| `cx3576` | Rockchip RK3576 | bring-up，镜像已发布；没有自动流程启动它——没有套件会启动 FIT 镜像 |
+| `s905x5m` | Amlogic S7D（BM201） | bring-up，镜像已发布；没有自动流程启动它，且没有受支持的办法装进空板 |
 
-尚无板卡完成认证。[支持等级表](docs/boards/support-tiers.md)是权威且最新的表，并说明
-每个等级的含义。
+尚无板卡完成认证：没有任何板卡档案里有注明日期的实机合格行，也没有任何实机启动拥有
+证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/boards/support-tiers.md)是权威且最新的表，并说明每个等级的
+含义；中文的[支持硬件列表](docs/zh/hardware/README.md)按板卡讲同一件事。
 
 ## 从这里开始
 
@@ -46,6 +48,7 @@ Mica OS 处于活跃开发中，尚无公开发布。
 | 构建一份镜像并启动它 | [快速上手](docs/zh/user/quickstart.md)、[构建指南](docs/design/build.md)、[安装](docs/zh/user/install.md) |
 | 配置与运维一台设备 | [首次配置](docs/zh/user/first-run.md)、[配置](docs/zh/user/configuration.md)、[更新与回滚](docs/zh/user/update-rollback.md) |
 | 把我的应用跑上去 | [应用](docs/zh/user/applications.md)、[容器](docs/design/containers.md) |
+| 看某块板卡的现状与刷机步骤 | [支持硬件列表](docs/zh/hardware/README.md) |
 | 上一块新板子 | [板卡合约](docs/boards/contract.md)、[移植指南](docs/boards/porting.md) |
 | 审视安全态势 | [安全](docs/zh/user/security.md)、[安全模型](docs/design/security-model.md) |
 | 浏览全部 | [中文用户指南](docs/zh/README.md) · [English documentation](docs/README.md) |

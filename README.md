@@ -37,17 +37,23 @@ device), a cloud or server OS, or a fleet management service.
 
 ## Project status
 
-Mica OS is under active development and has no public release yet.
+Mica OS is under active development. Every board below is a release target:
+its images are built, signed and published, and its products appear in the
+version index — which says nothing about whether the board boots on hardware.
 
-| Board | Hardware | Status |
+| Board | Hardware | Status (2026-09-20) |
 |---|---|---|
-| `x64` | generic x86_64, UEFI | bring-up, validated in QEMU |
-| `virt-arm64` | QEMU ARM64, UEFI | bring-up, QEMU reference |
-| `cx3576` | Rockchip RK3576 | bring-up, image builds, physical tests pending |
-| `s905x5m` | Amlogic S7D (BM201) | bring-up, image builds, physical tests pending |
+| `uefi-x64` | generic amd64, UEFI | bring-up, QEMU baseline; booted on each push and each release |
+| `uefi-arm64` | generic arm64, UEFI | bring-up, QEMU reference; built and verified, not booted automatically |
+| `cx3576` | Rockchip RK3576 | bring-up, images published; started by nothing automatic — no suite boots a FIT image |
+| `s905x5m` | Amlogic S7D (BM201) | bring-up, images published; started by nothing automatic, and no supported way to install onto a blank board |
 
-No board is qualified yet. The [support tiers](docs/boards/support-tiers.md)
-page is the authoritative, up-to-date table and explains what each tier means.
+No board is qualified: no dossier carries a dated physical qualification row,
+and no physical boot has an evidence row — a `cx3576` bench boot was reported
+on 2026-09-20 with no artefact, which moves nothing. The
+[support tiers](docs/boards/support-tiers.md) page is the authoritative,
+up-to-date table and explains what each tier means; the Chinese
+[hardware list](docs/zh/hardware/README.md) covers the same ground per board.
 
 ## Get started
 

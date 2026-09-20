@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 05:20 [progress]
+
+**A Chinese hardware list, one page per board** (`docs/zh/hardware/`, task
+`20260917-1033-zh-hardware-list`). Requested in Chinese, so it lives under
+`zh/`: a list page carrying a dated state snapshot, and one page per board —
+`uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m` — in one section order (overview;
+feature and verification state; layout; console; obtaining an image; flashing;
+first boot; updates; recovery; known limitations; verification record). The
+facts come from the English dossiers, each board's `board.env` and
+`evidence.json`, and the Chinese user pages; `uefi-x64` has no dossier, and its
+page says so and names where each fact came from. Every page dates its snapshot
+and names `docs/boards/support-tiers.md` as authoritative, so this is a
+reader's view of the status table rather than a second one.
+
+What the pages carry to be true on the day they were written: a release target
+is not a hardware claim; `uefi-x64` is booted on each push and each release
+while `uefi-arm64` is booted by nothing automatic, and the FIT images are
+started by nothing in these repositories; the three `uefi` rounds that power
+down at PID 1 are named beside the corrected round to take instead; the
+`cx3576` bench boot is a report with no artefact and moves no row; and
+`s905x5m` publishes images that cannot be installed onto a blank board.
+
+**Two board tables corrected.** `README.md` and `README.zh-CN.md` still listed
+`x64` and `virt-arm64` four days after the rename, and still said there was no
+public release. Both now carry the current names, a dated status column, and
+the distinction the tiers page draws. `docs/README.md` and `docs/zh/README.md`
+index the new tree.
+
+The first four pages were written before `16f2ddb` narrowed "never started by
+anything" to "started by nothing automatic", and were swept into `a00036c`
+before that edit reached them; they now say what was measured.
+
+`make docs-verify` passes.
+
 ## 2026-09-20 05:08 [finding]
 
 **A hardware boot of `cx3576` was reported by the user on 2026-09-20** — the

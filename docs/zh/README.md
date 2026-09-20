@@ -7,7 +7,13 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 总线名和路径使用 `mica` 前缀（例如 `micad`、`mica-deploy`、`/mica/config`），文中按原样引用。
 
 - [`architecture.md`](../architecture.md) — 系统架构总览与组件地图（从这里开始）
-- [板卡状态表](../boards/support-tiers.md#current-boards) — 各板卡的构建、验收与支持层级
+- [板卡状态表](../boards/support-tiers.md#current-boards) — 各板卡的构建、验收与支持层级（权威，英文）
+- `hardware/` — 中文支持硬件列表：按板卡讲清现状、刷机、更新与恢复
+  - [`README.md`](hardware/README.md) — 板卡一览、现状快照与选板指引
+  - [`uefi-x64.md`](hardware/uefi-x64.md) — 通用 amd64 UEFI 机器
+  - [`uefi-arm64.md`](hardware/uefi-arm64.md) — 通用 arm64 UEFI 机器
+  - [`cx3576.md`](hardware/cx3576.md) — CX3576-Z / Rockchip RK3576
+  - [`s905x5m.md`](hardware/s905x5m.md) — BM201 / Amlogic S905X5M
 - `user/` — 用户文档（覆盖全部 21 篇，含文档契约本身）
   - [`overview.md`](user/overview.md) — 一页读懂：七个仓库、发布链、产品与文件位置
   - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 uefi-x64 基线
