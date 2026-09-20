@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-20 17:28 [finding]
+
+**A sentence published here an hour ago counted two survivals as one kind, and
+they are not.** The shared checkout answered about a different tree four
+times: two cost a wrong sentence and nothing caught them; one survived because
+**a person ran `git status` before speaking**; one survived because **the
+report printed the head it read**. The earlier text credited both to the
+instrument.
+
+**A habit protects the person who has it, on the day they have it. A format
+protects every reader downstream, including one six months from now who never
+met the hazard and will never know it was there.** The habit survival left no
+artefact and taught nobody anything; the format survival would happen again
+for a reader who has never heard of that evening. Counting them together
+records this workspace as **half protected** when it is **a quarter protected
+and a quarter lucky**, and only the format quarter is load-bearing.
+
 ## 2026-09-20 17:26 [finding]
 
 **The aligned chain completed, `rc=0`, and clause A moves from *unreachable*

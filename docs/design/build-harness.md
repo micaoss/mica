@@ -59,9 +59,21 @@ sentence; this one cost a re-run** — which is the whole argument for a format
 in one comparison, and the first time today it has had a price on both sides.
 *(By the end of that day the shared checkout had answered about a different
 tree **four** times: its `main` was measured a full day behind the
-`origin/main` the chain actually ran at. **Four is not an incident**, and the
-instrument survived two of the four for one reason only — it prints the head
-it read.)*
+`origin/main` the chain actually ran at. **Four is not an incident.** Sorted
+rather than counted: two cost a wrong sentence and nothing caught them — a
+stale `mica-podman` pin, and four board pins of which one was stale. One
+survived **because a person ran `git status` before speaking**. One survived
+**because the report printed the head it read**.)*
+
+**And those two survivals must not be counted together**, which is a
+correction to the sentence that stood here before: **a habit protects the
+person who has it, on the day they have it; a format protects every reader
+downstream, including one six months from now who never met the hazard and
+will never know it was there.** The habit survival taught nobody anything and
+left no artefact; the format survival would happen again for a reader who has
+never heard of that evening. Counting them as one kind records this workspace
+as **half protected** when it is **a quarter protected and a quarter lucky** —
+and the quarter that is load-bearing is the format.
 
 **And the honest boundary of all of this, found the day it was argued: some
 false results are distinguishable only by somebody who knows what they did,
