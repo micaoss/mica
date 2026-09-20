@@ -299,10 +299,30 @@ and passed while the `uefi-arm64` and `cx3576` jobs skipped the step.
 Stated as one pair, because the halves are only useful together *(2026-09-20,
 after `s905x5m.20260920-0033` and the index `mica.20260920-0046`)*: **four
 boards are release targets, eight products are published and indexed, the UEFI
-images boot, and the `s905x5m` images have never been booted by anything.**
-Nor have the `cx3576` ones: the only suite that starts a guest is UEFI, its
-FIT counterpart runs on the host, and the automated boot covers the amd64 UEFI
-path alone.
+images boot, and no FIT board image has ever been booted by any suite —
+because no suite boots one.** Not "no automation runs it": there is nothing to
+run. `tests/lifecycle-uboot-fit/` carries no QEMU at all — measured file by
+file at `e92dc5d` and verified independently — and tests firmware IO,
+records, signatures, trust and dirty-filesystem behaviour on the host, while
+the boot machinery (`boot.sh`, `timed-boot.py`, `runtime-build.sh`,
+`kernel-faults.sh`) is in `tests/lifecycle-uefi/`.
+
+**The number, since it is half the catalogue.** Of eight published products,
+**four have never been started by anything**: `cx3576-dev`, `cx3576-prod`,
+`s905x5m-dev`, `s905x5m-prod`. `cx3576` is not a new-board exception — it has
+been a release target since before the rename, with six published releases
+behind it; it is the rule for its whole boot backend. The other four have boot
+evidence of two different ages: `uefi-x64` from the CI gate, per push and per
+release since 2026-09-19, and `uefi-arm64` from hand-run QEMU rows that
+predate the rename.
+
+**Why the mistake was easy, which is the part worth keeping.** The suite is
+named `lifecycle-uboot-fit`, it sits beside `lifecycle-uefi`, and it tests the
+FIT boot *path* — firmware IO, signatures, trust. Everything about the name
+and the neighbourhood says the FIT one boots too. A name that parallels a
+booting suite without booting is the same shape as a comment asserting what
+the code does not do: **a name is not evidence of behaviour**, and the check
+is one `grep` for the machinery, not a reading of the directory listing.
 
 This is consistent with the decision that a release target publishes images
 and asserts nothing about hardware

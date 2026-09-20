@@ -132,8 +132,11 @@ and per release, while `uefi-arm64` carries none: the gate's boot step is
 amd64-only and was skipped for both its products
 ([harness](../design/build-harness.md) section 4). And between UEFI and FIT:
 the `cx3576` and `s905x5m` images have never been booted by anything, because
-the only suite that starts a guest is the UEFI one. A published image is not a
-booted image, and for these two boards that gap is the whole distance. The three `uefi`
+no suite boots a FIT image at all — `tests/lifecycle-uboot-fit/` runs on the
+host and carries no QEMU. Four of the eight published products are on that
+side, and `cx3576` has been there through six releases, so it is the rule for
+the FIT backend rather than a new board's exception. A published image is not
+a booted image, and for these two boards that gap is the whole distance. The three `uefi`
 rounds published before it fail at PID 1 and power down. These rows describe
 what the boards were qualified to do, not what any particular published image
 does.

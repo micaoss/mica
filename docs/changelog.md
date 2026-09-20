@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 00:53 [finding]
+
+**No suite boots a FIT image, so half the published catalogue has never been
+started by anything.** Measured here file by file in
+`mica-build:tests/lifecycle-uboot-fit/` at `e92dc5d` — no QEMU anywhere; it
+tests firmware IO, records, signatures, trust and dirty-filesystem behaviour
+on the host, while the boot machinery lives in `tests/lifecycle-uefi/` — and
+verified independently afterwards. The claim it replaces, that three suites
+boot a guest, had been stated once and forwarded three times before anyone
+opened the directory.
+
+The statement is therefore bigger than last night's: not that the `s905x5m`
+images have never been booted, but that **no FIT board image has ever been
+booted by any suite, because no suite boots one**. Four of eight published
+products are on that side — `cx3576-dev`, `cx3576-prod`, `s905x5m-dev`,
+`s905x5m-prod` — and `cx3576` has been a release target through six releases,
+so it is the rule for the FIT backend rather than a new board's exception.
+`cx3576` is named beside `s905x5m` in every place the pair appears, for that
+reason. The other four carry boot evidence of two ages: `uefi-x64` from the CI
+gate per push and per release since 2026-09-19, `uefi-arm64` from hand-run
+QEMU rows predating the rename.
+
+**Why the mistake was easy is recorded with it**: the suite is named
+`lifecycle-uboot-fit`, sits beside `lifecycle-uefi`, and tests the FIT boot
+*path*, so the name and the neighbourhood both say it boots. A name that
+parallels a booting suite without booting is the same shape as a comment
+asserting what the code does not do — **a name is not evidence of behaviour**,
+and the check is one `grep` for the machinery rather than a reading of the
+directory listing.
+
+The user decision changes shape with it: not "should the FIT side have boot
+evidence" but "half the published catalogue has never been started, and a FIT
+boot suite is work nobody has scoped". It is recorded as that, unscoped.
+
 ## 2026-09-20 00:50 [progress]
 
 **All four boards are release targets, and the catalogue now has two kinds of
