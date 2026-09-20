@@ -125,10 +125,11 @@ draws — a release target is not a hardware claim — gets stated for this
 board.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
 It is also dated evidence, and it is now uneven between the two: since
-2026-09-19 23:56 UTC every amd64 product is booted in its own release run, so
-`uefi-x64` carries a boot per release, while `uefi-arm64` carries none — the
-gate's boot step is amd64-only and was skipped for both its products in that
-round ([harness](../design/build-harness.md) section 4). The three `uefi`
+2026-09-19 every amd64 product is booted automatically — on each push to
+`main` and again in its release run — so `uefi-x64` carries a boot per push
+and per release, while `uefi-arm64` carries none: the gate's boot step is
+amd64-only and was skipped for both its products
+([harness](../design/build-harness.md) section 4). The three `uefi`
 rounds published before it fail at PID 1 and power down. These rows describe
 what the boards were qualified to do, not what any particular published image
 does.

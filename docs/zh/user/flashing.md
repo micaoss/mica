@@ -14,9 +14,9 @@ Mica OS 镜像被写进过 U 盘、SATA 硬盘、NVMe 或 eMMC，也没有任何
 下面的 QEMU 小节是实际跑过的；硬件小节是从仓库里读出来的，未验证之处都有标注。
 日期很重要：板卡改名之后到 2026-09-19 之间发布的三轮 `uefi`（`20260916-0845`、
 `20260916-1653`、`20260919-2103`）不会启动，而是在 PID 1 把机器关掉。请取
-`20260919-2356` 或更新的镜像；自那一轮起，每个 amd64 产品都会在它自己的发布运行里
-被启动一次，而 `arm64` 与 `cx3576` 镜像只被构建和校验，没有任何自动流程启动它们
-（[获取发布版](download.md) 第 1 节）。
+`20260919-2356` 或更新的镜像；自那一轮起，每个 amd64 产品都会被自动启动——每次推送
+时一次，发布运行里再一次——而 `arm64` 与 `cx3576` 镜像只被构建和校验，没有任何自动
+流程启动它们（[获取发布版](download.md) 第 1 节）。
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 

@@ -102,10 +102,10 @@ make offline-chain PRODUCTS=uefi-x64-dev
 - `make os-smoke-test`、`os-smoke-negative-test` 和 `os-factory-root-gate` 在真正发布的
   根里执行真正发布的二进制，并证明反例确实会触发。
 - `make lifecycle-uefi PRODUCT=<name>` 对一个 UEFI 产品跑 QEMU 生命周期套件（启动、
-  运行时、更新、故障、重置、关机）。**整套是手工运行的**；自 2026-09-19 起，**发布**
-  会启动它所发布的东西：`release-product.yml` 对每个 amd64 产品跑这套套件的一个运行时
-  阶段，不跑故障阶段。推送到 `main` 仍然什么都不启动，`arm64` 与 `cx3576` 也没有任何
-  自动启动，所以对它们而言，“某个产品能启动”带的仍是**上一次有人手工跑它的日期**
+  运行时、更新、故障、重置、关机）。**整套是手工运行的**；自 2026-09-19 起，其中一个
+  运行时阶段（不跑故障阶段）会对每个 amd64 产品自动运行——`ci.yml` 在每次推送 `main`
+  和每个 pull request 上跑，`release.yml` 在发布时再跑一次。`arm64` 与 `cx3576` 没有
+  任何自动启动，所以对它们而言，“某个产品能启动”带的仍是**上一次有人手工跑它的日期**
   （[构建门](../../design/build-harness.md)）。
 - `make os-repart-test` 证明首次启动的扩容，`make os-layout-lint` 证明分区契约。
 

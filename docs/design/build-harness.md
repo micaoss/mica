@@ -39,7 +39,8 @@ host: use the actual host project path and mount only required directories.
 | Host/toolchain boundaries | `make os-host-toolchain-lint os-host-toolchain-lint-test` |
 
 **A query's aperture must be at least as wide as the claim built on it.**
-Three times now a narrow query has been read as a fact about the world:
+Four times now a narrow query has been read as a fact about the world, the
+fourth of them while correcting the third:
 `mica-res`'s reader followed the spec's slash form and silently ignored every
 dot-form release; the index count was taken with a `mica.` prefix test that
 could not match the slash-form index and returned nine of ten; and the boot
@@ -48,6 +49,13 @@ when it is a step of `release-product.yml` — the claim was about *anything in
 CI or release*, the query covered one file. A query returns nothing found, not
 nothing exists, and the two are indistinguishable from the output alone. State
 the aperture in the sentence the result becomes, or widen it until it matches.
+
+The fourth was the correction of the third, an hour later: `release-product.yml`
+was read, found to carry no `on:` block, and written up as a gate that does not
+run on push. True of that file, false of the system — a reusable workflow
+inherits the trigger of whoever calls it, so the aperture had to include the
+callers. When the claim is *when* something runs, one file is never the
+aperture.
 
 **Identical wrong bytes are a pass.** The shared component-contract fixtures
 are diffed byte for byte between `mica-core` and `mica-build`; on the board
@@ -273,9 +281,16 @@ hand run.
 `cx3576` products in the same round — read back from the three release runs.
 It covers the UEFI amd64 path, one runtime stage, no fault stages, no updates;
 `mica-deploy`'s arm64 arm (the `BOOTAA64.EFI` target) would pass this green if
-it broke. A push to `main` still boots nothing: `ci.yml` carries no lifecycle
-job, so between pushing and releasing, the sorting sentence above is still the
-one that applies.
+it broke.
+
+**It does run on a push, which an earlier wording here denied.**
+`release-product.yml` is a reusable workflow with no triggers of its own, and
+two workflows call it: `ci.yml`, whose `release-products` job calls it on
+every push to `main` and every pull request with `upload: false`, and
+`release.yml` when a release is published. So the gate fires on the push that
+renames a board, which was the point of asking for it. Measured on the push of
+`f46b64a6`: in that `ci` run, `release-products (uefi-x64-prod, amd64)` booted
+and passed while the `uefi-arm64` and `cx3576` jobs skipped the step.
 
 ## 5. Complete-image acceptance
 

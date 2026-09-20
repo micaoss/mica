@@ -120,11 +120,11 @@ for its release while developing, instead of the pinned release.
   cases fire.
 - `make lifecycle-uefi PRODUCT=<name>` runs the QEMU lifecycle suite (boot,
   runtime, updates, faults, reset, shutdown) over a UEFI product. **It is run
-  by hand**, and it is the full suite. Since 2026-09-19 a **release** boots
-  what it publishes: `release-product.yml` runs one runtime stage of this
-  suite, no faults, for every amd64 product. A push to `main` still boots
-  nothing, and no automated boot covers `arm64` or `cx3576`, so for those a
-  claim that a product boots carries the date of the last hand run
+  by hand**, and it is the full suite. Since 2026-09-19 one runtime stage of
+  it, no faults, runs automatically for every amd64 product — on every push to
+  `main` and pull request from `ci.yml`, and again from `release.yml` when a
+  release is published. No automated boot covers `arm64` or `cx3576`, so for
+  those a claim that a product boots carries the date of the last hand run
   ([harness](../design/build-harness.md)).
 - `make os-repart-test` proves first-boot growth, and `make os-layout-lint`
   the partition contracts.

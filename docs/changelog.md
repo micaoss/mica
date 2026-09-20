@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-20 00:21 [finding]
+
+**Correction, and it understated the gate: the boot runs on every push to
+`main` and every pull request, not only in a release.**
+`release-product.yml` is a reusable workflow with no triggers of its own;
+`ci.yml` calls it in its `release-products` job with `upload: false`, and
+`release.yml` calls it when a release is published. Measured on the push of
+`f46b64a6`: in that `ci` run `release-products (uefi-x64-prod, amd64)` booted
+and passed, while the `uefi-arm64` and `cx3576` jobs skipped the step. So the
+gate fires on the push that renames a board, which was the requirement it was
+asked for. The real limits are unchanged and stay written: amd64 only, one
+runtime stage, no faults, no updates, and `mica-deploy`'s `BOOTAA64.EFI` arm
+would pass it green. `build-harness.md` section 4, `docs/user/build.md`,
+`docs/user/flashing.md`, `docs/boards/support-tiers.md` and the Chinese pages
+are corrected.
+
+**Understating coverage costs what overstating it costs, in the other
+direction**: a record that says the gate does not run on push invites the next
+person to add a second gate that does, or to distrust the one that exists.
+
+**The aperture rule took its fourth instance, from correcting its third.**
+Having found the gate in `release-product.yml`, I read that file, saw no `on:`
+block, and wrote that it does not run on push — true of the file, false of the
+system, because a reusable workflow inherits the trigger of whoever calls it.
+When the claim is *when* something runs, one file is never the aperture. The
+rule catching its author within the hour is the evidence that it was worth
+writing.
+
 ## 2026-09-20 00:18 [finding]
 
 **Correction, twenty minutes old: a release does boot an image, and my query
