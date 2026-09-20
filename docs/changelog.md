@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-20 06:29 [progress]
+
+**The question is recorded; the authorisation is not.**
+`docs/task/20260920-0629-release-deletion-question.md` states, in this order: the rule
+that holds today — deleting or re-cutting a published release happens only on
+the user's explicit instruction — then that a development-phase practice to
+the contrary has been in use in coordination, then the five scope questions an
+answer has to settle, because *empty*, *superseded*, index releases and `ghcr`
+package versions are four different blast radii. The file says in its own
+first line that it authorises nothing.
+
+It exists for the reason the rest of today produced: a practice that
+contradicts a written rule and lives in one head is the shape where an agent
+reading the tree and an agent asking get different answers, and the difference
+is a deleted release. Recording the **question** closes that without granting
+anything — and either answer produces a record, including the one nobody would
+think to write: that the authorisation was assumed and is withdrawn.
+
 ## 2026-09-20 06:27 [progress]
 
 A placeholder with a fact in it, `docs/task/20260920-0627-feature-declaration-promises.md`:
