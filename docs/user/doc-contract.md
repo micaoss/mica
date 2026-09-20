@@ -146,6 +146,15 @@ English source.
   scripts they name.
 - User pages do not narrate implementation. The design record owns the why;
   these pages own what an operator or integrator can do today.
+- **A default with a specific-looking value is the best-disguised default
+  there is** *(2026-09-20; a writing rule at two instances, not yet a claim
+  about the world)*. `0`, `true` and an empty string announce themselves; a
+  **round, deliberate, sized** number does not. `mica:100000:65536` was
+  described in these records as though somebody had chosen the range — it is
+  `login.defs`' `SUB_UID_MIN`/`SUB_UID_COUNT` — and a harness value that read
+  as an identifier was `process.pid`. **The value looked like the thing it was
+  not, and nothing about its appearance was wrong.** Before citing a number as
+  a decision, find who wrote it.
 - **State the unit with the number.** 536 and 535 were both true of the same
   mirror on the same evening — one counts the keys a contract requires, the
   other the distinct byte strings stored — and a bare number is wrong for

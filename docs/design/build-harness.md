@@ -941,6 +941,27 @@ worst kind of check: **one that looks complete and omits the instance that
 motivated it.** The second draft keys on the **name** rather than the
 mechanism, because the mechanism is what varies.
 
+**Before calling a drop a defect, ask whether the rest of the feature is also
+absent** *(2026-09-20, reached independently by three repositories)*. **A
+feature absent in every piece is a composition decision; a feature absent in
+one piece of several is a defect — and only the census distinguishes them, not
+the file.** Absent in every piece: the `subuid`/`subgid` maps dropped **and**
+`uidmap` never installed at the source **and** the engine depending only on
+`libsubid5` — rootless is simply not shipped. Absent in one of several:
+`systemd-pstore`, where the unit and the binary ship and only the enablement
+fell out. The method is the transferable part: it read the `passwd` file
+**and** the binary list rather than inferring either from the other.
+
+**And the clause belongs inside that rule rather than beside it, because it is
+the census's own failure mode: the census must cover the feature as *the
+format* defines it, not as the investigator remembers it.** One census nearly
+stopped at *subuid is for rootless, rootless is absent, done* — a true
+sentence and a complete-looking answer — and went to the pinned source anyway,
+where `--userns=auto` turned out to be a **rootful** consumer of
+`/etc/subuid` that nobody here knew existed. **A census bounded by memory
+looks exactly like a census bounded by the feature**, and from inside there is
+no signal that the boundary was the wrong one.
+
 **And the first question about a dropped path is what its presence would
 authorise, not whether the binary still works without it** *(2026-09-20)*. The
 obvious question points the wrong way on the case that matters:

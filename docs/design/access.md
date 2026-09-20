@@ -98,11 +98,24 @@ because it is workspace policy rather than one repository's build detail)*:
   rootless, `uidmap` is a row of `mica-system-base:upstream.pkgs` — pinned for
   later stages, not installed in the root — rather than a change to the base
   root.
-- **`/etc/subuid` and `/etc/subgid` are kept, inert by design.**
-  `mica:100000:65536` is what `useradd` writes from `login.defs`; no code asks
-  for it, and with no `uidmap` in the root the ranges do nothing. They stay
-  because suppressing them would be inventing a policy to undo a Debian
+- **`/etc/subuid` and `/etc/subgid` are kept, inert in this configuration —
+  and *inert* is narrower than it read here until 2026-09-20.**
+  `mica:100000:65536` is not an allocation anybody made: `base-passwd`'s
+  postinst creates the files empty and `useradd` writes that line from
+  Debian's `SUB_UID_MIN`/`SUB_UID_COUNT` in `login.defs`. **A round,
+  deliberate, sized number is the best-disguised default there is**, and this
+  page previously described the range as though somebody had chosen it. They
+  stay because suppressing them would be inventing a policy to undo a Debian
   default.
+
+  **And *no code asks for it* was wrong**: `podman --userns=auto` reads
+  `/etc/subuid` and is a **rootful** consumer *(found in the pinned podman
+  source by `mica-podman`, 2026-09-20; not re-measured here)*. Nothing in the
+  shipped configuration passes it, so the ranges do nothing **today** — but an
+  integrator writing a Quadlet unit can reach them, and with no `uidmap` in
+  the root what they would meet is a failure rather than a mapping. The
+  correct statement is *nothing shipped invokes the one flag that reaches
+  them*, not *nothing can*.
 
 **The console login was missing from every published image until
 `20260920-0622`, and this is what it was** *(closed 2026-09-20; kept rather

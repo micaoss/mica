@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-20 19:58 [finding]
+
+**Before calling a drop a defect, ask whether the rest of the feature is also
+absent.** A feature absent in **every** piece is a composition decision; a
+feature absent in **one piece of several** is a defect, and **only the census
+distinguishes them, not the file**. The `subuid` maps dropped *and* `uidmap`
+never installed *and* the engine depending only on `libsubid5` — rootless is
+not shipped. `systemd-pstore` shipped its unit and its binary and lost only
+the enablement. The method transfers: read the `passwd` file **and** the
+binary list rather than inferring either from the other.
+
+**And the clause goes inside the rule, because it is the census's own failure
+mode: the census must cover the feature as *the format* defines it, not as the
+investigator remembers it.** One census nearly stopped at *subuid is for
+rootless, rootless is absent, done* — true, and complete-looking — and read
+the pinned source anyway, where `--userns=auto` proved to be a **rootful**
+consumer of `/etc/subuid`. **A census bounded by memory looks exactly like a
+census bounded by the feature**, and from inside there is no signal which one
+it was.
+
+**That correction lands on a sentence of this repository's**: `access.md` said
+the ranges were inert because *no code asks for it*. Nothing **shipped**
+invokes the one flag that reaches them — an integrator writing a Quadlet unit
+can — and the honest form is *nothing shipped invokes it*, not *nothing can*.
+
+**And a writing rule at two instances, not a claim about the world: a default
+with a specific-looking value is the best-disguised default there is.** `0`,
+`true` and an empty string announce themselves; a round, deliberate, sized
+number does not. `mica:100000:65536` is `login.defs`' `SUB_UID_MIN` and
+`SUB_UID_COUNT`, and these records had described it as a range somebody chose.
+**The value looked like the thing it was not, and nothing about its appearance
+was wrong.**
+
 ## 2026-09-20 19:54 [finding]
 
 **Clause A is not unproven: its byte-equality form is unachievable by everyone
