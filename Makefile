@@ -58,6 +58,15 @@
 # anything still refused was testing two rules at once. "No gate can check
 # this" is a permanent limit and "no harness exists yet" is a piece of work,
 # and only one of those ever gets built -- so it is recorded as the second.
+#
+# THE PRACTICE IS "NAME THE RULE FROM A MEASUREMENT": run the case and record
+# what fired, never what the source says should fire. It finds two things --
+# AMBIGUITY (two rules could refuse it) and MISLABELLING (one rule fires and it
+# is not the named one), and the second produces a coverage hole: the rule
+# everyone believed was tested has no test, behind a fixture that appears to
+# cover it. The subtraction that finds those holes is RULES THE READER CAN
+# PRODUCE MINUS RULES THE FIXTURES NAME, and it is cheap: run here on
+# 2026-09-20 it found `fetch-required` untested, 40 against 39.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"

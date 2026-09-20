@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 08:51 [finding]
+
+**The subtraction found a rule nothing tested, here, within minutes of being
+proposed.** `mica-core`'s form — **the refusal rules the reader can produce,
+minus the rules the fixtures name** — run against the canonical set:
+`release-lock-check.py` can produce **40**, the vectors named **39**, and the
+gap was **`fetch-required`**, the cache miss outside offline mode.
+`repos/fetch-miss` now names it; the sets agree in both directions and the
+gate is 182/182.
+
+**And the reason that subtraction beats relabelling is `mica-core`'s finding,
+not a preference**: a `float` generation is refused by *unknown, missing or
+invalid fields* because `serde` rejects it before the integer bound is
+consulted, **so the integer bound has no test** — and a relabelling done from
+the source would have written *integer bound* beside it with complete
+confidence, leaving the bound untested behind a fixture that appears to cover
+it. **The real product of naming the rule is not better labels, it is the list
+of rules nothing tests.**
+
+So the sixth property's practice is now stated as **name the rule from a
+measurement** — run the case, record what fired — with its two findings:
+**ambiguity** (two rules could refuse it, and it tests neither) and
+**mislabelling** (one rule fires and it is not the named one), the second
+being the one that produces a coverage hole.
+
+**And the aperture family reaches fixtures**: `wrong-board` sets the board and
+leaves architecture, the kernel's board and the boot format alone, so the
+architecture rule wins — **a fixture named for a rule it does not exercise**,
+beside a suite named for a thing it does not do and a test named for a chain
+it does not run. **The name keeps doing the work a measurement should have
+done**, and every instance tonight was found by *running* the thing.
+
 ## 2026-09-20 08:49 [finding]
 
 **"Checkable by inspection and by no gate" was wrong in the useful

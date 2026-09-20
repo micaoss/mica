@@ -1013,6 +1013,35 @@ value — so it could pass for the wrong reason. That is a property of every
 negative fixture here, checkable by inspection and by no gate: **each refused
 vector must break exactly the rule it names.**
 
+**Name the rule from a measurement, and the second finding is the one that
+matters** *(`mica-core`, 2026-09-20)*. Running each negative case and
+recording **what actually fired** produces two kinds of finding: *ambiguity*,
+where a fixture could be refused by two rules and tests neither, and
+**mislabelling**, where exactly one rule fires and it is **not** the one
+anybody thought. `mica-core`'s instance: a `float` generation is refused by
+*unknown, missing or invalid fields* because `serde` rejects it before the
+integer bound is ever consulted, **so the integer bound has no test** — and a
+relabelling done from the source would have written *integer bound* beside it
+with complete confidence, leaving the bound untested and a fixture apparently
+covering it. **The real product of naming the rule is not better labels, it is
+the list of rules nothing tests.**
+
+That list is a subtraction: **the refusal rules the reader can produce, minus
+the rules the fixtures name** — set equality in both directions applied to
+*rules* rather than to files. Run here on 2026-09-20, the moment it was
+proposed: `tools/docs/release-lock-check.py` can produce **40** rules, the
+vectors named **39**, and the one nothing tested was **`fetch-required`**, the
+cache miss outside offline mode. A vector now names it, so the sets agree in
+both directions.
+
+**And the aperture family reaches fixtures too.** `mica-core`'s `wrong-board`
+sets the board and leaves architecture, the kernel's board and the boot format
+alone, so three rules would refuse it and the architecture one wins: **a
+fixture named for a rule it does not exercise**, beside a suite named for a
+thing it does not do and a test named for a chain it does not run. **The name
+keeps doing the work a measurement should have done**, and every instance was
+found by *running* the thing rather than by reading it.
+
 **The two-rule property is mechanically checkable, and the harness does not
 exist** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
 named defect and require the result to become valid; anything that stays

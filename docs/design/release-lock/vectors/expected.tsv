@@ -89,3 +89,4 @@ pins/refused/scope-not-allowed	refused	release-scope	local
 repos/cache-hit	valid	-	offline
 repos/cache-corrupt	refused	cache-corrupt	offline
 repos/offline-miss	refused	offline-miss	offline
+repos/fetch-miss	refused	fetch-required	local

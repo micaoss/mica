@@ -38,6 +38,15 @@ one-off or a pattern in a set written over months by people thinking about the
 positive case. It is also **local rather than inherited** — the same file is
 byte-identical to canonical in the workspace's oldest copy.
 
+## Done already, because it was the cheap half
+
+The subtraction — **rules the reader can produce minus rules the fixtures
+name** — needs no harness, and it ran on 2026-09-20 the moment `mica-core`
+proposed it: the reference checker can produce **40** refusal rules, the
+vectors named **39**, and the untested one was **`fetch-required`** (a cache
+miss outside offline mode). `repos/fetch-miss` now names it and the sets agree
+both ways. What remains is the mutation harness for the ambiguity half.
+
 ## Dependencies
 
 - **blocked by**: nothing; the harness is the work
