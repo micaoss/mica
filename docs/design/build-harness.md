@@ -731,6 +731,21 @@ sharing its shape — a correct class with a hand-enumerated membership is the
 defect this page names above, and sorting a triage by shape is how it is
 produced.
 
+**And *dropped* is not one mechanism either, which matters because the
+artefact that explains one of them cannot see the other** *(2026-09-20,
+reported by another repository and stated here for the shape)*. The composer's
+unowned-path account explains the `tty1` symlink exactly: nothing claimed it,
+so nothing carried it. It does not reach the four dropped Debian drop-ins at
+all — those are **package-owned**, by `systemd` and `systemd-resolved`, so
+some other rule took them, and which rule is an open question at the time of
+writing. **An artefact listing what no package claims cannot report a
+package-owned drop by construction**: the same shape as a suite walking its
+own `expected.tsv`, one level down — a filter that defines its own scope is
+silent about everything outside it, and its silence reads as absence. Two true
+drops, two mechanisms, and the second is visible only to somebody who asks
+*why was this dropped* per path rather than reading the list that answers for
+the first.
+
 Each acceptance round uses one immutable candidate image:
 
 1. Preflight the whole input set: package ownership, generated files, symlinks

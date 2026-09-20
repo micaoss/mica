@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-20 15:17 [finding]
+
+***Dropped* is not one mechanism, and the artefact that explains one cannot
+see the other.** The composer's unowned-path account explains the `tty1`
+symlink exactly and reaches none of the four dropped Debian drop-ins, which
+are package-owned by `systemd` and `systemd-resolved`; which rule took them is
+open. **A list of what no package claims cannot report a package-owned drop by
+construction** — the same shape as a suite walking its own `expected.tsv`, one
+level down, where a filter that defines its own scope is silent about
+everything outside it and the silence reads as absence. Recorded beside the
+polarity axis, because a triage sorted by shape would have put the two drops
+in one row.
+
 ## 2026-09-20 15:14 [finding]
 
 **A claim these records made about another repository's *set* was measured
