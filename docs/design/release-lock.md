@@ -969,13 +969,17 @@ and the same argument for writing it down. Rows are
 `<refused vector>\t<relation>\t<valid vector>`:
 
 - **`edit-of`** — a small edit of that vector: **at most two changed lines**,
-  and not identical. 44 of the 48 refused lock vectors are these.
+  and not identical. 50 of the 56 refused vectors are these.
+- **`reorder-of`** — exactly that vector's rows in another order, so **order
+  is the only rule it can break**. The relation *is* the argument, and the
+  gate checks it by sorting both files: three vectors are these
+  (`lock/refused/unsorted`, `lock/refused/release-not-first`,
+  `upstream/refused/unsorted`).
 - **`minimal-of`** — an independently written minimal lock of the same shape,
   so no line bound applies and the sibling names the **shape** rather than the
-  source text. Four are these: `column-count`, `image-platform`,
-  `package-without-pool` and `unsorted`, which was worth measuring because
-  this section used to say *each a minimal edit of a valid lock* and four
-  vectors were never that.
+  source text. Three are these: `column-count`, `image-platform` and
+  `package-without-pool`, which was worth measuring because this section used
+  to say *each a minimal edit of a valid lock* and they were never that.
 
 **Minimality is measured rather than assumed, in one set.**
 `mica-system-base` ran the procedure over all 56 of its `refused/` fixtures
@@ -991,11 +995,18 @@ break** — an argument about what *cannot* differ rather than about what a
 re-parse returns, and the only form that reaches the ambiguity question
 without a report-every-rule mode. Measured here: `lock/refused/unsorted.lock`
 and `lock/refused/release-not-first.lock` hold exactly their sibling's rows in
-a different order, so each is **provably single-rule**. Applying it to
-`upstream/refused/unsorted.lock` found the opposite and fixed it: it was
-missing a **comment line** its sibling carries — an incidental difference,
-breaking no rule and breaking the argument. With the comment restored its
-multiset matches and it, too, can only be refused for order.
+a different order, so each is **provably single-rule**. Applying it to the `upstream/refused/`
+set found the opposite in **half of it**: five of the eight were missing the
+same **comment line** their sibling carries — an incidental difference,
+breaking no rule and breaking the argument, and present since those fixtures
+were written. All five are repaired, each still refuses the rule it names, and
+`upstream/refused/unsorted.lock` can now only be refused for order.
+
+**Two assertions keep it that way**, and both were proven against mutated
+copies before being trusted: a `reorder-of` whose rows differ from its sibling
+is refused, and **a vector naming `sort-order` whose rows differ from its
+sibling is refused** — which is exactly the defect that had been sitting in
+the set.
 
 **The pairing is declared rather than derived**, because deriving it by
 smallest diff matched `image-platform.lock`, a `mica-build-env` shape, against

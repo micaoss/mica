@@ -75,13 +75,28 @@ while IFS=$'\t' read -r vector relation sibling; do
     [ -f "$V/$sibling" ] || fail "$vector: sibling $sibling does not exist"
     is_listed "$sibling" || fail "$vector: sibling $sibling is not a listed vector"
     changed=$(diff <(cat "$V/$sibling") <(cat "$V/$vector") | grep -c '^[<>]' || true)
+    same_rows=no
+    diff <(sort "$V/$sibling") <(sort "$V/$vector") >/dev/null && same_rows=yes
     case "$relation" in
         edit-of)
             [ "$changed" -gt 0 ] || fail "$vector: identical to its sibling $sibling"
             [ "$changed" -le 2 ] || fail "$vector: $changed changed lines against $sibling, more than an edit-of allows" ;;
+        reorder-of)
+            # The relation IS the argument: identical rows in another order, so
+            # order is the only rule the vector can break.
+            [ "$same_rows" = yes ] || fail "$vector: rows differ from $sibling, so it is not a reorder-of"
+            [ "$changed" -gt 0 ] || fail "$vector: identical to its sibling $sibling" ;;
         minimal-of)
             [ "$changed" -gt 0 ] || fail "$vector: identical to its sibling $sibling" ;;
         *) fail "$vector: unknown relation '$relation'" ;;
+    esac
+    # A vector whose named rule is sort-order must hold exactly its sibling's
+    # rows: anything else is an incidental difference, which is what carrying a
+    # missing comment line turned out to be on 2026-09-20.
+    case "$vector" in
+        */unsorted.lock)
+            CHECKS=$((CHECKS + 1))
+            [ "$same_rows" = yes ] || fail "$vector names sort-order but its rows differ from $sibling" ;;
     esac
 done <"$DERIV"
 
@@ -92,7 +107,7 @@ while IFS= read -r vector; do
         [ "$candidate" = "$vector" ] && listed_in_derivation=0
     done
     [ "$listed_in_derivation" = 0 ] || fail "$vector declares no derivation in derived-from.tsv"
-done < <(cd "$V" && find lock/refused -name '*.lock' | sort)
+done < <(cd "$V" && find lock/refused upstream/refused -name '*.lock' | sort)
 
 if [ "$FAIL" -gt 0 ]; then
     echo "tools/docs/verify-release-lock.sh: $FAIL FAILED, $((CHECKS - FAIL)) passed" >&2

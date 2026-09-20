@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-20 14:14 [finding]
+
+**The borrowed argument found the same defect in five more fixtures, and it is
+now a gate.** Applying *the row multiset decides what can differ* across
+`upstream/refused/` showed **five of the eight** were missing the same comment
+line their sibling carries — an incidental difference present since they were
+written, breaking no rule and breaking the argument. All five repaired, each
+still refusing the rule it names, verified per vector rather than in bulk.
+
+**A third relation carries the argument itself**: `reorder-of` — exactly the
+sibling's rows in another order, so **order is the only rule that vector can
+break**. Three vectors are these; 50 are `edit-of`; three are `minimal-of`.
+The gate sorts both files to check it, and adds the assertion that would have
+caught the original defect: **a vector naming `sort-order` whose rows differ
+from its sibling is refused.** Both assertions were **proven against mutated
+copies** before being trusted — mislabel a reorder and it fails on the line
+bound; add a row to the `sort-order` vector and it fails on the rows. Gate
+**298/298**, up from 280.
+
+That is the audit's first real product beyond a list: a property borrowed from
+another repository, applied here, six fixtures repaired, and the property
+itself made checkable so the next one cannot arrive silently.
+
 ## 2026-09-20 14:10 [finding]
 
 **A technique borrowed, applied, and it found something in the canonical
