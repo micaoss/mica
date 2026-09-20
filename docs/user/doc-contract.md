@@ -315,6 +315,18 @@ English source.
   **correct behaviour inside a stated scope** and can only be answered by a
   second artefact or by asking the question per item. So it is not a third
   instance, and saying so is worth more than the instance would have been.
+- **When a text crosses a repository boundary, the author writes the rule and
+  the repository that can measure supplies the number — and neither signs for
+  the other's half** *(2026-09-20)*. Three handed-over texts landed here in
+  one day; the third arrived with a **deliberate hole** where a count belonged,
+  because its author had relayed a wrong one earlier and the repository
+  receiving it could read the figure out of its own commits. That is better
+  than checking a number afterwards, and the reason is mechanical rather than
+  polite: **an empty slot is visible and a wrong number is not.** Every figure
+  that travelled wrongly this workspace has recorded was a filled slot —
+  nobody would have quoted a blank. Checking afterwards costs a second reader
+  and only works if that reader arrives; leaving the slot empty costs the
+  author nothing and cannot fail silently.
 - **And say so when you reverse an answer you have already given**
   *(2026-09-20)*. Re-measuring and correcting yourself is the behaviour these
   rules want; not announcing it is what makes the correction private. A

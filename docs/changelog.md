@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 16:43 [finding]
+
+**The handover pattern is recorded as a mechanism rather than an etiquette:
+the author writes the rule, the repository that can measure supplies the
+number, and neither signs for the other's half.** Three handed-over texts
+landed here in one day and the third arrived with a **deliberate hole** where
+a count belonged. **An empty slot is visible and a wrong number is not** —
+every figure that travelled wrongly in these records was a filled slot, and
+nobody would have quoted a blank. Checking a number afterwards costs a second
+reader and only works if that reader arrives.
+
+**And the two counts are reconciled in the record rather than left to be
+found**: *five* is the comment-line repairs in `upstream/refused/`, *eight* is
+those plus the three whose named defect dragged `sort-order` with it, across
+the whole set. Two answers to two questions, not a stale figure — separated
+rather than summed, because *eight defects* alone would read as one technique
+finding one kind of thing.
+
+**With the mechanism under the routing rule, from the receiving end**: a
+conclusion routed alone does not get argued with, **it gets agreed with and
+shelved**, which is why nothing would have run. Same fact as the counting
+reflex firing at what you are about to argue rather than at what you are about
+to agree with — **a technique cannot be agreed with; it can only be run or not
+run.**
+
 ## 2026-09-20 16:41 [finding]
 
 **The three coordination rules are landed as a section of the decision that

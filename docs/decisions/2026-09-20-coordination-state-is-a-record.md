@@ -130,6 +130,13 @@ hour — defects that the same repository's own conclusion, routed alone, would
 not have found, because there would have been nothing to run. The cost of
 routing the conclusion is not a slower result; it is no result.
 
+*(The mechanism under that, from the repository on the receiving end: **a
+conclusion routed alone does not get argued with — it gets agreed with and
+shelved**, which is why nothing would have run. It is the same fact as the
+counting reflex firing at what you are about to argue and not at what you are
+about to agree with, arriving at routing instead of at classes. **A technique
+cannot be agreed with; it can only be run or not run.**)*
+
 **Send a correction to the repository about to act on the wrong version before
 it acts, not after it reports.** Late is not wrong, it is expensive, and the
 expense lands on whoever was mid-work. This is the one cost in this workspace
@@ -145,6 +152,10 @@ wrong one earlier the same day: the argument came from `mica-system-base`, it
 was run over these fixtures, and **eight fixtures were repaired across three
 commits — `0a4a13f`, `c4efe00` and `653f641` — five of them the missing
 comment line and three whose named defect dragged `sort-order` with it**. The
+two halves are separated rather than summed because they are different defects
+and different scopes: the five are `upstream/refused/`, the three are across
+the whole set. A reader who finds *five* in one account and *eight* in another
+has found two answers to two questions, not a stale figure. The
 other three instances — both conditional rulings, and the
 correction-before-acting case where `mica-podman` was told that a pin move is
 not one line where a copy is pinned to it, before it pushed a change a gate
