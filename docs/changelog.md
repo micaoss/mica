@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-20 07:16 [finding]
+
+**No silent pass is named at its third instance**, in `build-harness.md`
+section 4 beside the other rules about gates: *a check that cannot reach its
+subject, or that has nothing to check, must refuse.* The three arrived three
+different ways, which is the part worth keeping — `verify-board.sh` was
+designed with it (*a check over an empty set reports green without having
+checked anything*), `verify-world.sh` reasoned it from the aperture rule (no
+reader and no claims exit 2), and `mica-res` found it **by testing the gate
+rather than by thinking about it**: its guard reported *nothing to check*
+while a candidate stood in front of it, and *arguments given and none parsed*
+is now a refusal.
+
+The third route is the lesson. A silent pass is invisible from outside by
+construction, so a gate's own tests are the only place it can be caught — and
+only if they include the case where the gate has nothing to work with.
+
+**And the second independently-arrived pair of the evening is recorded where
+the first is**: *an alarm that cries wolf destroys the instrument more quietly
+than one that never fires* (`mica-res`, after two false alarms in an hour;
+after a third nobody would have read the number again) is the same principle
+as keeping dated measurements out of the world gate, reached from the opposite
+direction — by consequence rather than by design. Its comparison is the half
+this repository did not have: **a gate that never fires gets noticed
+eventually; one that fires constantly gets ignored without anyone deciding
+to.**
+
+**Two is still two**, so both stay where they were written. The trigger is now
+in `doc-contract.md` instead of in anyone's head: if a third such pair
+appears, the fact worth recording is not any of the ideas — it is that this
+workspace is producing **convergence rather than correction**, and that claim
+gets its own record.
+
 ## 2026-09-20 07:14 [finding]
 
 **Why `record.sh` gates after the rebase is now written in `record.sh`**, in

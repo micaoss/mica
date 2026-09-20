@@ -194,4 +194,9 @@ English source.
   repairing a composer* and *a detector belongs in the CI of the repository
   whose files it guards* are one principle — **the fix belongs where the thing
   being fixed lives** — reached in two repositories within an hour, neither
-  having seen the other.
+  having seen the other. A second such pair followed the same evening: *an
+  alarm that cries wolf destroys the instrument more quietly than one that
+  never fires*, reached by design here and by consequence in `mica-res`. **If
+  a third pair appears, the fact worth recording is not any of the ideas — it
+  is that this workspace is producing convergence rather than correction**,
+  and that is a claim about the workspace with a record of its own.

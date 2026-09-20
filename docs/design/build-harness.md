@@ -49,6 +49,32 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**A check that cannot reach its subject, or that has nothing to check, must
+refuse — never pass quietly.** Three instances, in three tools and two
+repositories, arrived three different ways. `verify-board.sh` was **designed**
+with it: *a check over an empty set reports green without having checked
+anything*, so both its heading list and its row set must be non-empty before
+anything is asserted. `verify-world.sh` **reasoned** it from the aperture
+rule: no reader and no claims exit 2, because a check that cannot reach its
+subject must not look like one that found nothing wrong. And `mica-res` found
+it **by testing the gate rather than by thinking about it** — its guard
+reported *nothing to check* while a candidate stood in front of it, and
+*arguments given and none parsed* is now a refusal.
+
+The third route is the one worth noticing: the first two were prevented, the
+third had to be **provoked**. A silent pass is invisible from the outside by
+construction, so a gate's own tests are the only place it can be caught, and
+they only catch it if they include the case where the gate has nothing to work
+with.
+
+**And an alarm that cries wolf destroys the instrument more quietly than one
+that never fires** *(`mica-res`, 2026-09-20, after two false alarms in an
+hour: after the third, nobody would have read the number again)*. It is the
+same reason `docs/world-claims.tsv` holds standing claims only — a dated
+measurement re-checked against today is a false alarm every morning — reached
+from the other direction. **A gate that never fires gets noticed eventually;
+one that fires constantly gets ignored without anyone deciding to ignore it.**
+
 **The unchosen-property test: count how many independent things would have to
 change for it to stop being true.** When you find a property nobody chose —
 something that happens to hold — **one is luck and needs a gate; several is
