@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 15:37 [finding]
+
+**The row written to watch a step nobody watched fired twenty minutes after it
+was written.** All four boards were released at `20260920-1536` from one
+commit, `2bfa259e`; the four `board-release.*` rows went red naming the new
+tags and the `board-pin.*` rows stayed green — **at this step and not at the
+next one**, which is what the prediction table in `containers.md` section 8
+said this event would look like. The value is not that the rows noticed. It is
+that the red needed **no investigation**: the table had already said which
+event produces this pattern and what it means — `mica-build` can now re-pin,
+and until it does the products carry the older kernels.
+
+**So the sentence those rows were guarding is already gone**: *the newest
+release of every board is exactly what `locks/` names, so there is nothing to
+re-pin to* was true when it was written at 15:14 and false at 15:36. Without
+the rows it would have been a dated paragraph that reads as current; with them
+it was a CI failure with its explanation attached.
+
+**And the clause A impossibility turns out to be contingent**, which is the
+reason it had to be repaired rather than waited out: with all four boards
+released from a single commit, a workspace could stand at one commit for all
+four inputs once they are pinned. **A clause that happens to be satisfiable on
+a given afternoon is not a satisfiable clause** — the boards diverge again at
+the next release anybody cuts alone.
+
 ## 2026-09-20 15:35 [finding]
 
 **The product identity is repaired and `diagnostics.md` takes the one edit it

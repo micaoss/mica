@@ -644,11 +644,19 @@ what lets a red be read without an investigation:
 The middle row is there because it was missing: the release is a step of the
 chain that **no instrument saw**, so a page could have said *the repair has
 shipped* on the day the tags were cut and been wrong by a re-pin. The
-`board-release.*` rows name today's newest tag per board and go red when a
-board is released, which is the moment the sentence above about *nothing to
-re-pin to* stops being true. And if two of these columns ever go red on the
-same run, something moved that no row of this table predicts, which is an
-investigation rather than an edit.
+`board-release.*` rows name the newest tag per board and go red when a board
+is released. And if two of these columns ever go red on the same run,
+something moved that no row of this table predicts, which is an investigation
+rather than an edit.
+
+**That middle row fired twenty minutes after it was written**, which is the
+only test a prediction has: the four boards were released at
+`20260920-1536`, those rows went red naming the new tags, and the
+`board-pin.*` rows stayed green — at this step and not at the next one,
+exactly as the table says. The value is not that the rows noticed; it is that
+**the red needed no investigation**, because the table had already said which
+event produces this pattern and what it means. A gate that says beforehand
+which way it will fail converts an alarm into a reading.
 
 **Nothing requires any of this.** A `.container` file with no `[Service]`
 section at all is accepted, generates a unit with no ceilings, and Mica OS adds

@@ -93,15 +93,22 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/ue
 # AND THE STEP BETWEEN THEM, WHICH NOTHING WATCHED. The config rows flip when
 # mica-boards records a symbol; the pin rows flip when mica-build moves to a
 # release that carries it. THE RELEASE ITSELF IS A THIRD STEP and it moved
-# neither: on 2026-09-20 the newest tag of every board was already exactly what
-# locks/ named, so "mica-build cannot re-pin, there is nothing to re-pin to"
-# was true and invisible. These rows name today's newest tag per board and go
-# red when a board is released, which is the moment that sentence stops being
-# true. Expect them red BEFORE the pin rows, never after.
-board-release.uefi-x64	newest-tag	micaoss/mica-boards:uefi-x64	^uefi-x64[.]20260916-0857$	docs/design/containers.md
-board-release.uefi-arm64	newest-tag	micaoss/mica-boards:uefi-arm64	^uefi-arm64[.]20260916-0857$	docs/design/containers.md
-board-release.cx3576	newest-tag	micaoss/mica-boards:cx3576	^cx3576[.]20260917-1007$	docs/design/containers.md
-board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260919-2259$	docs/design/containers.md
+# neither: when these rows were written the newest tag of every board was
+# already exactly what locks/ named, so "mica-build cannot re-pin, there is
+# nothing to re-pin to" was true and invisible.
+#
+# THEY FIRED TWENTY MINUTES LATER, WHICH IS THE ONLY TEST OF A ROW THAT
+# MATTERS. All four boards were released at 20260920-1536 from one commit,
+# 2bfa259e; these rows went red and the pin rows below stayed green, which is
+# exactly what the prediction table in containers.md 8 said would happen at
+# this step and not at the next one. The expectations are moved to the new
+# tags; they go red again at the next release, and a red here with the pin
+# rows still green means the same thing it meant today: mica-build now CAN
+# re-pin, and until it does the products carry the older kernels.
+board-release.uefi-x64	newest-tag	micaoss/mica-boards:uefi-x64	^uefi-x64[.]20260920-1536$	docs/design/containers.md
+board-release.uefi-arm64	newest-tag	micaoss/mica-boards:uefi-arm64	^uefi-arm64[.]20260920-1536$	docs/design/containers.md
+board-release.cx3576	newest-tag	micaoss/mica-boards:cx3576	^cx3576[.]20260920-1536$	docs/design/containers.md
+board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260920-1536$	docs/design/containers.md
 #
 # The floor itself is now more than one symbol, and these three are the shape
 # of the decision rather than of a scatter: PSI and IOCOST are ON for every

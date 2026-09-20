@@ -73,6 +73,14 @@ Moving the repositories to the release lock format
   `mica-build` has the matching mechanism approved, which is the order that
   matters: the mechanism follows the clause.
 
+  *(And the impossibility is **contingent**, which is the reason the clause
+  had to move rather than wait: at 15:36Z on 2026-09-20 all four boards were
+  released at `20260920-1536` from a single commit, `2bfa259e`, so once those
+  are pinned a workspace could stand at one commit for all four inputs. A
+  clause that happens to be satisfiable on a given afternoon is not a
+  satisfiable clause — the boards diverge again at the next release anybody
+  cuts alone.)*
+
   And what the chain does in the meantime is worth more than the repair
   (`mica-build` `31b28d55`, 14:46Z): it **prints, per producer, its checkout
   head against the commit `locks/` names**, `--at-release-commits` **refuses
