@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 16:49 [finding]
+
+**The falsification ran and found a defect in the check rather than confirming
+it — on its first run, by the deliberate test rather than by an accident.**
+Against a product built from the old pins (`uefi-x64` at `20260916-0857`,
+`# CONFIG_MEMCG is not set` in the fetched config), podman failed outright and
+`crun` said *open `memory.max` for writing: no such file or directory*; the
+variable then held that error text and the CPU case ran over the string and
+printed a **pass**. **A verdict about a string that was never a cgroup file.**
+The repair is the empty-parse rule where it had not arrived: **a run that did
+not happen has no ceilings to report.**
+
+**And the near-miss is worth more than the defect.** The suite was red only
+because the memory branch happened to fail first; one symbol different and it
+would have been **green with a false pass on the exact experiment designed to
+prove it could tell two worlds apart**. **A correct verdict reached by an
+accident of ordering is indistinguishable from a correct verdict** — the
+eight-of-nine shape, in an instrument instead of a fragment.
+
+**The fifth instance is held rather than recorded**, because the result was
+produced by a file that has since been fixed and both runs are repeating
+against the corrected one. Recording it now would be the subject problem one
+more time, in the record that names it.
+
+**Two smaller things the episode settled**: the `available:` list printed
+beside the verdict turned out to be a **second reading of the same fact** —
+`memory` absent on the old kernel, present on the new — so a format added to
+make a wrong answer legible paid for itself as evidence; and the report-both
+branches are retired by the author who wrote their condition, **the absent
+branch being a measurement while the floor was incomplete and a defect
+today**.
+
 ## 2026-09-20 16:43 [finding]
 
 **The handover pattern is recorded as a mechanism rather than an etiquette:

@@ -95,6 +95,18 @@ negative test for six days** while every commit report quoted `355/355 PASS`.
 The counterexample was found by applying the rule to the ledger used to test
 it.
 
+**And the falsification's first run found a defect rather than confirming the
+check**, which is the argument made by the experiment instead of about it: the
+run that was supposed to demonstrate a check could tell two worlds apart found
+that its CPU case was pronouncing a verdict on an **error string**, because
+the command it was reading had failed. The repair is the empty-parse rule in a
+place it had not been applied — **a verdict pronounced on a value never
+obtained** — and the near-miss is sharper than the defect: the suite was red
+only because another branch happened to fail first, so with one symbol
+different it would have been **green with a false pass on the experiment
+designed to prove it could not be**. **A correct verdict reached by an
+accident of ordering is indistinguishable from a correct verdict.**
+
 **The operational half is what makes it a build target rather than a virtue:
 a bite test by hand proves a gate once and proves nothing tomorrow.** This
 one had been mutated and restored twice, by a person, at a terminal — *seen to

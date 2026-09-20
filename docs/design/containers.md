@@ -769,6 +769,35 @@ path** — the thing logged and skipped when it does not resolve. A row left
 half-open is worth more than a row filled with a third thing that looks like
 evidence.
 
+**The check that produced those numbers had a third defect, found by the
+experiment designed to falsify it rather than by an accident.** Run against a
+product built from the **old** pins — `uefi-x64` at board release
+`20260916-0857`, whose fetched config carries `# CONFIG_MEMCG is not set` —
+podman failed outright, `crun` reporting *open `memory.max` for writing: no
+such file or directory*; the variable then held that error text, and the CPU
+case ran over the string and printed a **pass**. **A verdict about a string
+that was never a cgroup file.** The repair is the empty-parse rule in the one
+place it had not arrived: not a gate that extracted nothing, but **a verdict
+pronounced on a value never obtained — a run that did not happen has no
+ceilings to report.**
+
+**And the near-miss is worth more than the defect.** The suite was red only
+because the **memory** branch happened to fail first; had that kernel carried
+`MEMCG` and lacked only `CFS_BANDWIDTH`, the same run would have been **green
+with a false pass — on the exact experiment designed to prove the check could
+tell two worlds apart.** **A correct verdict reached by an accident of
+ordering is indistinguishable from a correct verdict**, which is the
+eight-of-nine shape again: nothing in the output separates the luck from the
+judgement. *(The corrected file is being run against both worlds — old must
+fail, new must pass — and this section will name that result when it exists
+rather than quoting one produced by a file that has since changed.)*
+
+**And the line added to make a wrong answer legible paid for itself as
+evidence**: the probe prints the root cgroup's `available:` list beside its
+verdict, and `memory` is **absent** there on the old kernel and present on the
+new. An unplanned second reading of the same fact, from a format rather than
+from a reader.
+
 **What let version 3 answer what two versions could not is that it stopped
 testing a path.** *Does `/sys/fs/cgroup/cpu.max` exist* was never a question
 anybody had; *does `--cpus=0.5` reach the container* is the sentence this
@@ -804,7 +833,11 @@ corroboration unless they could have disagreed, and one of these two was
 constant.** That is the same statement as *a branch that always passes is a
 measurement and not an assertion* — which the probe's author wrote, the same
 evening, about the **other** branch of the same test, without connecting it to
-the branch that was always taken.
+the branch that was always taken. Those report-both branches are retired now
+that the floor is uniform, by the author who wrote the condition: **the absent
+branch was a measurement while the floor was incomplete and is a defect
+today**, which is a sentence executing itself on the day its condition came
+true.
 
 **And the comment above it armoured the mistake.** The probe warned that `cpu`
 appears in `cgroup.controllers` on a kernel without `CFS_BANDWIDTH`, *"which
