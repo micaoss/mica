@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-20 07:19 [finding]
+
+**The self-edit hazard is not loud, and "loud when the length changes" is not
+the rule either — measured rather than reasoned.** A 78 KB script rewritten
+one second into its own `sleep`, three ways:
+
+- same inode, **large early insertion** → **loud**: the interpreter resumes
+  inside a line and runs garbage (`ed: applet not found`). This is the case
+  that was hit while editing `record.sh`'s own comment.
+- same inode, **small late change** → **silent**: the running script executes
+  the **new** text and exits 0 — and this held whether the replacement
+  preserved the length or changed it, which is where the framing offered to
+  this repository was wrong.
+- **rename-based** edit (`sed -i`) → the running script keeps the old inode
+  and never sees the change at all.
+
+So the hazard is not the length; it is **how far the bytes before the
+interpreter's position moved**. The note in `record.sh` now says that, with
+the measurements, because the silent case is the dangerous one: nothing dies,
+and the commit and the push are then performed by a script that is part old
+and part new. *Nothing was committed because the sequence dies before the
+commit exists* is true of the loud case only.
+
+The thing worth keeping from the exchange: a framing was about to be asserted,
+the test disproved it, and what went in was the measurement. Three behaviours
+beat one rule, and a note recording *it failed loudly once* would have taught
+that the hazard announces itself.
+
 ## 2026-09-20 07:16 [finding]
 
 **No silent pass is named at its third instance**, in `build-harness.md`

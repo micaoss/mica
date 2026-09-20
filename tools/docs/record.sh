@@ -40,12 +40,24 @@
 # would leave every collided push unchecked, and collisions are the normal case
 # in this repository.
 #
-# THIS SCRIPT CANNOT EDIT ITSELF THROUGH `--edit`. bash reads a script
-# incrementally by byte offset, so rewriting this file while it runs shifts the
-# ground under the interpreter and the run dies with a syntax error partway
-# through (seen 2026-09-20, editing this very comment). To change this file,
-# apply the edit first and then run the `edits already made` form, which
-# rewrites nothing during the run.
+# THIS SCRIPT CANNOT EDIT ITSELF THROUGH `--edit`, AND THE FAILURE IS NOT
+# RELIABLY LOUD. bash reads a script incrementally by byte offset, so a rewrite
+# of this file *in place* is picked up mid-run. Measured on 2026-09-20 with a
+# 78 KB script rewritten one second into its own sleep:
+#
+#   same inode, large early insertion   -> LOUD: the interpreter resumes inside
+#                                         a line and runs garbage ("ed: applet
+#                                         not found"). This is what was hit.
+#   same inode, small late change       -> SILENT: it runs the NEW text and
+#     (length-changing or preserving)      exits 0.
+#   rename-based edit (`sed -i`)        -> the running script keeps the old
+#                                         inode and never sees the change.
+#
+# So the hazard is not "the length changed"; it is how far the bytes before the
+# interpreter's position moved. The silent case is the dangerous one here:
+# nothing dies, and the commit and the push are then performed by a script that
+# is part old and part new. To change this file, apply the edit first and run
+# the `edits already made` form, which rewrites nothing during the run.
 set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
