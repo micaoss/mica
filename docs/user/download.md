@@ -38,14 +38,24 @@ name did not change. Those releases stay published and are not deleted
 ([release-lock](../design/release-lock.md) 2.1); the fix is the superseding
 release, not a deletion.
 
-**The corrected round is `20260919-2356`** — `uefi-x64.20260919-2356`, `uefi-arm64.20260919-2356` and `cx3576.20260919-2356`,
-with the index `mica.20260920-0008`, all built from `f46b64a6`. The client it
-ships accepts the current names: the `mica-core` release it pins,
-`20260919-2226`, matches `uefi-x64` and `uefi-arm64` in the board arm whose
-absence produced the refusal. Both `uefi-x64` products of that round were
-**booted in their release run** and reached the guest's own pass marker. The
-boot step is amd64-only, so the `uefi-arm64` and `cx3576` products of the same
-round were built and statically verified but not started.
+**Take `20260920-0622` or later** — `uefi-x64`, `uefi-arm64`, `cx3576` and
+`s905x5m` at that stamp, with the index `mica.20260920-0636`, from
+`73aca2c`. Two repairs are in the images, and both matter before you flash
+one:
+
+- `20260919-2356` (index `mica.20260920-0008`, from `f46b64a6`) fixed the
+  board name: the `mica-core` release it pins, `20260919-2226`, matches
+  `uefi-x64` and `uefi-arm64` in the arm whose absence made the earlier images
+  power down at PID 1. Both `uefi-x64` products of that round were **booted in
+  their release run** and reached the guest's own pass marker; the boot step
+  is amd64-only, so the other products were built and statically verified but
+  not started.
+- `20260920-0622` fixed the **console login**, which no image before it had:
+  `/etc/pam.d/login` and the four `common-*` files were missing, so the login
+  stack could not be assembled on any board and no account could log in
+  ([access](../design/access.md) section 2). SSH through micad was never
+  affected. Those roots now carry sixteen files in `/etc/pam.d` with every
+  include resolving.
 
 **A published image is not a booted image**, and the catalogue is split in
 half on that: four of the eight products — `cx3576-dev`, `cx3576-prod`,

@@ -44,7 +44,10 @@ worse than no gate: it converts an open question into a green tick. So a new
 gate starts by reporting its number, the number is split into what is
 explained and what is not, and the refusal arrives when the unexplained count
 reaches zero and stays there. The composition drops are the instance: 703
-paths left behind is not a failure condition, 703 *unexplained* would be.
+paths left behind is not a failure condition, 703 *unexplained* would be. And
+while it reports without refusing, say what it is: **a report is a necessary
+condition, not a proof** — the drops gate tells you what the composition left
+behind and proves nothing about whether the root is right.
 
 **The unchosen-property test: count how many independent things would have to
 change for it to stop being true.** When you find a property nobody chose —

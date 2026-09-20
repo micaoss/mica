@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 06:48 [progress]
+
+**The user pages now point at `20260920-0622`**, in `docs/user/download.md`,
+`docs/user/flashing.md` and their Chinese pages, with both repairs named and
+neither dropped: `20260919-2356` fixed the board name that made images power
+down at PID 1, and `20260920-0622` fixed the console login that no image
+before it had. Someone taking the round we recommended an hour ago would have
+had a bootable image nobody could log into.
+
+**One line beside the gate-reports rule**: while a gate reports without
+refusing, say what it is — **a report is a necessary condition, not a proof**.
+The drops gate tells you what the composition left behind and proves nothing
+about whether the root is right.
+
+**And an instance deliberately not counted**, recorded where it would have
+been counted: that drops gate is a candidate second instance for *a capability
+row is a necessary condition, not a proof of function*, and it is not one — it
+belongs to the gate-reports rule, where the sentence above now sits. Counting
+it in both places is the failure mode recorded next door in
+`doc-contract.md`: an instance spent twice inflates both classes. The
+capability-row sentence still has one instance and stays at its point of use.
+
 ## 2026-09-20 06:45 [progress]
 
 **The console-login gap is closed and the sentence is replaced rather than

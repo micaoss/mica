@@ -46,6 +46,14 @@ will be read as the check lying.*
 One instance so far, so it lives here at its point of use rather than as a
 rule of its own. If a second arrives, that is when to look for the third.
 
+**Considered and not counted**: `mica-build`'s drops gate reports 703 paths
+and refuses none, so it too is a necessary condition rather than a proof. It
+belongs to the *gate reports before it refuses* rule
+([harness](../design/build-harness.md) section 4), where that sentence now
+sits, rather than being a second instance of this one. Counting it here would
+be the failure mode already recorded next door: an instance spent twice
+inflates both.
+
 ## Dependencies
 
 - **blocked by**: the three-repository proposal
