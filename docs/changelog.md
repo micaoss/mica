@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-20 08:00 [finding]
+
+**A self-retiring check needs its predicate to *be* the reason, not a proxy
+for it** — recorded where the self-retiring form is defined, because the
+approved lock-mirroring round is about to test it. `poolsCovered()` guards a
+refusal because **nothing mirrors the pools**; the round adds a `lock` kind to
+the same mirror, and if a `lock` row were allowed to satisfy that predicate
+the refusal would vanish while the pools stayed unmirrored — **silently, and
+without the user ever being asked to lift it.**
+
+The sentence under it is what makes the earlier rule survivable: *a
+constraint that verifies itself cannot decay* is true only while the
+verification tracks the reason. **A check that can be satisfied by something
+other than its reason is worse than a record, because it retires itself
+confidently.**
+
+Applied where the hold lives: a `lock` row must not satisfy the pools
+predicate, so the mirror gaining a different kind of object leaves that
+refusal standing.
+
 ## 2026-09-20 07:57 [finding]
 
 **The migration task's third clause is open because the tool does one thing

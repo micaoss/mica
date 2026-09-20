@@ -77,7 +77,13 @@ and the condition waits on the mirroring.
 the board components and the device update service stay out. It does not
 unblock the hold's condition: locks become mirrored and **pools do not**, so
 the per-artefact condition still cannot collapse into one row
-([release-lock](../design/release-lock.md) 2.1).
+([release-lock](../design/release-lock.md) 2.1). **And a `lock` row must not
+be allowed to satisfy the pools predicate**: the refusal that guards the pools
+exists because nothing mirrors *them*, so a mirror that gains a different kind
+of object must leave it standing. Otherwise the approved work of (4) would
+retire a refusal the user was never asked to lift — the predicate has to be
+the reason ([coordination
+state](2026-09-20-coordination-state-is-a-record.md)).
 
 **The price, and it was a scope reversal rather than a recommendation anyone
 could act on**: under 5 MB against the 1.8 GB already

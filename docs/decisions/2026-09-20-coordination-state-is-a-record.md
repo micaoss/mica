@@ -72,6 +72,17 @@ is available less often than it looks: it needs the constraint's reason to be
 computable from the world rather than from intent. Where it is not, the rule
 above stands and the record is what there is.
 
+**The predicate must BE the reason, not a proxy for it** *(2026-09-20)*. A
+self-retiring check retires when its predicate goes true, so if the predicate
+is broader than the reason, unrelated work retires a refusal nobody decided to
+lift. The live instance: `poolsCovered()` guards a refusal because **nothing
+mirrors the pools**, and the approved lock-mirroring round adds a `lock` kind
+to the same mirror — if a `lock` row were allowed to satisfy that predicate,
+the refusal would disappear while the pools stayed unmirrored, silently, and
+the user would never have been asked. A check that can be satisfied by
+something other than its reason is worse than a record, because it retires
+itself confidently.
+
 **But *not computable* does not mean *not checkable*, and the middle case is
 the common one.** Applying the test to tonight's four split them three ways:
 
