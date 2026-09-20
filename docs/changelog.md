@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-20 14:28 [finding]
+
+**Two more instances of *identical wrong bytes are a pass*, recorded as
+instances rather than as new rules — and together they give it a shape.**
+
+The **healthy** arrangement (`mica-system-base`): 21 negative cases **built in
+code** from one baseline builder, so minimality holds by construction, and the
+aperture moves inside its own file — a wrong builder makes all 21 wrong
+together. What closes it is that the same `assertBase` runs on the **real
+bootstrapped root of both architectures** every CI run. Its line is the remedy
+in one sentence: **one reader over two originals catches what five readers
+over one original cannot.** The vectors here are the opposite arrangement —
+one original, five readers — which is why six defects sat in them.
+
+The **pathological** one (`mica-build`): a fixture seeds
+`50-mica-getty.preset` into a synthetic healthy root while **three of four
+real boards do not have that file**, to feed a suite deleted on 2026-09-09.
+**A fixture is never compared to a root, so it can fabricate reality in the
+one place where nothing can notice.**
+
+**And one repair in the vector set changed what the fixture is about**, which
+a diff will not show, so `release-lock.md` 9.3 says it: two of the three were
+re-sorted, but `image-source-reference` needed its **defect moved rather than
+its rows** — a valid source with a reference pointing at another repository,
+so it tests `reference-repository` alone instead of behind `image-source`.
+
 ## 2026-09-20 14:26 [progress]
 
 **Two of the seven unknowns were a misclassification, not a limit: 45

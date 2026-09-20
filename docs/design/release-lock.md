@@ -1210,6 +1210,14 @@ required. All three are repaired (`lock/refused/image-source`,
 `lock/refused/image-source-reference`, `upstream/refused/repository-source`),
 each still refusing the rule it names.
 
+**One of the three is different in kind and the diff will not show it.** Two
+were re-sorted; `image-source-reference` needed its **defect moved rather than
+its rows** — it now carries a **valid** source with a reference pointing at
+another repository, so it tests `reference-repository` alone instead of
+testing it behind `image-source`. It is the only repair in the set that
+changed **what the fixture is about**, which a later reader cannot see from
+the diff, so it is said here.
+
 The six that remain are **inherent pairs**, and the record is the pair rather
 than a repair:
 

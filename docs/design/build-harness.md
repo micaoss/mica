@@ -210,6 +210,34 @@ relationship is wrong — is named with its other instances in
 [doc-contract](../user/doc-contract.md) section 6; this is that shape outside
 prose.
 
+**Four instances now, and together they give the rule a shape it did not have:
+the healthy arrangement and the pathological one** *(2026-09-20)*.
+
+- The **second** is the stronger version of the first: 139 vector files
+  identical across repositories **as blob names**, six of them carrying the
+  same defect since they were written. Agreement between copies proved exactly
+  what it claimed — that the copies agreed — and had an aperture of zero on a
+  defect they shared.
+- The **healthy** arrangement, from `mica-system-base`: its 21 negative cases
+  are **built in code** from one baseline builder, so minimality holds by
+  construction — and the aperture moves inside its own file, since a wrong
+  builder makes all 21 wrong together. What closes it is that the **same
+  `assertBase` runs on the real bootstrapped root of both architectures in
+  every CI run**. Its formulation is the remedy in one line: **one reader over
+  two originals catches what five readers over one original cannot.** The
+  vectors here have the opposite arrangement — one original checked by five
+  readers — which is why six defects sat in them.
+- The **pathological** arrangement, from `mica-build`:
+  `verify/src/checks-fixture.ts` seeds `50-mica-getty.preset` into a synthetic
+  healthy root, and **three of the four real boards do not have that file**.
+  It seeds it to feed a suite deleted on 2026-09-09, with the comment naming
+  that suite touched *after* the deletion. **A fixture is never compared to a
+  root, so it can fabricate reality in the one place where nothing can notice.**
+
+All four are the same rule. Naming a new one for each would inflate the
+taxonomy and hide which rules are load-bearing
+([doc-contract](../user/doc-contract.md) section 6).
+
 The update-server command runs in its pinned Bun environment. Consult
 `.github/workflows/check.yml` for the full CI gate set. Local success and remote
 CI status are recorded separately; test counts belong to a dated delivery
