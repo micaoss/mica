@@ -943,6 +943,52 @@ claim about a repository's habits. That also relocates the difficulty of ever
 gating this — the hard part is **not** deciding what each reader owes, it is
 **finding each reader's copy**, and those are very different problems.
 
+**The derivation gives a FLOOR, not a ceiling** *(`mica-system-base`,
+2026-09-20)*. It pins one unscoped producer and could skip every scoped,
+index, product, bundle and asset vector; it runs them anyway, because **a
+producer that conforms only to what it consumes can emit a row nobody
+downstream accepts.** So the rule reads: **what you pin, plus what you
+produce, plus the vectors that say what your own forms may not be** — and that
+is the minimum. A floor stated as a ceiling is how a correct rule produces a
+worse tree.
+
+### 9.2 `vectors.pin`: the pin a gate reads
+
+A consumer records the vectors it conforms to in a file named **`vectors.pin`
+in a directory of its own choosing**:
+
+```text
+# mica-vectors-pin v1
+REPOSITORY=mica
+COMMIT=<40 lowercase hex>
+```
+
+Exactly those two keys, in that order, and nothing else. `COMMIT` is the full
+commit, never a short one: **the file is read by a gate rather than by a
+person**, which fetches the vectors at that commit and refuses a difference.
+Refusals, in the vocabulary of 1.5: `header`, `encoding` (no final newline, a
+CR, not UTF-8), `pin-format` (any other key set or order) and `field-value`
+(a repository name or commit outside its form). Six vectors under
+`vectors-pin/` prove them.
+
+**The basename is uniform and the directory is not**, which is the whole point
+of fixing it: finding each reader's copy was named as the hard part of ever
+gating this, and a uniform basename makes that **one command per repository**
+instead of a maintained list of paths. A naming convention that costs nothing
+today removes the obstacle that made the gate not worth building.
+
+**And a provenance comment nobody checks is not provenance** *(the rule's
+first live test, 2026-09-20)*. `mica-system-base`'s 133 vector blobs were
+byte-identical to this repository at `735ebaa`, compared blob sha by blob sha
+— while its provenance comment named `19fbdce`, at which the vector list had
+69 rows. **Current files, a stale line, and the line is the only thing anyone
+reads.** The rule had acquired the defect it was written to cure, in the
+opposite direction. What makes the line load-bearing instead of decorative is
+that a gate reads it: **a hand-maintained provenance comment is a claim; a pin
+a gate reads is an input.** A repository adopting the pin deletes its comment
+in the same commit — a provenance line surviving beside a pin is a second
+source of truth, and the two will disagree within a month.
+
 **And the table above has the same defect it describes**: nothing compares
 those copies to this one, so it will go stale the way its own numbers did.
 The commit-naming rule is what keeps it alive — **if every copy names its

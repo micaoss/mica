@@ -28,6 +28,7 @@ while IFS=$'\t' read -r path result rule mode; do
     case $path in
         lock/*)  got=$(python3 tools/docs/release-lock-check.py lock "$V/$path") ;;
         upstream/*) got=$(python3 tools/docs/release-lock-check.py upstream "$V/$path") ;;
+        vectors-pin/*) got=$(python3 tools/docs/release-lock-check.py vectors-pin "$V/$path") ;;
         pins/*)  got=$(python3 tools/docs/release-lock-check.py pins "$V/$path" "$mode") ;;
         repos/*) got=$(python3 tools/docs/release-lock-check.py repos "$V/$path" "$mode") ;;
         *)       got="unknown vector kind" ;;
@@ -55,7 +56,7 @@ is_listed() {
 while IFS= read -r vector; do
     CHECKS=$((CHECKS + 1))
     is_listed "$vector" || fail "$vector is not listed in expected.tsv"
-done < <(cd "$V" && { find lock upstream -name '*.lock'; find pins -mindepth 2 -maxdepth 2 -type d; find repos -mindepth 1 -maxdepth 1 -type d; } | sort)
+done < <(cd "$V" && { find lock upstream -name '*.lock'; find vectors-pin -name '*.pin'; find pins -mindepth 2 -maxdepth 2 -type d; find repos -mindepth 1 -maxdepth 1 -type d; } | sort)
 
 if [ "$FAIL" -gt 0 ]; then
     echo "tools/docs/verify-release-lock.sh: $FAIL FAILED, $((CHECKS - FAIL)) passed" >&2

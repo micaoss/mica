@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-09-20 08:39 [spec]
+
+**`vectors.pin` is specified and proven, because four repositories are writing
+it tonight.** `release-lock.md` 9.2: a two-key file — `REPOSITORY=` and
+`COMMIT=`, in that order, nothing else — with the full 40-hex commit because
+**the file is read by a gate rather than by a person**. Refusals are `header`,
+`encoding`, `pin-format` and `field-value`, and six vectors under
+`vectors-pin/` exercise each; the gate is **180/180**, up from 168.
+
+**The basename is uniform and the directory is not**, which is the point:
+*finding each reader's copy* was named here as the hard part of ever gating
+this, and a uniform basename makes it **one command per repository** instead
+of a maintained list of paths. The obstacle that made the gate not worth
+building is removed by a naming convention that costs nothing today.
+
+**The provenance rule met its failure mode within the hour, in the repository
+whose files are perfect.** `mica-system-base`'s 133 vector blobs were
+byte-identical to this tree at `735ebaa` — compared blob sha by blob sha —
+while its provenance comment named `19fbdce`, where the list had 69 rows.
+**Current files, a stale line, and the line is the only thing anyone reads**:
+the rule had acquired the defect it was written to cure, pointing the other
+way. **A provenance comment nobody checks is not provenance.** The resolution
+is the mechanism already adopted — a gate that reads the pin makes the line an
+**input** rather than a **claim** — and a repository adopting the pin deletes
+its comment in the same commit, because a provenance line beside a pin is a
+second source of truth that will disagree within a month.
+
+**And the derivation is a floor, not a ceiling** (`mica-system-base`): it pins
+one unscoped producer, could skip every scoped, index, product, bundle and
+asset vector, and runs them anyway — **a producer that conforms only to what
+it consumes can emit a row nobody downstream accepts.** The rule reads *what
+you pin, plus what you produce, plus the vectors that say what your own forms
+may not be*, and that is the minimum. **A floor stated as a ceiling is how a
+correct rule produces a worse tree.**
+
 ## 2026-09-20 08:32 [finding]
 
 **A record that needs a command instead of an owner.** The table in

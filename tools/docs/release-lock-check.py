@@ -10,6 +10,7 @@ out of its scope.
 
     release-lock-check.py lock <file>
     release-lock-check.py upstream <file>              (locks/upstream.lock)
+    release-lock-check.py vectors-pin <file>            (a repository's vectors.pin)
     release-lock-check.py pins <locks-dir> ci|local    (<locks-dir> holds <repository>[.<scope>].lock and pins/<repository>[.<scope>].pin)
     release-lock-check.py repos <dir> offline
 """
@@ -334,6 +335,28 @@ def read_pin(path):
     return values
 
 
+def check_vectors_pin(path):
+    # 9.2: the two-key pin that names the vectors a reader conforms to. It is
+    # read by a gate, not by a person, which is why the commit is the full 40
+    # hex and why nothing else is allowed in the file: a second key would be a
+    # second source of truth beside the one the gate acts on.
+    data = open(path, "rb").read()
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise Refused("encoding")
+    if not text.endswith("\n") or "\r" in text:
+        raise Refused("encoding")
+    lines = text[:-1].split("\n")
+    if lines[0] != "# mica-vectors-pin v1":
+        raise Refused("header")
+    pairs = [line.split("=", 1) if "=" in line else [line, None] for line in lines[1:]]
+    if [k for k, _ in pairs] != ["REPOSITORY", "COMMIT"]:
+        raise Refused("pin-format")
+    values = dict(pairs)
+    field(REPOSITORY.match(values["REPOSITORY"]) and COMMIT.match(values["COMMIT"]))
+
+
 def check_pins(directory, mode):
     pins_dir = os.path.join(directory, "pins")
     pins = sorted(f[:-4] for f in os.listdir(pins_dir) if f.endswith(".pin"))
@@ -387,6 +410,8 @@ def main(argv):
             check_lock(argv[2])
         elif argv[1] == "upstream":
             check_upstream(argv[2])
+        elif argv[1] == "vectors-pin":
+            check_vectors_pin(argv[2])
         elif argv[1] == "pins":
             check_pins(argv[2], argv[3])
         elif argv[1] == "repos":
