@@ -53,8 +53,35 @@ reads *the snapshots are in the bucket* as cover for pruning `ghcr` packages
 would be ending the hold on **half an argument**, with the wrong instrument
 for the half it did not measure.
 
-So the hold does not end on the snapshots alone, and the corrected condition
-must name both artefacts with their own instruments. It is **not written here
-yet**: the division is being confirmed by the repository that measured it
-rather than restated from an account of it, and this paragraph exists so that
-nothing ends the hold in the meantime.
+So the hold does not end on the snapshots alone. The corrected condition is
+**still not written here**, and the measurement that arrived on 2026-09-20
+gives a second reason beyond the first: it is not two artefacts with two
+instruments either. It is seven kinds, **two of them covered by nothing** —
+workflow logs and artifacts, and the OCI pools that carry every Debian package
+this workspace publishes ([release-lock](../design/release-lock.md) 2.1, with
+the trap that makes the wrong version of this easy to write). A condition
+restated as *the mirror holds the packages* would repeat tonight's error one
+level down, because it would be satisfied by an instrument covering one `ghcr`
+package out of many. **The condition that is true of the world is per
+artefact.**
+
+The fork is the user's: either the policy says the pools are never pruned
+while nothing mirrors them, or mirroring the pools becomes a phase and the
+condition waits on it. The recommendation put to them is both, in an order —
+mirror the **locks** first, because they are the binding and they are
+kilobytes, and declare the pools unprunable while nothing mirrors them, not as
+a stopgap but as the honest statement of the world.
+
+**The early-warning number is in, and the bound first asked for was the wrong
+one.** It is not GitHub's run retention: the collector reads one page of 100
+runs per repository with no pagination, and backfill reads its own artifacts
+rather than the API, so **a run that falls past position 100 before any pass
+sees it is unreachable by both paths**. The margin, printed by `history`:
+`mica` 48.3 h, `mica-res` 58.3 h, the other six about 102 h, where page one
+still reaches their whole history. Against a collector that fires every two to
+five hours ([mica-index](../design/mica-index.md)) that is a tenfold cushion,
+and a negative margin prints `UNREACHABLE`. The property is worth stating on
+its own: **a number that goes negative before anything is lost is worth more
+than an alarm that fires after.**
+
+This paragraph exists so that nothing ends the hold in the meantime.

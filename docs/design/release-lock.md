@@ -433,6 +433,44 @@ collector alone would delete images that nothing had captured. What protects
 image history is the mirror, and only for what the mirror holds — today
 `20260916-0735` and not `20260915-0138`.
 
+**Nor is it two instruments covering two artefacts.** Measured against the
+mirror's own catalogue by `mica-res`'s read-only `coverage` command on
+2026-09-20 (run `35495033872`), the picture is seven kinds and **two of them
+are covered by nothing**:
+
+| Artefact | What holds a copy |
+|---|---|
+| workflow run and job metadata | the collector's snapshots — unbroken, 427 over five days, holes zero |
+| workflow **logs and artifacts** | **nothing** |
+| build-env image bytes | the mirror, 115 objects |
+| `mica-build` product images and update archives | the mirror, 12 + 18 objects |
+| third-party `deb`, source and git inputs | the mirror, 324 + 23 + 43 objects |
+| **OCI pools — every Debian package this workspace publishes** | **nothing; `ghcr` holds the only copy** |
+| release locks and `SHA256SUMS` | not in the bucket: the producer's release and its consumers' git |
+
+Three of those are findings rather than restatements. **The pools are
+mirrored nowhere**: no `package` row and no `pool` row has ever existed in the
+mirror's catalogue, nothing regressed, and the gap was simply never looked at
+until a retention condition started depending on it. **The snapshots are
+metadata, not an archive**: logs and artifacts are never copied, so deleting a
+run still destroys its log bytes — a policy that permits deleting runs is
+permitting that loss and should say so rather than leaning on the word
+*protected*. And **the binding is not in the bucket**: zero lock-named and
+zero `SHA256SUMS` objects, while for every producer except `mica-build` a
+release's only unique bytes **are** the lock.
+
+**The trap, because the shape of the data invites it:** those 324 `deb`
+objects read exactly like package coverage and are not. Every one is upstream
+Debian from `snapshot.debian.org`. Counting them as *our packages are
+mirrored* is the same substitution as counting run snapshots as image history,
+one level down — a number that looks like the answer, sitting where the answer
+would be. The question to ask of any such number is which **artefact** it
+counts, not which repository produced it.
+
+*(Where to look, since this is a coverage statement about the mirror and not
+about the version index: the published `mica.20260920-0636` index carries no
+`mirrors` member at all. The numbers above come from the mirror's catalogue.)*
+
 So the current state, with its condition stated rather than left open-ended:
 `20260915-0138` stays and nothing is pruned; its images become prunable once
 they are mirrored **and** a consumer has been shown to read them from the

@@ -1,5 +1,50 @@
 # Changelog
 
+## 2026-09-20 06:53 [finding]
+
+**The hold covers seven kinds of artefact and two of them are covered by
+nothing.** Measured by `mica-res` against the mirror's own catalogue
+(2026-09-20, run `35495033872`) and recorded in `release-lock.md` 2.1 as a
+table rather than as the two-instrument sketch it replaces: run and job
+metadata by the collector's snapshots (427 over five days, holes zero),
+build-env images and product images and third-party inputs by the mirror, and
+**nothing at all** for workflow logs and artifacts, or for the OCI pools that
+carry every Debian package this workspace publishes.
+
+Three of those are new findings. **The pools are mirrored nowhere** — no
+`package` and no `pool` row has ever existed in the mirror's catalogue, so
+nothing regressed; the gap was never looked at until a retention condition
+depended on it. **The snapshots are metadata, not an archive** — deleting a
+run still destroys its log bytes, and a policy that permits deleting runs is
+permitting that loss rather than being covered by the word *protected*. **The
+binding is not in the bucket** — zero locks and zero `SHA256SUMS`, while for
+every producer except `mica-build` a release's only unique bytes are the lock.
+
+**And the trap is written where it will be walked into**: the 324 `deb`
+objects read exactly like package coverage and are not — every one is upstream
+Debian from `snapshot.debian.org`. Counting them as *our packages are
+mirrored* is the same substitution as counting run snapshots as image history,
+one level down: a number that looks like the answer, sitting where the answer
+would be. The question to ask of such a number is which **artefact** it
+counts.
+
+**The corrected end condition is still not written**, now for two reasons: the
+division is the measuring repository's to confirm, and restating it as *the
+mirror holds the packages* would repeat the error one level down, since that
+is satisfied by an instrument covering one `ghcr` package out of many. **The
+condition that is true of the world is per artefact.** The fork is the user's,
+and the recommendation put to them is recorded with it.
+
+**The early-warning number is in and the bound originally asked for was the
+wrong one.** Not GitHub's retention: the collector reads one page of 100 runs
+per repository without pagination and backfills from its own artifacts, so a
+run that falls past position 100 before any pass sees it is unreachable by
+both paths. The margins are `mica` 48.3 h, `mica-res` 58.3 h and about 102 h
+for the other six, against a collector firing every two to five hours — and a
+negative margin prints `UNREACHABLE`. Its property is the part worth keeping:
+**a number that goes negative before anything is lost is worth more than an
+alarm that fires after.**
+
 ## 2026-09-20 06:51 [finding]
 
 **The logo VT policy is capability-shared, not board-shared**, and the page
