@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-20 07:05 [decision]
+
+**A third form, taken because the two-row version could be read as *no check
+is possible here*** — which for the device-capture practice would be wrong.
+`2026-09-20-coordination-state-is-a-record.md` now splits the cases three
+ways: the reason computable gives a **self-retiring check**
+(`poolsCovered()`); the reason not computable but a **violation** detectable
+gives a **detector** — a committed capture carrying an SoC serial is a pattern
+a CI job can find, while *this publishes a device identity for the life of the
+board* is a judgement no job can evaluate; and neither gives the record, and
+only the record.
+
+The sentence that makes the middle row useful rather than a hedge: **a check
+that cannot compute its own reason cannot retire itself**, so it must carry a
+record to be read when someone asks why it is refusing. *The check stops the
+accident; the record stops the argument.* A detector belongs in the CI of the
+repository whose files it guards, which is its owner's to add.
+
 ## 2026-09-20 07:03 [progress]
 
 **"Found on the way to something else" was a description of the tooling, not a

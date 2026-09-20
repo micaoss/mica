@@ -72,6 +72,22 @@ is available less often than it looks: it needs the constraint's reason to be
 computable from the world rather than from intent. Where it is not, the rule
 above stands and the record is what there is.
 
+**But *not computable* does not mean *not checkable*, and the middle case is
+the common one.** Applying the test to tonight's four split them three ways:
+
+| | Form |
+|---|---|
+| the reason is computable | a **self-retiring check** — `poolsCovered()` refuses while it is false and the refusal disappears when the world changes |
+| the reason is not computable but a **violation** is detectable | a **detector**, paired with a record: a committed capture carrying an SoC serial is a pattern a CI job can find, while *committing this publishes a device identity for the life of the board* is a judgement about harm that no job can evaluate |
+| neither | the **record**, and only the record — the format freeze, the consolidated-round pause, the release-deletion authorisation |
+
+The middle row is why the sentence above is narrower than it first reads: **a
+check that cannot compute its own reason cannot retire itself**, so it must
+carry a record that can be read when someone asks why it is refusing. *The
+check stops the accident; the record stops the argument.* Where a detector is
+available it belongs in the CI of the repository whose files it guards, which
+is its owner's to add rather than this page's to impose.
+
 ## Why it is written as a rule rather than as an incident
 
 Five instances across two days is a claim about how the role works, not a
