@@ -47,6 +47,39 @@ vectors named **39**, and the untested one was **`fetch-required`** (a cache
 miss outside offline mode). `repos/fetch-miss` now names it and the sets agree
 both ways. What remains is the mutation harness for the ambiguity half.
 
+## What the remaining half needs, measured rather than guessed
+
+The obvious derivation does not work, and it is worth writing down so nobody
+spends an afternoon rediscovering it. *Repair the named defect* cannot be
+derived from a diff against a valid vector, **because the repair is the
+diff**: revert it and you have the valid file back, which proves nothing. Of
+the 48 refused lock vectors, 16 differ from a valid one by a single changed
+line and 28 by two (a replaced row), so for most of the set the whole edit
+*is* the defect.
+
+**And the nearest valid vector is the wrong key.** Picking a sibling by
+smallest line-diff matched `image-platform.lock` — a `mica-build-env` shape —
+against `offline-mica-core.lock`, and made `column-count.lock` look like a
+five-line edit when it is one row short of a column. Both were the heuristic,
+not drift; the check needs the **declared** sibling, not the nearest one. That
+is tonight's rule again, caught before it was reported: a comparison whose key
+is wrong returns a tidy answer about nothing.
+
+So the harness needs a fixture-format change rather than a script:
+
+1. each refused vector **declares the valid vector it was derived from** — one
+   more column in `expected.tsv`, and with it *the refused vector differs from
+   its sibling by exactly the rows the defect needs* becomes checkable;
+2. and for the two-rule property proper, either each vector **declares its
+   repair**, or the reference checker gains a mode that reports **every** rule
+   a file breaks rather than the first. The second is the honest one and the
+   larger: the checker short-circuits by design, because later checks assume
+   earlier ones passed, and a half-converted version would report rule pairs
+   that are artefacts of its own ordering — the false-alarm shape.
+
+Neither is an afternoon, and neither is blocked. What is done is the cheap
+half, which found a real gap.
+
 ## Dependencies
 
 - **blocked by**: nothing; the harness is the work

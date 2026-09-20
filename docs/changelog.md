@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 14:01 [progress]
+
+**The remaining half of the vector audit has a shape now, measured rather than
+guessed.** *Repair the named defect and require the result to become valid*
+cannot be derived from a diff, **because the repair is the diff**: revert it
+and the valid file is back, which proves nothing. Of the 48 refused lock
+vectors, 16 differ from a valid one by a single changed line and 28 by two, so
+for most of the set the whole edit is the defect.
+
+**And my first attempt at deriving the sibling was wrong in tonight's own
+way**, caught before it was reported: nearest-by-line-diff matched
+`image-platform.lock`, a `mica-build-env` shape, against
+`offline-mica-core.lock`, and made `column-count.lock` look like a five-line
+edit when it is one row short of a column. Those were the heuristic, not
+drift. **A comparison whose key is wrong returns a tidy answer about nothing**
+— which is the same rule that produced a uniform `ABSENT` this morning.
+
+So the work is a fixture-format change rather than a script, and
+`docs/task/20260920-0851-negative-vector-audit.md` says which: each refused
+vector **declares the valid vector it was derived from**, and then either
+declares its repair or the checker gains a mode reporting **every** rule a
+file breaks. The second is the honest one and the larger — the checker
+short-circuits by design, and a half-converted version would report rule pairs
+that are artefacts of its own ordering, which is the false-alarm shape.
+
 ## 2026-09-20 08:51 [finding]
 
 **The subtraction found a rule nothing tested, here, within minutes of being
