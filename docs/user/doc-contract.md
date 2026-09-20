@@ -351,6 +351,21 @@ English source.
   instrument whose limits are unwritten becomes the next false assurance: the
   row that watches one path reads as coverage of the question that path was
   cited for.
+- **A class defined by a shared failure mode is a diagnosis; a class defined
+  by a shared repair is a practice, and they are not written the same way**
+  *(2026-09-20)*. *Read the artefact, not the account of it* has four subjects
+  and **four different failure modes**: a **tree** — the artefact was there
+  and a different one was read (wrong subject); a **comment** — the account
+  was true when written and went stale because nobody reads the cited thing;
+  a **report** — accurate, and reachability was inferred that it never claimed
+  (over-reading a true account); a **unit of work** — there was no account at
+  all (never looked). One repair, four diagnoses. **A diagnosis tells a reader
+  what happened and lets them recognise it; a practice tells them what to do
+  and cannot help them recognise anything** — nobody meeting the third will
+  know it from the rule, because nothing looked wrong at the time. So a
+  practice is written **with its subjects named and no failure mode
+  attached**, and the missing failure mode is the honest signal that it will
+  not help anybody spot the fifth.
 - **Sort by whatever determines the action, which is not always the same
   property** *(2026-09-20, from two rules written the same day that look like
   they disagree)*. A triage of dropped files sorts by **consequence**, because

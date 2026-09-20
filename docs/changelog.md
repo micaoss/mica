@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 17:23 [finding]
+
+**The count came back four-for-four: *read the artefact, not the account* has
+four subjects and four different failure modes — a tree (wrong subject), a
+comment (a true account gone stale), a report (an accurate account over-read),
+a unit of work (never looked).** One repair, four diagnoses, so by the
+membership rule it is a class — and **a different kind of class from every
+other one here**.
+
+**A class defined by a shared failure mode is a diagnosis; a class defined by
+a shared repair is a practice.** A diagnosis lets a reader recognise what
+happened; a practice tells them what to do and **cannot help them recognise
+anything** — nobody meeting the third instance will know it from the rule,
+because nothing looked wrong at the time. So it is recorded with its subjects
+named and **no failure mode attached**, and that absence is the honest signal
+that it will not help anybody spot the fifth.
+
+**And the format-over-rule boundary gains a second member, worse than the
+first because it never looks like anything: a cost with no failing output.**
+The approved unit would have built four kernels to keep one, four times over —
+**a correct result, every time, fifty minutes at a time**. Every other defect
+recorded today eventually produced a wrong sentence, a red job or a false
+green; this one produces nothing to be wrong. **Formats catch wrong outputs;
+they do not catch right outputs bought at the wrong price.**
+
 ## 2026-09-20 17:21 [finding]
 
 **The sweep rule has a third state, measured while the class it came from was

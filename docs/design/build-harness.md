@@ -71,6 +71,15 @@ this page moves a judgement into an instrument; this is the residue that
 cannot be moved, and a page that recommends formats without naming it is
 selling the argument rather than making it.
 
+**The residue has a second member, and it is worse because it never looks like
+anything: a cost with no failing output.** A unit of work approved without
+reading the script it drives would have built four kernels to keep one, four
+times over — **a correct result, every time, fifty minutes at a time**. Every
+other defect recorded today eventually produced a wrong sentence, a red job or
+a false green; this one produces nothing to be wrong, so **no instrument in
+this workspace could ever have caught it**. Formats catch wrong outputs; they
+do not catch right outputs bought at the wrong price.
+
 **A reading that is the arithmetic consequence of its input carries its own
 corroboration** *(2026-09-20)*. `--memory=64m` producing `memory.max=67108864`
 and `--cpus=0.5` producing `cpu.max=50000 100000` are not two facts; they are
