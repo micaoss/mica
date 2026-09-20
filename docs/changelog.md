@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-20 14:35 [progress]
+
+**The ceiling measurement is a world claim now, not a dated sentence.** Six
+rows in `docs/world-claims.tsv`: `BLK_DEV_THROTTLING` absent on each of the
+four boards, and `MEMCG` and `CFS_BANDWIDTH` present on `uefi-x64` — the two
+the relayed table disagreed with me about, so the record carries the
+disagreement's resolution rather than my word for it. **12/12 claims hold**
+today.
+
+**The absence rows are expected to flip**, and the file says so: when the
+authorised repair lands, the `world` job goes red, which means **the dated
+note in `containers.md` 8 is stale and the capability text replaces it** — the
+gate doing its job rather than a regression. That is the first world claim
+written to be broken on purpose, and it is the cheapest way I know to stop a
+correct note outliving its correctness.
+
 ## 2026-09-20 14:34 [finding]
 
 **A section of this corpus promises five ceilings and one of them exists
