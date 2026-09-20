@@ -181,6 +181,33 @@ English source.
   share all of them says nothing; the threshold above guards against naming a
   class too early, and this guards against the same instances being spent
   twice.
+- **And the sentence that says why the same defect keeps arriving in different
+  clothes** *(`mica-boards`, 2026-09-20, and it is its formulation)*: **an
+  input I authored looks like an output I verified, and nothing in the tree
+  distinguishes them.** Its own instance is the cleanest — *the nine lines of
+  my floor read exactly like the nine facts they were supposed to establish*.
+  Counted against the day it was written, six of the seven shapes these
+  records name are it: a copy of the vectors beside the vectors, a committed
+  config beside a resolved one, a fragment at `main` beside what ships, a pin
+  beside a release, a comment asserting a check beside a check, and a
+  requested symbol beside a resolved one. **The seventh is on a different
+  axis** — a working tree read as a commit is not an authored thing
+  impersonating a checked one, it is a subject with no name at all — and the
+  wider phrasing that admits it (*something somebody wrote, sitting where a
+  reader expects something somebody checked*) is worth less than the narrower
+  one, because the narrow one names the repair.
+  **That repair is the same in all six, which is what makes it a class rather
+  than a theme: mark which it is, or re-derive the output and compare.** Keep
+  the sub-rules; they carry the operational halves and those differ. This
+  sentence carries the reason a reader keeps meeting the defect and not
+  recognising it.
+- **And the price list, which is the argument for a question asked before the
+  claim over a rule applied after it** *(2026-09-20)*. Of nine subject errors
+  in one day, exactly one was caught **in front of the sentence** — by running
+  `git status` before speaking rather than after — and it is the only one that
+  cost nothing. Every other was paid for by a second reader, a CI failure, or
+  an edit to a page that had already been published. A rule applied after the
+  claim is a rule that bills somebody else.
 - **A third guard, pointing the other way from those two** *(2026-09-20)*.
   The threshold and the double-counting rule both guard against **evidence
   that under-reaches** — too few instances, or the same ones spent twice.

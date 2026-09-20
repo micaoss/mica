@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-20 16:09 [finding]
+
+**The sentence under six of today's rules, in its author's words**
+(`mica-boards`): **an input I authored looks like an output I verified, and
+nothing in the tree distinguishes them.** Counted before it was written down,
+because a class is checked by putting its instances back through it: a copy of
+the vectors beside the vectors, a committed config beside a resolved one, a
+fragment at `main` beside what ships, a pin beside a release, a comment
+asserting a check beside a check, a requested symbol beside a resolved one —
+**six**. The seventh, a working tree read as a commit, is on a different axis:
+not an authored thing impersonating a checked one, but a subject with no name
+at all. The sub-rules stay, because the operational halves differ; **the
+repair is the same in all six — mark which it is, or re-derive the output and
+compare.**
+
+**And re-recording rather than reasoning caught a silent regression inside an
+approved deletion.** One of the nineteen denied requests was not inert:
+`CONFIG_MDIO_BCM_UNIMAC` went `m` to `y` when its request was removed, because
+**a modular selector leaves kconfig free to answer `m`** — the request had
+been refused as *off* and honoured as *not built in*, and nothing said which.
+**A fragment edit is not an outcome.**
+
+**The two FIT boards' numbers are bounded here before anybody quotes them**:
+`s905x5m`'s **vendor input** carries six of the nine requested-off symbols
+`=y` and `cx3576`'s carries none, measured at `8e6c3ba`. That is a statement
+about an input the floor is merged into afterwards, not about either kernel —
+their resolved configs are not in the tree, and the new loop's run is the
+first reading anybody has of them.
+
+**And the price list, beside the pre-assertion question**: of nine subject
+errors in one day, exactly one was caught in front of the sentence — by
+running `git status` before speaking — and it is the only one that cost
+nothing. Every other was paid for by a second reader, a CI failure, or an edit
+to a published page. **A rule applied after the claim is a rule that bills
+somebody else.**
+
 ## 2026-09-20 16:07 [finding]
 
 **The row written so that green is the defect and red is the fix went red four

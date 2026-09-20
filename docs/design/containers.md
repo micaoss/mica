@@ -646,6 +646,24 @@ you have to name off the drivers that select it**. Deleted rather than
 restated in the same commit, because a request a file cannot grant is not a
 record of a decision.
 
+**And deleting them was re-recorded rather than reasoned about, which is the
+only reason a silent regression was caught**: one of the nineteen was **not
+inert**. `CONFIG_MDIO_BCM_UNIMAC` went `m` to `y` when its request was
+removed, because **a modular selector leaves kconfig free to answer `m`** —
+the request had been refused as *off* and honoured as *not built in*, and
+nothing said which. **A fragment edit is not an outcome**, and the difference
+between an approved deletion and a measured one is a symbol that changed
+state.
+
+*(The same distinction bounds what the two FIT boards' numbers mean.
+`s905x5m`'s **vendor input** carries six of the nine requested-off symbols
+`=y` — `BLK_CGROUP_IOPRIO`, `CGROUP_RDMA`, `CGROUP_MISC`, `CGROUP_NET_PRIO`,
+`CGROUP_PERF` and `TASKSTATS`, measured at `mica-boards` `8e6c3ba`;
+`cx3576`'s carries none. That is a statement about an input the floor is
+merged into afterwards, **not** about either board's kernel: their resolved
+configs are not in the tree, so what the new loop finds there is the first
+reading anybody has of it.)*
+
 **And the floor states the distinction this section needs everywhere:
 `PSI` on is the capability; running `systemd-oomd` and setting those keys is a
 policy the kernel does not decide and does not enable.** A capability makes a
