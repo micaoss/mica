@@ -108,6 +108,18 @@ output. Five layers, five repositories, one distinction *(2026-09-19/20)*:
 The table is the argument and the sentence is only its title. Each row cost
 something to learn, and the fifth arrived the same day as the fourth.
 
+**A value that cannot express *not measured* is indistinguishable from a
+measurement.** Three instances, in three places: a vector copy's **size**,
+where 64 rows is either a deliberate subset or last month's copy and the file
+cannot say which; `podman stats` printing **`0B`** where the figure was not
+measured, which reads as *nothing is being used*; and **`cpu` appearing in
+`cgroup.controllers`** while `cpu.max` is absent, which reads as *a quota is
+in force*. In each the field has no value meaning *unknown*, so it returns one
+that means something else — and the reader cannot tell, because the two
+answers are the same bytes. **Ask what the field says when the thing is not
+known; if the answer is *the same as when it is zero*, the number is not
+evidence.**
+
 **A query's aperture must be at least as wide as the claim built on it.**
 *This is the general statement; where a spec needs the operational form, it
 cites this paragraph rather than restating it (`release-lock.md` 1.3).* Five

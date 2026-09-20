@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-20 08:32 [finding]
+
+**A record that needs a command instead of an owner.** The table in
+`release-lock.md` 9.1 has the defect it describes — nothing compares those
+copies to the canonical one, so it will go stale the way its own numbers did —
+and the resolution is the commit-naming rule doing a second job: **if every
+copy names its source, the table can be regenerated rather than maintained,
+and a regenerated table cannot be stale in the way a maintained one is.**
+
+**And the required subset is derivable rather than arguable**: what a reader
+can encounter follows from `locks/pins/` — a fact about a directory, not a
+claim about a repository's habits. That relocates the difficulty of ever
+gating this: the hard part is not deciding what each reader owes, it is
+**finding each reader's copy**.
+
+**Named at three instances, in `build-harness.md` section 4: a value that
+cannot express *not measured* is indistinguishable from a measurement.** A
+vector copy's size, where 64 rows is either a deliberate subset or last
+month's copy; `podman stats` printing `0B` where nothing was measured, which
+reads as *nothing is being used*; and `cpu` in `cgroup.controllers` while
+`cpu.max` is absent, which reads as *a quota is in force*. The field has no
+value meaning *unknown*, so it returns one that means something else, and the
+two answers are the same bytes. The operational form: **ask what the field
+says when the thing is not known — if that is the same as when it is zero, the
+number is not evidence.**
+
 ## 2026-09-20 08:30 [finding]
 
 **A conformance test that ships its own fixtures tests conformance to

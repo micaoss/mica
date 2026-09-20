@@ -937,5 +937,18 @@ pinned read answers whenever someone adds a seventh reader, and it answers
 *conforming* rather than *running*, which are not the same question — running
 a stale copy looks identical from outside.
 
+**The required subset is derivable, not arguable.** What a reader can
+encounter follows from `locks/pins/`: a fact about a directory rather than a
+claim about a repository's habits. That also relocates the difficulty of ever
+gating this — the hard part is **not** deciding what each reader owes, it is
+**finding each reader's copy**, and those are very different problems.
+
+**And the table above has the same defect it describes**: nothing compares
+those copies to this one, so it will go stale the way its own numbers did.
+The commit-naming rule is what keeps it alive — **if every copy names its
+source, the table can be regenerated rather than maintained, and a regenerated
+table cannot be stale in the way a maintained one is.** That is the difference
+between a record that needs an owner and one that needs a command.
+
 `mica-res` reads pins and now locks and carries no copy; that is the one row
 of the table with nothing behind it.
