@@ -1172,34 +1172,31 @@ collection and says `collect-stopped`, because a mode that hunts extra rules
 must never be able to invent one — and the default single-rule path is
 untouched, which the 298 existing checks prove.
 
-The first pass over the 56 refused vectors: **40 break exactly the rule they
-name**, **9 break more than one**, and **7 stopped early** because suppression
-walked into code the skipped check was protecting. The nine, with their extra
-rules:
+The first pass over the 56 refused vectors found **40 isolating the rule they
+name, 9 breaking more than one and 7 stopping early**. Three of the nine were
+**consequential** — changing a field that is part of the sort key moved the
+row out of order, so `sort-order` fired as well, which the named defect never
+required. All three are repaired (`lock/refused/image-source`,
+`lock/refused/image-source-reference`, `upstream/refused/repository-source`),
+each still refusing the rule it names, and the set now stands at **43
+isolating, 6 pairs, 7 unknown**.
 
-| Vector | Names | Also breaks |
-|---|---|---|
-| `lock/refused/image-source-reference` | `reference-repository` | `image-source`, `sort-order` |
-| `lock/refused/image-source` | `image-source` | `sort-order` |
-| `upstream/refused/repository-source` | `image-source` | `sort-order` |
-| `lock/refused/index-only-inputs` | `index-only-inputs` | `index-input` |
-| `lock/refused/release-slash` | `field-value` | `release-scope` |
-| `lock/refused/release-value` | `field-value` | `release-scope` |
-| `lock/refused/upstream-image-without-digest` | `reference-digest` | `field-value` |
-| `upstream/refused/image-without-digest` | `reference-digest` | `field-value` |
-| `upstream/refused/release-row` | `upstream-release-row` | `kind-unknown` |
+The six that remain are **inherent pairs**, and the record is the pair rather
+than a repair:
 
-**They are not all the same finding**, and the difference decides what can be
-done about each. Three are **consequential**: changing a field that is part of
-the sort key moves the row out of order, so `sort-order` fires as well — and
-those are repairable by re-sorting the fixture, since the named defect does
-not require the disorder. The rest are **inherent pairs**: a slash-form
-release is malformed *and* wrongly scoped by the same token, a reference
-without a digest fails its form test as well, and a row of the wrong kind in
-an upstream lock is an unknown kind by definition. **No single fixture can
-separate an inherent pair**, so the honest record is the pair itself rather
-than a repair — the same shape as a refusal no input can reach, one level up:
-not a defect to fix, a fact about the rules.
+| Vector | Names | Also breaks | Why they cannot be separated |
+|---|---|---|---|
+| `lock/refused/release-slash` | `field-value` | `release-scope` | a slash-form release is malformed *and* wrongly scoped by the same token |
+| `lock/refused/release-value` | `field-value` | `release-scope` | as above |
+| `lock/refused/upstream-image-without-digest` | `reference-digest` | `field-value` | a reference without a digest fails its form test too |
+| `upstream/refused/image-without-digest` | `reference-digest` | `field-value` | as above |
+| `upstream/refused/release-row` | `upstream-release-row` | `kind-unknown` | a `release` row in an upstream lock is a kind that file may not carry |
+| `lock/refused/index-only-inputs` | `index-only-inputs` | `index-input` | an input row an index lock may not hold is also an input no `index` row names |
+
+**No single fixture can separate an inherent pair**, so demanding isolation
+would push someone to contort a fixture until it tested less than it does now.
+That is the same shape as a refusal no input can reach, one level up: **not a
+defect to fix, a fact about the rules.**
 
 **The property is mechanically checkable, and it was stated before it was
 built** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-20 14:22 [progress]
+
+**The three repairable fixtures are repaired: the set is now 43 isolating, 6
+inherent pairs, 7 unknown.** `image-source`, `image-source-reference` and
+`repository-source` each broke `sort-order` as well, because the field their
+defect changes is part of the sort key — which the defect never required. Each
+is re-sorted, each still refuses the rule it names, and one needed its defect
+moved rather than its rows: `image-source-reference` now carries a **valid**
+source with a reference pointing at another repository, so it tests
+`reference-repository` alone instead of testing it behind `image-source`.
+
+**The six that remain are recorded as pairs with the reason each cannot be
+separated** — a slash-form release is malformed *and* wrongly scoped by the
+same token; a reference without a digest fails its form test too; a `release`
+row in an upstream lock is a kind that file may not carry; an input row an
+index lock may not hold is also an input no `index` row names. **Demanding
+isolation here would push someone to contort a fixture until it tested less
+than it does now.**
+
 ## 2026-09-20 14:19 [finding]
 
 **The collect mode is built, and the audit has its answer: 40 of 56 refused
