@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 08:16 [finding]
+
+**A fourth kind of aperture: a resolution.** The three named so far — a
+filter, a file, a name — are all about *where* someone looked. This one is
+about *how finely*: `mica-boards` compared two arm64 kernels, one from a
+native CI runner and one cross-built locally, and they are **exactly the same
+size, 33 065 472 bytes, with 3.7 MB of differing content.** A size comparison
+would have passed and recorded a no-op that was not one — neither truncated
+nor misaimed, just too coarse to see what it was asked about.
+
+**And the rule it corrects is narrower than the one that was adopted.** *The
+same pinned toolchain image is necessary and not sufficient, and whether cross
+and native agree is a property of the tree*: mainline agrees, the Amlogic
+vendor tree does not, so it is measured **per tree** and **one board's
+agreement licenses nothing about another**. The generalisation it replaces was
+offered, adopted into a standing note the same hour, and **withdrawn within
+the hour by its own author on its own measurement** — and it was too strong in
+the direction that makes a **local build look authoritative**, which is the
+dangerous direction for a claim about reproducibility to be wrong in.
+
+**The shape of the withdrawal is worth more than the kernel**, so it is in
+`doc-contract.md` and its Chinese page: **the threshold binds whoever adopts a
+generalisation as much as whoever offers one.** It reads as a rule for
+authors, and the failure it exists to prevent happens at **adoption**. This
+one was caught only because its author kept measuring after being believed,
+which no rule can require — **being believed is where measurement usually
+stops** — so the question to ask of an arriving rule is the one you would ask
+of your own: how many instances, and did any come from somewhere that could
+have disagreed?
+
 ## 2026-09-20 08:09 [decision]
 
 **A fifth property for a new checker, taken because the first four all guard

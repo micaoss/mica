@@ -210,6 +210,15 @@ English source.
   appearance** — because the next reader either extends the mechanism for
   consistency or removes it as theatre, and both are wrong for the same
   reason.
+- **The threshold binds whoever adopts a generalisation as much as whoever
+  offers one.** It is written as a rule for authors, and the failure it was
+  built to prevent happens at adoption: on 2026-09-20 a one-instance
+  generalisation about kernels was offered confidently, written into a
+  standing note the same hour, and was false — withdrawn by its own author,
+  who kept measuring after being believed. **Being believed is where
+  measurement usually stops**, so the question to ask of an arriving rule is
+  the one you would ask of your own: how many instances, and did any of them
+  come from somewhere that could have disagreed?
 - **The strongest pair is one instance hypothesised and one observed**, and
   that is a better reason to keep both than *two is not three*. A rule
   designed in guards against a failure someone imagined; a rule extracted from

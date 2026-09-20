@@ -154,7 +154,13 @@ once rather than twice: a suite named for FIT lifecycle tests the FIT boot
 path and boots nothing, so *no suite boots a FIT image* could only be
 established by reading every suite, not by trusting the one named for it. A
 negative claim inherits the aperture of the query that produced it, whether
-the aperture was a filter, a file or a name.
+the aperture was a filter, a file, a name — **or a resolution.** The three
+named so far are all about *where* someone looked; the fourth is about *how
+finely*. `mica-boards` compared two arm64 kernels, one published by a native
+CI runner and one cross-built locally: **exactly the same size, 33 065 472
+bytes, with 3.7 MB of differing content.** A size comparison would have passed
+and recorded a no-op that was not one — neither truncated nor misaimed, just
+too coarse to see what it was asked about.
 
 **A name is an aperture, and the second instance says what the first could
 not** *(2026-09-20, `mica-build`, reached from a failure rather than from this
@@ -242,6 +248,17 @@ answers in one repository (2026-09-16):
 - **U-Boots** are cross-built on amd64 in CI and cross-built on amd64 locally,
   pinned there deliberately because the assembly runs the FIT host tools on
   x86-64. Same build in both places: nothing to sort.
+
+**The same pinned toolchain image is necessary and not sufficient, and
+whether cross and native agree is a property of the *tree*** *(2026-09-20)*. A
+generalisation that the toolchain image was the variable — that cross versus
+native stops mattering once both use the pinned image — was offered, adopted,
+and **withdrawn within the hour by its own author on its own measurement**:
+mainline agrees, the Amlogic vendor tree does not. So it is measured **per
+tree**, and **one board's agreement licenses nothing about another**. The
+withdrawal is worth as much as the rule: the claim was too strong in the
+direction that makes a **local build look authoritative**, which is the
+dangerous direction for a claim about reproducibility to be wrong in.
 
 Compare **OCI layer bytes, not manifest digests**. A manifest digest moves
 with the release string, so comparing manifests reports noise for every
