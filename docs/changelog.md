@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 06:33 [decision]
+
+**The VT question is placed as a question with a pending measurement**, in
+`docs/design/access.md` section 2 beside the console-login sentence, where
+someone asking what local access a product has will meet it: is there a local
+virtual-terminal login on a board with a display and a keyboard, or is the
+serial console the only local console? Recorded with the correction rather
+than the first version of the claim — *a board with a display has no VT login*
+overstated what had been looked at, because the dropped symlink governs `tty1`
+at boot while Alt+F2 goes through `logind` activating `autovt@ttyN.service`,
+a different mechanism. A table says what each outcome turns the question into:
+a real product question only if the units survived composition **and** the
+board's kernel can render a VT; no decision at all if `autovt` survived, since
+then the only thing ever wrong with it was PAM; and part of the repair, not a
+decision, if `autovt` was dropped too.
+
+**And the rule those five instances earned**,
+`docs/decisions/2026-09-20-coordination-state-is-a-record.md`: **a
+coordinator's working state is a record nobody else can read**, and the role
+produces them faster than any single one gets written. The five are named —
+the format freeze, the consolidated-round pause, the device-capture practice,
+the release-deletion authorisation and this VT question — with the property
+that makes it a claim about the role rather than about a person: each was
+reasonable when issued, and **four of the five were found by the repository
+being told, not by the one telling**. The operational half is the test already
+in use, *could someone check this without asking the holder*, plus: write the
+rule the second time you enforce it, record a constraint's end in the same
+file as the constraint, and treat a queued record as an unrecorded constraint
+with a good intention attached.
+
 ## 2026-09-20 06:29 [progress]
 
 **The question is recorded; the authorisation is not.**
