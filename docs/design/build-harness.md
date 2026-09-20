@@ -61,8 +61,14 @@ it **by testing the gate rather than by thinking about it** — its guard
 reported *nothing to check* while a candidate stood in front of it, and
 *arguments given and none parsed* is now a refusal.
 
-The third route is the one worth noticing: the first two were prevented, the
-third had to be **provoked**. A silent pass is invisible from the outside by
+The routes are not three copies of one fact: a designed rule guards against a
+failure someone imagined, a reasoned one inherits its evidence from elsewhere,
+and **only the third establishes that anyone would ever have hit it**. The
+provenance of the middle one is worth its line too, since it is how most of
+what this workspace knows actually travels: `verify-world.sh` has its
+empty-set refusal because `verify-board.sh` already had one and the habit was
+copied, before either had a name. The third route is the one worth noticing:
+the first two were prevented, the third had to be **provoked**. A silent pass is invisible from the outside by
 construction, so a gate's own tests are the only place it can be caught, and
 they only catch it if they include the case where the gate has nothing to work
 with.

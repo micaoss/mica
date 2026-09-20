@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-20 07:21 [decision]
+
+**A better reason to keep a pair than the count**, in `doc-contract.md`
+section 6 and its Chinese page: **the strongest pair is one instance
+hypothesised and one observed.** A rule designed in guards against a failure
+someone imagined; a rule extracted from a failure that happened establishes
+that anyone would ever have hit it. Keeping dated measurements out of the
+world gate is the first kind — nobody knows whether anyone would have added
+one — and `mica-res` reaching the same rule after two false alarms in an hour
+is the second. Where a pair has both, the record says which is which: **the
+hypothesis explains, the observation proves.**
+
+**And one line of provenance in `build-harness.md`**, because it is how most
+of what this workspace knows actually travels: `verify-world.sh` has its
+empty-set refusal because `verify-board.sh` already had one and the habit was
+copied, before either had a name. An origin that says *I copied this* is rarer
+in a record than one that says *I realised this*, and more useful, because it
+names the mechanism by which a rule spreads before anybody writes it down.
+
 ## 2026-09-20 07:19 [finding]
 
 **The self-edit hazard is not loud, and "loud when the length changes" is not

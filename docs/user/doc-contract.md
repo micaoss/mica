@@ -200,3 +200,11 @@ English source.
   a third pair appears, the fact worth recording is not any of the ideas — it
   is that this workspace is producing convergence rather than correction**,
   and that is a claim about the workspace with a record of its own.
+- **The strongest pair is one instance hypothesised and one observed**, and
+  that is a better reason to keep both than *two is not three*. A rule
+  designed in guards against a failure someone imagined; a rule extracted from
+  a failure that actually happened establishes that anyone would ever have hit
+  it. Keeping dated measurements out of the world gate is the first kind —
+  nobody knows whether anyone would have added one; `mica-res` reaching the
+  same rule after two false alarms in an hour is the second. Where a pair has
+  both, say which is which: the hypothesis explains, the observation proves.
