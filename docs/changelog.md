@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 15:35 [finding]
+
+**The product identity is repaired and `diagnostics.md` takes the one edit it
+was held for.** Since `mica-build` `77a124ba`, `/usr/lib/os-release` carries
+`ID=mica`, `IMAGE_ID` and `IMAGE_VERSION` with `/etc/os-release` symlinked to
+it, from the same expression the signed components take their version from, so
+the banner, `os-release` and what was signed cannot disagree. The user page
+was held rather than edited and is true again without a diff.
+
+**What the page records is the order, not the values.** The identity is
+written **after the `dpkg` run**; the first placement was beside the preset
+install, which runs before the packages are unpacked, where a `base-files` or
+`mica-system` unpack would have put the component's identity straight back.
+**A correction writes the right value once; a repair makes the wrong value
+unreachable** — and the two would have looked identical until the next package
+bump.
+
+**And the check was verified in the direction that proves something**, which
+is now a rule in the harness: the old `Mica OS *` prefix **could not have
+failed** on the Base's banner and the anchored one **cannot pass** on it. A
+tightened check is verified by showing it would now refuse what it used to
+accept; a repair whose test was only ever run against the fixed world is a
+test of the world.
+
+**The widening that put a wrong sentence on this page is worth the record more
+than the sentence was.** One repository said *my* unowned artefact cannot see
+these four, true of that artefact; it was relayed as *if the other
+repository's report has them in the same bucket, the bucket is wrong*, a claim
+about a tool nobody in the chain had read; and it was written here as a fact.
+**Every link was true of its own subject, which is why it survived every
+reader** — each was reading their own link.
+
 ## 2026-09-20 15:31 [finding]
 
 **A citation that was never checkable now has a row that goes red the day it

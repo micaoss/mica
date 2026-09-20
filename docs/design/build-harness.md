@@ -49,6 +49,17 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**A tightened check is verified by showing it would now refuse what it used to
+accept** *(2026-09-20)*. The session probe's identity test was a `Mica OS *`
+prefix match, which a component's banner satisfies; the anchored version
+requires `ID=mica` with a non-empty `IMAGE_ID` and `IMAGE_VERSION`. The
+evidence that the repair is real is not that the new check passes on the
+repaired image — a check that asserts nothing passes there too — it is that
+**the old check could not have failed on the old banner and the new one cannot
+pass on it.** Run the tightened check against the input that motivated it,
+expecting red; a repair whose test was only ever run against the fixed world
+is a test of the world.
+
 **A check that cannot reach its subject, or that has nothing to check, must
 refuse — never pass quietly.** Three instances, in three tools and two
 repositories, arrived three different ways. `verify-board.sh` was **designed**
@@ -773,7 +784,13 @@ already put them in its `owned` bucket — **the buckets were right**, and the
 first version of this paragraph, which said the account could not see them and
 left the rule that took them open, was an inference passed along rather than a
 reading of the report. Corrected here rather than quietly, because it was
-published.
+published — and the chain is worth keeping, because **every link was true of
+its own subject**: one repository said *my* unowned artefact cannot see these,
+which is true of that artefact; it was relayed as *if the other repository's
+report has them in the same bucket, the bucket is wrong*, a claim about a tool
+nobody in the chain had read; and it was written down here as a fact. **A
+statement widened one subject at a time survives every reader, because each of
+them is reading their own link.**
 
 What is actually wrong is narrower and sharper: **the rule that claims
 `systemd`'s resources enumerates `/usr/lib/systemd/system/*`,

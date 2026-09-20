@@ -32,6 +32,25 @@ Moving the repositories to the release lock format
 
 ## Notes
 
+- 2026-09-20, after the clause repair: **clause A is running against a fetched
+  board bundle, one product, with the static check done first**, and the tool
+  says what that is worth without being asked: `local-pins.sh` reads
+  `<checkout>/_out/boards/<board>/outputs.tsv` with the signer certificate and
+  the component file rows, the fetched bundle has exactly those at exactly
+  those paths, and `bundle-is` asserts that `mica-boards`' offline output
+  equals the file rows of that same `outputs.tsv` — **two halves joined by
+  their assertion, which is still *the shapes match* and not a run.**
+
+  And one thing from the same tool belongs beside the subject rule rather than
+  beside the clause: its alignment report reads the workspace's **shared**
+  `mica-build` checkout, which was behind its own branch — it pins `mica-core`
+  `20260919-2226` where the branch pins `20260920-0552`, and the branch pin is
+  what the release names. Nothing is wrong, and the difference was legible
+  only because the report prints `checkout <name>: HEAD …` and therefore
+  **names its subject**. A tool reading the same stale shared checkout that
+  produced three subject errors by hand the same day, and surviving it for the
+  one reason none of those did: it says what it read.
+
 - 2026-09-20, latest: **clause A was unsatisfiable as written, and the repair
   is in the clause rather than in a build.** It asks a workspace to stand at
   the release commits of every input, which assumes **one release commit per
