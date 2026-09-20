@@ -92,6 +92,16 @@ keyboard, EDID negotiation and visual output require testing the flashed image.
 
 ## 5. Board requirements (extends [board contract](../boards/contract.md) §4)
 
+**Giving another board a logo is four things in this order**, and the order is
+the point *(2026-09-20)*: `CONFIG_LOGO` (with `LOGO_LINUX_CLUT224`) in the
+board's kernel configure hook; the `mklogo.py` hook rendering the master into
+the kernel tree at build time; `fbcon=logo-pos:` in the board's forced command
+line; and **only then** the `logind` drop-in that keeps `tty1` idle. Out of
+order, the last step alone gives the board an idle VT protecting nothing — a
+`tty1` that shows kernel messages and then goes dark, which is what three of
+the four boards have today ([access](access.md) section 2). `cx3576` is the
+worked example of all four.
+
 `mica-boards:boards/<board>/board.env` names `display` in `BOARD_FEATURES` or not; cx3576 does and the QEMU boards do not. It gates the boot
 experience above, not the kiosk. A board whose product has an HDMI output must
 provide:

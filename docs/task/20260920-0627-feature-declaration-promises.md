@@ -46,6 +46,23 @@ will be read as the check lying.*
 One instance so far, so it lives here at its point of use rather than as a
 rule of its own. If a second arrives, that is when to look for the third.
 
+**Flagged, not counted, and deliberately not folded into the sentence above**
+*(2026-09-20)*: `mica-boards` used the capability idea in the **opposite
+direction**. The vocabulary answers *does this board provide capability X*; it
+answered *should this board carry policy P*, with `P` conditioned on the same
+`X` — the `logind` drop-in that keeps `tty1` idle exists because the board
+draws a kernel boot logo there. And it drew a placement rule from it: if a
+second board gains a logo, the drop-in comes from a fragment **selected by the
+same flag that turns `CONFIG_LOGO` on**, so that **a policy selected by its
+own precondition cannot outlive it**.
+
+That is a different claim from the necessary-condition limit and is recorded
+separately for that reason. It may be no more than a good decision in one
+file. But if the capability table turns out to be a language for
+*conditioning* policy as well as for *checking* provision, it is a larger
+thing than the table was proposed as, and the moment to notice that is while
+it is one file rather than five.
+
 **Considered and not counted**: `mica-build`'s drops gate reports 703 paths
 and refuses none, so it too is a necessary condition rather than a proof. It
 belongs to the *gate reports before it refuses* rule

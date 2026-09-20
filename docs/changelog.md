@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-09-20 06:51 [finding]
+
+**The logo VT policy is capability-shared, not board-shared**, and the page
+says why rather than only what. The logo `50-mica-console.conf` protects is
+the **kernel's**: `cx3576`'s `kernel/hooks/configure.sh` enables `LOGO` and
+`LOGO_LINUX_CLUT224`, `prepare.sh` renders `flash/assets/splash.png` into the
+kernel tree at build time through `common/kernel/mklogo.py`, and the forced
+command line places it with `fbcon=logo-pos:center,logo-count:1`. No other
+board does any of it — checked at `main`: `uefi-x64` and `s905x5m` say
+`# CONFIG_LOGO is not set`, `uefi-arm64` does not mention it, having no
+framebuffer. **So the drop-in's comment describes a state, not a preference,
+and the rule it encodes is conditional: a board that draws a boot logo keeps
+the logo VT idle.**
+
+*With an aperture note that cost me a minute and would have cost a reader
+more:* `cx3576`'s **committed** kernel config also says
+`# CONFIG_LOGO is not set`. The hook turns it on during configure, so grepping
+the config file answers the opposite of the truth. The file is not the
+pipeline.
+
+**The consequence a reader needs is now in the page**: on three of four boards
+`tty1` shows kernel messages and then nothing — no logo, no prompt, a dead VT.
+That is what a person with a monitor meets on a generic board today, and it is
+the second confirmed instance of the composition defect rather than a design.
+
+**And the repair's ownership, in the sentence that decided it**: `mica-boards`
+could have closed its own question with three board overlays and refused,
+because **a board overlay re-enabling `tty1` would be a board repairing a
+composer — the wrong repository holding the fix**. The Base half is in
+`assertBase`; the product half is `mica-build`'s.
+
+**Pure preservation**, in `docs/design/display.md` section 5: giving another
+board a logo is four things **in order** — `CONFIG_LOGO` in the kernel
+configure hook, the `mklogo.py` hook, `fbcon=logo-pos:` in the forced command
+line, and only then the drop-in. Out of order, the last step alone gives an
+idle VT protecting nothing. Nobody is doing this yet, which is exactly when
+the order is cheapest to write down.
+
+**Flagged, not counted**, in the feature-declaration task: `mica-boards` used
+the capability idea in the opposite direction — not *does this board provide
+X* but *should this board carry policy P*, with `P` conditioned on the same
+`X` — and drew from it that **a policy selected by its own precondition cannot
+outlive it**. It is not folded into *a capability row is a necessary
+condition, not a proof of function*, because it is a different claim. If the
+capability table is becoming a language for conditioning policy and not only
+for checking provision, that is bigger than the table was proposed as, and the
+time to notice is while it is one file.
+
 ## 2026-09-20 06:48 [progress]
 
 **The user pages now point at `20260920-0622`**, in `docs/user/download.md`,

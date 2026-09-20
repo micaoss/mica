@@ -140,7 +140,8 @@ with `systemd.postrm` named as its writer. So a product root loses it by
 exactly the mechanism that lost the `pam.d` files, and what the loss *agrees
 with* is what decides whether it was meant:
 
-- **`cx3576`: deliberate.** Its board package carries
+- **`cx3576`: deliberate, and the reason is a capability rather than a
+  preference.** Its board package carries
   `overlay/etc/systemd/logind.conf.d/50-mica-console.conf` —
 
   ```ini
@@ -150,9 +151,27 @@ with* is what decides whether it was meant:
   ReserveVT=2
   ```
 
-  so `tty1` is the logo and `tty2` takes an on-demand console, by intent. The
+  — and the logo that comment protects is **the kernel's**: the board's
+  `kernel/hooks/configure.sh` enables `LOGO` and `LOGO_LINUX_CLUT224`, its
+  `kernel/hooks/prepare.sh` renders `flash/assets/splash.png` into the kernel
+  tree at build time with `common/kernel/mklogo.py`, and the forced command
+  line places it with `fbcon=logo-pos:center,logo-count:1`
+  ([display](display.md) section 4). No other board does any of that: the
+  committed configs of `uefi-x64` and `s905x5m` say `# CONFIG_LOGO is not
+  set`, and `uefi-arm64`'s does not mention it at all, having no framebuffer.
+  So `tty1` is the logo and `tty2` takes an on-demand console, by intent; the
   board renders a VT on HDMI at 1920x1080p60 with a USB HID keyboard bound,
   and the user confirmed it on the device: Alt+F2 a console, F1 the logo.
+
+  **The drop-in's comment describes a state, not a preference, and the rule it
+  encodes is conditional: a board that draws a boot logo keeps the logo VT
+  idle.** The policy is capability-shared, not board-shared — which is why
+  citing the overlay alone does not explain why it exists.
+
+  *(An aperture note for anyone checking this: `cx3576`'s committed kernel
+  config also says `# CONFIG_LOGO is not set`. The hook turns it on during
+  configure, so grepping the config file answers the opposite of the truth —
+  the file is not the pipeline.)*
 - **`uefi-x64`, `uefi-arm64`, `s905x5m`: accident.** No board overlay sets any
   `logind` policy — measured across the `main` trees of `mica-boards`,
   `mica-build`, `mica-core` and `mica-system-base`; `uefi-x64` and
@@ -161,12 +180,21 @@ with* is what decides whether it was meant:
   those three have **no `tty1` console by accident**, and whatever `tty2` does
   there is `logind`'s default rather than a policy. That makes it a **second
   confirmed instance of the composition defect**, not an answered design
-  question.
+  question. **What a person with a monitor meets on a generic board today:
+  `tty1` shows kernel messages and then nothing** — no logo, no prompt, a dead
+  VT.
 
 `mica-build` has a falsifiable prediction to run in its QEMU session: on
 `uefi-x64`, Alt+F2 through F6 should each answer and `tty1` should not, with
 no policy behind the absence. Until it runs, this page claims no VT behaviour
 for those three boards.
+
+**The repair belongs to composition, and the reason is worth keeping.**
+`mica-boards` could have closed its own question by adding three board
+overlays, and refused: **a board overlay re-enabling `tty1` would be a board
+repairing a composer — the wrong repository holding the fix.** The Base half
+of the burden is already where it belongs, in `assertBase`; the product half
+is `mica-build`'s.
 
 **The burden is now the right way round**, which is the shape of every fix
 that worked here: `mica-system-base`'s `assertBase` refuses a base root
