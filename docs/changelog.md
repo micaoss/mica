@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 07:25 [finding]
+
+**The instruction I wrote in a message was contradicted by the tree, in the
+line a tidier reads first.** The `Makefile` header said *`make docs-verify` is
+the one gate* three lines above two gate targets — true when it was written,
+and by this morning the sentence that would have justified deleting the
+second. It now says there are two gates and why: one **offline and hermetic**,
+which `record.sh` runs and which must never depend on the network, and one
+that **reaches other repositories**, holds standing claims only and is its own
+CI job.
+
+**And one word where it will be misread**: `docs-verify-test` runs
+`verify-world-test.sh`, which is correct — that test drives the checker
+through its injectable reader and touches no network — but *world* inside the
+offline target looks like a violation of the rule three lines above it. The
+header says so, because **a name that looks like a violation of a rule you
+just wrote will be read as one.**
+
+**A category named at its first instance and left ungated on purpose**: the
+world gate holds claims about *other* repositories by construction, so a claim
+the records make about **themselves** is outside it and checked by nothing
+either. That is what this was. The note sits in `docs/world-claims.tsv` beside
+the completeness limit, and is the whole of the category's defence — the same
+honest shape as saying that adding a row is a habit rather than a gate.
+
 ## 2026-09-20 07:23 [finding]
 
 **Named at its third instance, beside the noise floor: testing instead of

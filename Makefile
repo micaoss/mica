@@ -1,6 +1,23 @@
 # Mica OS project management and documentation: the records under docs/ and
-# the gates that keep them honest. `make docs-verify` is the one gate; the
-# code lives in micaoss/mica-build and the package repositories.
+# the gates that keep them honest. The code lives in micaoss/mica-build and the
+# package repositories.
+#
+# THERE ARE TWO GATES AND THE SPLIT IS DELIBERATE, so that neither is removed
+# as a duplicate of the other:
+#
+#   make docs-verify        offline and hermetic. tools/docs/record.sh runs it
+#                           before every commit, so it must never depend on the
+#                           network: a records change cannot be blocked by
+#                           GitHub being slow or another repository being
+#                           mid-edit.
+#   make docs-verify-world  the one that reaches other repositories. It holds
+#                           STANDING claims only (docs/world-claims.tsv) and
+#                           runs as its own CI job, red when a claim drifts.
+#
+# `make docs-verify-test` is offline as well, verify-world-test.sh included:
+# that test drives the checker through an injectable reader and touches no
+# network. A "world" test inside the offline target looks like a violation of
+# the rule above and is not one.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"

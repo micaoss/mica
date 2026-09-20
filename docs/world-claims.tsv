@@ -27,6 +27,14 @@
 # puts it in the third row -- the record alone -- and this comment is that
 # record. A standing claim left outside this file will be found the way the
 # two of 2026-09-20 were: incidentally.
+#
+# AND THIS FILE IS ABOUT OTHER REPOSITORIES BY CONSTRUCTION, so a claim the
+# records make about THEMSELVES is outside it and is checked by nothing either.
+# First instance, 2026-09-20: the Makefile header said "`make docs-verify` is
+# the one gate" three lines above two gate targets -- true when written, and by
+# then the sentence a tidier would have cited while deleting the second. Fixed
+# where it stood; the category has no gate and this comment is the whole of its
+# defence.
 release-target.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.cx3576	line	micaoss/mica-boards:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
