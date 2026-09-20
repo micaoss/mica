@@ -9,3 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: make docs-verify docs-verify-test
+  # Separate job on purpose: this one reads other repositories over the
+  # network, and a records change must not be blocked by GitHub being slow or
+  # by another repository being mid-edit. It is still red when it drifts.
+  world:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: make docs-verify-world
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 07:03 [progress]
+
+**"Found on the way to something else" was a description of the tooling, not a
+property of stale records — so the tooling changed.**
+`tools/docs/verify-world.sh` reads the claims these records make about
+*another repository's standing state* and checks each against that repository:
+six to start with, the four `BOARD_RELEASE_TARGET` rows behind
+`support-tiers.md`, the index tag form behind `release-artifacts.md` (read
+across **both** separators, so a slash-form index reappearing would be seen),
+and the `logind` drop-in behind the `access.md` claim that the logo policy is
+`cx3576`'s. Both of this morning's stale claims would have been caught by it.
+
+**It is deliberately not part of `make docs-verify`.** That gate is offline,
+file-only and deterministic, and a records change must not be blocked by
+GitHub being slow or by another repository being mid-edit. `docs-verify-world`
+is its own `make` target and its own CI job, red when a claim drifts.
+
+**Only standing claims go in `docs/world-claims.tsv`**, and the file says why:
+a dated measurement is true of a moment, and re-checking *427 snapshots on
+2026-09-20* against today would turn a record into a false alarm every
+morning. The distinction is the whole difference between a check that stays
+useful and one that gets muted.
+
+**No silent pass, and the tests need no network.** Without a reader it exits 2
+and says it could not reach its subject, because a check that cannot reach the
+world must not look like one that found nothing wrong; an empty claims file is
+refused for the same reason. The reader is injectable, so
+`verify-world-test.sh` drives nine refusals against a stub — including the one
+that matters most, *a claim the world no longer holds is refused*.
+
 ## 2026-09-20 06:59 [finding]
 
 **Corrected before it set: the unmirrored pools are a decision's consequence,

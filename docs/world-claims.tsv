@@ -1,0 +1,20 @@
+# Claims these records make about ANOTHER repository's standing state, and the
+# artefact that settles each one. Checked by tools/docs/verify-world.sh, which
+# needs the network; `make docs-verify` stays offline and does not read this.
+#
+# A row is: claim<TAB>kind<TAB>locator<TAB>expected<TAB>stated in
+#   line        the expected literal must be a line of <repo>:<path> at main
+#   no-line     it must not be
+#   newest-tag  the greatest tag of <repo> matching <locator prefix>[./] must
+#               match the expected ERE
+#
+# ONLY STANDING CLAIMS BELONG HERE. A dated measurement ("427 snapshots on
+# 2026-09-20") is true of a moment and must not be re-checked against today;
+# a standing claim ("s905x5m is a release target") is false the moment the
+# world moves and nothing here would have said so.
+release-target.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
+release-target.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
+release-target.cx3576	line	micaoss/mica-boards:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
+release-target.s905x5m	line	micaoss/mica-boards:boards/s905x5m/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
+index-tag-form	newest-tag	micaoss/mica-build:mica	^mica[.][0-9]{8}-[0-9]{4}$	docs/design/release-artifacts.md
+logo-policy-is-cx3576s	line	micaoss/mica-boards:boards/cx3576/package/overlay/etc/systemd/logind.conf.d/50-mica-console.conf	NAutoVTs=0	docs/design/access.md
