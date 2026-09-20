@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-20 08:27 [finding]
+
+**Surveyed rather than guessed: five of six repositories carry a copy of the
+vectors, and every copy is a different size.** Read from each tree on
+2026-09-20, counting non-comment rows of `expected.tsv` — `mica` 84,
+`mica-system-base` 84, `mica-build` 78, `mica-boards` 64, `mica-core` 51,
+`mica-podman` 48, `mica-res` none. The answer to *who runs the vectors* was
+neither "all of them" nor "two of six": **they all run a snapshot of them**,
+and the mechanism that is supposed to make the copies agree is itself copied.
+The table is in `release-lock.md` 9.1 with a home, so a seventh reader is a
+row rather than another survey.
+
+**The counter is written down as the rule rather than left as the reason
+nobody wired them up**: a reader must pass every vector **for the forms it can
+encounter**, and what it can encounter is decided by what it pins. A
+repository pinning only unscoped producers never sees a `<scope>.<release>`
+row — which is why `mica-system-base`'s reader sat on the retired separator
+for four days and it cost nothing. Requiring it to conform to scoped rules
+would be requiring conformance nobody needs.
+
+**And the residual problem is a resolution one, one level up**: a subset and a
+stale copy are **indistinguishable by size**. 64 rows may be a deliberate
+subset or last month's copy, and the file does not say. So the spec now asks a
+copy to **name the `mica` commit it was taken from**, the way the Chinese
+coverage table names each page's source version — with that, *stale* becomes a
+question anyone can answer and *subset* stops being a guess.
+
 ## 2026-09-20 08:23 [finding]
 
 **A third axis for weighing a rule, recorded at its point of use rather than

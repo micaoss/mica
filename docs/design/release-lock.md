@@ -874,3 +874,41 @@ vectors.
 `make docs-verify` runs it over every vector (`tools/docs/verify-release-lock.sh`)
 and fails when a result or rule differs from `expected.tsv` or a vector is not
 listed. It proves the vectors; it is not a tool the other repositories use.
+
+### 9.1 Who carries a copy, and how much of one
+
+Every repository that reads a lock carries a **private implementation of rules
+this document owns**, and the vectors are the only thing that makes those
+copies agree. They are copied, so each copy is a **snapshot**. Surveyed
+2026-09-20 by reading each repository's tree, counting non-comment rows of its
+`expected.tsv`:
+
+| Repository | Copy | Rows |
+|---|---|---|
+| `mica` (owner) | `docs/design/release-lock/vectors/` | 84 |
+| `mica-system-base` | `tests/vectors/` | 84 |
+| `mica-build` | `tests/release-lock/vectors/` | 78 |
+| `mica-boards` | `tests/vectors/` | 64 |
+| `mica-core` | `tests/vectors/` | 51 |
+| `mica-podman` | `tests/vectors/` | 48 |
+| `mica-res` | none | — |
+
+**A reader must pass every vector for the forms it can encounter**, and what
+it can encounter is decided by what it pins: a repository that pins only
+unscoped producers never sees a `<scope>.<release>` row, and requiring it to
+conform to scoped rules is requiring conformance nobody needs. That is the
+honest reason a subset is legitimate, and it is written here rather than left
+as the reason nobody wired the rest up — `mica-system-base`'s reader was on
+the retired `<scope>/<release>` separator for four days and it cost nothing,
+because it pins no scoped producer.
+
+**But a subset and a stale copy are indistinguishable by size**, which is the
+resolution problem one level up ([harness](build-harness.md) section 4): 64
+rows may be a deliberate subset or last month's copy, and nothing in the file
+says which. So a copy **names the `mica` commit it was taken from**, the way
+the Chinese coverage table names the source version of each page it tracks.
+With that, *stale* is a question anyone can answer and *subset* stops being a
+guess. Without it, the only signal is a number that cannot tell the two apart.
+
+`mica-res` reads pins and now locks and carries no copy; that is the one row
+of the table with nothing behind it.
