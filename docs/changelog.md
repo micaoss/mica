@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 14:34 [finding]
+
+**A section of this corpus promises five ceilings and one of them exists
+nowhere.** Measured in the four committed kernel configs at `mica-boards`
+`main` on 2026-09-20: `MEMCG`, `CFS_BANDWIDTH` and `CGROUP_PIDS` are set on
+**all four boards**, so `memory.high`, `memory.max`, `cpu.max` and `pids.max`
+are real — and **`BLK_DEV_THROTTLING` is set on none**, so `io.max` does not
+exist and the two `IO*` keys bound nothing on any Mica board today.
+`containers.md` section 8 now says so beside the table, with the input/output
+distinction stated: the configs are the input, and a published kernel carries
+what the release that built it carried.
+
+**The finding worth more than the table is that the section already worries
+about the wrong half of the worst case.** Its warning — an `IO*` key naming a
+device path that does not exist is logged and skipped, the unit starts
+unlimited, the evidence is in the journal — is careful, true, and one level
+above the real cause: the controller is **absent**, which produces no journal
+line at all. **A correct warning about the near cause is exactly what stops
+the next reader from looking for the far one.**
+
+**And the section now says which of its claims are measured**: *a container
+runs with no flag* is measured — ten "to run" symbols uniform across four
+boards, and the session probe has seen a container run on a booted image —
+while *a ceiling is a kernel controller* was an assumption until tonight, and
+one fifth of it was wrong. **A document that says which of its claims are
+measured is worth more than one that is uniformly confident.**
+
+**Separately, one line for the floor derivation** (`mica-core`): it had read
+`release-slash` as constraining its own release values **from the vector's
+name**; the file is a `mica-boards` lock carrying `uefi-x64/20260914-2042`, a
+form it neither pins nor emits. **A floor derived from filenames is a floor
+derived from somebody's naming** — the rule survives only if it reads the
+file.
+
 ## 2026-09-20 14:31 [finding]
 
 **One rule with two instances from different domains on the same day: a

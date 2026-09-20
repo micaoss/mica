@@ -412,6 +412,35 @@ the board is a line systemd logs and then skips — the unit starts, unlimited,
 and the only evidence is in the journal. `/dev/mmcblk0` is the eMMC on the
 cx3576; check the board before copying it.
 
+**A ceiling is only a kernel controller if the controller is compiled in, and
+one of these is not** *(measured 2026-09-20 in the four committed kernel
+configs at `mica-boards` `main`)*. `MEMCG`, `CFS_BANDWIDTH` and `CGROUP_PIDS`
+are set on **all four boards**, so `memory.high`, `memory.max`, `cpu.max` and
+`pids.max` are real there. **`BLK_DEV_THROTTLING` is set on none of them**, so
+`io.max` does not exist and the two `IO*` keys above bound nothing on any Mica
+board today.
+
+That is worth reading beside the warning above it, which is careful and true
+and one level too high: a missing **device path** is logged and skipped, but
+the reason IO is unlimited here is that the **controller is absent**, which
+produces no journal line at all. A correct warning about the near cause is
+exactly what stops the next reader from looking for the far one.
+
+*(The configs are the input; a published kernel carries what the release that
+built it carried. `mica-boards` has a ruling to set the missing symbol on all
+four boards under the user's decision that container behaviour is uniform
+unless the kernel cannot support it — and the kernel supports it everywhere;
+it was never set. This section's promise becomes true as written when that
+lands.)*
+
+**And the section does not distinguish what is measured from what was
+assumed, so it does here**: *a container runs with no flag* is **measured** —
+the ten "to run" symbols are uniform across the four boards, and the session
+probe has seen a container run on a booted image. *A ceiling is a kernel
+controller* was an **assumption** until it was checked, and one fifth of it
+was wrong. A document that says which of its claims are measured is worth more
+than one that is uniformly confident.
+
 **Nothing requires any of this.** A `.container` file with no `[Service]`
 section at all is accepted, generates a unit with no ceilings, and Mica OS adds
 none. There is no admission step between a file appearing in the Quadlet

@@ -955,6 +955,13 @@ morning.** The canonical set is 92 rows now rather than 84, seven of them the
 `vectors-pin` family specified after four repositories had already written the
 file.
 
+**A floor derived from filenames is a floor derived from somebody's naming**
+*(2026-09-20)*. `mica-core` read `release-slash` as constraining its own
+release values, from the vector's **name**; the file is a `mica-boards` lock
+carrying `uefi-x64/20260914-2042` — **a scoped release with a slash, a form it
+neither pins nor emits**. It rebuilt its floor from vector **content**. The
+derivation rule survives only if it reads the file.
+
 **The required subset is derivable, not arguable.** What a reader can
 encounter follows from `locks/pins/`: a fact about a directory rather than a
 claim about a repository's habits. That also relocates the difficulty of ever
