@@ -656,14 +656,28 @@ nothing said which. **A fragment edit is not an outcome**, and the difference
 between an approved deletion and a measured one is a symbol that changed
 state.
 
+**And `m` is only the second of four answers a request cannot tell apart.** A
+symbol the floor asks to be off can come back `=y`, come back `=m`, be
+explicitly off, or **not be mentioned at all** — `CGROUP_HUGETLB` appears
+nowhere in `s905x5m`'s 8382-line vendor input, neither granted nor denied,
+decided at `olddefconfig`. The request has one form and the outcome has four,
+so **`is not set` has been doing duty for several different states all
+along**, and which one it meant was never readable from the file. That is the
+*a value that cannot express **not measured*** rule in a new place: the line
+cannot say *unmentioned*, cannot say *modular*, and cannot say *absent because
+its dependencies were unmet* — and a reader cannot tell those from *decided
+off*.
+
 *(The same distinction bounds what the two FIT boards' numbers mean.
 `s905x5m`'s **vendor input** carries six of the nine requested-off symbols
 `=y` — `BLK_CGROUP_IOPRIO`, `CGROUP_RDMA`, `CGROUP_MISC`, `CGROUP_NET_PRIO`,
 `CGROUP_PERF` and `TASKSTATS`, measured at `mica-boards` `8e6c3ba`;
-`cx3576`'s carries none. That is a statement about an input the floor is
-merged into afterwards, **not** about either board's kernel: their resolved
-configs are not in the tree, so what the new loop finds there is the first
-reading anybody has of it.)*
+`cx3576`'s carries none, and a seventh — `CGROUP_HUGETLB` — is not in that
+file at all. That is a statement about an input the floor is merged into
+afterwards, **not** about either board's kernel: their resolved configs are
+not in the tree, so what the new loop finds there is the first reading anybody
+has of it. *A claim about a kernel from a measurement of an input* is the same
+trap this section is about, one artefact further down.)*
 
 **And the floor states the distinction this section needs everywhere:
 `PSI` on is the capability; running `systemd-oomd` and setting those keys is a

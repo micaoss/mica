@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-20 16:14 [finding]
+
+**A requested-off symbol has four possible outcomes and the request can
+express one of them.** It can come back `=y`, come back `=m` — the
+`MDIO_BCM_UNIMAC` case, where a modular selector leaves kconfig free to answer
+`m` — be explicitly off, or **not be mentioned at all**: `CGROUP_HUGETLB`
+appears nowhere in `s905x5m`'s 8382-line vendor input, neither granted nor
+denied, decided at `olddefconfig`. So **`is not set` has been doing duty for
+several different states all along**, which is the *a value that cannot
+express **not measured*** rule arriving in kconfig: the line cannot say
+*unmentioned*, *modular*, or *absent because a dependency was unmet*, and a
+reader cannot tell any of them from *decided off*.
+
+**And the count of `=y` in that vendor input is six**, read here at `8e6c3ba`
+and confirmed independently: `BLK_CGROUP_IOPRIO`, `CGROUP_RDMA`,
+`CGROUP_MISC`, `CGROUP_NET_PRIO`, `CGROUP_PERF`, `TASKSTATS`. The number that
+had been travelling was five. It remains a measurement of an **input** — the
+floor is merged in afterwards — so *s905x5m ships controllers its floor
+records off* would be a claim about a kernel from a measurement of an input,
+which is this section's own trap one artefact further down.
+
 ## 2026-09-20 16:12 [finding]
 
 **Every sentence claiming a booted guest confirmed `cpu.max`, `memory.max` or
