@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-09-20 08:30 [finding]
+
+**A conformance test that ships its own fixtures tests conformance to
+itself.** *78 of 78* is a true statement about a set six vectors short, green
+on every push, with the test name and the pass line both looking complete —
+worse than a suite that proves nothing, because it **proves something real
+about the wrong specification**.
+
+**The counts are re-measured with the unit stated**, since two correct counts
+of one file differed by one until someone said which: a `lines` count includes
+the header comment, a `rows` count is the vectors. Canonical 85/84 with six
+`data` vectors; `mica-system-base` 85/84 and **byte-identical to the canonical
+file**; `mica-build` 79/78 and **exactly the six short**; `mica-boards` 65/64;
+`mica-core` 52/51; `mica-podman` 49/48; `mica-res` none. So *three counts, no
+two the same* is not today's picture — two are identical and one is precisely
+six behind, which is a sharper fact than the spread was.
+
+**And the answer adopted goes further than the one proposed here**: not *name
+the commit you copied from* but **do not copy** — a consumer reads the vectors
+out of `mica` at a pinned commit and refuses a difference, the mechanism
+`deploy-pool.sh --check` already uses for `mica-core`'s contract fixtures and
+the one that caught the board vocabulary this morning. **Being on a list that
+is checked beats being on a list that is surveyed**, and it answers
+*conforming* rather than *running*, which are not the same question: running a
+stale copy looks identical from outside.
+
+**The `data` row's own record now carries what its first release costs**: the
+lock will be refused with `kind-unknown` by readers that have not implemented
+it, the release goes anyway because **holding a correct release for a stale
+consumer is backwards**, each consumer implements before its next re-pin, and
+— the sentence that is the whole argument for pinning the vectors — **the
+artefact a repository asked for cannot reach it through a lock until it
+implements a row it did not know had been specified.**
+
+**One more aperture instance, self-reported**: a 404 at a **guessed path** is
+not evidence of absence. Four repositories were probed at `mica-build`'s
+vector path and answered nothing, while `mica-system-base`'s reader and
+vectors were elsewhere, in TypeScript — one keystroke from *only `mica-build`
+has vectors*.
+
 ## 2026-09-20 08:27 [finding]
 
 **Surveyed rather than guessed: five of six repositories carry a copy of the

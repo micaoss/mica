@@ -243,6 +243,18 @@ never another repository's `data` file — so no repository's build may come to
 depend on one. And not mutable: like every other asset it is fixed at its
 release, and a correction is the next release.
 
+**The first release carrying these rows is refused by readers that have not
+implemented them, and that is correct** *(2026-09-20)*. `mica-system-base`
+publishes `data` rows in its next release; `mica-build`'s reader does not know
+the kind and refuses the lock with `kind-unknown`. The release still goes —
+**holding a correct release for a stale consumer is backwards**, and the
+failure is loud rather than silent, which is the property `kind-unknown` was
+kept for. Each consumer implements the row before its next re-pin, not before
+the release, because nothing breaks until something re-pins. And the sentence
+this cost is the argument for 9.1 in one line: **the artefact a repository
+asked for cannot reach it through a lock until it implements a row it did not
+know had been specified.**
+
 **What a consumer may assume about a `data` row it does not understand**: that
 the file exists in that release and hashes to that value, that it is needed
 for nothing, and that skipping it is always safe. Its meaning belongs to the
@@ -879,19 +891,24 @@ listed. It proves the vectors; it is not a tool the other repositories use.
 
 Every repository that reads a lock carries a **private implementation of rules
 this document owns**, and the vectors are the only thing that makes those
-copies agree. They are copied, so each copy is a **snapshot**. Surveyed
-2026-09-20 by reading each repository's tree, counting non-comment rows of its
-`expected.tsv`:
+copies agree. They are copied, so each copy is a **snapshot** — and **a
+conformance test that ships its own fixtures tests conformance to itself**:
+*78 of 78* is a true statement about a set six vectors short, green on every
+push, with the test name and the pass line both looking complete.
 
-| Repository | Copy | Rows |
-|---|---|---|
-| `mica` (owner) | `docs/design/release-lock/vectors/` | 84 |
-| `mica-system-base` | `tests/vectors/` | 84 |
-| `mica-build` | `tests/release-lock/vectors/` | 78 |
-| `mica-boards` | `tests/vectors/` | 64 |
-| `mica-core` | `tests/vectors/` | 51 |
-| `mica-podman` | `tests/vectors/` | 48 |
-| `mica-res` | none | — |
+Measured 2026-09-20 by reading each tree, **with the unit stated, because two
+correct counts of one file differed by one until someone said which**: a
+`lines` count includes the header comment, a `rows` count is the vectors.
+
+| Repository | Copy | Lines | Vector rows | `data` vectors |
+|---|---|---|---|---|
+| `mica` (owner) | `docs/design/release-lock/vectors/` | 85 | 84 | 6 |
+| `mica-system-base` | `tests/vectors/` | 85 | 84 | 6 — byte-identical to the canonical file |
+| `mica-build` | `tests/release-lock/vectors/` | 79 | 78 | 0 — exactly the six short |
+| `mica-boards` | `tests/vectors/` | 65 | 64 | 0 |
+| `mica-core` | `tests/vectors/` | 52 | 51 | 0 |
+| `mica-podman` | `tests/vectors/` | 49 | 48 | 0 |
+| `mica-res` | none | — | — | — |
 
 **A reader must pass every vector for the forms it can encounter**, and what
 it can encounter is decided by what it pins: a repository that pins only
@@ -905,10 +922,20 @@ because it pins no scoped producer.
 **But a subset and a stale copy are indistinguishable by size**, which is the
 resolution problem one level up ([harness](build-harness.md) section 4): 64
 rows may be a deliberate subset or last month's copy, and nothing in the file
-says which. So a copy **names the `mica` commit it was taken from**, the way
-the Chinese coverage table names the source version of each page it tracks.
-With that, *stale* is a question anyone can answer and *subset* stops being a
-guess. Without it, the only signal is a number that cannot tell the two apart.
+says which. Naming the `mica` commit a copy was taken from would answer that —
+and the adopted answer goes further and removes the copy:
+
+> **The vectors are not copied. A consumer reads them out of `mica` at a
+> pinned commit and refuses a difference** — the mechanism
+> `mica-build:tools/deploy-pool.sh --check` already uses to read `mica-core`'s
+> contract fixtures at the commit of its release, and the one that caught the
+> board vocabulary on 2026-09-20.
+
+The sentence behind it generalises past vectors: **being on a list that is
+checked beats being on a list that is surveyed.** A survey answers today; a
+pinned read answers whenever someone adds a seventh reader, and it answers
+*conforming* rather than *running*, which are not the same question — running
+a stale copy looks identical from outside.
 
 `mica-res` reads pins and now locks and carries no copy; that is the one row
 of the table with nothing behind it.

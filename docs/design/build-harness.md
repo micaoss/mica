@@ -154,7 +154,12 @@ once rather than twice: a suite named for FIT lifecycle tests the FIT boot
 path and boots nothing, so *no suite boots a FIT image* could only be
 established by reading every suite, not by trusting the one named for it. A
 negative claim inherits the aperture of the query that produced it, whether
-the aperture was a filter, a file, a name — **or a resolution.** The three
+the aperture was a filter, a file, a name, a guessed path — **or a
+resolution.** *(A 404 at a guessed path is not evidence of absence: four
+repositories were probed at `mica-build`'s vector path on 2026-09-20 and
+answered nothing, while `mica-system-base`'s reader and vectors were simply
+elsewhere, in TypeScript. The probe was one keystroke from being reported as
+"only `mica-build` has vectors".)* The three
 named so far are all about *where* someone looked; the fourth is about *how
 finely*. `mica-boards` compared two arm64 kernels, one published by a native
 CI runner and one cross-built locally: **exactly the same size, 33 065 472
