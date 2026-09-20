@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-20 20:46 [finding]
+
+**The hardest denominator to get right is the one inside a direct
+measurement.** *Nine of ten structs carry the annotation* mixed structs in a
+file with structs a parser reaches, and it survived a day in which every other
+error was caught by somebody going and looking — because **going to the source
+buys correctness about the objects and nothing about the population, and the
+confidence it produces does not know the difference.** A ratio announces
+itself and invites the question; **a count of things you actually counted
+arrives carrying its own evidence of diligence.**
+
+**And the episode is evidence about the method rather than only about the
+fact**: the constraint went one struct → nine → no exception across three
+reads, each by a party closer to the source, and **each read strengthened
+it.**
+
 ## 2026-09-20 20:43 [finding]
 
 **Asked which of the ten structs lacks `deny_unknown_fields`, the answer is

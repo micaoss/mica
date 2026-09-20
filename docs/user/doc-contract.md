@@ -164,6 +164,17 @@ English source.
   modesty**: an overstatement invites challenge and an understatement invites
   agreement. State coverage in the units the claim is about — here, **the
   components that carry code and data onto the device**.
+  **And the hardest denominator to get right is the one in a direct
+  measurement** *(2026-09-20)*: *nine of ten structs carry the annotation*
+  mixed **structs in a file** with **structs a parser reaches**, and it
+  survived a day in which every other error was caught by somebody going and
+  looking — because **going to the source buys correctness about the objects
+  and nothing about the population, and the confidence it produces does not
+  know the difference.** A ratio announces itself and invites the question; a
+  count of things you actually counted **arrives carrying its own evidence of
+  diligence.** *(The claim went one struct → nine → no exception across three
+  reads, each by a party closer to the source and each strengthening it, which
+  is evidence about the method rather than only about the fact.)*
 - **State the unit with the number.** 536 and 535 were both true of the same
   mirror on the same evening — one counts the keys a contract requires, the
   other the distinct byte strings stored — and a bare number is wrong for
