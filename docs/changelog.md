@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 15:31 [finding]
+
+**A citation that was never checkable now has a row that goes red the day it
+becomes true.** `mica-boards`' kernel config test names
+`mica-build:verify/src/checks-kernel.ts` as the instrument that reads the
+`/boot/config-*` an image ships — the top rung of the ladder in
+`containers.md` section 8. The path is absent from that repository's directory
+listing **and `git log` over it returns nothing**, so it was never there under
+that name. A four-rung ladder whose top rung's instrument nobody can find is
+three rungs with an assurance attached.
+
+**So the gate learned a new kind, `no-path`, and its implementation is a rule
+this corpus already carried.** The parent directory is **listed** rather than
+the path probed: a probe answers *not found* both for an absent file and for a
+reader that never arrived, and the two are the same exit status — while a
+directory that answers proves the reach, and only then does a missing name
+mean anything. Absence is claimed from positive evidence or not at all. The
+expected column must read the literal `absent`, so a typo is loud rather than
+a silent pass. Four negative tests: absent passes, present refuses, an
+unlistable directory refuses, and a different expectation refuses. 13 of 13,
+and 25 of 25 claims hold.
+
+**The shape it belongs to is the third instance today of a comment asserting a
+check in the present tense while the check is not there** — and it is the
+worst of the three, because a **cross-repository citation is checked by no
+gate either repository owns**: `mica-boards`' gates do not read `mica-build`'s
+tree, and `mica-build` has never read that comment. It takes a third party
+whose whole job is claims about other repositories, which is what this file
+is.
+
 ## 2026-09-20 15:28 [finding]
 
 **A paragraph published here four hours ago rested on an inference I had

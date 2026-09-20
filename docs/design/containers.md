@@ -508,9 +508,16 @@ rungs one and two and `mica-build`'s pins; `mica-build`'s own table was read
 from the build tree; the session probe reads the running kernel's behaviour,
 which is downstream of the shipped artefact. The instrument for the shipped
 `/boot/config-*` is named in `mica-boards`' test header as
-`mica-build:verify/src/checks-kernel.ts` — **a path that does not resolve at
-`mica-build` `main` today** (checked 2026-09-20), so that rung's instrument is
-named here and locatable by its own repository rather than by this page.
+`mica-build:verify/src/checks-kernel.ts` — and **that path has no history in
+`mica-build` at all**: it is absent from the directory listing and
+`git log` over it returns nothing, so it is a citation that was never
+checkable rather than one that rotted. A successor under another name may
+exist and two queries did not find it, which is a statement about the queries;
+what is settled is that the named file is not there. **A four-rung ladder
+whose top rung's instrument nobody can find is three rungs with an assurance
+attached**, so `docs/world-claims.tsv` now carries the absence as a row: it
+goes red the day that file appears, which is the day this paragraph should be
+rewritten.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but

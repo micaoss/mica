@@ -61,6 +61,18 @@ read_tags() { # <repo>
     fi
 }
 
+# A DIRECTORY LISTING RATHER THAN A PATH PROBE, and the difference is the whole
+# reason `no-path` can be trusted: a probe at the path answers "not found" both
+# when the file is absent and when the reader cannot reach the repository at
+# all, and the two are the same exit status. Listing the PARENT makes reach
+# positive evidence -- a directory that answers proves the reader arrived, and
+# only then does a missing name mean anything.
+read_dir() { # <repo> <dir>
+    if [ -n "$READER" ]; then "$READER" list "$1" "$2"; else
+        gh api "repos/$1/contents/$2" --jq '.[].name'
+    fi
+}
+
 total=0
 drift=0
 while IFS=$'\t' read -r claim kind locator expected stated; do
@@ -79,6 +91,19 @@ while IFS=$'\t' read -r claim kind locator expected stated; do
             done <<<"$body"
             if [ "$kind" = line ] && [ "$found" = yes ]; then verdict=OK; fi
             if [ "$kind" = no-line ] && [ "$found" = no ]; then verdict=OK; fi
+            ;;
+        no-path)
+            [ "$expected" = absent ] || {
+                echo "${NAME}: ${claim}: a no-path row expects the literal 'absent', not '${expected}'" >&2; exit 2; }
+            dir="${rest%/*}"
+            [ "$dir" = "$rest" ] && dir=""
+            base="${rest##*/}"
+            listing="$(read_dir "$repo" "$dir")" || {
+                echo "${NAME}: ${claim}: cannot list ${repo}:${dir:-/}; absence cannot be claimed from a directory that did not answer" >&2; exit 2; }
+            verdict=OK
+            while IFS= read -r name; do
+                [ "$name" = "$base" ] && verdict=DRIFT
+            done <<<"$listing"
             ;;
         newest-tag)
             newest=""

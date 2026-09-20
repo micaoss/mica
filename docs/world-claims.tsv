@@ -7,6 +7,11 @@
 #   no-line     it must not be
 #   newest-tag  the greatest tag of <repo> matching <locator prefix>[./] must
 #               match the expected ERE
+#   no-path     the locator's PARENT DIRECTORY must not list its basename;
+#               the expected column is the literal `absent`. The parent is
+#               listed rather than the path probed because a probe answers
+#               "not found" both for an absent file and for a reader that
+#               never arrived, and a directory that answers proves the reach.
 #
 # ONLY STANDING CLAIMS BELONG HERE. A dated measurement ("427 snapshots on
 # 2026-09-20") is true of a moment and must not be re-checked against today;
@@ -103,6 +108,15 @@ board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260919
 # board because a unit key a product can set reaches the file they create, and
 # TASKSTATS is OFF for every board because nothing does. A defconfig bump that
 # re-scatters any of them turns this red.
+#
+# AND ONE ROW FOR AN INSTRUMENT THAT DOES NOT EXIST. mica-boards' kernel config
+# test names mica-build:verify/src/checks-kernel.ts as the half that reads the
+# /boot/config-* an image ships -- the top rung of the four-rung ladder in
+# containers.md 8. That path has no history in mica-build at all, so the rung
+# is cited rather than guarded. This row goes RED THE DAY THE FILE APPEARS,
+# which is the only event that changes the sentence, and until then it keeps a
+# citation nobody can check from being read as a check that runs.
+shipped-config-check	no-path	micaoss/mica-build:verify/src/checks-kernel.ts	absent	docs/design/containers.md
 psi-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/design/containers.md
 iocost-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/design/containers.md
 taskstats-floor-off	line	micaoss/mica-boards:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/design/containers.md
