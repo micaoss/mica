@@ -102,10 +102,10 @@ make offline-chain PRODUCTS=uefi-x64-dev
 - `make os-smoke-test`、`os-smoke-negative-test` 和 `os-factory-root-gate` 在真正发布的
   根里执行真正发布的二进制，并证明反例确实会触发。
 - `make lifecycle-uefi PRODUCT=<name>` 对一个 UEFI 产品跑 QEMU 生命周期套件（启动、
-  运行时、更新、故障、重置、关机）。**它是手工运行的**：截至 2026-09-19，没有任何 CI
+  运行时、更新、故障、重置、关机）。**它是手工运行的**：截至 2026-09-20，没有任何 CI
   作业、也没有任何发布会启动镜像，所以“某个产品能启动”这个断言，带的是**上一次有人跑
-  它的日期**。这套套件的一次 `uefi` 启动已获准进入 `ci.yml`，随 `mica-build` 下一轮
-  重新 pin 落地（[构建门](../../design/build-harness.md)）。
+  它的日期**。这套套件的一次 `uefi` 启动已获准进入 `ci.yml`；它已被两次加入又撤出，
+  在能以非 root 用户通过之前一直不在（[构建门](../../design/build-harness.md)）。
 - `make os-repart-test` 证明首次启动的扩容，`make os-layout-lint` 证明分区契约。
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:make product-verify`, `mica-build:make lifecycle-uefi`

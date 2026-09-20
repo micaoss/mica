@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 00:16 [progress]
+
+**The corrected round is published and the non-booting note resolves.**
+`uefi-x64.20260919-2356`, `uefi-arm64.20260919-2356` and
+`cx3576.20260919-2356`, with `mica.20260920-0008` marked latest, all from
+`f46b64a6`; the four trust hashes were read back from the published
+`SHA256SUMS` and match, and each scoped release carries exactly its two
+products' images and one full archive each. `docs/user/download.md`,
+`docs/user/flashing.md`, their Chinese pages and
+`docs/boards/support-tiers.md` now point a reader at `20260919-2356` or later
+and keep the three broken rounds named, still published, still not deleted.
+
+**Full-only rounds, both directions, in one rule** in
+`docs/user/update-packages.md`: this round is full-only because *everything
+compared moved* — `mica-deploy` is in every root and `mica-lifecycle` ships
+the `mica-runkit` packed into the initramfs as `/init`, part of the
+authenticated kernel identity — and a board's first release, `s905x5m`'s
+among them, will be full-only because *there is nothing to compare against*.
+A reader meets one rule instead of two coincidences.
+
+**One claim did not survive the read-back, and the boundary stands.** The
+round was forwarded as built from the commit whose guest reached
+`FILE_AB_RUNTIME_PASS` **in CI**. At `f46b64a6` `ci.yml` carries no lifecycle
+job — the gate was landed and withdrawn twice while it was being made to pass
+as a non-root user (`bc5e400`, `c8eb64d`) — and that commit's `ci` run has
+nineteen jobs, none of which boots a guest. So what backs the corrected images
+is a source fact: the `mica-core` release they pin, `20260919-2226`
+(`dc1c870`), matches `uefi-x64` and `uefi-arm64` in the board arm whose
+absence produced the refusal. The pages say exactly that and leave *boots* as
+a claim carrying the date of a run. `build-harness.md` section 4 records that
+the boundary still stands on 2026-09-20.
+
 ## 2026-09-19 22:24 [finding]
 
 **Nine was ten, and the count is replaced by a boundary sentence.** There are

@@ -245,6 +245,17 @@ What closes this is the guest reaching `FILE_AB_RUNTIME_PASS` after the pin
 moves, not the diff. A rename verified by reading the diff is what produced
 the break.
 
+**The boundary still stands on 2026-09-20, after the re-pin round shipped.**
+The gate was landed and taken back out twice while it was being made to pass
+as a non-root user (`mica-build` `bc5e400`, `c8eb64d`), and at `f46b64a6` —
+the commit the corrected releases are built from — `ci.yml` carries no
+lifecycle job; its `ci` run has nineteen jobs and none of them boots a guest.
+So the corrected images are backed by a source fact (the client they pin
+matches the current board names) and by whatever hand run produced the pass
+marker, not by a CI boot. The sorting sentence above is the one to apply, and
+it is now the second time the same week that a boot claim has needed the
+distinction.
+
 ## 5. Complete-image acceptance
 
 Build the current package pool and compose the root, then produce signed root,

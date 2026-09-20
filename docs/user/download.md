@@ -30,14 +30,22 @@ a `dev` or `prod` product; the minimal products were removed on 2026-09-16
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
 releases cut before that date keep their minimal assets.
 
-**The published `uefi` images do not boot** *(2026-09-19)*. Every `uefi-x64`
-and `uefi-arm64` image in `20260916-0845`, `20260916-1653` and
-`20260919-2103` refuses the board name in its own signed identity at PID 1 and
-powers the machine down at 1.7 seconds: the boards were renamed while the
-pinned client that reads that name was not. `cx3576` is unaffected — its name
-did not change. Nothing is deleted; a corrected release supersedes them, and
-this page names it when it exists. Until then those files download and do not
-run ([harness](../design/build-harness.md) section 4).
+**Three `uefi` rounds do not boot; the newest releases supersede them.** The
+`uefi-x64` and `uefi-arm64` images of `20260916-0845`, `20260916-1653` and
+`20260919-2103` refuse the board name in their own signed identity at PID 1
+and power the machine down at 1.7 seconds: the boards were renamed while the
+pinned client that reads that name was not. `cx3576` was never affected — its
+name did not change. Those releases stay published and are not deleted
+([release-lock](../design/release-lock.md) 2.1); the fix is the superseding
+release, not a deletion.
+
+**The corrected round is `20260919-2356`** — `uefi-x64.20260919-2356`, `uefi-arm64.20260919-2356` and `cx3576.20260919-2356`,
+with the index `mica.20260920-0008`, all built from `f46b64a6`. The client it
+ships accepts the current names: the `mica-core` release it pins,
+`20260919-2226`, matches `uefi-x64` and `uefi-arm64` in the board arm whose
+absence produced the refusal. That is a source fact about the arm; *that a
+product boots* is a separate claim and carries the date of a run
+([harness](../design/build-harness.md) section 4).
 
 Per product a release carries:
 

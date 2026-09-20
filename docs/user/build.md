@@ -120,10 +120,10 @@ for its release while developing, instead of the pinned release.
   cases fire.
 - `make lifecycle-uefi PRODUCT=<name>` runs the QEMU lifecycle suite (boot,
   runtime, updates, faults, reset, shutdown) over a UEFI product. **It is run
-  by hand**: as of 2026-09-19 no CI job and no release boots an image, so a
+  by hand**: as of 2026-09-20 no CI job and no release boots an image, so a
   claim that a product boots carries the date of the last time someone ran
-  this. One `uefi` boot of this suite is authorised for `ci.yml` and lands
-  with `mica-build`'s next re-pin round
+  this. One `uefi` boot of this suite is authorised for `ci.yml`; it has been
+  landed and withdrawn twice and is out until it passes as a non-root user
   ([harness](../design/build-harness.md)).
 - `make os-repart-test` proves first-boot growth, and `make os-layout-lint`
   the partition contracts.

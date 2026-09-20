@@ -28,7 +28,16 @@ Each product release has one signed deployment, published as up to three
 | `root` | `mica-<product>-<stamp>.root.micaupd` | the kernel identity is unchanged from the product's previous release |
 | `kernel` | `mica-<product>-<stamp>.kernel.micaupd` | the rootfs identity is unchanged |
 
-When both changed, only `full` is published. The `root` case first ran on
+When both changed, only `full` is published. A round that publishes only
+`full` archives can mean either of two opposite things, and both are the
+format working: **everything compared moved** — `20260919-2356` is full-only
+for all six products because `mica-deploy` is in every root and
+`mica-lifecycle` ships the `mica-runkit` packed into the initramfs as `/init`,
+part of the authenticated kernel identity, so both ids moved everywhere — or
+**there is nothing to compare against**, which is what a board's first release
+will look like, `s905x5m`'s among them. A full-only round is not evidence of a
+defect in either case; what distinguishes them is whether a previous release
+exists. The `root` case first ran on
 real releases on 2026-09-16, on all six products at once and against the
 devices that exist
 ([record](../task/20260916-1653-root-only-archive.md)). A `root` archive carries the
