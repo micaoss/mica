@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-20 08:02 [finding]
+
+**Five layers of one distinction, written as a table rather than as a
+slogan.** *Check the output, not the input* fits everything and tells nobody
+what to do — the failure mode of a rule that fits everything, and the reason
+this was worth hesitating over. What makes it usable is naming, per kind of
+claim, which artefact is the input and which is the output, so
+`build-harness.md` section 4 now carries the five with their pairs: a
+composer's declarations against the composed root (no image had a console
+login); a committed `kernel/config` against the configured kernel (`cx3576`
+says `# CONFIG_LOGO is not set` and its hook turns it on); board overlay trees
+against a non-`cx3576` composed root (four readings of trees before anyone
+asked a root); the tree before a rebase against the tree that reaches
+`origin`; and — the fifth, the same day as the fourth — an `fstab` entry
+against the **effective** mount on a booted guest, since a bind cannot weaken
+the underlying mount and only the guest has both sets composed.
+
+**The table is the argument and the sentence is only its title.** That is the
+whole of why it is written down now: not because the general form became
+truer with a fifth instance, but because five instances in five repositories
+make a pairing table that someone can actually apply, and each row names the
+artefact to go and read.
+
 ## 2026-09-20 08:00 [finding]
 
 **A self-retiring check needs its predicate to *be* the reason, not a proxy

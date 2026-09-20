@@ -90,6 +90,24 @@ unreachable is the second: several independent facts hold it, so it is a
 property of the design and belongs written down rather than guarded. The test
 is `mica-core`'s and it answers a question that otherwise turns into taste.
 
+**Ask the artefact that ships, not the one that produced it** — and the
+useful form of this is a table, not the sentence. Said as *check the output,
+not the input* it fits everything and tells nobody what to do, which is the
+failure mode of a rule that fits everything. What makes it actionable is
+naming, per kind of claim, which artefact is the input and which is the
+output. Five layers, five repositories, one distinction *(2026-09-19/20)*:
+
+| The claim is about | The input someone checked | The output that settles it |
+|---|---|---|
+| what a root contains | the composer's declarations | the composed root — `/etc/pam.d/login` was declared nowhere and no image had a console login |
+| what a kernel enables | the committed `kernel/config` | the configured kernel — `cx3576`'s config says `# CONFIG_LOGO is not set` and its hook turns it on |
+| which board carries a policy | the board overlay trees | a non-`cx3576` composed root — four readings of trees before anyone asked the root |
+| what a gate validated | the tree before the rebase | the tree that reaches `origin` — `record.sh` gates again afterwards for this reason |
+| a mount's options | the `fstab` entry | the **effective** mount on the booted guest: a bind cannot weaken the underlying mount, so the effective set is `DATA`'s options composed with the bind's, and only the guest has both |
+
+The table is the argument and the sentence is only its title. Each row cost
+something to learn, and the fifth arrived the same day as the fourth.
+
 **A query's aperture must be at least as wide as the claim built on it.**
 *This is the general statement; where a spec needs the operational form, it
 cites this paragraph rather than restating it (`release-lock.md` 1.3).* Five
