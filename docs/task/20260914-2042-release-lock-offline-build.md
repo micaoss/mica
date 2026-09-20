@@ -1,6 +1,6 @@
 # 20260914-2042-release-lock-offline-build Move every repository to the release lock format and build the chain offline
 
-- **status**: in_progress — clause A reachable and unproven (2026-09-20 17:26; before that, unreachable since 2026-09-20 12:00)
+- **status**: in_progress — clause A's byte-equality form **closed as unachievable by design** (2026-09-20 19:54); its keyless-fingerprint restatement is pending a coverage measurement. (Earlier: reachable-and-unproven 17:26, unreachable 12:00.)
 - **priority**: P1
 - **owner**: olea2l5k (step 0 and records); each step by its repository owner
 - **createdAt**: 2026-09-14 20:42
@@ -31,6 +31,42 @@ Moving the repositories to the release lock format
 - **blocks**: (none)
 
 ## Notes
+
+- 2026-09-20, later: **clause A is not unproven. Its byte-equality form is
+  unachievable by everybody except the release job, and that is the trust
+  model working rather than a gap.** Verified here at `origin` rather than
+  taken: `mica-build:.github/workflows/release-product.yml` writes the three
+  release **secrets** — `MICA_RELEASE_VERITY_KEY`, `MICA_RELEASE_BOOT_KEY`,
+  `MICA_RELEASE_UPDATES_KEY` — into `_out/release-signing/*/signer.key.pem`
+  and sets `MICA_SIGNING_OUTPUT` to that directory, so **a published product
+  is signed with private keys that exist only as GitHub secrets**. No offline
+  build on a machine without them can produce the published bytes, with or
+  without a version stamp. *(That the non-release default is `meta` is
+  `mica-build`'s reading, not re-measured here.)*
+
+  **A clause satisfiable only by the party it is meant to check is not a weak
+  clause, it is an empty one**, so this half is recorded as **closed —
+  achieved by design** rather than deferred: *a deferred item attracts effort
+  forever; a closed one does not.* The user delegated the shape to the
+  coordinator, which ruled it; the wording is this repository's.
+
+  **The achievable form is equality of what was *signed*, not of signed
+  artefacts** — the root component already writes `rootfs.roothash` beside its
+  `.p7s`, a dm-verity root hash is a complete fingerprint of the root and
+  **needs no key**, so two builds agreeing on it agree on every byte of the
+  root, and anyone can check that offline. **Its coverage is not yet written,
+  because a root is not a product**: `rootfs.roothash` does not cover the
+  kernel, the UKI, the boot components or the ESP — **precisely the things
+  that are signed** — and the lock's `asset` rows are sha256 of the *signed*
+  artefacts, so they cannot serve either. What else carries a keyless
+  fingerprint is being measured. **A zero is a fine answer; a zero presented
+  as full coverage is not**, so the restatement waits for the number rather
+  than being written to sound complete.
+
+  **And why it read as *reachable and unproven* all day**: every obstacle
+  anybody had hit before this one — the bundle shape, the slash form, the
+  pins — was the kind effort removes. This one is not, and **nothing in the
+  clause's text says which kind it is up against.**
 
 - 2026-09-20, evening: **the aligned chain completed, `rc=0`, and the state of
   clause A changes from *unreachable* to *reachable and unproven* — not to

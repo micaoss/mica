@@ -343,6 +343,19 @@ English source.
   and not the outcomes they produced. Where two independent measurements agree
   on a count, the class is closed; where only one exists, say which side it
   was taken from.
+- **A clause that cannot distinguish *not yet done* from *cannot be done* is
+  read as the first every time, because that is the reading that asks nothing
+  of the reader** *(2026-09-20)*. *Unproven* is the comfortable state: it
+  implies somebody will eventually, and it costs whoever holds it nothing
+  today. One clause here was tracked as open for a day while it was **closed
+  by the trust model** — signed bytes cannot be reproduced without the private
+  keys that only the release job holds. **And what distinguished the two was
+  not a better reading of the clause; it was somebody grepping for where a
+  value comes from.** So a clause states which kind of obstacle it faces, or
+  it will be read as the kind that effort removes. *(Fifth subject for the
+  practice above — a tree, a comment, a report, a unit of work, and now a
+  clause. The five share a repair and not a failure mode, so it stays a
+  practice.)*
 - **A status line is a cached summary of the notes below it, and nothing in
   the file says which was updated last** *(2026-09-20)*. A record can change
   **in the note** while the status reads the same: the offline-build task's

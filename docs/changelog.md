@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 19:54 [finding]
+
+**Clause A is not unproven: its byte-equality form is unachievable by everyone
+except the release job, and that is the trust model working rather than a
+gap.** Verified here at `origin`: `release-product.yml` writes the three
+release **secrets** into `_out/release-signing/*/signer.key.pem` and points
+`MICA_SIGNING_OUTPUT` at that directory, so a published product is signed with
+private keys that exist only as GitHub secrets. **A clause satisfiable only by
+the party it is meant to check is not a weak clause, it is an empty one** — so
+it is recorded as **closed, achieved by design**, not deferred: *a deferred
+item attracts effort forever; a closed one does not.*
+
+**The achievable form is equality of what was signed, and its coverage is not
+yet written.** `rootfs.roothash` is keyless and a complete fingerprint of the
+root, so two builds agreeing on it agree on every byte of it, offline, by
+anyone. But **a root is not a product**: it does not cover the kernel, the
+UKI, the boot components or the ESP — precisely the signed things — and the
+lock's `asset` rows are sha256 of the *signed* artefacts, so they cannot
+serve. **A zero is a fine answer; a zero presented as full coverage is not**,
+so the restatement waits for the measurement rather than being written to
+sound complete.
+
+**And the rule it leaves: a clause that cannot distinguish *not yet done* from
+*cannot be done* is read as the first every time**, because that reading asks
+nothing of the reader. *Unproven* is the comfortable state, and it cost this
+workspace a day of treating a closed question as an open one. What
+distinguished them was **not a better reading of the clause — it was somebody
+grepping for where a value comes from**: the practice arriving at a fifth
+subject, which is a clause.
+
 ## 2026-09-20 17:35 [finding]
 
 **A practice can precede its diagnosis**, which this afternoon's entry was
