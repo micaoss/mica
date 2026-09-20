@@ -22,8 +22,10 @@ published between the board rename and 2026-09-19 (`20260916-0845`,
 `20260916-1653`, `20260919-2103`) power the machine down at PID 1 instead of
 booting. Take an image from `20260919-2356` or later; since that round every
 amd64 product is booted automatically — on each push and again in its release
-run — while an `arm64` or `cx3576` image is built and verified but started by
-nothing automatic ([download](download.md) section 1).
+run — while a `uefi-arm64` image is built and verified but started by nothing
+automatic, and a `cx3576` or `s905x5m` image has never been started by
+anything at all: the only suite that boots a guest is the UEFI one
+([download](download.md) section 1).
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
