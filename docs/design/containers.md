@@ -445,8 +445,18 @@ chosen.** Measured in the products built from the board releases pinned on
 | `MEMCG` | `memory.max` | **no** | yes | yes | yes |
 | `BLK_DEV_THROTTLING` | `io.max` | **no** | **no** | **no** | **no** |
 
-Of the five ceiling keys this section promises, one is real on every board and
-one is real on none. The `MEMCG` column is not a decision anybody made about
+Of the five ceiling keys this section promises, one was real on every board
+and one was real on none.
+
+**That table is history since 16:28, and the dates on it are why both it and
+what follows can be true.** The pinned releases are now `20260920-1536` on all
+four boards, and those kernels carry `MEMCG`, `CFS_BANDWIDTH`,
+`BLK_DEV_THROTTLING` and `PSI` **on every board** — read by `mica-build` from
+`_out/boards/<board>/kernel/config` after deleting that directory and
+re-fetching. Verified here for the two UEFI boards, whose recorded configs
+carry all four at `main`; the two FIT boards commit a vendor input, so that
+half rests on the re-fetched measurement rather than on anything in the tree.
+The table above describes what shipped **until** the re-pin. The `MEMCG` column is not a decision anybody made about
 `uefi-x64`: `mica-boards`' own floor records the cause — arm64's `defconfig`
 carries `MEMCG` and `x86_64_defconfig` does not, and nothing ever compared
 that floor against what the products declare. Two upstream defconfigs
@@ -741,16 +751,30 @@ finds one instrument and assumes it covers the other gets the wrong answer in
 both directions, and here the second instrument was not covering its own
 question either.
 
-**And the product column has an answer for one of the three files.**
-`mica-build` reports, from a running `uefi-x64-prod` guest, that
-**`memory.max` is present** — the far end of a chain that began at 08:35 the
-same day: the fragment, four board releases at `20260920-1536`, a re-pin, an
-artefact, a running product. The releases were read from
-`_out/boards/<board>/kernel/config` **after deleting the directory and
-re-fetching**, which is what makes it a measurement of the released artefact
-rather than of a build tree that was already there. **Nothing is claimed here
-about `cpu.max` or `io.max` from the product side**: that reading does not
-exist, and the two that were offered for it were both about something else.
+**And the product column has an answer: three of the five ceilings are
+enforced, measured inside a running product.** From a booted `uefi-x64-prod`
+guest built on `20260920-1536`, `podman run --memory=64m --cpus=0.5
+--pids-limit=42` returns `memory.max=67108864`, `cpu.max=50000 100000` and
+`pids.max=42` — 64 MiB exactly, half a CPU exactly, 42 — answers only a kernel
+with `MEMCG` and `CFS_BANDWIDTH` can give. That is the far end of a chain that
+began at 08:35 the same day: the fragment, four board releases at
+`20260920-1536`, a re-pin, an artefact, a running product, with the release
+configs read from `_out/boards/<board>/kernel/config` **after deleting the
+directory and re-fetching** — which is what makes them a measurement of the
+released artefact rather than of a build tree that was already there.
+
+**`io.max` stays a kernel-config claim, and the reason is this section's own
+warning.** No IO limit was passed, because an `IO*` key needs a **device
+path** — the thing logged and skipped when it does not resolve. A row left
+half-open is worth more than a row filled with a third thing that looks like
+evidence.
+
+**What let version 3 answer what two versions could not is that it stopped
+testing a path.** *Does `/sys/fs/cgroup/cpu.max` exist* was never a question
+anybody had; *does `--cpus=0.5` reach the container* is the sentence this
+section writes and the thing an integrator does. **Neither earlier mistake was
+reachable from a check written against the document's own promise** — a proxy
+has a gap the promise does not have, and both wrong versions lived in it.
 
 *(The subject of that measurement had a location before it had a value, and
 the location moved while this paragraph was being written. At 16:24 the re-pin
@@ -844,7 +868,9 @@ only test a prediction has: the four boards were released at
 `board-pin.*` rows stayed green — at this step and not at the next one,
 exactly as the table says. The value is not that the rows noticed; it is that
 **the red needed no investigation**, because the table had already said which
-event produces this pattern and what it means. A gate that says beforehand
+event produces this pattern and what it means. **A prediction table
+whose rows have all fired is no longer a design; it is a measurement of the
+chain it was written about.** A gate that says beforehand
 which way it will fail converts an alarm into a reading.
 
 **Nothing requires any of this.** A `.container` file with no `[Service]`

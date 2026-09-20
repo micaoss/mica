@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-20 16:33 [finding]
+
+**Three of the five ceilings are enforced, measured inside a running
+product.** From a booted `uefi-x64-prod` guest on `20260920-1536`,
+`podman run --memory=64m --cpus=0.5 --pids-limit=42` returns
+`memory.max=67108864`, `cpu.max=50000 100000`, `pids.max=42` — 64 MiB exactly,
+half a CPU exactly, 42 — answers only a kernel with `MEMCG` and
+`CFS_BANDWIDTH` can give. Nine hours from the fragment, through four board
+releases, a re-pin and an artefact, to a machine.
+
+**`io.max` stays a kernel-config claim, on this section's own warning**: no IO
+limit was passed, because an `IO*` key needs a device path — the thing logged
+and skipped when it does not resolve. **A row left half-open is worth more
+than a row filled with a third thing that looks like evidence**, from the
+author who had filled it with two.
+
+**And what let version 3 answer what two versions could not is that it stopped
+testing a path.** *Does `/sys/fs/cgroup/cpu.max` exist* was never a question
+anybody had; *does `--cpus=0.5` reach the container* is the sentence this
+document writes. **Neither earlier mistake was reachable from a check written
+against the document's own promise.**
+
+**The four-column table is now history and says so**: the pinned kernels carry
+all four symbols on all four boards since the re-pin, and the table above
+keeps its releases so both can be true. **A prediction table whose rows have
+all fired is no longer a design; it is a measurement of the chain it was
+written about.**
+
 ## 2026-09-20 16:29 [finding]
 
 **The last unexercised row of the prediction table fired: `board-pin.*` red,
