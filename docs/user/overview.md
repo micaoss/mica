@@ -83,16 +83,18 @@ machine of that class; or a **hardware board**, named for the hardware
 another image kind is
 [the naming rules](../decisions/2026-09-16-board-and-product-naming.md).
 
-Every board is a release target: `uefi-x64`, `uefi-arm64` and `cx3576`, and
-`s905x5m` since the user decision of 2026-09-19, whose flag and first release
-follow. Being a release target means the board's images are published
-and its products are indexed; it is not a claim that the board boots on
-hardware — `uefi-arm64`'s qualification stays QEMU-only, and `s905x5m` stays
-at the bring-up tier with its physical rows untested
-([support tiers](../boards/support-tiers.md#current-boards)). The product set is `uefi-x64-dev`,
-`uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`, `cx3576-dev`,
-`cx3576-prod` and `s905x5m-dev`: a `dev` product for every board and a `prod`
-product where the board has one. There are no minimal products
+Every board is a release target: `uefi-x64`, `uefi-arm64`, `cx3576` and
+`s905x5m`, the last since the user decision of 2026-09-19 and its first
+release `s905x5m.20260920-0033`. Being a release target means the board's
+images are published and its products are indexed; it is not a claim that the
+board boots on hardware — `uefi-arm64`'s qualification stays QEMU-only, and
+`s905x5m` stays at the bring-up tier with its physical rows untested
+([support tiers](../boards/support-tiers.md#current-boards)). It is not even a
+claim that the image has been started: nothing starts a FIT image, so the four
+`cx3576` and `s905x5m` products have never been booted by anything
+([download](download.md#1-what-exists-to-download)). The product set is a
+`dev` and a `prod` product for each of the four boards, eight in all. There
+are no minimal products
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)).
 
 > status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-16-minimal-products-removed.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
