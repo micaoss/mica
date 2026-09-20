@@ -994,7 +994,10 @@ REPOSITORY=mica
 COMMIT=<40 lowercase hex>
 ```
 
-Exactly those two keys, in that order, and nothing else. `COMMIT` is the full
+Exactly those two keys, in that order. **Comment lines (`#`) may follow the
+header** and carry nothing the gate acts on — the first real pin used one to
+record that its commit carries a known inert defect, and forbidding it would
+have pushed that into nowhere. Anything else is refused. `COMMIT` is the full
 commit, never a short one: **the file is read by a gate rather than by a
 person**, which fetches the vectors at that commit and refuses a difference.
 Refusals, in the vocabulary of 1.5: `header`, `encoding` (no final newline, a
@@ -1015,8 +1018,20 @@ briefs and the vectors*) turned `x64` into `uefi-x64` inside a third-party
 download URL: ten vector files carried
 `bun-linux-uefi-x64.zip`, **an asset that does not exist** — Bun publishes
 `bun-linux-x64.zip`, which is what `mica-build-env`'s real
-`locks/upstream.lock` names. Fixed on 2026-09-20, before any repository pinned
-the commit.
+`locks/upstream.lock` names. Fixed on 2026-09-20 — **before any pin was correct, and not before pinning
+began**: `mica-system-base` and `mica-podman` pinned the pre-fix commit
+`735ebaa` two and four minutes after the repair landed, while the messages
+crossed. Both had byte-compared against `735ebaa` while it was `HEAD`, and
+pinning the commit you have just verified is the natural move; the timing was
+four minutes, not carelessness.
+
+**The mechanism's first observed success and first observed failure fell in
+the same hour, and both are worth keeping.** Four days of drift went unnoticed
+because nothing named a commit; two minutes of drift was visible immediately
+because something did — read out of two files, a check that was impossible
+that morning. `mica-system-base` went further and wrote the defect into its
+pin's own comment, so its pin records *why* it is at that commit rather than
+only which.
 
 It survived four days for a structural reason rather than a careless one: **a
 vector's URL is inert by design.** Nothing downloads it, so no gate can

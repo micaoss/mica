@@ -350,7 +350,11 @@ def check_vectors_pin(path):
     lines = text[:-1].split("\n")
     if lines[0] != "# mica-vectors-pin v1":
         raise Refused("header")
-    pairs = [line.split("=", 1) if "=" in line else [line, None] for line in lines[1:]]
+    # Comment lines are allowed after the header and carry no claim the gate
+    # acts on: the first real pin used one to record that its commit carries a
+    # known inert defect, and forbidding it would have pushed that into nowhere.
+    body = [line for line in lines[1:] if not line.startswith("#")]
+    pairs = [line.split("=", 1) if "=" in line else [line, None] for line in body]
     if [k for k, _ in pairs] != ["REPOSITORY", "COMMIT"]:
         raise Refused("pin-format")
     values = dict(pairs)

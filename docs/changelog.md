@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 14:08 [finding]
+
+**A line in these records was wrong and is corrected: the fix did not beat the
+pinning.** *Fixed before any repository pinned the commit* has become **fixed
+before any pin was correct** — `mica-system-base` (`62c1ab51`, 08:46) and
+`mica-podman` (`5cb82ec1`, 08:48) pinned the pre-fix commit `735ebaa` two and
+four minutes after the repair landed at 08:44, while the messages crossed.
+Both had byte-compared against `735ebaa` while it was `HEAD`; pinning the
+commit you have just verified is the natural move, and the timing was four
+minutes rather than carelessness. A reader of the old line would have
+concluded that no pin carries the artefact, and two do.
+
+**The mechanism's first observed success and first observed failure fell in
+the same hour.** Four days of drift went unnoticed because nothing named a
+commit; two minutes of drift was visible immediately because something did,
+and it was found by **reading two files** — a check that was impossible that
+morning. `mica-system-base` went further: its pin's comment records the
+defect, so the file says *why* it sits at that commit rather than only which.
+
+**Which changed the format, measured against its first two real uses.**
+`vectors.pin` said *exactly those two keys and nothing else*; the first pin
+written carries a six-line comment doing exactly what a record should. So
+**comment lines are now allowed after the header** — they carry nothing the
+gate acts on, and forbidding them would have pushed that reasoning into
+nowhere. A vector proves it and the gate is 280/280.
+
+**Two format defects in those same files, for their owners rather than for
+me**: `mica-podman`'s pin begins `# mica-vectors v1` and `mica-system-base`'s
+begins with a comment rather than the header, so **both are refused by the
+checker as specified** — the identifier is the first line, as in every other
+format here.
+
 ## 2026-09-20 14:05 [spec]
 
 **The cheap first part is done: every refused vector now declares the valid
