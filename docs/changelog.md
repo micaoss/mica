@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-09-20 06:40 [finding]
+
+**The VT question closed within the hour, and not by a decision: by a policy
+that was in the tree all along.** `logind.conf.d/50-mica-console.conf` sets
+`NAutoVTs=0` and `ReserveVT=2` with the comment *keep the logo VT idle; only
+tty2 receives an on-demand login console*. `autovt@.service` — still a symlink
+to `getty@.service` — `getty@.service`, `serial-getty@.service`,
+`getty.target`, `logind` and its D-Bus files all survived composition; the
+`cx3576` renders a VT on HDMI at 1920x1080p60 with a USB HID keyboard; and the
+user confirmed it on the device, Alt+F2 a console and F1 the logo.
+`docs/design/access.md` now records the answer and drops the outcome table,
+which had done its job.
+
+**One correction, found by looking for the file before citing it**: the
+drop-in is **not** shipped by `mica-system`. It is
+`mica-boards:boards/cx3576/package/overlay/etc/systemd/logind.conf.d/50-mica-console.conf`,
+and no other board carries one — measured by reading the `main` trees of
+`mica-boards`, `mica-build`, `mica-core` and `mica-system-base` for any
+`logind.conf.d` entry. So the `tty1`-logo/`tty2`-console split is `cx3576`'s
+board policy rather than a system-wide one, and on a board without the
+drop-in `logind`'s own default applies. The record cites the file rather than
+anyone's account of it.
+
+Two boards stay outside the answer and both are in the page: `uefi-arm64`
+**cannot** render a VT by construction and declares no `display` feature — a
+capability absent and a declaration absent, agreeing, the one place in this
+investigation where the two sides matched without anyone checking — and
+`uefi-x64` is open, because `FB_EFI` and `FRAMEBUFFER_CONSOLE` are set while
+`DRM_FBDEV_EMULATION` is not with `i915` and `virtio-gpu` built in. A QEMU
+session answers the `virtio-gpu` half only, and **a QEMU pass does not stand
+for real Intel hardware**.
+
+**A sixth instance for the aperture rule, in a variant none of the five had: a
+wrong key is an aperture of zero.** A symbol carried from memory,
+`CONFIG_BLK_DEV_BFQ`, grepped exactly, returned absent on all four boards —
+nothing truncated, nothing filtered, and the answer still a property of the
+query. The symbol is `CONFIG_IOSCHED_BFQ` and the real split is `uefi-x64` no,
+`uefi-arm64` yes, `cx3576` no, `s905x5m` yes. It is the most dangerous variant
+because **a uniform answer reads as a finding rather than as an error**, and
+it was caught by distrusting the key — a case-insensitive `grep` for `bfq` —
+rather than the result.
+
 ## 2026-09-20 06:33 [decision]
 
 **The VT question is placed as a question with a pending measurement**, in

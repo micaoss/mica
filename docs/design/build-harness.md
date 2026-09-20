@@ -76,6 +76,21 @@ inherits the trigger of whoever calls it, so the aperture had to include the
 callers. When the claim is *when* something runs, one file is never the
 aperture.
 
+**The sixth is the sharpest and it is a different variant: a wrong key is an
+aperture of zero.** A symbol was handed on from memory and never checked —
+`CONFIG_BLK_DEV_BFQ` — and a `grep` for exactly that returned **absent on all
+four boards**. Nothing was truncated, nothing was filtered out, and the answer
+was still a property of the query: the symbol in those trees is
+`CONFIG_IOSCHED_BFQ`, and the real split is `uefi-x64` no, `uefi-arm64` yes,
+`cx3576` no, `s905x5m` yes. Every other instance here is an aperture too
+narrow; this one points at nothing at all, and it is the most dangerous
+variant **because it returns a uniform answer, and a uniform answer reads as a
+finding rather than as an error**. It was caught by grepping
+case-insensitively for `bfq` instead of for the symbol that had been handed
+over — that is, by distrusting the **key** rather than the result. When a
+result is suspiciously tidy, re-ask the question with a looser key before
+believing it.
+
 The fifth came from the opposite direction and is the reason this is stated
 once rather than twice: a suite named for FIT lifecycle tests the FIT boot
 path and boots nothing, so *no suite boots a FIT image* could only be

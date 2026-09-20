@@ -111,29 +111,58 @@ the fix and `mica-system-base` publishes the list of unowned paths that makes
 the second class reasonable about
 ([proposal](../task/20260920-0610-producer-data-assets.md)).
 
-**Open, with the measurement still running: is there a local virtual-terminal
-login on a board with a display and a keyboard, or is the serial console the
-only local console?** *(2026-09-20)*. It arose from `mica-build` finding
+**Answered, by a policy that was in the tree the whole time: on `cx3576`,
+`tty1` is the logo and `tty2` takes an on-demand login, both by intent**
+*(2026-09-20)*. The question — whether a board with a display and a keyboard
+offers a local virtual-terminal login, or whether the serial console is the
+only local one — arose from `mica-build` finding
 `/etc/systemd/system/getty.target.wants/getty@tty1.service` dropped from every
-product root. The first version of the claim — *a board with a display has no
-VT login* — **overstated the measurement**, and the user corrected it: that
-symlink governs `tty1` at boot only, while Alt+F2 goes through `systemd-logind`
-activating `autovt@ttyN.service` on demand, which is a different mechanism. The
-aperture of the claim exceeded the aperture of what had been looked at
+product root. The first version of the claim, *a board with a display has no VT
+login*, **overstated the measurement**: that symlink governs `tty1` at boot,
+while Alt+F2 goes through `systemd-logind` activating `autovt@ttyN.service` on
+demand, which is a different mechanism
 ([harness](build-harness.md) section 4).
 
-So this is a question with a pending measurement, not a decision awaiting an
-answer, and each outcome turns it into something different:
+What decides it is `logind.conf.d/50-mica-console.conf` — four lines, and the
+comment states the intent:
 
-| What the measurements find | What the question becomes |
-|---|---|
-| `autovt@.service`, `getty@.service` and `logind` survived composition, and the board's kernel can render a VT (`CONFIG_VT`, framebuffer console, keyboard path) | a real product question: whether a product should offer a local VT login at all |
-| `autovt` survived and the kernel can render | no decision to make — Alt+F2 already gives a prompt, and the only thing ever wrong with it was PAM, above |
-| `autovt` was dropped too | not a decision: a second instance of the composition defect, and it belongs in the repair |
+```ini
+[Login]
+# Keep the logo VT idle; only tty2 receives an on-demand login console.
+NAutoVTs=0
+ReserveVT=2
+```
 
-`mica-build` is measuring what survived composition and `mica-boards` whether
-each board's kernel can render a VT at all. Until both report, nothing here
-claims a product does or does not have a local VT login.
+`autovt@.service` (still a symlink to `getty@.service`), `getty@.service`,
+`serial-getty@.service`, `getty.target`, `systemd-logind` and its D-Bus files
+all survived composition, the `cx3576` renders a VT on HDMI at 1920x1080p60
+with a USB HID keyboard bound, and the user confirmed it on the device: Alt+F2
+gives a console, F1 is the logo. Until the login files of the paragraph above
+are back in a release, that console will refuse every credential — the policy
+is intact and the authentication is not.
+
+**The drop-in is a board file, not a system-wide one** *(measured 2026-09-20
+by reading the trees of `mica-boards`, `mica-build`, `mica-core` and
+`mica-system-base` at `main` for any `logind.conf.d` entry)*: it is
+`mica-boards:boards/cx3576/package/overlay/etc/systemd/logind.conf.d/50-mica-console.conf`
+and no other board carries one. So the `tty1`-logo/`tty2`-console split is
+`cx3576`'s policy; on a board without the drop-in, `logind`'s own default
+applies unless something outside those four trees sets it.
+
+Two boards stay outside that answer:
+
+- **`uefi-arm64` cannot render a VT by construction** — no framebuffer, no
+  DRM, no keyboard driver class — **and declares no `display` feature.** A
+  capability that is absent and a declaration that is absent, agreeing. It is
+  the one place in this investigation where the two sides matched without
+  anyone checking, which is worth stating precisely because nothing had to be
+  fixed for it to be true.
+- **`uefi-x64` is still open, and its kernel configuration cannot answer it.**
+  `FB_EFI` and `FRAMEBUFFER_CONSOLE` are set, `DRM_FBDEV_EMULATION` is not,
+  and `i915` and `virtio-gpu` are built in — and a DRM driver taking over
+  usually removes the EFI framebuffer. A QEMU session answers the `virtio-gpu`
+  half only: **a QEMU pass does not stand for real Intel hardware**, and this
+  page will not record one as though it did.
 
 **One policy source.** The image carries **Dropbear**, and micad renders the only
 file that configures it — `/run/mica/dropbear.env`, one `DROPBEAR_ARGS` line —
