@@ -506,32 +506,49 @@ board have `io.max`* is not well posed without naming the rung.
 reading rung one says nothing about rung four: `docs/world-claims.tsv` reads
 rungs one and two and `mica-build`'s pins; `mica-build`'s own table was read
 from the build tree; the session probe reads the running kernel's behaviour,
-which is downstream of the shipped artefact. **The top rung is unguarded for the symbols this section is about**, and that
-is measured rather than inferred. `mica-boards`' test header named
-`mica-build:verify/src/checks-kernel.ts` as the half that reads the shipped
-`/boot/config-*`; that path has no history in `mica-build` at all, and none of
-the **61** files under `verify/src/` mentions `/boot/` — checked here by
-reading every one of them rather than by grepping for a name. Two places do
-read a kernel configuration and neither is in `verify/`:
-`build/src/kernel-package.ts` asserts the boot and verity floor over the
-kernel **component** (`RD_ZSTD`, `BLK_DEV_DM`, `DM_VERITY`, the trusted
-keyring, `SQUASHFS`, the watchdog, and a FIT kernel's forced command line),
-and `rootfs/compose/compose-install.sh` asserts `DM_INIT`, `BLK_DEV_DM`,
-`DM_VERITY` and `SQUASHFS` against `/boot/config-<release>` in the composed
-root. **Neither names a container-limit symbol, and nothing in either
-repository asserts anything from `mica-required.fragment` against a shipped
-artefact.** So for `MEMCG`, `CFS_BANDWIDTH`, `BLK_DEV_THROTTLING` and their
-neighbours, the **committed inputs are the only end** — which is also why the
-stale-build-tree hazard above escapes everything: nothing downstream of the
-build would notice.
+which is downstream of the shipped artefact. **The top rung is unguarded for the symbols this section is about — and it
+was guarded until 2026-09-09.** None of the **61** files under
+`mica-build:verify/src/` mentions `/boot/`, checked here by reading every one
+of them rather than by grepping for a name, and the two places that do read a
+kernel configuration are `build/src/kernel-package.ts`, over the kernel
+**component**, and `rootfs/compose/compose-install.sh`, over
+`/boot/config-<release>` in the composed root. Both assert the boot and verity
+floor: `DM_INIT`, `BLK_DEV_DM`, `DM_VERITY`, `SQUASHFS`, the trusted keyring,
+the watchdog. **Neither names a container-limit or netavark symbol, and
+nothing in either repository asserts anything from `mica-required.fragment`
+against a shipped artefact.** So for `MEMCG`, `CFS_BANDWIDTH`,
+`BLK_DEV_THROTTLING` and their neighbours the **committed inputs are the only
+end** — which is also why the stale-build-tree hazard above escapes
+everything: nothing downstream of the build would notice.
 
-That is worth separating from the citation it arrived as. A wrong path is a
-bad citation and would have been repaired by correcting it; **this was a false
-assurance**, and the paragraph that described the hazard was the same
-paragraph that claimed it was covered. **Correcting the citation would have
-left the reassurance in place; naming the gap removes it.** The closure is
-owned by `mica-build`, where the reader that could assert these symbols
-already exists.
+**It is a regression from a cleanup rather than a rung nobody built**, and
+that reads differently: somebody built it, so the mechanism is known to be
+possible and its cost is known. `mica-build` reports that
+`verify/src/checks-kernel.ts` was 748 lines, read `/boot/config-*` out of the
+packed root and asserted the floor — `VETH`, `NFT_FIB_INET`/`IPV4`/`IPV6` with
+the netavark reasons, `BPF`, `BPF_SYSCALL`, `BPF_JIT` and `CGROUP_BPF` with
+the crun citation, `NF_TABLES` and the firewall family — and that it was
+deleted on 2026-09-09 in `1875d133`, the same commit as `checks-display.ts`.
+**So the `mica-boards` comment citing it was accurate when it was written.**
+
+*(That citation cannot be checked from here, and saying so is part of
+recording it: `1875d133` answers 422 at `origin`, because `mica-build`'s
+history is rooted at `a5f1e36` — a parentless commit of 2026-09-14 — and the
+deletion predates the root. It is read from that repository's local clone and
+taken on its authority. **A line number and a commit is checkable only if the
+commit is fetchable**, so a citation into pre-root history has to carry its
+own unreachability or the next reader gets a 422 and concludes the claim is
+false.)*
+
+**What closes it is one source rather than a restoration.** The deleted file
+carried **its own copy** of the symbol list, with a comment saying it was the
+same set the shared fragment pins, so restoring it verbatim would rebuild the
+private copy — the thing two of these records already call a defect. The
+approved shape instead: `mica-boards` publishes the fragment as a **file row
+of the board bundle**, and `mica-build` asserts `/boot/config-<release>`
+against the fragment **from the pinned board release**. One source, fetched at
+the pin, no copy — and the assertion then moves with the pin, which is the
+same distinction the rest of this section is about.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but

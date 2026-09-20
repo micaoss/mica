@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-20 15:54 [finding]
+
+**The unguarded rung is a regression, not a gap nobody filled, and that reads
+differently.** `mica-build:verify/src/checks-kernel.ts` existed — 748 lines,
+reading `/boot/config-*` out of the packed root and asserting `VETH`, the
+`NFT_FIB_*` family with the netavark reasons, the `BPF`/`CGROUP_BPF` set with
+the crun citation, `NF_TABLES` and the firewall family — and was deleted on
+2026-09-09 in the same commit as `checks-display.ts`. **The `mica-boards`
+comment citing it was accurate when it was written.** Somebody built the
+mechanism, so its cost is known; section 8 and the claims row say *deleted*
+rather than *never existed*.
+
+**And the citation form both of us endorsed an hour ago fails on this very
+citation.** `1875d133` answers **422** at `origin` — measured here — because
+`mica-build`'s history is rooted at `a5f1e36`, a parentless commit of
+2026-09-14, so the deletion predates the root and lives only in that
+repository's clone. **A line number and a commit is checkable only if the
+commit is fetchable**: a citation into pre-root history must carry its own
+unreachability, or a reader gets a 422 and concludes the claim is false. The
+boards contract now says so beside the rule it qualifies.
+
+**Nobody was careless, which is what decides between a convention and a
+row.** One cleanup deleted two checks and left comments in three places
+asserting both, in another repository. The comments did not go out of date —
+they were **falsified from outside their own file**, by an author with no
+reason to read them. A row catches that; a convention is an instruction to
+people who are not in the room when it breaks.
+
+**And the closure is one source rather than a restoration**: the deleted file
+carried its own copy of the symbol list, so restoring it verbatim would
+rebuild the private copy. Approved instead — `mica-boards` publishes the
+fragment as a file row of the board bundle and `mica-build` asserts
+`/boot/config-<release>` against the fragment **from the pinned board
+release**. One source, fetched at the pin, no copy, and the assertion moves
+with the pin.
+
 ## 2026-09-20 15:46 [finding]
 
 **The withheld paragraph is replaced rather than restored, in its author's

@@ -212,6 +212,18 @@ today, read neither the file nor the comment, and built a guard. The cost of
 getting this wrong is not a repeated discussion, it is that **the second
 repository pays the discovery again**, at whatever hour it lands.
 
+**And the instance that decides between a convention and a row: nobody was
+careless** *(2026-09-20)*. One cleanup on 2026-09-09 deleted two checks and
+left comments in three places asserting both, in a second repository. The
+comments were **accurate when written**; they became false by somebody else's
+deletion, in another file, in a commit whose author had no reason to read
+them. **The author of the comment did nothing wrong and the author of the
+deletion never read it** — which is exactly the case a row catches and a
+convention cannot, because a convention is an instruction to people who are
+not in the room when it breaks. It is also the reason *a constraint in a
+header warns nobody who needs it* has a sharper edge than decay: the comment
+did not go out of date, it was **falsified from outside its own file**.
+
 **And the hazard is located rather than general, which took a run rather than
 a reading**: it needs an `_out/boards/<board>/kernel/` that persists across a
 fragment change and is consumed as an input rather than rebuilt — the

@@ -116,14 +116,19 @@ board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260920
 # TASKSTATS is OFF for every board because nothing does. A defconfig bump that
 # re-scatters any of them turns this red.
 #
-# AND ONE ROW FOR AN INSTRUMENT THAT DOES NOT EXIST. mica-boards' kernel config
-# test named mica-build:verify/src/checks-kernel.ts as the half that reads the
+# AND ONE ROW FOR A DELETED CHECK. mica-boards' kernel config test names
+# mica-build:verify/src/checks-kernel.ts as the half that reads the
 # /boot/config-* an image ships -- the top rung of the ladder in containers.md
-# 8. That path has no history in mica-build at all, and measurement since has
-# made it worse than a bad citation: none of the 61 files under verify/src/
-# mentions /boot/, and no gate in either repository asserts a container-limit
-# or netavark symbol against a shipped artefact. THE RUNG IS UNGUARDED FOR
-# THOSE SYMBOLS, not merely uncited, and the page says so.
+# 8. THAT FILE EXISTED AND WAS DELETED on 2026-09-09, so the citation was
+# accurate when written and the rung is a REGRESSION rather than a gap nobody
+# filled; measured since, no gate in either repository asserts a
+# container-limit or netavark symbol against a shipped artefact.
+#
+# THE DELETION CANNOT BE CHECKED FROM HERE AND THE ROW DOES NOT TRY: the
+# deleting commit answers 422 at origin, because mica-build's history is
+# rooted at a5f1e36 of 2026-09-14 and the deletion predates the root. What
+# this row asserts is only what it can read -- that nothing is at that path
+# today.
 #
 # The row stays because it is cheap and still true, but be clear about what it
 # can and cannot do: it goes red THE DAY SOMETHING APPEARS AT THAT PATH, which

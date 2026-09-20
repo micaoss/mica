@@ -703,7 +703,12 @@ author's words, where *this file* is
 negative by enumerating the tree and fetching every one of the 61 files under
 `verify/src/` — none mentions `/boot/`. The citation form is the author's and
 is the one to copy for anything crossing a repository boundary: a line number
-and a commit, so a reader can check it and it goes stale visibly.*
+and a commit, so a reader can check it and it goes stale visibly — **with the
+qualifier the next hour supplied: checkable only if the commit is fetchable.**
+A citation into history that predates a repository's root answers 422, which a
+reader reads as a false claim rather than as an unreachable one, so such a
+citation carries its own unreachability
+([containers.md](../design/containers.md) section 8 has the instance).*
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written
