@@ -31,6 +31,28 @@ Moving the repositories to the release lock format
 
 ## Notes
 
+- 2026-09-20: **the third acceptance clause is open because the tool does one
+  thing and the clause says another**, which is a different state from
+  *waiting for a run*. `mica-build:tools/offline-chain.sh` builds each
+  producer from its **checkout's head**, not from the commit its release was
+  cut at. Measured here: the workspace's `mica-build` checkout is at
+  `e13b4f78` (2026-09-19 23:58:35Z) while the PAM repair is `49913d78`
+  (2026-09-20 05:50:01Z), so a product built from this workspace today would
+  be **missing the fix that four releases shipped this morning**.
+
+  The two readings are not the same work:
+
+  | | What it claims | What it needs |
+  |---|---|---|
+  | **A** — the clause as written | an offline build **equals the published release** | a scratch workspace cloned at the four release commits; hours of kernel and engine compilation |
+  | **B** — what runs today | the chain builds a product **from source without touching a release** | nothing further; it proves the **mechanism**, not the equality |
+
+  **A is the central claim of the whole `locks/` design** — that a person with
+  the sources can rebuild what we published — so B is reported as B, and A is
+  a round of its own after the 626-path triage. Owner: `mica-build`. The
+  clause stays open with that shape rather than as *pending*, because
+  *pending* reads like something that will close itself.
+
 - 2026-09-14: step 0 done in `mica`: `docs/design/release-lock.md` and 36
   vectors under `docs/design/release-lock/vectors/` (`expected.tsv`), proven
   by `make docs-verify`. The coordinator dispatches the step 1 writers.

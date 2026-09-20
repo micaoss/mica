@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-20 07:57 [finding]
+
+**The migration task's third clause is open because the tool does one thing
+and the clause says another** — not because a run is pending, and the records
+now say which. `offline-chain.sh` builds each producer from its **checkout's
+head**, not from the commit its release was cut at. Read back here: the
+workspace's `mica-build` checkout is `e13b4f78` (2026-09-19 23:58:35Z) and the
+PAM repair is `49913d78` (2026-09-20 05:50:01Z), so a product built from this
+workspace today would be **missing the fix four releases shipped this
+morning**.
+
+Two readings, recorded as a table because they are not the same work: **A**,
+the clause as written — an offline build *equals the published release*, which
+needs a scratch workspace cloned at the four release commits and hours of
+compilation, and which is **the central claim of the whole `locks/` design**;
+and **B**, what runs today — the chain builds a product from source without
+touching a release, proving the **mechanism** and not the equality. B is
+reported as B, A is a round of its own after the 626-path triage, owner
+`mica-build`. *Pending* was the wrong word: it reads like something that will
+close itself.
+
+**And this is the second instance of the category named at instance one this
+morning**, written beside the first in `docs/world-claims.tsv`: claims the
+records make about **themselves**, which nothing checks. The first was a
+self-description gone **stale** — *`make docs-verify` is the one gate*, three
+lines above two gate targets. This is the other half, an **absent** one:
+`offline-chain.sh` does not say what it builds from, so a clause here came to
+assert what the tool never did, and it survived six days because **nothing
+compares a record's claim about a tool against the tool**. The rows in that
+file are claims about another repository's *state*, which a query settles;
+this is a claim about its *behaviour*, which one probably cannot — so the
+category still has no gate, and now two instances in one day.
+
 ## 2026-09-20 07:55 [spec]
 
 **The `data` row is approved and in the spec.** The user took proposal A

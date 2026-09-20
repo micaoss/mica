@@ -35,6 +35,17 @@
 # then the sentence a tidier would have cited while deleting the second. Fixed
 # where it stood; the category has no gate and this comment is the whole of its
 # defence.
+#
+# SECOND INSTANCE, THE SAME DAY, AND THE OTHER HALF OF THE CATEGORY. The first
+# was a self-description that went STALE. This one was ABSENT:
+# mica-build:tools/offline-chain.sh does not say what it builds from -- each
+# producer's checkout head, not the commit its release was cut at -- so an
+# acceptance clause in these records came to assert something the tool has
+# never done, and it survived six days because NOTHING COMPARES A RECORD'S
+# CLAIM ABOUT A TOOL AGAINST THE TOOL. Note the difference from the rows
+# below: those are claims about another repository's STATE, which a query can
+# settle; this is a claim about its BEHAVIOUR, which one probably cannot.
+# Recorded in docs/task/20260914-2042-release-lock-offline-build.md.
 release-target.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.cx3576	line	micaoss/mica-boards:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
