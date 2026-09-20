@@ -154,6 +154,13 @@ taskstats-floor-off	line	micaoss/mica-boards:common/kernel/mica-required.fragmen
 # states today's denial and goes GREEN-TO-RED when mica-boards turns the
 # selector off, which is the repair -- so a red here is the repair landing and
 # not a regression, and the row is deleted in the same edit that reads it.
+# GREEN IS THE DEFECT AND RED IS THE FIX, which is the opposite of every other
+# row in this file, and a red row is the one thing nobody reads twice.
+#
+# AND IT READS origin, SO IT FLIPS WHEN THE REPAIR IS PUSHED AND NOT WHEN IT
+# IS WRITTEN. The repair existed in a working tree while this row was still
+# green, and both were correct: a row cannot see an uncommitted edit, and it
+# should not try.
 net-classid-denied.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CGROUP_NET_CLASSID=y	docs/design/containers.md
 board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260916-0857	docs/design/containers.md
 board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260916-0857	docs/design/containers.md

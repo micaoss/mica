@@ -602,7 +602,17 @@ output is recorded: of the nine symbols the floor asks to be off, **eight are
 off on both and one is not** — `uefi-x64` ships `CONFIG_CGROUP_NET_CLASSID=y`,
 because `CONFIG_NET_CLS_CGROUP=y` in the x86_64 defconfig selects it and the
 arm64 defconfig does not have it. **Two boards, one floor line, and the answer
-differs because of a file neither repository wrote.**
+differs because of a file neither repository wrote** — nothing in the floor
+mentions `NET_CLS_CGROUP` at all, verified at `mica-boards` `f3ff004`, which
+is that repository's `main` as this is written.
+
+**And the result is the eight rather than the one.** A floor that never
+asserted its negative lines was **right eight times out of nine by luck**, and
+nothing in the output distinguishes the eight from the one: they are not
+eight decisions that held, they are eight coincidences that happened to match
+a decision. The same argument as a branch that always passes being a
+measurement — the file cannot say which of its lines were granted, and neither
+can anybody reading it.
 
 So **every *off* in this section is a different kind of claim from every
 *on***, and the page had been presenting them as the same kind: `y` was

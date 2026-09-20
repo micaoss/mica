@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-20 16:04 [finding]
+
+**A fourth subject, and it is the one that cannot carry its own name: the
+working tree of a shared checkout.** Two readings of `mica-boards`' floor on
+the same afternoon were opposite and both true — nothing mentions
+`NET_CLS_CGROUP` at `f3ff004` (verified here; that commit *is* `main`), and
+something does in the workspace checkout, where its owner was implementing the
+repair with five files modified and a fixture untracked. The rule has to be
+about **where you read**, not about care: **in a shared checkout, read from a
+commit — `git show <sha>:<path>` — or run `git status` first and say which you
+read.** A working tree has no name to cite and no timestamp a reader can
+check.
+
+**And the result of the floor measurement is the eight, not the one.** A floor
+that never asserted its negative lines was **right eight times out of nine by
+luck**; nothing in the output distinguishes the eight from the one, because
+they are not eight decisions that held but eight coincidences that happened to
+match a decision. Same argument as a branch that always passes being a
+measurement: the file cannot say which of its lines were granted.
+
+**Row 26 gets the two sentences its reader will otherwise get backwards**:
+green is the defect and red is the fix, and it reads `origin`, so it flips
+when the repair is **pushed** and not when it is written. The repair existed
+in a working tree while the row was still green, and both were correct — a row
+cannot see an uncommitted edit and should not try.
+
 ## 2026-09-20 16:00 [finding]
 
 **A fragment's `# CONFIG_X is not set` is a request, not a fact, and section 8

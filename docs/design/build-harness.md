@@ -269,6 +269,18 @@ repository* was true of `origin` and false of the clone that holds the
 deletion. In both, the instrument answers with a boundary it does not mention,
 and the answer is **the same empty result** either way.
 
+**And a fourth subject that cannot carry its own name: the working tree of a
+shared checkout** *(2026-09-20)*. Two readings of `mica-boards`' floor on the
+same afternoon were opposite and both true: nothing mentions `NET_CLS_CGROUP`
+at `f3ff004`, and something does in the workspace checkout — where its owner
+was implementing the repair, with the fragment, a board config, the gate and
+two Dockerfiles modified and a new fixture file untracked. **In a shared
+checkout, read from a commit — `git show <sha>:<path>` — or run `git status`
+first and say which you read.** A working tree has no name to cite and no
+timestamp a reader can check: it is the only artefact here that **cannot carry
+its own subject**, which is why the rule has to be about where you read rather
+than about how carefully.
+
 The operational form is a question to ask before the claim, not a habit of
 care: **before asserting that a path has no history, check whether the
 repository's history is rooted and compare the root's date to the period you
