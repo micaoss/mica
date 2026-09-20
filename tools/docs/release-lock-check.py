@@ -10,6 +10,7 @@ out of its scope.
 
     release-lock-check.py lock <file>
     release-lock-check.py upstream <file>              (locks/upstream.lock)
+    release-lock-check.py collect lock|upstream <file>  (every rule it breaks, 9.1)
     release-lock-check.py vectors-pin <file>            (a repository's vectors.pin)
     release-lock-check.py pins <locks-dir> ci|local    (<locks-dir> holds <repository>[.<scope>].lock and pins/<repository>[.<scope>].pin)
     release-lock-check.py repos <dir> offline
@@ -22,6 +23,23 @@ import sys
 
 class Refused(Exception):
     pass
+
+
+# COLLECT MODE (release-lock.md 9.1). The default is unchanged: the first rule
+# a file breaks is raised and the rest of the file is not consulted, which is
+# what expected.tsv names. With a rule in SUPPRESS the check that would have
+# refused is skipped instead, so a second run reports what fires next, and the
+# caller iterates. It is deliberately one-directional: suppression can only
+# UNDER-report -- a run that raises anything other than Refused stops the
+# collection and the caller says so -- because a mode that hunts extra rules
+# must never be able to invent one.
+SUPPRESS = set()
+STRUCTURAL = {"header", "encoding", "kind-unknown", "column-count"}
+
+
+def refuse(rule):
+    if rule not in SUPPRESS:
+        raise Refused(rule)
 
 
 KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5,
@@ -57,16 +75,16 @@ def lines_of(path, header):
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
-        raise Refused("encoding")
+        refuse("encoding")
     if not text.endswith("\n") or "\r" in text:
-        raise Refused("encoding")
+        refuse("encoding")
     lines = text[:-1].split("\n")
     if lines[0] != header:
-        raise Refused("header")
+        refuse("header")
     rows = []
     for line in lines[1:]:
         if line == "" or line.endswith("\t") or line.startswith(" "):
-            raise Refused("encoding")
+            refuse("encoding")
         if line.startswith("#"):
             continue
         rows.append(line.split("\t"))
@@ -75,15 +93,15 @@ def lines_of(path, header):
 
 def field(ok):
     if not ok:
-        raise Refused("field-value")
+        refuse("field-value")
 
 
 def check_upstream_image(row):
     field(UPSTREAM_NAME.match(row[2]) and row[3] in PLATFORM)
     if "@sha256:" not in row[4]:
-        raise Refused("reference-digest")
+        refuse("reference-digest")
     if row[4].startswith(("ghcr.io/micaoss/", "local/")):
-        raise Refused("reference-upstream")
+        refuse("reference-upstream")
     field(UPSTREAM_REFERENCE.match(row[4]))
 
 
@@ -91,32 +109,32 @@ def check_lock(path):
     rows = lines_of(path, "# mica-lock v1")
     for row in rows:
         if row[0] not in KIND_COLUMNS:
-            raise Refused("kind-unknown")
+            refuse("kind-unknown")
         if len(row) != KIND_COLUMNS[row[0]]:
-            raise Refused("column-count")
+            refuse("column-count")
     if not rows or rows[0][0] != "release" or sum(r[0] == "release" for r in rows) != 1:
-        raise Refused("release-row")
+        refuse("release-row")
     _, repository, release, commit = rows[0]
     scope, _, release = release.rpartition(".")
     field(REPOSITORY.match(repository) and (RELEASE.match(release) or release == "offline") and COMMIT.match(commit)
           and (scope == "" or SCOPE.match(scope)))
     if (scope != "") != (repository in SCOPED):
-        raise Refused("release-scope")
+        refuse("release-scope")
     if scope == INDEX_SCOPE and repository != "mica-build":
-        raise Refused("index-scope")
+        refuse("index-scope")
     index_lock = repository == "mica-build" and scope == INDEX_SCOPE
     registry = "local" if release == "offline" else "ghcr.io/micaoss"
 
     def reference(value, expected=repository):
         if "@sha256:" not in value:
-            raise Refused("reference-digest")
+            refuse("reference-digest")
         m = REFERENCE.match(value)
         if not m:
-            raise Refused("field-value" if value.startswith(("ghcr.io/micaoss/", "local/")) else "reference-registry")
+            refuse("field-value" if value.startswith(("ghcr.io/micaoss/", "local/")) else "reference-registry")
         if m.group("registry") != registry:
-            raise Refused("reference-registry")
+            refuse("reference-registry")
         if m.group("repository") != expected:
-            raise Refused("reference-repository")
+            refuse("reference-repository")
         return m.group("tag") or ""
 
     board_scope = scope if repository == "mica-boards" else ""
@@ -125,7 +143,7 @@ def check_lock(path):
         input_repository, _, input_scope = name.partition(".")
         field(input_repository == "mica-build" and SCOPE.match(input_scope))
         if input_scope == INDEX_SCOPE:
-            raise Refused("index-scope")
+            refuse("index-scope")
 
     def asset_file(row, asset_release):
         prefix = "mica-" + row[1] + "-" + asset_release + "."
@@ -143,15 +161,15 @@ def check_lock(path):
                 field(NAME.match(row[2]) and row[3] in PLATFORM)
                 reference(row[4], row[1])
                 if row[1] != repository:
-                    raise Refused("image-source")
+                    refuse("image-source")
             else:
-                raise Refused("image-source")
+                refuse("image-source")
             key = (row[1], row[2], row[3])
         elif kind == "pool":
             field(row[1] in ARCH)
             tag = reference(row[2])
             if board_scope and not tag.startswith("pool." + board_scope + "." + row[1] + "."):
-                raise Refused("scope-content")
+                refuse("scope-content")
             key = (row[1],)
             pools.add(row[1])
         elif kind == "package":
@@ -161,7 +179,7 @@ def check_lock(path):
             field(NAME.match(row[1]) and row[2] in COMPONENT and row[3] in ARCH)
             tag = reference(row[4])
             if board_scope and (row[1] != board_scope or not tag.startswith(row[2] + "." + row[1] + ".")):
-                raise Refused("scope-content")
+                refuse("scope-content")
             key = (row[1], row[2])
         elif kind == "upstream":
             roots = row[6].split(",")
@@ -176,9 +194,9 @@ def check_lock(path):
             field(REPOSITORY.match(name) and (input_scope == "" or SCOPE.match(input_scope))
                   and (RELEASE.match(row[2]) or row[2] == "offline") and SHA256.match(row[3]))
             if (input_scope != "") != (name in SCOPED):
-                raise Refused("release-scope")
+                refuse("release-scope")
             if input_scope == INDEX_SCOPE:
-                raise Refused("index-scope")
+                refuse("index-scope")
             key = (row[1],)
         elif kind == "origin":
             index_input(row[1])
@@ -190,19 +208,19 @@ def check_lock(path):
             if not (REPOSITORY.match(name) and (built_scope == "" or SCOPE.match(built_scope))
                     and (built_scope != "") == (name in SCOPED)
                     and (RELEASE.match(row[3]) or row[3] == "offline") and SHA256.match(row[4])):
-                raise Refused("index-built-form")
+                refuse("index-built-form")
             key = (row[1], row[2])
         elif kind == "index":
             field(SCOPE.match(row[1]))
             if row[1] == INDEX_SCOPE:
-                raise Refused("index-scope")
+                refuse("index-scope")
             index_input(row[2])
             key = (row[1],)
         elif kind == "product":
             field(SCOPE.match(row[1]) and SCOPE.match(row[2]) and row[3] in PROFILE and GENERATION.match(row[4])
                   and all(SHA256.match(v) for v in row[5:8]))
             if INDEX_SCOPE in (row[1], row[2]):
-                raise Refused("index-scope")
+                refuse("index-scope")
             key = (row[1],)
         elif kind == "bundle":
             field(SCOPE.match(row[1]) and row[2] in BUNDLE)
@@ -220,56 +238,56 @@ def check_lock(path):
             # meaning depend on which row a reader happened to take.
             field(NAME.match(row[1]) and NAME.match(row[2]) and SHA256.match(row[3]))
             if any(r[0] == "data" and r[2] == row[2] and r is not row for r in rows):
-                raise Refused("data-file")
+                refuse("data-file")
             key = (row[1],)
         else:
-            raise Refused("release-row")
+            refuse("release-row")
         if (kind,) + key in keys:
-            raise Refused("duplicate-key")
+            refuse("duplicate-key")
         keys.add((kind,) + key)
         sort_keys.append((KIND_ORDER.index(kind),) + tuple(k.encode() for k in key))
     if repository != "mica-system-base" and any(r[0] in BASE_ONLY for r in rows):
-        raise Refused("base-only-kind")
+        refuse("base-only-kind")
     if repository != "mica-build" and any(r[0] in BUILD_ONLY for r in rows):
-        raise Refused("build-only-kind")
+        refuse("build-only-kind")
     if not index_lock and any(r[0] in INDEX_KINDS for r in rows):
-        raise Refused("index-scope")
+        refuse("index-scope")
     if index_lock:
         if not any(r[0] == "index" for r in rows):
-            raise Refused("index-scope")
+            refuse("index-scope")
         if any(r[0] in ("image", "pool", "package", "board", "upstream", "apt") for r in rows) \
                 or any(r[0] == "input" and r[1].partition(".")[0] != "mica-build" for r in rows):
-            raise Refused("index-only-inputs")
+            refuse("index-only-inputs")
         inputs = {r[1]: r[2] for r in rows if r[0] == "input"}
         if any(r[0] in ("origin", "built") and r[1] not in inputs for r in rows) \
                 or any(r[0] == "index" and r[2] not in inputs for r in rows) \
                 or any(sum(r[0] == "origin" and r[1] == name for r in rows) != 1
                        or not any(r[0] == "built" and r[1] == name for r in rows) for name in inputs):
-            raise Refused("index-input")
+            refuse("index-input")
         indexed = {r[1]: inputs[r[2]] for r in rows if r[0] == "index"}
         if {r[1] for r in rows if r[0] == "product"} != set(indexed) \
                 or any(r[0] in ("bundle", "asset") and r[1] not in indexed for r in rows):
-            raise Refused("index-product-source")
+            refuse("index-product-source")
         for r in rows:
             if r[0] == "bundle" and REFERENCE.match(r[3]).group("tag") != r[2] + "." + r[1] + "." + indexed[r[1]]:
-                raise Refused("index-product-source")
+                refuse("index-product-source")
             if r[0] == "asset" and not asset_file(r, indexed[r[1]]):
-                raise Refused("index-product-source")
+                refuse("index-product-source")
     products = {r[1] for r in rows if r[0] == "product"}
     bundles = {(r[1], r[2]) for r in rows if r[0] == "bundle"}
     if any(r[0] in ("bundle", "asset") and r[1] not in products for r in rows):
-        raise Refused("bundle-without-product")
+        refuse("bundle-without-product")
     if any(r[0] == "asset" and (r[1], r[2]) not in bundles for r in rows):
-        raise Refused("asset-without-bundle")
+        refuse("asset-without-bundle")
     if any(r[0] == "bundle" and r[2] == "update" and not any(a[0] == "asset" and a[1:4] == [r[1], "update", "full"] for a in rows)
            for r in rows):
-        raise Refused("update-full")
+        refuse("update-full")
     if any(r[0] == "package" and r[2] not in pools for r in rows):
-        raise Refused("package-without-pool")
+        refuse("package-without-pool")
     if repository == "mica-boards" and not {"board", "kernel"} <= {r[2] for r in rows if r[0] == "board"}:
-        raise Refused("board-components")
+        refuse("board-components")
     if sort_keys != sorted(sort_keys):
-        raise Refused("sort-order")
+        refuse("sort-order")
     return repository, scope, release
 
 
@@ -280,18 +298,18 @@ def check_upstream(path):
     rows = lines_of(path, "# mica-lock v1")
     for row in rows:
         if row[0] == "release":
-            raise Refused("upstream-release-row")
+            refuse("upstream-release-row")
         if row[0] not in UPSTREAM_COLUMNS:
-            raise Refused("kind-unknown")
+            refuse("kind-unknown")
         if len(row) != UPSTREAM_COLUMNS[row[0]]:
-            raise Refused("column-count")
+            refuse("column-count")
     keys, sort_keys = set(), []
     order = list(UPSTREAM_COLUMNS)
     for row in rows:
         kind = row[0]
         if kind == "image":
             if row[1] != "upstream":
-                raise Refused("image-source")
+                refuse("image-source")
             check_upstream_image(row)
             key = (row[1], row[2], row[3])
         elif kind == "source":
@@ -302,11 +320,11 @@ def check_upstream(path):
             field(NAME.match(row[1]) and row[2].startswith("https://") and row[3] and COMMIT.match(row[4]))
             key = (row[1],)
         if (kind,) + key in keys:
-            raise Refused("duplicate-key")
+            refuse("duplicate-key")
         keys.add((kind,) + key)
         sort_keys.append((order.index(kind),) + tuple(k.encode() for k in key))
     if sort_keys != sorted(sort_keys):
-        raise Refused("sort-order")
+        refuse("sort-order")
 
 
 def read_pin(path):
@@ -314,12 +332,12 @@ def read_pin(path):
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
-        raise Refused("encoding")
+        refuse("encoding")
     if not text.endswith("\n") or "\r" in text:
-        raise Refused("encoding")
+        refuse("encoding")
     lines = text[:-1].split("\n")
     if lines[0] != "# mica-pin v1":
-        raise Refused("header")
+        refuse("header")
     pairs = [line.split("=", 1) if "=" in line else [line, None] for line in lines[1:]]
     keys = [k for k, _ in pairs]
     values = dict(pairs)
@@ -327,7 +345,7 @@ def read_pin(path):
     scoped = "SCOPE" in values
     if keys != (["REPOSITORY"] + (["SCOPE"] if scoped else []) + ["RELEASE", "SHA256SUMS"]
                 + (["CHECKOUT"] if offline else [])):
-        raise Refused("pin-format")
+        refuse("pin-format")
     field(REPOSITORY.match(values["REPOSITORY"]) and SHA256.match(values["SHA256SUMS"])
           and (offline or RELEASE.match(values["RELEASE"])) and (not scoped or SCOPE.match(values["SCOPE"])))
     if offline:
@@ -344,19 +362,19 @@ def check_vectors_pin(path):
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
-        raise Refused("encoding")
+        refuse("encoding")
     if not text.endswith("\n") or "\r" in text:
-        raise Refused("encoding")
+        refuse("encoding")
     lines = text[:-1].split("\n")
     if lines[0] != "# mica-vectors-pin v1":
-        raise Refused("header")
+        refuse("header")
     # Comment lines are allowed after the header and carry no claim the gate
     # acts on: the first real pin used one to record that its commit carries a
     # known inert defect, and forbidding it would have pushed that into nowhere.
     body = [line for line in lines[1:] if not line.startswith("#")]
     pairs = [line.split("=", 1) if "=" in line else [line, None] for line in body]
     if [k for k, _ in pairs] != ["REPOSITORY", "COMMIT"]:
-        raise Refused("pin-format")
+        refuse("pin-format")
     values = dict(pairs)
     field(REPOSITORY.match(values["REPOSITORY"]) and COMMIT.match(values["COMMIT"]))
 
@@ -370,31 +388,31 @@ def check_pins(directory, mode):
         values = read_pin(os.path.join(pins_dir, name + ".pin"))
         repository, _, scope = name.partition(".")
         if values["REPOSITORY"] != repository:
-            raise Refused("name-mismatch")
+            refuse("name-mismatch")
         if values.get("SCOPE", "") != scope:
-            raise Refused("scope-mismatch")
+            refuse("scope-mismatch")
         if ("SCOPE" in values) != (repository in SCOPED):
-            raise Refused("release-scope")
+            refuse("release-scope")
         records[name] = values
     for name in pins:
         if name not in locks:
-            raise Refused("pin-without-lock")
+            refuse("pin-without-lock")
     for name in locks:
         if name not in pins:
-            raise Refused("lock-without-pin")
+            refuse("lock-without-pin")
     for name, values in records.items():
         try:
             lock_repository, lock_scope, lock_release = check_lock(os.path.join(directory, name + ".lock"))
         except Refused:
-            raise Refused("lock-invalid")
+            refuse("lock-invalid")
         if lock_repository != values["REPOSITORY"]:
-            raise Refused("lock-invalid")
+            refuse("lock-invalid")
         if lock_scope != values.get("SCOPE", ""):
-            raise Refused("scope-mismatch")
+            refuse("scope-mismatch")
         if lock_release != values["RELEASE"]:
-            raise Refused("release-mismatch")
+            refuse("release-mismatch")
         if "CHECKOUT" in values and mode == "ci":
-            raise Refused("checkout-in-ci")
+            refuse("checkout-in-ci")
 
 
 def check_repos(directory, mode):
@@ -402,14 +420,49 @@ def check_repos(directory, mode):
     path = os.path.join(directory, "repos", "sha256", digest)
     if not os.path.exists(path):
         if mode == "offline":
-            raise Refused("offline-miss")
-        raise Refused("fetch-required")
+            refuse("offline-miss")
+        refuse("fetch-required")
     if hashlib.sha256(open(path, "rb").read()).hexdigest() != digest:
-        raise Refused("cache-corrupt")
+        refuse("cache-corrupt")
+
+
+def collect(check, path):
+    """Every rule the file breaks, by re-running with each found rule suppressed.
+
+    A structural refusal is reported alone: the rest of the file is unreadable
+    after it, so continuing would report rules that are artefacts of this
+    mode's own ordering rather than of the file (release-lock.md 9.1).
+    """
+    SUPPRESS.clear()
+    found = []
+    while True:
+        try:
+            check(path)
+        except Refused as refusal:
+            rule = str(refusal)
+            found.append(rule)
+            if rule in STRUCTURAL:
+                break
+            SUPPRESS.add(rule)
+            continue
+        except Exception:
+            # Suppression walked into code the skipped check was protecting.
+            # Stop and say so rather than guessing: under-reporting is the only
+            # safe direction for a mode that hunts extra rules.
+            print("collect-stopped", " ".join(found))
+            SUPPRESS.clear()
+            return
+        break
+    SUPPRESS.clear()
+    print("valid" if not found else "refused-set " + " ".join(found))
 
 
 def main(argv):
     try:
+        if argv[1] == "collect":
+            kind = {"lock": check_lock, "upstream": check_upstream}[argv[2]]
+            collect(kind, argv[3])
+            return
         if argv[1] == "lock":
             check_lock(argv[2])
         elif argv[1] == "upstream":

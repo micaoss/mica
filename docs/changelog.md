@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 14:19 [finding]
+
+**The collect mode is built, and the audit has its answer: 40 of 56 refused
+vectors isolate the rule they name, 9 do not, 7 are unknown.**
+`release-lock-check.py collect lock|upstream <file>` re-runs the reader with
+each found rule suppressed. It **under-reports by construction** — anything
+other than a refusal stops the collection with `collect-stopped`, because a
+mode that hunts extra rules must never invent one — and the default path is
+untouched, which the 298 existing checks prove.
+
+**The nine are not one finding, and the split decides what to do.** Three are
+**consequential**: changing a field that is part of the sort key moves the row
+out of order, so `sort-order` fires too, and re-sorting the fixture repairs it
+because the named defect does not need the disorder. Six are **inherent
+pairs** — a slash-form release is malformed *and* wrongly scoped by the same
+token; a reference without a digest also fails its form test; a wrong-kind row
+in an upstream lock is an unknown kind by definition. **No single fixture can
+separate an inherent pair**, so the record is the pair rather than a repair:
+the same shape as a refusal no input can reach, one level up — **not a defect
+to fix, a fact about the rules**.
+
+**And the seven that stopped early are reported as unknown rather than as
+clean.** Suppression walked into code the skipped check was protecting, which
+is exactly the case the mode was designed to refuse to guess about.
+
 ## 2026-09-20 14:16 [decision]
 
 **The second half has a shape and this repository owns it**: an optional

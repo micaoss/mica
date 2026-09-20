@@ -1164,8 +1164,45 @@ semantic refusals**, and never mixes them. A partially built version is the
 one thing that must not be shipped here: a gate whose noise is
 indistinguishable from its findings is worse than no gate.
 
-**The two-rule property is mechanically checkable, and the harness does not
-exist** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
+**Built 2026-09-20 and run over the whole set**:
+`release-lock-check.py collect lock|upstream <file>` reports every rule a file
+breaks, by re-running with each found rule suppressed. It **under-reports by
+construction** — a run that raises anything other than a refusal stops the
+collection and says `collect-stopped`, because a mode that hunts extra rules
+must never be able to invent one — and the default single-rule path is
+untouched, which the 298 existing checks prove.
+
+The first pass over the 56 refused vectors: **40 break exactly the rule they
+name**, **9 break more than one**, and **7 stopped early** because suppression
+walked into code the skipped check was protecting. The nine, with their extra
+rules:
+
+| Vector | Names | Also breaks |
+|---|---|---|
+| `lock/refused/image-source-reference` | `reference-repository` | `image-source`, `sort-order` |
+| `lock/refused/image-source` | `image-source` | `sort-order` |
+| `upstream/refused/repository-source` | `image-source` | `sort-order` |
+| `lock/refused/index-only-inputs` | `index-only-inputs` | `index-input` |
+| `lock/refused/release-slash` | `field-value` | `release-scope` |
+| `lock/refused/release-value` | `field-value` | `release-scope` |
+| `lock/refused/upstream-image-without-digest` | `reference-digest` | `field-value` |
+| `upstream/refused/image-without-digest` | `reference-digest` | `field-value` |
+| `upstream/refused/release-row` | `upstream-release-row` | `kind-unknown` |
+
+**They are not all the same finding**, and the difference decides what can be
+done about each. Three are **consequential**: changing a field that is part of
+the sort key moves the row out of order, so `sort-order` fires as well — and
+those are repairable by re-sorting the fixture, since the named defect does
+not require the disorder. The rest are **inherent pairs**: a slash-form
+release is malformed *and* wrongly scoped by the same token, a reference
+without a digest fails its form test as well, and a row of the wrong kind in
+an upstream lock is an unknown kind by definition. **No single fixture can
+separate an inherent pair**, so the honest record is the pair itself rather
+than a repair — the same shape as a refusal no input can reach, one level up:
+not a defect to fix, a fact about the rules.
+
+**The property is mechanically checkable, and it was stated before it was
+built** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
 named defect and require the result to become valid; anything that stays
 refused was testing two rules at once.** That is a definition rather than an
 inspection, and the distinction matters — *no gate can check this* is a
