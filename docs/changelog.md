@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 07:07 [finding]
+
+**The world gate's own limit is now written in the gate**, in
+`docs/world-claims.tsv` where someone adding a row will read it and in the
+checker's header: **the claims file's completeness is unchecked.** Six rows
+are compared against the world; nothing compares the records against the file,
+so a seventh standing claim written into a page tomorrow is stale-able and
+invisible — the same shape as a declaration nobody compares to the thing it
+declares, one level up, in my own tree.
+
+**It is classified rather than hedged.** *This sentence is a standing claim
+about another repository* is not detectable in prose, so the reason is not
+computable and the violation is not reliably detectable either; by the three
+forms written this morning that is the third row, **the record alone**, and
+the comment in the claims file is that record. Adding a row is a **habit, not
+a gate**, and a standing claim left outside the file will be found the way the
+two of 2026-09-20 were: incidentally.
+
+Stating it costs nothing and buys the only thing available here — a reader who
+knows what the green tick covers. A gate whose limit is written where its
+users are is a gate that is not mistaken for more than it is.
+
 ## 2026-09-20 07:05 [decision]
 
 **A third form, taken because the two-row version could be read as *no check

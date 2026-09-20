@@ -30,6 +30,11 @@
 # NO SILENT PASS. Without a usable reader this exits 2 and says so: a check
 # that cannot reach its subject must not look like a check that found nothing
 # wrong.
+#
+# WHAT THIS GATE DOES NOT PROVE: that the claims file is COMPLETE. Every row is
+# checked against the world and nothing checks the records against the rows, so
+# a standing claim written into a page tomorrow is invisible here. The limit is
+# stated in the claims file itself, where someone adding a row will read it.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

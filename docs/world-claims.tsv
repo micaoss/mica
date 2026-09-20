@@ -12,6 +12,21 @@
 # 2026-09-20") is true of a moment and must not be re-checked against today;
 # a standing claim ("s905x5m is a release target") is false the moment the
 # world moves and nothing here would have said so.
+#
+# THE LIMIT OF THIS FILE, STATED HERE BECAUSE NOTHING ELSE CAN STATE IT: its
+# COMPLETENESS is unchecked. The six rows below are compared against the
+# world; nothing compares the records against this file, so a seventh standing
+# claim written into a page tomorrow is stale-able and invisible here. That is
+# the same shape as a declaration nobody compares to the thing it declares --
+# adding a row is a HABIT, not a gate.
+#
+# It is not closable mechanically: "this sentence is a standing claim about
+# another repository" is not detectable in prose, so the reason is not
+# computable and the violation is not reliably detectable either. By the three
+# forms in docs/decisions/2026-09-20-coordination-state-is-a-record.md that
+# puts it in the third row -- the record alone -- and this comment is that
+# record. A standing claim left outside this file will be found the way the
+# two of 2026-09-20 were: incidentally.
 release-target.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.cx3576	line	micaoss/mica-boards:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
