@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 08:09 [decision]
+
+**A fifth property for a new checker, taken because the first four all guard
+one direction.** Assert nothing until the set is non-empty, keep a positive
+control, one refusal per clause with its own message, refuse rather than pass
+when the subject is unreachable — every one of those guards against a **false
+green**, which made the list read as a complete account of how a checker fails
+when it was not. The fifth guards the other way: **the checker's own parsing
+must not be able to misread a pass as a fail.**
+
+Its instance is `mica-build`'s session probe, which read **four of its own
+seven passes as red** because its verdict reader anchored at line start while
+the probe shares a console with `systemd` and a getty — *the reading was more
+fragile than the thing read*. That cost a boot, and it is the direction that
+kills an instrument rather than hiding a defect: **a suite that fails on its
+own formatting gets disabled, and the disabling is reasonable at the time.**
+
+The list is a list of properties rather than a claim about the world, so the
+three-instance threshold does not govern it: a property a checker should have
+earns its place by being a property a checker should have. What it needed was
+an instance to stop it being a preference, and it has one.
+
 ## 2026-09-20 08:09 [finding]
 
 **The third acceptance clause is not unproven, it is FALSE as of 2026-09-20.**

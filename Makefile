@@ -32,7 +32,21 @@
 # this workspace's standards actually travel -- and imitation has no quality
 # filter: a sloppy first file would have propagated just as fast and just as
 # invisibly, and nobody could have pointed at the decision that caused it. So
-# the file to copy is named instead of left to whichever one is open.
+# the file to copy is named instead of left to whichever one is open, and the
+# properties are named too: a copier who has only the file copies its
+# accidents and cannot tell which parts were the point, while a copier who has
+# the properties can start from a different file the day this one is rewritten
+# by someone who never read this.
+#
+# A FIFTH PROPERTY, GUARDING THE OTHER DIRECTION: the checker's own parsing
+# must not be able to misread a pass as a fail. The four above all guard
+# against a FALSE GREEN, which makes them read as a complete account of how a
+# checker fails, and they are not one. mica-build's session probe read four of
+# its own seven passes as red because its verdict reader anchored at line
+# start while the probe shares a console with systemd and a getty -- "the
+# reading was more fragile than the thing read". That cost a boot, and a suite
+# that fails on its own formatting gets disabled, with the disabling
+# reasonable at the time.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"
