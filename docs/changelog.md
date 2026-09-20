@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-09-20 08:06 [decision]
+
+**A justification is removed and no check is** *(user, 2026-09-20)*:
+*"不应该限制podman的权限…只是提示说明即可"*. The engine is rootful and rootless
+is unsupported, so **a caller who can run `podman` is already root** and can
+run `--privileged` or mount the graph root elsewhere. `nosuid` and `nodev`
+constrain nobody who is not already constrained: they are a **default, not a
+boundary**.
+
+`docs/design/containers.md` says that where the graph root is described, with
+the two failure modes the note exists to prevent: **nobody removes them as
+useless**, because that changes what containers can do for no reason, and
+**nobody tightens them believing they are a boundary** — the next reader will
+either add `noexec` for consistency or strip the lot as theatre, and both are
+wrong for the same reason.
+
+**The checks stand and their reason changes.** They were never security
+checks: if `noexec` were ever set on DATA on one board, containers there could
+not execute out of the graph root and the bind could not remove it — a
+container behaving differently on one board with an identical kernel
+configuration. They prove **uniformity, not confinement**, which is the
+functional half of *uniform behaviour unless the kernel cannot support it* —
+and the check belongs on the booted guest, since only the guest has DATA's
+options composed with the bind's.
+
+**The sentence worth more than the ruling**, now in
+`docs/design/access.md` section 2 where the accounts are described:
+**`podman` access implies root implies SSH — there is no unprivileged-user
+story on these devices.** That makes *rootless is not supported* coherent with
+the access model rather than merely unimplemented, and it explains why the
+operator account `mica` exists without being an access path. Three records
+answered that by omission until now.
+
+**And the shape is named at three instances** in `doc-contract.md` and its
+Chinese page: when a mechanism looks like it serves a reason it does not
+serve, write what it is for beside it — `nosuid,nodev` that looks like
+hardening, a quiet `tty1` that looked like policy and was a dropped symlink, a
+`lock` row that would have looked like pool coverage. **Say what it is, keep
+what works, and stop anyone reasoning from the appearance.**
+
 ## 2026-09-20 08:03 [decision]
 
 **The most reliable quality mechanism here is imitation, and imitation has no

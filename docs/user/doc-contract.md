@@ -200,6 +200,16 @@ English source.
   a third pair appears, the fact worth recording is not any of the ideas — it
   is that this workspace is producing convergence rather than correction**,
   and that is a claim about the workspace with a record of its own.
+- **When a mechanism looks like it serves a reason it does not serve, write
+  what it is for beside it.** Three instances in one evening: `nosuid,nodev`
+  on a container graph root looks like hardening, and the access model does
+  not support the belief; `tty1` sitting quiet looked like a logo policy and
+  was a dropped symlink on three of four boards; a `lock` row in the mirror
+  would have looked like pool coverage. The repair is the same each time —
+  **say what it is, keep what works, and stop anyone reasoning from the
+  appearance** — because the next reader either extends the mechanism for
+  consistency or removes it as theatre, and both are wrong for the same
+  reason.
 - **The strongest pair is one instance hypothesised and one observed**, and
   that is a better reason to keep both than *two is not three*. A rule
   designed in guards against a failure someone imagined; a rule extracted from

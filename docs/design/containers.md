@@ -212,6 +212,32 @@ storage before exposing application units, preventing startup on an unmounted
 container backing directory. [Storage policy](storage.md#capacity) defines the
 shared capacity and the bounded variable-data project.
 
+**The graph root's `nosuid` and `nodev` are a default, not a boundary**
+*(user ruling, 2026-09-20)*. They look like hardening and are not: the engine
+is rootful, so anyone who can run `podman` is already root and can run
+`--privileged` or mount the graph root elsewhere without them
+([access](access.md) section 2). The options **stay exactly as they are**, in
+`mica-system-base`'s `mica-containers.mount` and `mica-podman`'s
+`storage.conf`, and the note is what the record is for:
+
+- **nobody removes them as useless** — removing them changes what containers
+  can do, which is a behavioural change made for no reason;
+- **nobody tightens them believing they are a boundary** — the next reader of
+  `nosuid,nodev` on a container graph root will assume a threat model that
+  does not exist here, and will either add `noexec` for consistency or strip
+  the lot as theatre. Both are wrong for the same reason.
+
+**The mount checks stand, and their reason is uniformity rather than
+confinement.** If `noexec` were ever set on DATA on one board, containers
+there could not execute anything out of the graph root and the bind could not
+remove it — a container behaving differently on one board with an identical
+kernel configuration. That is the functional half of the user's other rule,
+*uniform behaviour unless the kernel cannot support it*. And the check belongs
+on the **booted guest** rather than on the `fstab`: a bind cannot weaken the
+underlying mount, so the effective set is DATA's options composed with the
+bind's, and only the guest has both
+([harness](build-harness.md) section 4).
+
 Two consequences worth stating plainly:
 
 - **Container, system and user data are unlimited.** They share DATA capacity

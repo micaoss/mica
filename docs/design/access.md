@@ -88,7 +88,13 @@ because it is workspace policy rather than one repository's build detail)*:
   fault is `mica-seed-home.service` or `home.mount`, never the account.
 - **`uidmap` is absent on purpose.** `newuidmap` and `newgidmap` are not
   installed: nothing in the base root maps a user namespace, and rootless
-  containers are deliberately unsupported. If a later stage ever wants
+  containers are deliberately unsupported — which is **coherent with the
+  access model rather than merely unimplemented** *(user, 2026-09-20)*:
+  **`podman` access implies root implies SSH. There is no unprivileged-user
+  story on these devices.** The engine is rootful, so a caller who can run
+  `podman` is already root; that is also why the operator account `mica`
+  exists without being an access path, and why a container privilege
+  restriction constrains nobody who is not already constrained. If a later stage ever wants
   rootless, `uidmap` is a row of `mica-system-base:upstream.pkgs` — pinned for
   later stages, not installed in the root — rather than a change to the base
   root.
