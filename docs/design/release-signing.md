@@ -17,6 +17,27 @@ mappings. No earlier update format or mutable command-line trust input is read.
 
 The components themselves are `mica/kernel/v1` and `mica/rootfs/v2`, and a
 published update travels in a `mica/update-envelope/v1` envelope.
+
+**These payloads are addition-closed for readers already deployed, and the
+ordering that follows is the opposite of the producer-first instinct**
+*(measured in `mica-core`'s reader, 2026-09-20; read back here)*. Nine of the
+ten structs in `mica-core:crates/mica-deploy/src/components.rs` carry
+`#[serde(deny_unknown_fields)]` — `BootArtifact` is exactly `format` and
+`artifact`, `KernelComponent` exactly its eight — so **adding a field does not
+degrade gracefully: a device running today's `mica-deploy` refuses the whole
+record.** A new field therefore travels in this order, and only this one:
+
+1. the reader changes in `mica-core` and accepts the field;
+2. that lands in a `mica-core` release;
+3. **the release reaches the devices**;
+4. only then may `mica-build` emit the field.
+
+**Anybody reasoning from *the producer owns the format* gets this backwards**,
+and backwards means publishing a record deployed devices reject. *(The cost of
+step 3 is a question about whether there is a fleet, which is open with the
+user; this section states the ordering, which is correct either way — **it is
+expensive the day there are devices**. If a fleet exists, that sentence is
+already operational.)*
 `mica/rootfs/v2` replaces v1 without its `version` field, so a release that
 changes nothing in the root keeps its rootfs identity; the release identity
 is only in the signed deployment's `version`, `generation` and `product`

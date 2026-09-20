@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-20 20:40 [finding]
+
+**The deployment envelope's payloads are addition-closed for deployed
+readers**, recorded beside the format rather than in whichever proposal next
+trips over it. Read back here: nine of the ten structs in
+`mica-core:crates/mica-deploy/src/components.rs` carry
+`#[serde(deny_unknown_fields)]` — `BootArtifact` is exactly `format` and
+`artifact` — so **adding a field does not degrade gracefully; a device running
+today's `mica-deploy` refuses the record outright.**
+
+**And the ordering that follows is the opposite of the producer-first
+instinct**: the reader changes in `mica-core`, lands in a release, **reaches
+the devices**, and only then may `mica-build` emit the field. Anybody
+reasoning from *the producer owns the format* gets it backwards, and backwards
+means publishing a record deployed devices reject — the party that owns the
+producer said plainly this was the opposite of what it would have assumed.
+
+**Written in the form that is correct under both answers to the open fleet
+question**: *it is expensive the day there are devices*. If a fleet exists the
+sentence is already operational; if every device is a bench device that gets
+reflashed, the ordering is a property with no population **and the record does
+not have to be rewritten either way.**
+
 ## 2026-09-20 20:11 [finding]
 
 **The candidate recorded an hour ago is dangerous without its other half, and
