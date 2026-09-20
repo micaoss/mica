@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 14:25 [spec]
+
+**The multiset argument is stated as its author states it — a theorem about
+the format rather than a fact about one fixture**: *a refused vector whose row
+multiset equals a valid vector's can only break an order rule, because every
+other rule here is a predicate on a row or on a set of rows, and both are
+invariant under permutation.* Decidable by inspection, with no checker run and
+no repair declaration. **And its generalisation subsumes `reorder-of` instead
+of sitting beside it**: name the set of rules the vector's difference from its
+declared sibling can **reach**; a singleton is provably single-rule. Order-only
+is the easy end, and the three `minimal-of` vectors are where it stops — they
+differ by rows, so their reachable set is not a singleton by inspection.
+
+**The two things a coverage number would misread as a gap are now recorded
+together**, because they are one failure mode at two levels: **a refusal no
+input can reach** (`mica-core`) and **a rule no fixture can isolate** (the six
+inherent pairs). In both the number goes green **by damaging something** — a
+deleted guard, or a fixture contorted until it tests less — which is why the
+subtraction and the collect mode report rather than refuse. A reader who meets
+one is handed the other.
+
+**And the best argument for the whole mechanism is what it did the hour it was
+specified** (`mica-core`): it wrote a new `vectors.pin`, pinned the commit,
+read the vectors at it, and **the vectors told it the file was wrong** — same
+hour, nobody reviewing. **A copy taken that morning would have said nothing,
+because the family did not exist that morning.** The canonical set is **92
+rows**, seven of them that family. And the floor derivation **grew a fourth
+element without the rule changing**: a repository that pins the vectors
+produces a `vectors.pin`, so the family is in its floor the moment it writes
+the file — the rule was written before the family existed and covered it
+anyway.
+
 ## 2026-09-20 14:22 [progress]
 
 **The three repairable fixtures are repaired: the set is now 43 isolating, 6

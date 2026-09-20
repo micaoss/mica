@@ -946,11 +946,26 @@ pinned read answers whenever someone adds a seventh reader, and it answers
 *conforming* rather than *running*, which are not the same question — running
 a stale copy looks identical from outside.
 
+**The mechanism's best argument is what happened the hour it was specified**
+*(`mica-core`, 2026-09-20)*: it wrote a new `vectors.pin`, pinned the commit,
+read the vectors at that commit — and **the vectors told it the file was
+wrong**, within the same hour, with nobody reviewing it. **A copy taken that
+morning would have said nothing, because the family did not exist that
+morning.** The canonical set is 92 rows now rather than 84, seven of them the
+`vectors-pin` family specified after four repositories had already written the
+file.
+
 **The required subset is derivable, not arguable.** What a reader can
 encounter follows from `locks/pins/`: a fact about a directory rather than a
 claim about a repository's habits. That also relocates the difficulty of ever
 gating this — the hard part is **not** deciding what each reader owes, it is
 **finding each reader's copy**, and those are very different problems.
+
+**And the derivation grew a fourth element without the rule changing**, which
+is what a derivation is for and a list never does: a repository that pins the
+vectors **produces** a `vectors.pin`, so the whole `vectors-pin` family is in
+its floor the moment it writes the file. The rule was written before that
+family existed and covered it anyway.
 
 **The derivation gives a FLOOR, not a ceiling** *(`mica-system-base`,
 2026-09-20)*. It pins one unscoped producer and could skip every scoped,
@@ -990,10 +1005,21 @@ section exists to record: **no vector in that set carries incidental
 differences beyond its defect**, so a declaration here records something true
 rather than aspirational.
 
-**And where the row multiset is identical, order is the only rule a vector can
-break** — an argument about what *cannot* differ rather than about what a
-re-parse returns, and the only form that reaches the ambiguity question
-without a report-every-rule mode. Measured here: `lock/refused/unsorted.lock`
+**A theorem about the format, not a fact about one fixture**
+*(`mica-system-base`, 2026-09-20)*: **a refused vector whose row multiset
+equals a valid vector's can only break an order rule, because every other rule
+in this format is a predicate on a row or on a set of rows, and both are
+invariant under permutation.** Decidable by inspection — no checker run, no
+repair declaration.
+
+**And its generalisation subsumes `reorder-of` rather than sitting beside
+it**: for each refused vector, name **the set of rules whose predicates its
+difference from the declared valid vector can possibly reach**. If that set
+has one member, the vector is **provably single-rule with no harness at all**.
+Order-only is the easy end of that, which is why the relation below is a
+special case rather than a category of its own. It also says where it stops:
+the three `minimal-of` vectors differ by **rows**, so their reachable set is
+not a singleton by inspection, and they need the collect mode. Measured here: `lock/refused/unsorted.lock`
 and `lock/refused/release-not-first.lock` hold exactly their sibling's rows in
 a different order, so each is **provably single-rule**. Applying it to the `upstream/refused/`
 set found the opposite in **half of it**: five of the eight were missing the
@@ -1195,8 +1221,18 @@ than a repair:
 
 **No single fixture can separate an inherent pair**, so demanding isolation
 would push someone to contort a fixture until it tested less than it does now.
-That is the same shape as a refusal no input can reach, one level up: **not a
-defect to fix, a fact about the rules.**
+
+**Two things a coverage number would misread as a gap, recorded together
+because they are one failure mode at two levels** — a reader who meets one
+should be handed the other:
+
+| | What it is | What a coverage rule would do |
+|---|---|---|
+| **A refusal no input can reach** (`mica-core`) | the floor under the check above it; deleting it widens that check | count it as an untested rule, and somebody deletes a guard to make the number green |
+| **A rule no fixture can isolate** (here) | two rules one token breaks together; the pair is the fact | count it as a bad fixture, and somebody contorts it until it tests less |
+
+In both the number goes green **by damaging something**, which is why the
+subtraction and the collect mode **report rather than refuse**.
 
 **The property is mechanically checkable, and it was stated before it was
 built** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
