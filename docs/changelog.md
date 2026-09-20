@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 15:44 [finding]
+
+**The held sentence was not a bad citation, it was a false assurance, and the
+difference decides the repair.** `mica-boards`' test header named
+`mica-build:verify/src/checks-kernel.ts` as the half that reads the shipped
+`/boot/config-*`. Measured: that path has no history in `mica-build`, **none
+of the 61 files under `verify/src/` mentions `/boot/`** — read here one file
+at a time rather than grepped for a name — and the two places that do read a
+kernel configuration are `build/src/kernel-package.ts`, over the kernel
+component, and `rootfs/compose/compose-install.sh`, over
+`/boot/config-<release>` in the composed root. Both assert the boot and verity
+floor. **Neither names a container-limit symbol, and nothing in either
+repository asserts anything from `mica-required.fragment` against a shipped
+artefact.**
+
+**So the top rung of section 8's ladder is unguarded for the symbols that
+section is about, and the committed inputs are the only end.** That is also
+why the stale-build-tree hazard escapes everything: nothing downstream of the
+build would notice. **The paragraph describing the hazard was the same
+paragraph claiming it was covered** — correcting the citation would have left
+the reassurance standing, and naming the gap removes it. The claims file keeps
+its row with what the row can and cannot do written beside it: a reader under
+another name closes the gap without ever touching it, and *a shipped artefact
+is asserted against the fragment* is not expressible as a line in a file.
+
+**And a rule from the clause repair that applies to everything written here
+today: repair a clause on its shape, not on its current counterexample.** Four
+boards released from one commit made the old per-producer form satisfiable the
+same afternoon; had it been repaired only when it bit, the first single-board
+release would have re-broken it and somebody would have re-derived the
+argument from scratch.
+
 ## 2026-09-20 15:41 [finding]
 
 **`mica-boards`' cx3576 measurement is landed in its author's words**, as

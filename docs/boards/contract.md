@@ -639,7 +639,12 @@ service-namespace and shutdown checks.
 *Written by `mica-boards`, landed here verbatim so the measurement lives in a
 record rather than in a file header. One paragraph, about which instrument
 reads the shipped `/boot/config-*`, was withheld by the coordinator pending a
-`mica-build` answer and will be added in its author's words. Checked here
+`mica-build` answer; the answer came back as a measured absence, so that
+paragraph is **withdrawn rather than pending** and its author has replaced it
+in `mica-boards` `f3ff004`. The state it leaves behind is in
+[containers.md](../design/containers.md) section 8: no gate in either
+repository asserts a container-limit or netavark symbol against a shipped
+artefact, so for those symbols the committed inputs are the only end. Checked here
 before landing: the fragment's contents and the two FIT boards' lack of a
 `kernel-config` target, read at `mica-boards` `main`; the `# CONFIG_SECURITY
 is not set` line in `cx3576`'s committed config, read at the pinned release.

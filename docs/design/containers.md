@@ -506,18 +506,32 @@ board have `io.max`* is not well posed without naming the rung.
 reading rung one says nothing about rung four: `docs/world-claims.tsv` reads
 rungs one and two and `mica-build`'s pins; `mica-build`'s own table was read
 from the build tree; the session probe reads the running kernel's behaviour,
-which is downstream of the shipped artefact. The instrument for the shipped
-`/boot/config-*` is named in `mica-boards`' test header as
-`mica-build:verify/src/checks-kernel.ts` — and **that path has no history in
-`mica-build` at all**: it is absent from the directory listing and
-`git log` over it returns nothing, so it is a citation that was never
-checkable rather than one that rotted. A successor under another name may
-exist and two queries did not find it, which is a statement about the queries;
-what is settled is that the named file is not there. **A four-rung ladder
-whose top rung's instrument nobody can find is three rungs with an assurance
-attached**, so `docs/world-claims.tsv` now carries the absence as a row: it
-goes red the day that file appears, which is the day this paragraph should be
-rewritten.
+which is downstream of the shipped artefact. **The top rung is unguarded for the symbols this section is about**, and that
+is measured rather than inferred. `mica-boards`' test header named
+`mica-build:verify/src/checks-kernel.ts` as the half that reads the shipped
+`/boot/config-*`; that path has no history in `mica-build` at all, and none of
+the **61** files under `verify/src/` mentions `/boot/` — checked here by
+reading every one of them rather than by grepping for a name. Two places do
+read a kernel configuration and neither is in `verify/`:
+`build/src/kernel-package.ts` asserts the boot and verity floor over the
+kernel **component** (`RD_ZSTD`, `BLK_DEV_DM`, `DM_VERITY`, the trusted
+keyring, `SQUASHFS`, the watchdog, and a FIT kernel's forced command line),
+and `rootfs/compose/compose-install.sh` asserts `DM_INIT`, `BLK_DEV_DM`,
+`DM_VERITY` and `SQUASHFS` against `/boot/config-<release>` in the composed
+root. **Neither names a container-limit symbol, and nothing in either
+repository asserts anything from `mica-required.fragment` against a shipped
+artefact.** So for `MEMCG`, `CFS_BANDWIDTH`, `BLK_DEV_THROTTLING` and their
+neighbours, the **committed inputs are the only end** — which is also why the
+stale-build-tree hazard above escapes everything: nothing downstream of the
+build would notice.
+
+That is worth separating from the citation it arrived as. A wrong path is a
+bad citation and would have been repaired by correcting it; **this was a false
+assurance**, and the paragraph that described the hazard was the same
+paragraph that claimed it was covered. **Correcting the citation would have
+left the reassurance in place; naming the gap removes it.** The closure is
+owned by `mica-build`, where the reader that could assert these symbols
+already exists.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but
