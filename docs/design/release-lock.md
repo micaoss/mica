@@ -226,7 +226,30 @@ data <name> <file> <sha256>
 
 `<name>` is the producer's own identifier for the datum and is the row's key;
 `<file>` is the asset's file name; `<sha256>` is its digest. Both are
-`[a-z0-9][a-z0-9.+-]*`. The instance it was approved for is
+`[a-z0-9][a-z0-9.+-]*`.
+
+**`<file>` is a second uniqueness key, and it has no required relation to
+`<name>` or to the repository.** Two `data` rows may not name the same file
+even under different names — that is `data-file`, and it is a separate rule
+from `duplicate-key`, which is about `<name>`. A reader that implements *the
+row's key* and stops implements half of it and accepts a lock this format
+refuses. In the other direction, **nothing constrains the file's form beyond
+the charset**: it need not contain the repository, the name, or a suffix. Two
+independent readers got this row wrong on 2026-09-20 **in opposite
+directions** — one implementing only `<name>`, one requiring
+`<repository>-<name>.tsv` because the valid vector happens to look like that —
+which is a fact about this paragraph rather than about either reader.
+
+**And the diagnosis is worth more than the clarification** *(`mica-boards`,
+2026-09-20)*: **an example's incidental properties are indistinguishable from
+its required ones, and a reader generalising from one instance cannot tell
+which is which.** The refused vector caught the invention; the example it was
+generalised from could not have. A **valid** vector is the one artefact in
+this corpus with no defence against being generalised from, which is why
+`lock/valid/data-file-form.lock` now carries `data` files named nothing like
+their keys — one fixture makes that invention impossible. *(The same argument
+reaches every valid vector here, and widening it is a design question rather
+than this section's fix.)* The instance it was approved for is
 `mica-system-base`'s list of the paths in its root that no package owns, each
 with its writer named — data a consumer needs and cannot derive.
 

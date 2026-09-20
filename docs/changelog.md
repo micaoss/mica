@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-20 17:05 [finding]
+
+**Two independent readers got the `data` row wrong in opposite directions,
+which is a fact about the text.** One implemented *the row's key* and stopped,
+so it accepted a lock with two rows naming one file; one required
+`<repository>-<name>.tsv` because the single valid vector happens to look like
+that, so a duplicate-key vector came back `data-file`. **1.2.4 now says both
+halves**: `<file>` is a second uniqueness key, and its form is unconstrained
+beyond the charset — no repository, no name, no suffix.
+
+**And the diagnosis is worth more than the clarification**: *an example's
+incidental properties are indistinguishable from its required ones, and a
+reader generalising from one instance cannot tell which is which.* The refused
+vector caught the invention; the example generalised from could not have. **A
+valid vector is the one artefact in this corpus with no defence against being
+generalised from**, so `lock/valid/data-file-form.lock` now carries `data`
+files named nothing like their keys — one fixture makes that invention
+impossible. 357/357.
+
+**A skipped vector is worse than a missing one: it is in the count.** Three
+vectors were carried and skipped for want of a tool while the table counted
+their rows as coverage. **A missing vector is a gap somebody can see; a
+skipped one is coverage already claimed** — so either the runner refuses a row
+it cannot run, or the row moves to an exclusion list with its reason.
+
+**And the sweep rule, from a defect found once in the morning and eight more
+times that evening**: **finding an instance is what creates the obligation to
+sweep, and the finder is the least likely person to do it**, because the
+satisfaction of a fix closes the question the instance opened. Third time in
+one day that a class was mistaken for its first member.
+
 ## 2026-09-20 16:49 [finding]
 
 **The falsification ran and found a defect in the check rather than confirming

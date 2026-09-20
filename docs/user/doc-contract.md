@@ -208,6 +208,15 @@ English source.
   cost nothing. Every other was paid for by a second reader, a CI failure, or
   an edit to a page that had already been published. A rule applied after the
   claim is a rule that bills somebody else.
+- **Finding an instance is what creates the obligation to sweep, and the
+  finder is the least likely person to do it** *(2026-09-20)*. A rename defect
+  was found once in the morning, fixed in the file where it was found, and met
+  **eight more times** that evening — and the record that found it is the one
+  that missed the siblings. The mechanism is not carelessness: **the
+  satisfaction of a fix closes the question that the instance opened**, which
+  is why the sweep has to be booked at the moment of the find rather than
+  after it. Third time in one day that a class was mistaken for its first
+  member.
 - **A third guard, pointing the other way from those two** *(2026-09-20)*.
   The threshold and the double-counting rule both guard against **evidence
   that under-reaches** — too few instances, or the same ones spent twice.

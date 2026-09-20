@@ -82,6 +82,17 @@ only be answered by a kernel that has the controller. **A proxy can be wrong
 in ways the promise cannot**, and the promise is usually one command further
 on.
 
+**A skipped vector is worse than a missing one: it is in the count**
+*(2026-09-20)*. Three vectors were carried into a suite and skipped for want
+of a tool, while the table that lists them counted their rows as coverage. **A
+missing vector is a gap somebody can see; a skipped one is coverage already
+claimed** — the same family as a branch that always passes and a floor right
+eight times in nine, and the same repair: **a number that includes something
+that did not run is not a smaller number, it is a different kind of claim.**
+Either the runner refuses a row it cannot run, or the row moves to a list of
+exclusions **with its reason**, where the next reader meets the gap instead of
+the total.
+
 **Never quote a check you have not seen fail** *(2026-09-20, five instances)*.
 A gate that has only ever been green is a gate whose red nobody has
 witnessed, and a green from it is a number rather than evidence. The
