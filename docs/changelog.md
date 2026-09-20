@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-20 07:11 [decision]
+
+**Why the threshold exists is now written beside the threshold**, in
+`docs/user/doc-contract.md` section 6 and its Chinese page, because that is
+what decides when it could ever move: it guards against **a reader inventing a
+pattern**. Two instances one reader finds while looking are two instances and
+one reader; two reached **independently**, by repositories that never saw each
+other's messages, cannot have been matched to the same template — so the
+manner of arrival supplies the guard the third instance would have given.
+
+**The bar does not move and nothing here was written on two.** The note exists
+so that whoever meets the case recognises it instead of arguing the count, and
+it names the single distinction on which the bar could ever move rather than
+leaving that to be rediscovered as a dispute.
+
+The instance that prompted it is worth its line: *a board overlay re-enabling
+`tty1` would be a board repairing a composer* and *a detector belongs in the
+CI of the repository whose files it guards* are one principle — **the fix
+belongs where the thing being fixed lives** — reached in two repositories
+within an hour, neither having seen the other. It is the first time today two
+repositories arrived at the same idea rather than one correcting another.
 ## 2026-09-20 07:09 [progress]
 
 **The hardware list is published, in both locales** (task

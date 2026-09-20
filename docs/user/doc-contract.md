@@ -181,3 +181,17 @@ English source.
   share all of them says nothing; the threshold above guards against naming a
   class too early, and this guards against the same instances being spent
   twice.
+- **What the threshold is actually guarding against, since that decides when
+  it could ever move: a reader inventing a pattern.** Two instances a single
+  reader finds while looking for a pattern are two instances *and* one reader;
+  two reached **independently** — by repositories that never saw each other's
+  messages — cannot have been matched to the same template, so the manner of
+  arrival supplies the guard the third instance would have. The bar does not
+  move today and none of the rules here were written on two: this is recorded
+  because it is the **one distinction** on which it could, and because whoever
+  meets the case should recognise it rather than argue the count. The instance
+  that prompted it: *a board overlay re-enabling `tty1` would be a board
+  repairing a composer* and *a detector belongs in the CI of the repository
+  whose files it guards* are one principle — **the fix belongs where the thing
+  being fixed lives** — reached in two repositories within an hour, neither
+  having seen the other.
