@@ -977,6 +977,33 @@ gating this, and a uniform basename makes that **one command per repository**
 instead of a maintained list of paths. A naming convention that costs nothing
 today removes the obstacle that made the gate not worth building.
 
+**A vocabulary rename is a change to words this project owns, and a fixture
+contains words it does not** *(2026-09-20)*. The board sweep of 2026-09-16
+(`91fce7c8`, *rename the generic systems in the design pages, the website
+briefs and the vectors*) turned `x64` into `uefi-x64` inside a third-party
+download URL: ten vector files carried
+`bun-linux-uefi-x64.zip`, **an asset that does not exist** — Bun publishes
+`bun-linux-x64.zip`, which is what `mica-build-env`'s real
+`locks/upstream.lock` names. Fixed on 2026-09-20, before any repository pinned
+the commit.
+
+It survived four days for a structural reason rather than a careless one: **a
+vector's URL is inert by design.** Nothing downloads it, so no gate can
+notice, which is exactly why it lasted in the file every repository is now
+told to trust — and why a pin would have made it *permanent and uniform*
+rather than merely present. Whoever writes the next sweeping rename should
+know that one already crossed this line, in the one kind of file where nothing
+would complain.
+
+**And a refused vector that could be refused by two rules tests neither**
+*(`mica-core`, 2026-09-20)*. Its copy of `upstream/refused/other-kind.lock`
+carried `pool.amd64.x` where this one carries `pool.amd64.20260914-2042`: the
+vector exists to prove an upstream lock is refused **for carrying a `pool`
+row**, and the edited copy would also have been refused for an invalid release
+value — so it could pass for the wrong reason. That is a property of every
+negative fixture here, checkable by inspection and by no gate: **each refused
+vector must break exactly the rule it names.**
+
 **And a provenance comment nobody checks is not provenance** *(the rule's
 first live test, 2026-09-20)*. `mica-system-base`'s 133 vector blobs were
 byte-identical to this repository at `735ebaa`, compared blob sha by blob sha

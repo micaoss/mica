@@ -47,6 +47,13 @@
 # reading was more fragile than the thing read". That cost a boot, and a suite
 # that fails on its own formatting gets disabled, with the disabling
 # reasonable at the time.
+#
+# AND A SIXTH, ABOUT THE FIXTURES RATHER THAN THE CHECKER: a refused fixture
+# that could be refused by two rules tests neither. A negative case must break
+# exactly the rule it names, or it passes for the wrong reason and keeps
+# passing after the rule it was written for is broken. Checkable by inspection
+# and by no gate, which is why it is written where someone writing fixtures
+# will read it.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"

@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 08:43 [finding]
+
+**The canonical vectors carried a rename artefact, and it is fixed before any
+repository pins the commit.** The board sweep of 2026-09-16 (`91fce7c8`)
+turned `x64` into `uefi-x64` inside a **third-party download URL**:
+`bun-linux-uefi-x64.zip`, an asset that does not exist, in **ten files** —
+`pins/valid/release/upstream.lock`, `upstream/valid/upstream.lock` and eight
+`upstream/refused/*.lock` (the count is files, and it is ten rather than the
+five first reported). Bun publishes `bun-linux-x64.zip`, which is what
+`mica-build-env`'s real `locks/upstream.lock` names. Timing mattered more than
+the typo: a pinned commit would have made it **permanent and uniform** rather
+than merely present.
+
+**The boundary it crossed is recorded where the vectors are described**: **a
+vocabulary rename is a change to words this project owns, and a fixture
+contains words it does not.** It survived four days structurally rather than
+carelessly — **a vector's URL is inert by design**, nothing downloads it, so
+no gate could notice, which is precisely why it lasted in the file every
+repository is now told to trust.
+
+**And a new property of negative fixtures, from `mica-core`: a refused vector
+that could be refused by two rules tests neither.** Its copy of
+`upstream/refused/other-kind.lock` carried `pool.amd64.x` where the canonical
+one carries a valid release — the vector exists to prove an upstream lock is
+refused **for carrying a `pool` row**, and that copy would also have been
+refused for an invalid release value, so it could pass for the wrong reason.
+Each refused vector must break **exactly the rule it names**; it is checkable
+by inspection and by no gate, and it is now the sixth property beside the five
+a new checker starts from.
+
 ## 2026-09-20 08:39 [spec]
 
 **`vectors.pin` is specified and proven, because four repositories are writing
