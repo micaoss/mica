@@ -98,58 +98,84 @@ because it is workspace policy rather than one repository's build detail)*:
   because suppressing them would be inventing a policy to undo a Debian
   default.
 
-**What the published images actually do today, which is none of the above**
-*(2026-09-20)*. `mica-build`'s composer proves a declaration by package
-ownership, so a path no rule names is dropped even when a package owns it;
+**The console login was missing from every published image until
+`20260920-0622`, and this is what it was** *(closed 2026-09-20; kept rather
+than deleted, because a record that loses its own defects teaches that there
+never were any)*. `mica-build`'s composer proves a declaration by package
+ownership, so a path no rule names is dropped even when a package owns it.
 `/etc/pam.d/login` and the four generated `common-*` files were dropped, and
-**every published image of every board has no console login** as a result. The
-measurement from a real compose is 2980 paths carried and 703 left behind, 626
-of them owned by a package and claimed by nothing and 77 shipped by no package
-at all. The rows above describe the design; until a release carries those
-files, a login prompt on any published image cannot succeed. `mica-build` owns
-the fix and `mica-system-base` publishes the list of unowned paths that makes
-the second class reasonable about
+the failure was in the **stack, not the account**: `agetty` runs
+`/usr/bin/login`, PAM finds no `login` service file, falls back to `other`,
+and `other` includes `common-auth`, `common-account`, `common-password` and
+`common-session`, none of which were there — *PAM failure, aborting: Critical
+error - immediate abort*. No account could log in on any board. SSH through
+micad was unaffected throughout: `dropbear` authenticates against
+`/etc/shadow` without PAM, which is why the gap survived three days of use.
+
+**Closed by** `uefi-x64`, `uefi-arm64`, `cx3576` and `s905x5m`
+`20260920-0622`, index `mica.20260920-0636`, from `73aca2c`: those composed
+roots carry sixteen files in `/etc/pam.d`, `login` and all four `common-*`
+among them, with every include resolving. Deliberately still not there:
+`/etc/subuid` and `/etc/subgid` — the Base root provisions them, the composer
+drops them, and **carrying inert files to close a gap is not a fix** while
+rootless containers are unsupported by decision (the `subuid` bullet above is
+about the base root, not about a product root). The measurement from a real
+compose that started all of this — 2980 paths carried, 703 left behind, 626
+owned by a package and claimed by nothing, 77 shipped by no package at all —
+is what `mica-system-base` now publishes as a list with each writer named
 ([proposal](../task/20260920-0610-producer-data-assets.md)).
 
-**Answered, by a policy that was in the tree the whole time: on `cx3576`,
-`tty1` is the logo and `tty2` takes an on-demand login, both by intent**
-*(2026-09-20)*. The question — whether a board with a display and a keyboard
-offers a local virtual-terminal login, or whether the serial console is the
-only local one — arose from `mica-build` finding
-`/etc/systemd/system/getty.target.wants/getty@tty1.service` dropped from every
-product root. The first version of the claim, *a board with a display has no VT
-login*, **overstated the measurement**: that symlink governs `tty1` at boot,
-while Alt+F2 goes through `systemd-logind` activating `autovt@ttyN.service` on
-demand, which is a different mechanism
+**The local virtual-terminal question is not settled design: it is one board's
+policy and three boards' accident** *(2026-09-20)*. It arose from
+`/etc/systemd/system/getty.target.wants/getty@tty1.service` being missing from
+every product root. The first version of the claim — *a board with a display
+has no VT login* — overstated what had been looked at: that symlink governs
+`tty1` at boot, while Alt+F2 goes through `systemd-logind` activating
+`autovt@ttyN.service` on demand, a different mechanism
 ([harness](build-harness.md) section 4).
 
-What decides it is `logind.conf.d/50-mica-console.conf` — four lines, and the
-comment states the intent:
+The base root **ships `tty1` enabled**: `systemd`'s postinst writes that
+symlink, and it is line 51 of `mica-system-base`'s own unowned-paths artefact
+with `systemd.postrm` named as its writer. So a product root loses it by
+exactly the mechanism that lost the `pam.d` files, and what the loss *agrees
+with* is what decides whether it was meant:
 
-```ini
-[Login]
-# Keep the logo VT idle; only tty2 receives an on-demand login console.
-NAutoVTs=0
-ReserveVT=2
-```
+- **`cx3576`: deliberate.** Its board package carries
+  `overlay/etc/systemd/logind.conf.d/50-mica-console.conf` —
 
-`autovt@.service` (still a symlink to `getty@.service`), `getty@.service`,
-`serial-getty@.service`, `getty.target`, `systemd-logind` and its D-Bus files
-all survived composition, the `cx3576` renders a VT on HDMI at 1920x1080p60
-with a USB HID keyboard bound, and the user confirmed it on the device: Alt+F2
-gives a console, F1 is the logo. Until the login files of the paragraph above
-are back in a release, that console will refuse every credential — the policy
-is intact and the authentication is not.
+  ```ini
+  [Login]
+  # Keep the logo VT idle; only tty2 receives an on-demand login console.
+  NAutoVTs=0
+  ReserveVT=2
+  ```
 
-**The drop-in is a board file, not a system-wide one** *(measured 2026-09-20
-by reading the trees of `mica-boards`, `mica-build`, `mica-core` and
-`mica-system-base` at `main` for any `logind.conf.d` entry)*: it is
-`mica-boards:boards/cx3576/package/overlay/etc/systemd/logind.conf.d/50-mica-console.conf`
-and no other board carries one. So the `tty1`-logo/`tty2`-console split is
-`cx3576`'s policy; on a board without the drop-in, `logind`'s own default
-applies unless something outside those four trees sets it.
+  so `tty1` is the logo and `tty2` takes an on-demand console, by intent. The
+  board renders a VT on HDMI at 1920x1080p60 with a USB HID keyboard bound,
+  and the user confirmed it on the device: Alt+F2 a console, F1 the logo.
+- **`uefi-x64`, `uefi-arm64`, `s905x5m`: accident.** No board overlay sets any
+  `logind` policy — measured across the `main` trees of `mica-boards`,
+  `mica-build`, `mica-core` and `mica-system-base`; `uefi-x64` and
+  `uefi-arm64` carry only `system` under `overlay/etc/systemd` and `s905x5m`
+  carries no `overlay/etc/systemd` at all. The loss agrees with nothing, so
+  those three have **no `tty1` console by accident**, and whatever `tty2` does
+  there is `logind`'s default rather than a policy. That makes it a **second
+  confirmed instance of the composition defect**, not an answered design
+  question.
 
-Two boards stay outside that answer:
+`mica-build` has a falsifiable prediction to run in its QEMU session: on
+`uefi-x64`, Alt+F2 through F6 should each answer and `tty1` should not, with
+no policy behind the absence. Until it runs, this page claims no VT behaviour
+for those three boards.
+
+**The burden is now the right way round**, which is the shape of every fix
+that worked here: `mica-system-base`'s `assertBase` refuses a base root
+without that link — *a base root has a login console on `tty1`, and a product
+that wants none says so itself*. Before it, a product that wanted a console
+had to discover it had lost one; after it, a product that wants a logo VT has
+to state so.
+
+Two boards stay outside the VT answer for reasons of their own:
 
 - **`uefi-arm64` cannot render a VT by construction** — no framebuffer, no
   DRM, no keyboard driver class — **and declares no `display` feature.** A
@@ -157,12 +183,12 @@ Two boards stay outside that answer:
   the one place in this investigation where the two sides matched without
   anyone checking, which is worth stating precisely because nothing had to be
   fixed for it to be true.
-- **`uefi-x64` is still open, and its kernel configuration cannot answer it.**
-  `FB_EFI` and `FRAMEBUFFER_CONSOLE` are set, `DRM_FBDEV_EMULATION` is not,
-  and `i915` and `virtio-gpu` are built in — and a DRM driver taking over
-  usually removes the EFI framebuffer. A QEMU session answers the `virtio-gpu`
-  half only: **a QEMU pass does not stand for real Intel hardware**, and this
-  page will not record one as though it did.
+- **`uefi-x64`'s kernel configuration cannot answer its own case.** `FB_EFI`
+  and `FRAMEBUFFER_CONSOLE` are set, `DRM_FBDEV_EMULATION` is not, and `i915`
+  and `virtio-gpu` are built in — and a DRM driver taking over usually removes
+  the EFI framebuffer. A QEMU session answers the `virtio-gpu` half only: **a
+  QEMU pass does not stand for real Intel hardware**, and this page will not
+  record one as though it did.
 
 **One policy source.** The image carries **Dropbear**, and micad renders the only
 file that configures it — `/run/mica/dropbear.env`, one `DROPBEAR_ARGS` line —

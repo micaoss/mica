@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-20 06:45 [progress]
+
+**The console-login gap is closed and the sentence is replaced rather than
+deleted.** `uefi-x64`, `uefi-arm64`, `cx3576` and `s905x5m` `20260920-0622`,
+index `mica.20260920-0636`, from `73aca2c`, read back from the releases: those
+composed roots carry sixteen files in `/etc/pam.d`, `login` and all four
+`common-*` among them, every include resolving. `docs/design/access.md` now
+says what the gap was, when it closed and which release closed it, with the
+mechanism worth keeping — the failure was the **stack, not the account**:
+`agetty` runs `/usr/bin/login`, PAM finds no `login` service, falls back to
+`other`, and `other` includes the four `common-*` that were missing. SSH was
+unaffected because `dropbear` authenticates against `/etc/shadow` without PAM,
+which is why the gap survived three days of use. `/etc/subuid` and
+`/etc/subgid` are deliberately still absent from a product root: carrying
+inert files to close a gap is not a fix.
+
+**The VT question re-opens as one board's policy and three boards' accident.**
+`mica-system-base` measured that the base root ships `tty1` enabled — the
+symlink is written by `systemd`'s postinst and is line 51 of its own unowned
+artefact, writer `systemd.postrm` — so a product root loses it by exactly the
+mechanism that lost the `pam.d` files. What the loss *agrees with* decides
+whether it was meant: on `cx3576` it agrees with a board overlay
+(`NAutoVTs=0`, `ReserveVT=2`), so `tty1` is the logo by intent; on `uefi-x64`,
+`uefi-arm64` and `s905x5m` it agrees with **nothing**, so those three have no
+`tty1` console by accident and whatever `tty2` does there is `logind`'s
+default. That is a second confirmed instance of the composition defect, and
+the page says so instead of reading as a settled design. `mica-build` has the
+falsifiable prediction: on `uefi-x64`, Alt+F2 through F6 answer and `tty1`
+does not, with no policy behind the absence.
+
+**And the half that belongs to `mica-system-base`**, which is the shape of
+every fix that worked here: `assertBase` now refuses a base root without that
+link — *a base root has a login console on `tty1`, and a product that wants
+none says so itself.* Before it, a product that wanted a console had to
+discover it had lost one; after it, a product that wants a logo VT has to
+state so.
+
 ## 2026-09-20 06:43 [finding]
 
 **The retention hold's end condition measures one instrument while the hold
