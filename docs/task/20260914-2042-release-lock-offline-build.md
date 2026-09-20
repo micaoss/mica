@@ -1,6 +1,6 @@
 # 20260914-2042-release-lock-offline-build Move every repository to the release lock format and build the chain offline
 
-- **status**: in_progress — clause A's byte-equality form **closed as unachievable by design** (2026-09-20 19:54); its keyless-fingerprint restatement is pending a coverage measurement. (Earlier: reachable-and-unproven 17:26, unreachable 12:00.)
+- **status**: in_progress — clause A's byte-equality form **closed as unachievable by design**; its restatement written 2026-09-20 20:08: **three of four components pinned keylessly today**, the boot UKI **not done rather than not possible**. (Earlier: reachable-and-unproven 17:26, unreachable 12:00.)
 - **priority**: P1
 - **owner**: olea2l5k (step 0 and records); each step by its repository owner
 - **createdAt**: 2026-09-14 20:42
@@ -41,25 +41,29 @@ Moving the repositories to the release lock format
   release format** for the achievable half of clause A to be checkable by
   anyone.
 
-  | Keyless, over content, pre-signature | Not keyless — over a signed thing |
+  | Component | Unsigned content pinned keylessly **today** |
   |---|---|
-  | `rootfs.content.image`, `rootfs.content.rootHash` | `kernel.boot.artifact` (the signed UKI) |
-  | `kernel.support.image`, `kernel.support.rootHash` | `rootfs.content.signature`, `kernel.support.signature`, the firmware envelope over the signed `BOOTX64.EFI` |
+  | root | **yes** — content sha256 and the verity `rootHash`, in the envelope payload |
+  | kernel support | **yes** — content sha256 and `rootHash`, same place |
+  | firmware | **yes, already** — its unsigned input is `mica-systemd-boot` `257.13-mica1`, pinned by version and sha256 in `locks/mica-system-base.lock` (`054bbb71…` amd64, `8a745830…` arm64, read back here); the signed `BOOTX64.EFI` is a pure function of a pinned archive and a key |
+  | boot UKI | **no — and not because it cannot be.** `ukify build --signtool=sbsign` assembles and signs in one invocation and writes only `boot.efi`, so the unsigned PE is **transient inside `ukify`**; `ukify build` without `--signtool` is a supported mode. **A script change, not a format change.** |
 
-  **Two of four components: not nothing, and not the product.** The keyless
-  fingerprint reaches further than the root and still not to the UKI, the
-  firmware, the ESP or the assembled image.
+  **Three of four components, stated in components because a byte ratio has
+  the wrong denominator** — most of a 1.8 GB image is slack, padding and ESP.
+  The UKI is recorded as **not done**, with the mechanism beside it, because
+  the mechanism is what makes it a choice somebody can take rather than a law
+  of PE files.
 
-  **The restatement is still held, on one word.** The report says the UKI and
-  firmware **cannot** have keyless fingerprints, because signing *is part of
-  producing them* rather than a wrapper around them. A UKI is a PE binary and
-  an Authenticode signature is appended in a certificate table — the unsigned
-  PE exists while `ukify` assembles it and the signer runs on it, so **the
-  object may be transient rather than absent**. The open measurement is
-  exactly that: *does an unsigned UKI exist as a file at any point in `boot/`,
-  even for one step.* If it does, keyless content coverage is four of four and
-  only the signatures stay permanently out of reach; if it does not, the
-  sentence is right **and it will be right because somebody looked**.
+  **The word was `cannot` and the answer is `does not` — twice, at two
+  different distances.** For the UKI, *cannot* was one script change away. For
+  the firmware, *cannot* was **already recorded, in a lock that repository
+  maintains, today**: the larger error was on the component nobody thinks
+  about. That is why the restatement was held: **the hold did not change the
+  sentence's confidence, it changed its content.** *Two of four* was ready to
+  be written as a table an hour earlier, and it was wrong in the direction
+  this record had just warned about — **an understatement invites agreement**,
+  it would have been quoted approvingly by everyone, and nothing downstream
+  would ever have failed on it.
 
 - 2026-09-20, later: **clause A is not unproven. Its byte-equality form is
   unachievable by everybody except the release job, and that is the trust

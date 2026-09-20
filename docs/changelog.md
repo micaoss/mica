@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 20:08 [finding]
+
+**The hold is released and the number changed: three of four components are
+pinned keylessly today, not two, and the fourth is a script change away rather
+than a law of PE files.** Root and kernel support carry content sha256 and
+`rootHash` in the envelope payload. **The firmware already had one** — its
+unsigned input is `mica-systemd-boot` `257.13-mica1`, pinned by version and
+sha256 in `locks/mica-system-base.lock` (`054bbb71…`, `8a745830…`, read back
+here), and the signed `BOOTX64.EFI` is a pure function of a pinned archive and
+a key. The boot UKI has none because `ukify build --signtool=sbsign` assembles
+and signs in one invocation; **`ukify build` without `--signtool` is a
+supported mode**, so it is **not done**, not impossible.
+
+**The word was `cannot` and the answer is `does not` — twice, at two
+distances.** For the UKI, one script change. For the firmware, *already, in
+that repository's own locks directory*. **The larger error was on the
+component nobody thinks about.**
+
+**And the justification for holding is that the hold did not change the
+sentence's confidence — it changed its content.** *Two of four* was ready to
+be written as a table an hour earlier, and it was wrong **in the direction
+this record had warned about an hour before that**: an understatement invites
+agreement, it would have been quoted approvingly by everyone including its
+author, and **nothing downstream would ever have failed on it.**
+
+**The unachievable half is unchanged and still closed**: the signatures
+themselves, permanently, without the release private keys. What moved is how
+much of the **content** under those signatures anybody with no key can
+compare — and it is now most of it.
+
 ## 2026-09-20 20:03 [finding]
 
 **Two rules of this page can collide, and tonight they did not only by luck.**
