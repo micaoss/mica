@@ -236,6 +236,29 @@ English source.
   available*. Without the qualifier the rule is a demand for guesses, which is
   the over-reach this page warns about arriving as a **process** instead of as
   a class.
+- **And the key must discriminate, which is the third state** *(2026-09-20,
+  measured while closing that same class)*. `x64` is both the retired board
+  name and the **architecture nickname** — *on an x64 host the arm64 pool is
+  emulated* — so the sweep returns something that looks like a list of defects
+  and is mostly noise, **and the noise is what stops the sweep**. That is the
+  aperture family arriving from the opposite end: not a key that answers too
+  little, but one that **answers too much**. Three states, wanting three
+  different things: **no key** — wait, and let the next invention specify its
+  own fixture; **a discriminating key** — sweep; **an over-answering key** —
+  *sort the hits into kinds before counting them*. Sorting is what made that
+  class closeable: historical record that must keep the old names or stop
+  being history, the records **of** the defect that quote it to name it, and
+  the nickname. Its author's sentence is the test of a closed class: **"no
+  fourth home, and now I know that rather than hoping it."**
+- **And the harder case: a correct generalisation that still did not produce
+  the count** *(2026-09-20)*. The record that first found that defect
+  generalised it **rightly** — naming the one place where no copy could be
+  blamed — and then fixed a single file, while eight siblings waited for the
+  evening. Every other over-reach here was written by somebody convinced by
+  their own sentence; this one was **not an over-reach at all**, which is why
+  the rule above does not reach it. **Naming a class is not counting it**, and
+  writing the general sentence can close the question as firmly as a fix
+  does.
 - **A third guard, pointing the other way from those two** *(2026-09-20)*.
   The threshold and the double-counting rule both guard against **evidence
   that under-reaches** — too few instances, or the same ones spent twice.

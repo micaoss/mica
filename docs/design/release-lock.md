@@ -240,6 +240,14 @@ directions** — one implementing only `<name>`, one requiring
 `<repository>-<name>.tsv` because the valid vector happens to look like that —
 which is a fact about this paragraph rather than about either reader.
 
+**And it took two of them to be that**, which is the part worth keeping when
+this paragraph is eventually shortened: one reader's error is
+indistinguishable from that reader's carelessness — *from here it looked like
+my mistake, and one data point cannot tell a personal error from a
+specification one* — so it takes **two independent readers failing in opposite
+directions**, neither able to see the other's attempt, before the text is the
+defendant. A single wrong implementation is evidence about an implementation.
+
 **And the diagnosis is worth more than the clarification** *(`mica-boards`,
 2026-09-20)*: **an example's incidental properties are indistinguishable from
 its required ones, and a reader generalising from one instance cannot tell

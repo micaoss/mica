@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 17:21 [finding]
+
+**The sweep rule has a third state, measured while the class it came from was
+being closed: a key that answers too much.** `x64` is both the retired board
+name and the architecture nickname, so the sweep returns a list that looks
+like defects and is mostly noise — **and the noise is what stops the sweep**.
+The aperture family from the opposite end: not too little answered, too much.
+Three states wanting three different things — **no key**, wait and let the
+next invention specify its fixture; **a discriminating key**, sweep; **an
+over-answering key**, sort the hits into kinds before counting them. Sorting
+closed that class into three homes, and the test of a closed class is its
+author's sentence: *no fourth home, and now I know that rather than hoping
+it.*
+
+**And the harder case the rule still does not reach: a correct generalisation
+that did not produce the count.** The record that first found the defect named
+its class rightly and then fixed one file, while eight siblings waited for the
+evening. Not an over-reach — which is why the *finder is least likely to
+sweep* rule misses it. **Naming a class is not counting it**, and the general
+sentence can close the question as firmly as a fix does.
+
+**And why the `data` row needed two readers to become a defect in the text**:
+one reader's error is indistinguishable from that reader's carelessness — *one
+data point cannot tell a personal error from a specification one* — so it took
+two failing in **opposite** directions, neither able to see the other's
+attempt. **A single wrong implementation is evidence about an
+implementation.** That is what routing buys and reading each other's trees does
+not.
+
 ## 2026-09-20 17:19 [finding]
 
 **The clause repair was tested by the world moving and survived both states.**
