@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 06:12 [spec]
+
+**The 2026-09-14 format freeze is spent, checked rather than recalled.** Its
+terms — no new release asset, lock or OCI formats until the common `locks/`
+and offline-build proposal is decided, each repository frozen until its step
+was dispatched — are met on both counts: the user accepted the proposal on
+2026-09-14 (`docs/decisions/2026-09-14-release-lock-and-offline-build.md`) and
+all four migration stages read done in the plan's own table, with `locks/` and
+`make offline` everywhere. Worth saying beside the answer: **the freeze is
+written in no record of this repository**. It lived in coordination memory, so
+nobody could have checked it from the tree, and a constraint only its holder
+can verify decays without anyone noticing. It is now in
+`docs/task/20260920-0610-producer-data-assets.md`.
+
+**A proposal, not a change: where a producer publishes data about its own
+output.** `mica-system-base` computed a list its consumers need — 93 rows per
+architecture naming every path no package owns, with its writer named
+mechanically — and stopped, because the spec says a release carries exactly
+the lock and a `SHA256SUMS` listing it, and `asset` rows are `mica-build`
+only. The correct reading of the spec is what blocked it, which is the spec
+working. `docs/plan/20260920-0610-producer-data-assets.md` proposes reusing the existing
+chain (`SHA256SUMS` → lock → row with sha256) through a new `data` row, with
+one correction to the recommended form: the existing `asset` row **cannot** be
+widened literally, because its columns are product-shaped and tied to a
+`bundle`, and one kind with two column layouts is what `column-count` exists
+to prevent. The alternative if that is rejected is to carry the rows in the
+lock itself, and the criterion between them is stated: identity-shaped and
+bounded belongs in the lock, a dataset that grows with the output belongs
+behind a row naming an asset.
+
+The user decides; nothing is wired into any release meanwhile, and the
+statuses of the 2026-09-14 migration records are noted as stale rather than
+quietly closed — two of its three acceptance clauses are verifiable here, the
+offline-bytes clause is not.
 ## 2026-09-20 05:20 [progress]
 
 **A Chinese hardware list, one page per board** (`docs/zh/hardware/`, task
