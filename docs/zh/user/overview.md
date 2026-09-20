@@ -69,14 +69,15 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 是新板卡、新产品，还是仅仅另一种镜像类型，见
 [命名规则](../../decisions/2026-09-16-board-and-product-naming.md)。
 
-每一块板都是发布目标：`uefi-x64`、`uefi-arm64`、`cx3576`，以及 2026-09-19 用户决定
-开放的 `s905x5m`（其标志位与首个发布随后到来）。**是发布目标，意味着这块板的镜像会
-被发布、它的产品会进入版本索引；它不是“这块板能在实机上启动”的断言**——`uefi-arm64`
-的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行未测
-（[支持层级](../../boards/support-tiers.md#current-boards)）。
-产品集合是 `uefi-x64-dev`、`uefi-x64-prod`、`uefi-arm64-dev`、`uefi-arm64-prod`、
-`cx3576-dev`、`cx3576-prod` 和 `s905x5m-dev`：每块板一个 `dev` 产品，有 `prod` 的板再
-加一个。没有 minimal 产品（[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。
+每一块板都是发布目标：`uefi-x64`、`uefi-arm64`、`cx3576` 和 `s905x5m`，最后这块自
+2026-09-19 的用户决定起，首个发布是 `s905x5m.20260920-0033`。**是发布目标，意味着
+这块板的镜像会被发布、它的产品会进入版本索引；它不是“这块板能在实机上启动”的断言**
+——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行未测
+（[支持层级](../../boards/support-tiers.md#current-boards)）。它甚至不是“这个镜像被
+启动过”的断言：没有任何东西会启动 FIT 镜像，所以 `cx3576` 与 `s905x5m` 这四个产品
+从未被任何东西启动过（[获取发布版](download.md)）。产品集合是四块板各一个 `dev`
+与一个 `prod`，共八个。没有 minimal 产品
+（[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。
 
 > status: board-dependent — evidence: `docs/boards/support-tiers.md`, `docs/decisions/2026-09-16-minimal-products-removed.md`, `docs/decisions/2026-09-15-release-images-and-products.md`
 
@@ -102,8 +103,11 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 
 - 板卡专用的刷写格式（Rockchip 的 `update.img`、Amlogic 的烧录镜像）有设计但未实现：
   今天每块板只声明 `disk` 一种镜像类型。
-- `s905x5m` **暂时**还没有镜像：它在 2026-09-19 被开放为发布目标，首个发布随后到来。
-- `uefi-arm64` 已从这份清单上移除：它的产品镜像已经存在，自
-  `uefi-arm64.20260916-1653` 起。
+- 没有任何东西会启动 FIT 镜像：不存在能启动它的套件，而两套会启动的套件都按名字
+  拒绝 FIT 板，所以 `cx3576` 与 `s905x5m` 的产品被发布、却从未被启动
+  （[构建门](../../design/build-harness.md) 第 4 节）。FIT 启动套件将是一套**新**
+  套件；它没有被估过工，是一个用户决定。
+- `s905x5m` 与 `uefi-arm64` 已从这份清单上移除：它们的产品镜像已经存在，自
+  `s905x5m.20260920-0033` 与 `uefi-arm64.20260916-1653` 起。
 
 > status: unsupported

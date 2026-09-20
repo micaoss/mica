@@ -124,9 +124,12 @@ checked before and after decompressing.
 - Board-specific flashing formats (a Rockchip `update.img`, an Amlogic burn
   image) are designed but not implemented: every board declares only the
   `disk` image kind today.
-- `s905x5m` publishes no images **yet**: it was opened as a release target on
-  2026-09-19 and its first release follows.
-- `uefi-arm64` is no longer on this list: its product images exist, from
-  `uefi-arm64.20260916-1653` on.
+- Nothing starts a FIT image: there is no suite that boots one, and the two
+  suites that boot refuse a FIT board by name, so the `cx3576` and `s905x5m`
+  products are published and never started
+  ([harness](../design/build-harness.md) section 4). A FIT boot suite would be
+  a new suite; it is unscoped and is a user decision.
+- `s905x5m` and `uefi-arm64` are no longer on this list: their product images
+  exist, from `s905x5m.20260920-0033` and `uefi-arm64.20260916-1653` on.
 
 > status: unsupported
