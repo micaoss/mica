@@ -538,6 +538,14 @@ counts, not which repository produced it.
 about the version index: the published `mica.20260920-0636` index carries no
 `mirrors` member at all. The numbers above come from the mirror's catalogue.)*
 
+*(And as of 2026-09-20 the mirror's own published index pointer is four days
+stale, pending an `index` namespace being declared or its token granted that
+write, so a count read off the site is not the count the bucket holds. The
+`coverage` command says so before every count it prints, which is the right
+behaviour for an instrument that knows its own reading is behind — and the
+reason the numbers here are cited from that command rather than from the
+site.)*
+
 **Scope amended for locks only** *(user, 2026-09-20: "按你推荐处理，可以加")*.
 The accepted scope of 2026-09-16 put release locks and `SHA256SUMS` *out of
 scope and not to be re-added*; that part is reversed and they move into the

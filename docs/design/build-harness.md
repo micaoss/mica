@@ -260,6 +260,14 @@ withdrawal is worth as much as the rule: the claim was too strong in the
 direction that makes a **local build look authoritative**, which is the
 dangerous direction for a claim about reproducibility to be wrong in.
 
+**And it is evidence of a kind that independence cannot supply: it cost its
+author something.** The original rule made that repository's own local builds
+look authoritative — it benefited — and the withdrawal took that away, on its
+own measurement, unprompted. Two instances arriving independently rule out
+both having been matched to one template; **a withdrawal against interest
+rules out something else — that the rule survived because nobody with a reason
+to look hard had looked.**
+
 Compare **OCI layer bytes, not manifest digests**. A manifest digest moves
 with the release string, so comparing manifests reports noise for every
 artefact and signal for none.

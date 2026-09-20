@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-20 08:23 [finding]
+
+**A third axis for weighing a rule, recorded at its point of use rather than
+in the question: did an instance cost the person who produced it?** The
+withdrawn kernel generalisation made its author's own local builds look
+authoritative — it **benefited** — and the withdrawal took that away, on its
+own measurement, unprompted. Two instances arriving independently rule out
+both having been matched to one template; **a withdrawal against interest
+rules out something else: that the rule survived because nobody with a reason
+to look hard had looked.** Added beside the withdrawal in `build-harness.md`,
+which is where the instance already was.
+
+**And one dated caveat where the mirror's numbers are cited**: as of
+2026-09-20 the mirror's published index pointer is four days stale, pending an
+`index` namespace being declared or its token granted that write, so a count
+read off the site is not the count the bucket holds. The `coverage` command
+announces that before every count it prints — the right behaviour for an
+instrument that knows its own reading is behind, and the reason the figures in
+`release-lock.md` 2.1 are cited from the command rather than from the site.
+
 ## 2026-09-20 08:20 [finding]
 
 **The composer has two proof mechanisms and a third category neither covers**,
