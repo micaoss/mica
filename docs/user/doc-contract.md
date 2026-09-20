@@ -259,6 +259,23 @@ English source.
   the rule above does not reach it. **Naming a class is not counting it**, and
   writing the general sentence can close the question as firmly as a fix
   does.
+- **A candidate recorded at two instances, with its test written in advance —
+  deliberately not named** *(2026-09-20)*. Two defects share a property
+  narrower than *no failure mode*: **the deliverable is correct and stays
+  correct.** A unit of work that builds four kernels to keep one — the image
+  is right, the price is wrong; and a wrong supporting number inside a true
+  paragraph — the conclusion is right, the number is wrong. Neither is a false
+  green, two checks cancelling or right-for-the-wrong-reason, because in all
+  of those the **output** is wrong and somebody eventually trips on it. Here
+  there is nothing to trip on. **The candidate test, stated now so it cannot
+  be fitted to the third instance afterwards: the defect lives in a dimension
+  nothing downstream reads.** Nobody consumes the price of a build; nobody
+  checks a supporting number against the conclusion it supports. Two instances
+  and a use make a writing rule; **a claim about how the world is needs three
+  and truth**, so this is not named — and whoever meets the third can test it
+  against a sentence that was not written with their instance in front of it.
+  *(Writing it down early is the whole of its value: a test stated after the
+  third instance is a description of three things, not a prediction.)*
 - **A third guard, pointing the other way from those two** *(2026-09-20)*.
   The threshold and the double-counting rule both guard against **evidence
   that under-reaches** — too few instances, or the same ones spent twice.
@@ -337,7 +354,10 @@ English source.
   state, the status line says so and carries the date it was decided**, which
   turns *which of these two is newer* from unanswerable into readable. Applied
   to that task today; making it a required form across every task file is a
-  proposal and not something to impose on 48 records by fiat.
+  proposal and not something to impose on 48 records by fiat — **which would
+  have produced 47 status lines carrying dates nobody verified against their
+  notes, a cell that reports itself falsely, and that is worse than the empty
+  one.**
 - **Do not rewrite a page to the later fact when the earlier one taught
   something** *(2026-09-20)*. A claim was published at 16:24 with its subject
   named — a re-pin that answered 422 at `origin` — and by 16:28 the push had

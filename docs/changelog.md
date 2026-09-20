@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-20 17:33 [finding]
+
+**A candidate class is recorded at two instances without being named, with its
+membership test written in advance.** The shared property is narrower than *no
+failure mode*: **the deliverable is correct and stays correct** — a build that
+makes four kernels to keep one (the image is right, the price is wrong), and a
+wrong supporting number inside a true paragraph (the conclusion is right, the
+number is wrong). Neither is a false green or a check right for the wrong
+reason, because in those the output is wrong and somebody trips on it
+eventually; here there is nothing to trip on.
+
+**The test, stated now so it cannot be fitted to the third instance
+afterwards: the defect lives in a dimension nothing downstream reads.** Nobody
+consumes the price of a build; nobody checks a supporting number against the
+conclusion it supports. Two instances and a use make a writing rule; a claim
+about how the world is needs three and truth — so it is not named, and
+**writing the test down early is the whole of its value: a test stated after
+the third instance is a description of three things, not a prediction.**
+
+**And the reason the status-line format was not imposed on the other 47 is now
+in the rule**: it would have produced 47 status lines carrying dates nobody
+verified against their notes — **a cell that reports itself falsely, which is
+worse than the empty one.**
+
 ## 2026-09-20 17:30 [finding]
 
 **Exactly one cell of the defence table reports itself.** A format's save
