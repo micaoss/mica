@@ -960,7 +960,14 @@ file.
 release values, from the vector's **name**; the file is a `mica-boards` lock
 carrying `uefi-x64/20260914-2042` — **a scoped release with a slash, a form it
 neither pins nor emits**. It rebuilt its floor from vector **content**. The
-derivation rule survives only if it reads the file.
+derivation rule survives only if it reads the file — and the same sentence was
+wrong in its first half and right in its second: `release-slash` constrains
+nobody's own release value, but `scoped-release-not-allowed.lock` **is** a
+`mica-core` lock carrying `uefi-x64.20260914-2042`, an unscoped producer with
+a scope, so it belongs in a consumer's floor by the third clause — **the
+vectors that say what its own forms may not be**. Read from the name, half of
+that was invented; read from the file, half of it held. Three repositories
+made the same mistake about the same vector on the same day.
 
 **The required subset is derivable, not arguable.** What a reader can
 encounter follows from `locks/pins/`: a fact about a directory rather than a

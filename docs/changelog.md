@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 14:40 [finding]
+
+**Two measurements disagreed and neither was stale: they were about different
+artefacts.** The configs at `mica-boards` `main` carry `MEMCG` and
+`CFS_BANDWIDTH` on all four boards since `04e0fae` (2026-09-20 08:35:36Z,
+*the floor carries the container limits*), verified here in
+`common/kernel/mica-required.fragment`. `mica-build`'s table was read from
+`_out/boards/<board>/kernel/config` — the kernel in the products it builds —
+so it describes the board releases it **pins**: `20260916-0857` for three
+boards and `20260917-1007` for `cx3576`, all cut before that commit. **One
+describes what `main` builds, the other what ships today, and the gap is
+exactly one re-pin.**
+
+**So the rule the disagreement produced is in section 8, and it is the one
+that would have prevented it**: *a capability measured from a build output is
+a statement about a **pin**, not about a board.* Each column names the release
+it was measured from — a reader given both tables without their dates
+concludes one of them is wrong, and both are right.
+
+**And the floor text gains the other half of the `release-slash` correction**:
+read from the **name**, it was taken as constraining a consumer's own release
+values — it does not. Read from the **file**,
+`scoped-release-not-allowed.lock` **is** a `mica-core` lock carrying
+`uefi-x64.20260914-2042`, an unscoped producer with a scope, so it does belong
+in a consumer's floor by the third clause, *the vectors that say what its own
+forms may not be*. One sentence, half invented from a filename and half held
+by the file — and three repositories made the same mistake about the same
+vector on the same day.
+
 ## 2026-09-20 14:35 [progress]
 
 **The ceiling measurement is a world claim now, not a dated sentence.** Six
