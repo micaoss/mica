@@ -56,10 +56,29 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: bun run check:index
+      # Built here and written to KV from here: the Worker cannot read GitHub
+      # from Cloudflare's shared egress without being rate-limited.
+      - run: bun run publish:catalog
+      - name: Publish the catalogue to KV
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: kv key put catalog --binding KV --remote --path .tmp/catalog.json
+      - name: Publish the status to KV
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: kv key put catalog-status --binding KV --remote --path .tmp/catalog-status.json
 
   deploy:
     if: github.event_name == 'workflow_dispatch'
-    needs: checks
+    needs: [checks, index]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -80,9 +99,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: website
-          # Bound to the Worker on every deploy, so the token the refresh
-          # endpoint checks is the one this repository holds.
-          secrets: |
-            REFRESH_TOKEN
-        env:
-          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}

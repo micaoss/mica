@@ -5071,3 +5071,26 @@ Worker's environment and from the index check's workflow step.
 `bun run check:index` reads the same URL, so the hourly CI check now exercises the path
 production takes rather than a neighbouring one. A 404 there says the latest release carries
 no index; any other non-redirect answer is named with its status.
+
+## 2026-09-20 05:10 [decision]
+
+The Worker no longer refreshes the download catalogue; CI builds it and writes it into KV,
+and the Worker only reads.
+
+Reading GitHub from a Cloudflare egress address does not work for this. The cron's refreshes
+failed with `403 (rate limit remaining 0)` from the API; moving to
+`releases/latest/download/mica-index.json`, which is outside the API, only changed the
+symptom to `429`. Those addresses are shared and heavily used against GitHub, so neither the
+anonymous API allowance nor the web download path survives on them. A GitHub token would have
+fixed the API call, but CI needs no token and reads GitHub from GitHub.
+
+So the website workflow's `index` job — already running hourly to check the live index —
+now also parses it (`scripts/publish-catalog.ts`) and writes `catalog` and `catalog-status`
+with `wrangler kv key put`. `deploy` waits on it, so a manual deployment leaves the catalogue
+current. The cron is gone from `wrangler.jsonc`, and so are the Worker's refresh endpoint and
+its `REFRESH_TOKEN`: refreshing on demand is `gh workflow run website`. The publish is refused
+when an index names products and none parses, which is the guard that kept an empty catalogue
+off the board pages when the release stamp changed form.
+
+This needs the deploy token to carry **Workers KV Storage: Edit**. If it does not, the
+publish steps fail loudly in CI rather than leaving the catalogue silently stale.

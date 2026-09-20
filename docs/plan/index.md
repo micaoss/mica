@@ -67,3 +67,4 @@ file cannot take it for an open row.
 - [-] [**20260914-0558-mica-build-released-inputs mica-build: adopt the released inputs and the workspace rules**](20260914-0558-mica-build-released-inputs.md) `2026-09-14`
 - [-] [**20260914-2042-release-lock-offline-build Move every repository to the release lock format and build the chain offline**](20260914-2042-release-lock-offline-build.md) `2026-09-14`
 - [-] [**20260915-0318-docs-multi-repo-ownership Restate the documentation system for seven repositories**](20260915-0318-docs-multi-repo-ownership.md) `2026-09-15`
+- [ ] [**20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board**](20260917-1033-zh-hardware-list.md) `2026-09-17`

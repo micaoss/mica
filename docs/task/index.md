@@ -87,3 +87,4 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [-] [**20260916-0040-uefi-board-names Rename the generic systems to uefi-x64 and uefi-arm64**](20260916-0040-uefi-board-names.md) `P1`
 - [x] [**20260916-0900-emulated-arm64-bytes Identify what differs inside an emulated arm64 archive**](20260916-0900-emulated-arm64-bytes.md) `P3`
 - [x] [**20260916-1653-root-only-archive The root-only update archive, first exercised on real releases**](20260916-1653-root-only-archive.md) `P1`
+- [-] [**20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board**](20260917-1033-zh-hardware-list.md) `P2`

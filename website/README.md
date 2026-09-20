@@ -54,57 +54,32 @@ control loads the earlier ones.
 ### Where the rows come from
 
 ```
-mica-build's latest release ──> mica-index.json ──(parse)──> KV ──> GET /api/catalog
-                                                      ▲
-                                    cron every 30 min, or POST /api/catalog/refresh
+mica-build's latest release ──> mica-index.json ──(CI, hourly)──> KV ──> GET /api/catalog
 ```
 
-The read path is a KV lookup and never calls GitHub, so an upstream rate limit or outage
-costs a stale answer rather than a broken page.
-
 `mica-build` publishes a version index — `mica-index.json` on the release GitHub marks
-*latest*, cut automatically after a scoped release. It is the documented entry point: one
-file names every current product with its board, profile, deployment identity, release, and
-each image and update archive with its URL, sha256 and size
-(`mica:docs/design/mica-index.md`). The Worker reads that file and nothing else; nothing is
-inferred from a file name.
+*latest*. It is the documented entry point: one file names every current product with its
+board, profile, deployment identity, release, and each image and update archive with its
+URL, sha256 and size (`mica:docs/design/mica-index.md`). Nothing is inferred from a file
+name.
 
-What the index gives that a release listing does not: the **deployment identity** behind each
-row, the **uncompressed size** beside the compressed one (an image is `.img.gz`, a fraction
-of what it writes), and which of the three update archives a row is — `full` always applies,
-`root` only where the device already runs the kernel it names, `kernel` only where it runs
-the rootfs (`mica:docs/user/update-packages.md`). Those are not interchangeable, so the table
-says which.
+**The catalogue is built in CI, not in the Worker.** The website workflow's `index` job
+reads the index, parses it (`scripts/publish-catalog.ts`) and writes the result into KV with
+`wrangler kv key put`; the Worker only reads that key. The Worker used to refresh it on a
+cron, and that failed continuously: GitHub answered 403 to the API and 429 to the release
+download, because Cloudflare's egress addresses are shared and heavily used against GitHub.
+A token would have fixed the API call, but CI needs none and reads GitHub from GitHub.
 
-A product absent from `products` is absent on purpose: the catalogue lists it with
-`publish: false`, which is how the `-minimal` products stay off the site. An archive kind the
-parser does not know is skipped rather than shown as a plain update.
+A publish is refused when the index names products and none of them parses — that means the
+shape moved under the parser, not that everything was unpublished, and an empty catalogue
+would blank every board page.
+
+To refresh on demand, run the workflow: `gh workflow run website --repo micaoss/mica`.
 
 ### When the catalogue goes stale
 
-`GET /api/catalog` answers a `status` beside the rows:
-
-```json
-{
-  "status": {
-    "lastAttemptAt": "2026-09-17T08:00:03.120Z",
-    "trigger": "cron",
-    "lastSuccessAt": "2026-09-16T19:30:38.632Z",
-    "lastError": {
-      "at": "2026-09-17T08:00:03.120Z",
-      "message": "mica-index.json of mica.20260916-1709 answered 503"
-    }
-  }
-}
-```
-
-Every refresh — the cron, `POST /api/catalog/refresh`, or the background fill of an empty
-store — records when it ran, what started it, and why it failed; a success clears
-`lastError` and moves `lastSuccessAt`. The status is its own KV key, so a failed attempt is
-recorded without touching the rows the pages read. No GitHub API call is involved: the index
-is read from `releases/latest/download/mica-index.json`, which redirects to the latest
-release's asset, so the API's anonymous rate limit — which the cron's shared egress address
-had exhausted — does not apply.
+`GET /api/catalog` answers a `status` beside the rows — when the publish ran, what triggered
+it, when one last succeeded — so a stale catalogue says so rather than looking current.
 
 ### Checking the live index
 
@@ -121,20 +96,12 @@ fetch around it.
 
 ### Setting it up
 
-The KV namespace and the cron are configured. Nothing else is required: a request that finds
-no stored catalogue fills it in the background, so the first deployment is current within a
-request or two, and the cron keeps it so.
+The KV namespace is bound in `wrangler.jsonc` and CI publishes into it with the
+`CLOUDFLARE_API_TOKEN` the deploy already uses; that token needs **Workers KV Storage: Edit**
+as well as Workers Scripts: Edit. No GitHub token is involved.
 
-One secret is optional and worth setting:
-
-- `REFRESH_TOKEN` — the bearer token `POST /api/catalog/refresh` requires. It is a GitHub
-  secret of this repository and the deploy workflow binds it to the Worker, so rotating it
-  is `gh secret set REFRESH_TOKEN` and a deploy. Without it the endpoint answers 401 to
-  everyone and refreshing waits for the cron; a refresh anyone can trigger is a way to spend
-  the upstream rate limit.
-
-`CATALOG_REPO` selects the repository, defaulting to `micaoss/mica-build`. Setting
-`CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
+`CATALOG_REPO` selects the repository the index is read from, defaulting to
+`micaoss/mica-build`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
 
 ### The sample
 

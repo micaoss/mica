@@ -11,14 +11,9 @@
   "kv_namespaces": [
     { "binding": "KV", "id": "c55809c8a72a4d1b9ac52c2484cc9c29" }
   ],
-  // Rebuilds the stored catalogue. A manual refresh is POST /api/catalog/refresh
-  // with the REFRESH_TOKEN secret.
-  "triggers": {
-    "crons": ["*/30 * * * *"]
-  },
-  "vars": {
-    "CATALOG_REPO": "micaoss/mica-build"
-  },
+  // No cron: the catalogue is built and written by CI, which can read GitHub
+  // reliably. See website/README.md, "Where the rows come from".
+
   // Both hostnames resolve to this Worker; the zone has to be on the same
   // Cloudflare account.
   "routes": [
