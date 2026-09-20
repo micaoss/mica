@@ -20,12 +20,15 @@ published update travels in a `mica/update-envelope/v1` envelope.
 
 **These payloads are addition-closed for readers already deployed, and the
 ordering that follows is the opposite of the producer-first instinct**
-*(measured in `mica-core`'s reader, 2026-09-20; read back here)*. Nine of the
-ten structs in `mica-core:crates/mica-deploy/src/components.rs` carry
-`#[serde(deny_unknown_fields)]` — `BootArtifact` is exactly `format` and
-`artifact`, `KernelComponent` exactly its eight — so **adding a field does not
-degrade gracefully: a device running today's `mica-deploy` refuses the whole
-record.** A new field therefore travels in this order, and only this one:
+*(measured in `mica-core`'s reader, 2026-09-20; read back here)*. **Every
+deserialised struct** in `mica-core:crates/mica-deploy/src/components.rs`
+carries `#[serde(deny_unknown_fields)]` — all nine that derive `Deserialize`,
+`BootArtifact` being exactly `format` and `artifact` and `KernelComponent`
+exactly its eight. The file's two other structs, `ContractError` and
+`DeploymentPaths`, derive `Debug` alone and are never parsed from a payload,
+so **the constraint has no exception and there is no permissive struct a field
+could be added to**: adding one does not degrade gracefully, **a device
+running today's `mica-deploy` refuses the whole record.** A new field therefore travels in this order, and only this one:
 
 1. the reader changes in `mica-core` and accepts the field;
 2. that lands in a `mica-core` release;

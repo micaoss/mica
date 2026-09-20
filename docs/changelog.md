@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-20 20:43 [finding]
+
+**Asked which of the ten structs lacks `deny_unknown_fields`, the answer is
+none that is parsed — and the question exposed that *nine of ten* was the
+wrong sentence.** It implied an exception in the schema and invited a reader
+to go looking for the one permissive place a field could be added. Measured:
+**all nine structs that derive `Deserialize` carry the annotation**, and the
+other two — `ContractError` and `DeploymentPaths` — derive `Debug` alone and
+are never parsed from a payload. **The constraint has no exception.**
+
+**So there is no finding to route**: nothing is missing an annotation, and the
+permissive extension point somebody would have gone looking for does not
+exist. A count that mixes two populations — structs in a file, and structs a
+parser reaches — reads as a property with a gap; **the denominator had to be
+the parsed ones, which is the same wrong-denominator error as a byte ratio,
+two hours later and in a place it looked like precision.**
+
 ## 2026-09-20 20:40 [finding]
 
 **The deployment envelope's payloads are addition-closed for deployed
