@@ -190,6 +190,40 @@ bytes, with 3.7 MB of differing content.** A size comparison would have passed
 and recorded a no-op that was not one — neither truncated nor misaimed, just
 too coarse to see what it was asked about.
 
+**And there is a kind none of these are: no aperture at all in the direction
+that mattered** *(2026-09-20, `mica-build`)*. Its copy of the
+release-lock vectors held **127 files where `mica` held 143** — sixteen
+missing, including all five `data-*` vectors, the board vector under its
+post-rename name, and `derived-from.tsv` itself — while its suite was **green
+at 81 of 81**, because the suite walks the **copy's own** `expected.tsv`: a
+vector absent from the copy is absent from the list of vectors to run. The
+suite was complete with respect to itself. Every instance above is an aperture too
+narrow, misaimed, too coarse, or pointed at nothing; this one has none in the
+direction of the question, and **a set that defines its own
+completeness cannot detect an omission by any amount of care.** That is why it
+is filed here rather than as a rule of its own, and why set equality **in both
+directions** against the source is the only instrument that reaches it. The
+cost was concrete rather than hypothetical: the `data` kind the suite reported
+as exercised was exercised against the four vectors it happened to hold, and
+the five written for that row had never run there. They pass now, 88 of 88 —
+**the implementation was right and the evidence was weaker than it believed.**
+
+**A drift gate diffs where a release gate digests.** The repair
+(`mica-build:tests/vectors-pin-check.sh`) pins the copy to a `mica` commit and
+compares the trees with `diff -r` and not a digest, *"because a digest says
+that they differ and the whole reason this drifted is that nobody could see
+what"*. Both are equality checks and they are not interchangeable: a digest is
+right for a release asset, where the question is *are these the bytes that
+were published* and any difference disqualifies; it is wrong for a gate
+somebody has to act on at eight in the morning, where the question is *what
+moved*. **Choose the instrument by what its red output has to tell the person
+who reads it.** The pin is the other half: because the gate compares against a
+named commit rather than against `main`, this repository's later commits do
+not turn it red — drift becomes visible at the deliberate act of moving the
+pin, and `diff -r` then names the files. (It also refuses when `gh` is absent
+instead of skipping, which is the *a check that cannot reach its subject must
+refuse* rule arriving from a third repository.)
+
 **A name is an aperture, and the second instance says what the first could
 not** *(2026-09-20, `mica-build`, reached from a failure rather than from this
 record)*. `make os-offline-chain-test` runs in `ci.yml` on every push and
@@ -674,6 +708,28 @@ tidy list **not containing the one defect anyone knew about**. That is the
 worst kind of check: **one that looks complete and omits the instance that
 motivated it.** The second draft keys on the **name** rather than the
 mechanism, because the mechanism is what varies.
+
+**And the first question about a dropped path is what its presence would
+authorise, not whether the binary still works without it** *(2026-09-20)*. The
+obvious question points the wrong way on the case that matters:
+`/usr/lib/systemd/system/nftables.service` runs `nft -f /etc/nftables.conf` at
+start and `nft flush ruleset` at stop, and Debian's conffile itself begins
+`flush ruleset` — so enabling that unit *for completeness* would wipe
+netavark's ruleset on every reload, restart and shutdown. Because
+`/etc/nftables.conf` is **dropped**, that mistake instead fails loudly on a
+missing file and takes `sysinit.target` with it. **The drop converts a
+silent-harm path into a loud one, so presence is the dangerous pole here** —
+the opposite of the assumption a loud/silent field is built on.
+
+So that field has **three values and not two**: absence breaks it **loudly**,
+absence **changes a default silently**, and **presence authorises harm**. And
+a fourth state is none of the three: `ld.so.conf` is inert only because a
+cached artefact happens to be carried, which is a property of the image and
+not of the file. **Membership follows the consequence, not the shape**, so
+`mke2fs.conf` must not be assumed to share `nftables.conf`'s polarity for
+sharing its shape — a correct class with a hand-enumerated membership is the
+defect this page names above, and sorting a triage by shape is how it is
+produced.
 
 Each acceptance round uses one immutable candidate image:
 

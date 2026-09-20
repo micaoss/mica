@@ -108,6 +108,28 @@ files carry", not "when was this image made". Reading it keeps the surface a
 reader of the existing seam rather than a second writer; naming it `buildDate`
 made it answer a question it cannot answer.
 
+**`release` is `/etc/os-release`, and on a built product today that file is
+Debian's** *(measured by `mica-build` on 2026-09-20, on a `uefi-x64-prod`
+root: `PRETTY_NAME="Debian GNU/Linux 13 (trixie)"`, no `ID=mica`)*. The member
+is faithful — it reports what the file says — so the **surface** is right and
+the **answer** is wrong: a caller asking the system who it is gets an
+available, well-formed, correct-looking statement about the wrong system, and
+nothing in the response says so. `/etc/issue` on the same root reads `Mica OS
+Base 20260920-0832`, which is the **Base component's** release and build date,
+not the product's. Ruled a defect rather than a documentation question and
+owned outside these records; noted here because this page is where a reader
+learns what `release` answers, and until the repair lands the honest reading
+of that member is *what the root's `os-release` file carries* — a statement
+about a package.
+
+Two things about that measurement are worth keeping beside it. Earlier records
+verified `/etc/issue` on a **Base root** and read `Mica OS 20260915-0209`:
+correct for the subject verified, and the same file answering a different
+question the moment the subject is a product — which is why a measurement
+names its subject. And `mica-build`'s session probe accepts the line with a
+`Mica OS *` prefix match, which a component's string satisfies: **a prefix is
+an aperture**, and it passed a product that does not name itself.
+
 `packages` carries at most 4096 rows and says `truncated: true` past that; a
 row that is not three tab-separated fields is counted in `malformedRows`
 and skipped. A Mica OS row is one whose package name starts with `mica`, the

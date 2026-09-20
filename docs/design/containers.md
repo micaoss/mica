@@ -477,6 +477,42 @@ four days for the last defect this corpus found by hand — and the neighbouring
 what ships had changed. A claim written to fail is worth more than a claim
 written to hold.
 
+**Two instruments now watch this section and neither can answer the other's
+question.** The `world` job reads another repository's `main`: the
+`io-throttling.*` and `memcg.*` rows say what the **next** board release will
+carry, the `board-pin.*` rows what the products being built carry **today**,
+and no row of it can reach a build output.
+`mica-build:tests/session-probe/probe.sh` reads the machine: `mica-build`
+reports 9 of 9 on a booted `uefi-x64-prod` image on 2026-09-20, including
+`memory.max` **absent** — from `/sys/fs/cgroup` on a running system, not
+inferred from a config. That is the third row of the table above confirmed
+from the other end, for `MEMCG` on one product: what ships today has no memory
+controller, so `podman run --memory=` has no file to write. A reader who finds
+one instrument and assumes it covers the other gets the wrong answer in both
+directions — the world job cannot see a product, and the probe cannot see a
+change in `mica-boards` until it has been released, pinned, built and booted.
+
+The probe's memory branch reaches this section's own rule from the other side.
+**Both** of its branches call `pass()`, with the comment that *a branch that
+always passes is a measurement and not an assertion*, written that way
+deliberately until the kernel floor is uniform — at which point the absent
+branch becomes a `fail()`, "because the promise will then be one promise". A
+column that can only say `valid` records nothing, and a branch that can only
+pass is the same instrument.
+
+**And each instrument says in advance which way it will go red**, which is
+what lets a red be read without an investigation:
+
+| What moves next | `io-throttling*`, `memcg*` | `board-pin.*` | the session probe |
+|---|---|---|---|
+| `mica-boards` re-records the two FIT kernel configs | the `-unrecorded` rows go red | green | unchanged |
+| `mica-build` re-pins the boards | green | red | unchanged until a product is rebuilt |
+| a product built from those pins is booted | green | green | its absent branches stop being reached |
+
+If the config rows and the pin rows ever go red on the same run, something
+moved that neither prediction covers, and that is an investigation rather than
+an edit.
+
 **And the section does not distinguish what is measured from what was
 assumed, so it does here**: *a container runs with no flag* is **measured** —
 the ten "to run" symbols are uniform across the four boards, and the session

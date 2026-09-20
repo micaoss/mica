@@ -1,5 +1,63 @@
 # Changelog
 
+## 2026-09-20 15:05 [finding]
+
+**An acceptance clause of these records is unsatisfiable, and the repair is in
+the clause.** Clause A of the offline-build task asks a workspace to stand at
+the release commits of every input, which assumes **one release commit per
+producer**; `mica-build`'s `locks/` name four `mica-boards` releases at
+**three distinct commits** (`97aca03d`, `48d995b1`, `a15dbf8c`, each read back
+from its tag), and one working tree cannot be at three commits. Not a
+`mica-boards` special case: `mica-build` releases per scope too, so every
+consumer of it inherits the same impossibility. The satisfiable form is **per
+pinned input rather than per producer** — a producer with several pinned
+inputs is checked out once per input — and it is now what the task and the
+plan say, with the mechanism following the clause rather than the other way
+round.
+
+**Section 8 of `containers.md` names both of its instruments and predicts
+which way each will go red.** The `world` rows watch another repository's
+source and cannot reach a build output; `mica-build`'s session probe reads a
+booted `uefi-x64-prod` and recorded `memory.max` **absent** — the third row of
+the artefact table confirmed from the machine end, for `MEMCG` on one product.
+Its memory branch passes on **both** sides on purpose, with the comment that
+*a branch that always passes is a measurement and not an assertion*, and turns
+into a `fail()` when the floor is uniform: the same rule as a column that can
+only say `valid`, reached from the other side. A gate that says in advance
+which way it will fail is a gate whose red can be read without an
+investigation.
+
+**A set that defines its own completeness cannot detect an omission.**
+`mica-build`'s copy of the release-lock vectors held 127 files where this
+repository held 143 — the five `data-*` vectors, the post-rename board vector
+and `derived-from.tsv` among the missing — and its suite was green at 81 of
+81, because it walks the copy's own `expected.tsv`. Filed with the aperture
+family as a kind none of the others are: not too narrow, misaimed or too
+coarse, but **no aperture at all in the direction that mattered**. The
+repaired gate is worth a rule of its own — it compares the trees with `diff -r`
+and not a digest, *because a digest says that they differ and nobody could see
+what*: a digest is right for a release asset and wrong for a drift gate
+somebody has to act on in the morning.
+
+**Two guards became three, and a dropped file's polarity is the opposite of
+the obvious question.** The generalisation threshold and the
+counted-in-two-classes rule both guard against evidence that under-reaches;
+neither guards a class wide enough to absorb every instance, and one
+instrument answers both — enumerate, then test each instance against the class
+as written. Separately, the first question about a dropped path is **what its
+presence would authorise**: `/etc/nftables.conf` is the case where the drop
+converts a silent-harm path into a loud one, so the triage field has three
+values, not two.
+
+**And a design page was wrong before its repair rather than after it**:
+`system/info`'s `release` member is `/etc/os-release`, which on a built
+product is Debian's, and `/etc/issue` names the Base component's release. The
+member is faithful and the answer is wrong — an available, well-formed,
+correct-looking statement about the wrong system. Recorded in
+`design/diagnostics.md` where a reader learns what `release` answers; the
+repair is owned elsewhere, and the user page's sentence becomes true again
+when it lands rather than needing an edit in each direction.
+
 ## 2026-09-20 14:53 [finding]
 
 **The claims written to fail flipped four hours after they were written, and

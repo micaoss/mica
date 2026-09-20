@@ -83,7 +83,13 @@ in that format; no stage starts before the previous stage has released.
 - Each stage: the repository's tree has no old input file, names every input
   only in `locks/`, and its release carries `<repository>.lock`.
 - O3: an offline chain with `MICA_OFFLINE=1` produces the same bytes as the
-  online build.
+  online build, from a workspace standing at the release commit of **each
+  pinned input** — not of each producer. A producer that releases per scope
+  has several pinned inputs at several commits, so it is checked out once per
+  input: `mica-build`'s `locks/` name four `mica-boards` releases at three
+  distinct commits today, and one working tree cannot be at three commits.
+  `mica-build` releases per scope too, so every consumer of it inherits the
+  same shape.
 
 ## Risks
 

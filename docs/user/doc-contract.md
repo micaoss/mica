@@ -181,6 +181,18 @@ English source.
   share all of them says nothing; the threshold above guards against naming a
   class too early, and this guards against the same instances being spent
   twice.
+- **A third guard, pointing the other way from those two** *(2026-09-20)*.
+  The threshold and the double-counting rule both guard against **evidence
+  that under-reaches** — too few instances, or the same ones spent twice.
+  Neither guards the opposite failure: **a class stated widely enough to
+  absorb every instance**, which passes both tests and says nothing. One
+  instrument answers both — **enumerate the instances, then test each one
+  against the class as written**. Under-reach shows as a count below the
+  threshold; over-reach shows as an instance the class admits that nobody
+  would have called a member. A class is not checked by re-reading it, only by
+  putting its own instances back through it, and the occasion for this was a
+  synthesis withdrawn by its author after counting rather than after being
+  argued with.
 - **What the threshold is actually guarding against, since that decides when
   it could ever move: a reader inventing a pattern.** Two instances a single
   reader finds while looking for a pattern are two instances *and* one reader;

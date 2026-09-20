@@ -18,7 +18,8 @@ every repository gets a `repos/` source cache with `tools/repos.sh` and a
 
 Acceptance: every producer releases only in the new format; every consumer
 names its inputs only in `locks/`; an offline chain with `MICA_OFFLINE=1`
-reproduces the online bytes.
+reproduces the online bytes, from a workspace standing at the release commit
+of each **pinned input** (not of each producer — see the 2026-09-20 note).
 
 ## ActiveForm
 
@@ -30,6 +31,37 @@ Moving the repositories to the release lock format
 - **blocks**: (none)
 
 ## Notes
+
+- 2026-09-20, latest: **clause A was unsatisfiable as written, and the repair
+  is in the clause rather than in a build.** It asks a workspace to stand at
+  the release commits of every input, which assumes **one release commit per
+  producer**. `mica-build`'s `locks/` name four `mica-boards` releases at
+  **three distinct commits**, read back from the tags rather than relayed:
+  `uefi-x64.20260916-0857` and `uefi-arm64.20260916-0857` at `97aca03d`,
+  `cx3576.20260917-1007` at `48d995b1`, `s905x5m.20260919-2259` at `a15dbf8c`.
+  **One working tree cannot be at three commits.** There is no such thing as
+  *the `mica-boards` release commit* and there should not be: boards release
+  independently, and that is the design.
+
+  It is not a `mica-boards` special case, which is why it is repaired in the
+  clause and not worked around: `mica-build` is a per-scope producer too, so
+  every future consumer of `mica-build` inherits the same impossibility, and
+  so does every per-scope producer this workspace ever adds. The satisfiable
+  form is **per pinned input rather than per producer** — a workspace stands
+  at the release commit of each pinned input, and a producer with several
+  pinned inputs is checked out once per input (four `mica-boards` trees, one
+  per board). The acceptance line above and the plan's O3 now carry that form;
+  `mica-build` has the matching mechanism approved, which is the order that
+  matters: the mechanism follows the clause.
+
+  And what the chain does in the meantime is worth more than the repair
+  (`mica-build` `31b28d55`, 14:46Z): it **prints, per producer, its checkout
+  head against the commit `locks/` names**, `--at-release-commits` **refuses
+  instead of building**, and every non-aligned run states the limitation
+  itself — the chain proves a product can be built from source without
+  touching a release, and cannot be quoted for byte equality with anything.
+  That sentence used to travel in a message; it now lives where it is read,
+  which is the same move as a standing claim becoming a world row.
 
 - 2026-09-20, later: **the clause is not unproven, it is FALSE.** B ran to the
   end for the first time and failed. The three producers build from source in
