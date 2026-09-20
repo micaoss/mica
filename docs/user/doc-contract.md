@@ -398,6 +398,16 @@ English source.
   practice is written **with its subjects named and no failure mode
   attached**, and the missing failure mode is the honest signal that it will
   not help anybody spot the fifth.
+- **And a practice can precede its diagnosis**, which the entry above was
+  written as though it could not *(2026-09-20)*. A candidate held at two
+  instances **has no recognition sentence yet, and that is its expected state
+  rather than a defect in it**. This also says what the third instance
+  decides, which is more than membership: **if the three share a failure mode
+  the candidate becomes a diagnosis** and a reader can be taught to recognise
+  it; **if they do not, it stays a practice permanently**, and the missing
+  recognition sentence is then **a finding rather than a gap**. So whoever
+  meets the third instance is asked to check for a shared failure mode and not
+  only to count to three.
 - **Sort by whatever determines the action, which is not always the same
   property** *(2026-09-20, from two rules written the same day that look like
   they disagree)*. A triage of dropped files sorts by **consequence**, because

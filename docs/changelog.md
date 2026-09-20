@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-20 17:35 [finding]
+
+**A practice can precede its diagnosis**, which this afternoon's entry was
+written as though it could not. A candidate held at two instances has **no
+recognition sentence yet, and that is its expected state rather than a defect
+in it** — which also says what the third instance decides, and it is more than
+membership: **if the three share a failure mode the candidate becomes a
+diagnosis** and a reader can be taught to recognise it; **if they do not, it
+stays a practice permanently** and the missing recognition sentence is **a
+finding rather than a gap**. Whoever meets the third is asked to check for a
+shared failure mode, not only to count to three.
+
 ## 2026-09-20 17:33 [finding]
 
 **A candidate class is recorded at two instances without being named, with its
