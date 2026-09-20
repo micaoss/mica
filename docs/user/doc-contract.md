@@ -122,8 +122,9 @@ say so.
 
 ## 5. English and Chinese
 
-English under `docs/user/` is authoritative. A tracked Chinese user-facing set
-lives under `docs/zh/`, indexed by `docs/zh/README.md` with a per-page
+English under `docs/user/` and `docs/hardware/` is authoritative. A tracked
+Chinese user-facing set lives under `docs/zh/`, indexed by `docs/zh/README.md`
+with a per-page
 coverage table carrying, for every page in this set: the source page, the
 source version it was translated from, and a status that is one of `current`,
 `lagging` or `not-translated`. On any conflict the English page wins.

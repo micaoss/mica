@@ -185,6 +185,7 @@ export const en: typeof zh = {
     ],
     groups: {
       start: 'Getting started',
+      hardware: 'Supported hardware',
       operating: 'Operating',
       trouble: 'When something goes wrong',
       reference: 'Reference',

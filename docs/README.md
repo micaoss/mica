@@ -19,6 +19,7 @@ board status is in [support tiers](boards/support-tiers.md#current-boards).
 | Develop the API or UI | [API contract](design/api.md), [dashboard](design/dashboard.md), OpenAPI (`mica-core:apid/openapi.json`) |
 | Integrate an application | [Native applications](design/native-applications.md), [containers](design/containers.md), [bus](design/bus.md) |
 | Build, verify or publish artifacts | [Check harness](design/build-harness.md), [release directory](design/release-artifacts.md), [key delivery](design/key-delivery.md) |
+| See what a board does today, and how to flash it | [Supported hardware](hardware/README.md) |
 | Port or qualify a board | [Board contract](boards/contract.md), [porting](boards/porting.md), [qualification](boards/qualification.md), [support tiers](boards/support-tiers.md) |
 | Cut or understand a release | [Releasing](user/releasing.md), [release lock](design/release-lock.md), [version index](design/mica-index.md) |
 | Find work status or a decision | [Tasks](task/index.md), [plans](plan/index.md), [decisions](decisions/README.md), [changelog](changelog.md) |
@@ -58,6 +59,7 @@ restating it.
 | `design/` | engineering contracts for current behaviour; unimplemented parts are labelled | chronology, test transcripts, record IDs |
 | `boards/` | the board contract, porting and qualification process, per-board dossiers and the board status table | generic OS design |
 | `user/` | operator and integrator instructions with truth-status lines | engineering rationale |
+| `hardware/` | the per-board reader's view: feature and verification state, and the flashing, update and recovery route for one board | the board status table, the board contract and the dossiers, which are `boards/` |
 | `website/` | publication copy for micaos.dev and its claim limits | anything not yet evidenced |
 | `research/` | measurements and external references that inform, but do not define, a contract | normative requirements |
 | `plan/`, `task/` | `/pma` tracking: proposals, open work and acceptance evidence | permanent contracts |
@@ -138,6 +140,12 @@ work in progress lives in `plan/` and `task/`.
   - `flashing.md` — writing a release image to a board, per board, and what is not a verified procedure
   - `update-packages.md` — which update archive applies to a device, how it is taken, and how to pick it from the index
   - `releasing.md` — for maintainers: how a release is cut in each repository, what it carries, and what decides a rebuild
+- `hardware/` — the supported hardware set, one page per board, for a reader choosing or operating one
+  - `README.md` — the board list, a dated state snapshot and the route into each board's page
+  - `uefi-x64.md` — generic amd64 UEFI machines: the baseline, and the only target with automatic boot evidence
+  - `uefi-arm64.md` — generic arm64 UEFI machines: the carried driver set, and why carrying is not qualifying
+  - `cx3576.md` — CX3576-Z / RK3576: features, the rockusb flashing path and what a reported bench boot does not establish
+  - `s905x5m.md` — BM201 / S905X5M: features, and why a published image cannot install onto a blank board
 - `website/` — micaos.dev content briefs, one per page
   - `contract.md` — the website content contract: page set, tone, claims policy
   - `product.md` — page brief: what Mica OS is, in one honest screen

@@ -6,6 +6,7 @@
 #
 #   docs/design/*.md    <->  docs/README.md
 #   docs/user/*.md      <->  docs/README.md
+#   docs/hardware/*.md  <->  docs/README.md
 #   docs/website/*.md   <->  docs/README.md
 #   docs/boards/*.md    <->  docs/README.md
 #   docs/research/*.md  <->  docs/README.md
@@ -98,6 +99,7 @@ check_readme_dir() {
 echo "tools/docs/verify-index.sh: design/ user/ website/ boards/ research/ <-> $README"
 check_readme_dir design
 check_readme_dir user
+check_readme_dir hardware
 check_readme_dir website
 check_readme_dir boards
 check_readme_dir research

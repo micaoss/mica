@@ -196,6 +196,7 @@ export const zh = {
     ],
     groups: {
       start: '快速开始',
+      hardware: '支持硬件',
       operating: '日常运维',
       trouble: '出问题的时候',
       reference: '参考',

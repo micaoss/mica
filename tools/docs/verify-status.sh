@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Asserts that every truth-status line under docs/user/, docs/website/ and
-# docs/boards/ follows the grammar in docs/user/doc-contract.md and cites
+# Asserts that every truth-status line under docs/user/, docs/hardware/,
+# docs/website/ and docs/boards/ follows the grammar in docs/user/doc-contract.md and cites
 # evidence that exists. Read-only: it opens files and prints, changes nothing.
 #
 #   bash tools/docs/verify-status.sh          (or: make docs-verify)
@@ -145,7 +145,7 @@ check_status_line() {
     fi
 }
 
-TREES=(docs/user docs/website docs/boards)
+TREES=(docs/user docs/hardware docs/website docs/boards)
 echo "tools/docs/verify-status.sh: truth-status lines under ${TREES[*]}"
 
 for tree in "${TREES[@]}"; do

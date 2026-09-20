@@ -82,8 +82,9 @@ new_fixture() {
     mkdir -p "${dir}/docs" "${dir}/tools/docs"
     cp "${ROOT}/docs/README.md" "${dir}/docs/"
     cp "${VERIFIER}" "${dir}/tools/docs/"
-    cp -R "${ROOT}/docs/design" "${ROOT}/docs/user" "${ROOT}/docs/website" \
-          "${ROOT}/docs/boards" "${ROOT}/docs/research" "${dir}/docs/"
+    cp -R "${ROOT}/docs/design" "${ROOT}/docs/user" "${ROOT}/docs/hardware" \
+          "${ROOT}/docs/website" "${ROOT}/docs/boards" "${ROOT}/docs/research" \
+          "${dir}/docs/"
 }
 
 # Duplicates the line matching $2 in file $1, and fails loudly if that line was

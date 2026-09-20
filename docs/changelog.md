@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 07:09 [progress]
+
+**The hardware list is published, in both locales** (task
+`20260920-0700-hardware-pages-in-english`). `docs/zh/hardware/` existed and
+`/docs/hardware/` was a 404, because the site could not name it: every
+allowlist entry resolved through `userDoc(name)` to `user/<name>.md`, so
+`docs/user/` was the only tree that could ever be published.
+
+**`docs/hardware/` now carries the English originals** — the board list and one
+page per board — and joins the gates as a published tree does: catalog
+membership in `docs/README.md`, truth-status lines under `verify-status.sh`,
+and a row per page in the en/zh coverage table. The Chinese pages took the same
+status lines in the same order, which is what the coverage gate compares.
+`doc-contract.md` section 5 now names both authoritative trees.
+
+**The allowlist entry gained a shape instead of a convention.** An entry may
+name `dir` (default `user`) and `slug` (default `<dir>/<name>`), so
+`hardware/README.md` publishes at `/docs/hardware/` rather than at a
+`/README/` path, and `published.ts` resolves `<dir>/<name>.md` and
+`zh/<dir>/<name>.md` rather than hardcoding one tree. The test that keeps
+`design/`, `boards/`, `task/`, `plan/` and `research/` off the site is
+unchanged and is what holds the line now that the shape is general.
+
+Two gate self-tests had to learn the new tree: the index fixture copies
+`docs/hardware/`, and the status fixture gained a hardware page with its own
+evidence file — sharing one artefact would have reported a single deletion
+twice and broken the case that counts findings.
+
+`make docs-verify`, `make docs-verify-test`, and the website's lint, typecheck,
+test and build all pass; the build emits the five pages under `/docs/hardware/`
+and `/en/docs/hardware/`.
+
 ## 2026-09-20 07:07 [finding]
 
 **The world gate's own limit is now written in the gate**, in

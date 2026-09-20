@@ -6,7 +6,8 @@
 #   bash tools/docs/verify-coverage.sh          (or: make docs-verify)
 #
 # THE RULE (docs/user/doc-contract.md section 5, normative): English under
-# docs/user/ is authoritative, a tracked Chinese set lives under docs/zh/, and
+# docs/user/ and docs/hardware/ is authoritative, a tracked Chinese set lives
+# under docs/zh/, and
 # docs/zh/README.md carries a per-page coverage table naming, for every page in
 # the gated trees, the source page, the source version it was translated from,
 # and a status of `current`, `lagging` or `not-translated`.
@@ -30,7 +31,8 @@
 #     is the one status that asserts a translation exists;
 #   - every English page in the gated trees has EXACTLY one row: none means
 #     an untracked page, two mean two claims that will drift apart;
-#   - every file under docs/zh/user/ has a `current` row -- the direction that
+#   - every file under docs/zh/user/ and docs/zh/hardware/ has a `current`
+#     row -- the direction that
 #     catches a translation whose row was left behind at `not-translated`;
 #   - every `current` row's zh page carries the same `> status:` lines, in the
 #     same order, as its English source. The truth-status line is normative
@@ -47,7 +49,7 @@ set -euo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 TABLE=docs/zh/README.md
-TREES=(user website boards)
+TREES=(user hardware website boards)
 
 FAIL=0
 CHECKS=0
@@ -141,17 +143,22 @@ for tree in "${TREES[@]}"; do
     done
 done
 
-# --- 3. every translated page under docs/zh/user/ has a `current` row -------
-for f in docs/zh/user/*.md; do
-    [ -e "$f" ] || continue
-    path="../user/$(basename "$f")"
-    # cut -f1,3: the row is path/version/status, and this direction asks only
-    # which status the table gives that path.
-    if coverage_rows | cut -f1,3 | grep -cxF -- "$(printf '%s\tcurrent' "$path")" >/dev/null; then
-        ok
-    else
-        fail "$f is translated but $TABLE does not carry a 'current' row for '$path'"
-    fi
+# --- 3. every translated page under the mirrored trees has a `current` row --
+# The trees that carry a translation, not every gated tree: docs/website/ and
+# docs/boards/ are `not-translated` by policy, so a file under docs/zh/ for
+# them would be the anomaly, and there is none to walk.
+for tree in user hardware; do
+    for f in "docs/zh/$tree"/*.md; do
+        [ -e "$f" ] || continue
+        path="../$tree/$(basename "$f")"
+        # cut -f1,3: the row is path/version/status, and this direction asks
+        # only which status the table gives that path.
+        if coverage_rows | cut -f1,3 | grep -cxF -- "$(printf '%s\tcurrent' "$path")" >/dev/null; then
+            ok
+        else
+            fail "$f is translated but $TABLE does not carry a 'current' row for '$path'"
+        fi
+    done
 done
 
 # --- 4. every `current` row: zh status lines equal the English page's --------

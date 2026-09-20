@@ -43,6 +43,8 @@
 解析后的配置少一个就构建失败。代价也记着：内核模块从 71 个增加到 232 个，`Image`
 24.5 MB，CI 内核任务从 330 秒变成 718 秒。
 
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/uefi-arm64/kernel/config`
+
 ## 分区布局
 
 | 分区 | 角色 | 起点 | 大小 |
@@ -88,6 +90,8 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 
 **写到实体 arm64 机器上（未验证）**：与 `uefi-x64` 同理，整盘写入，机器需信任该发布
 的启动证书。没有任何实体 arm64 机器被验证过。
+
+> status: unsupported
 
 ## 首次启动
 
@@ -136,3 +140,5 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 | 实体断电 | 不适用 | 模拟存储 |
 | 射频与现场总线 | 不适用 | 这块板不声明 |
 | 物理恢复动作 | 不适用 | 不存在物理在场断言 |
+
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-boards:boards/uefi-arm64/evidence.json`, `docs/design/build-harness.md`

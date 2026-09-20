@@ -69,3 +69,4 @@ file cannot take it for an open row.
 - [-] [**20260915-0318-docs-multi-repo-ownership Restate the documentation system for seven repositories**](20260915-0318-docs-multi-repo-ownership.md) `2026-09-15`
 - [x] [**20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board**](20260917-1033-zh-hardware-list.md) `2026-09-17`
 - [ ] [**20260920-0610-producer-data-assets Where a producer publishes data about its own output**](20260920-0610-producer-data-assets.md) `2026-09-20`
+- [x] [**20260920-0700-hardware-pages-in-english Publish the hardware list: English pages and an allowlist that can name them**](20260920-0700-hardware-pages-in-english.md) `2026-09-20`

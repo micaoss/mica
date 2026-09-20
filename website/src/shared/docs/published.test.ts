@@ -29,13 +29,30 @@ describe('the publishing allowlist', () => {
   })
 
   it('publishes exactly what the allowlist file names', () => {
-    const named = allowlist.groups.flatMap(group => group.docs.map(doc => doc.name))
-    expect(PUBLISHED_DOCS.map(doc => doc.slug)).toEqual(named.map(name => `user/${name}`))
+    const named = allowlist.groups.flatMap(group => group.docs.map((doc) => {
+      const entry = doc as { name: string, dir?: string, slug?: string }
+      return entry.slug ?? `${entry.dir ?? 'user'}/${entry.name}`
+    }))
+    expect(PUBLISHED_DOCS.map(doc => doc.slug)).toEqual(named)
+  })
+
+  it('reads an entry outside docs/user/ from its own directory in both locales', () => {
+    const hardware = PUBLISHED_DOCS.find(doc => doc.slug === 'hardware/cx3576')
+    expect(hardware?.sources).toEqual({
+      en: 'hardware/cx3576.md',
+      zh: 'zh/hardware/cx3576.md',
+    })
+  })
+
+  it('lets an entry override its slug, so a directory index is not /README/', () => {
+    const index = PUBLISHED_DOCS.find(doc => doc.sources.en === 'hardware/README.md')
+    expect(index?.slug).toBe('hardware')
   })
 
   it('lists every group the sidebar renders', () => {
     expect(DOC_GROUPS.map(group => group.id)).toEqual([
       'start',
+      'hardware',
       'operating',
       'trouble',
       'reference',

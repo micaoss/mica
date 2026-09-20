@@ -46,7 +46,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 ## 覆盖表
 
 按 [`user/doc-contract.md`](user/doc-contract.md) 第 5 节的规则，下表为
-`docs/user/`、`docs/website/` 和 `docs/boards/` 下的每一个英文页面各记录一行：
+`docs/user/`、`docs/hardware/`、`docs/website/` 和 `docs/boards/` 下的每一个英文页面各记录一行：
 源页面（相对本目录的路径）、翻译所依据的源版本（git 短提交号）、以及覆盖
 状态（`current` | `lagging` | `not-translated`）。`tools/docs/verify-coverage.sh`
 （挂在 `make docs-verify` 上）保证这张表与两边的文件树一致。
@@ -77,6 +77,11 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../user/support.md` | 00a5147d | current |
 | `../user/troubleshooting.md` | 50b85a5e | current |
 | `../user/update-rollback.md` | 88db4ae9 | current |
+| `../hardware/README.md` | c04f0e4 | current |
+| `../hardware/uefi-x64.md` | c04f0e4 | current |
+| `../hardware/uefi-arm64.md` | c04f0e4 | current |
+| `../hardware/cx3576.md` | c04f0e4 | current |
+| `../hardware/s905x5m.md` | c04f0e4 | current |
 | `../website/contract.md` | db66fc02 | not-translated |
 | `../website/documentation.md` | db66fc02 | not-translated |
 | `../website/downloads.md` | db66fc02 | not-translated |

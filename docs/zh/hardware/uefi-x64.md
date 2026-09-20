@@ -39,6 +39,8 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 
 为什么这些存储驱动必须内建：verity root 没有 initramfs，root 挂上之前什么都加载不了。
 
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-x64/kernel/config`, `mica-boards:boards/uefi-x64/evidence.json`
+
 ## 分区布局
 
 | 分区 | 角色 | 起点 | 大小 |
@@ -74,6 +76,8 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 **Secure Boot（未验证）**：机器必须把该发布的启动证书注册进固件的 `db`，或者关掉
 Secure Boot。关掉它不削弱 root——签名的内核命令行里仍带
 `dm_verity.require_signatures=1`。
+
+> status: unsupported
 
 ## 首次启动
 
@@ -112,3 +116,5 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 | QEMU 生命周期（API、电源动作、重启、运行时、更新、重置） | 通过 | 支持层级表记录的验收列 |
 | 每次推送与每次发布自动启动 | 通过（自 2026-09-19） | amd64 产品启动到 guest 自己的通过标记 |
 | 实体机器冷启动 / 写入 / 恢复 | 未测试 | 没有实机 |
+
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`

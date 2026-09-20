@@ -13,7 +13,7 @@ export interface PublishedDoc {
   sources: Partial<Record<LocaleCode, string>>
 }
 
-export type GroupId = 'start' | 'operating' | 'trouble' | 'reference'
+export type GroupId = 'start' | 'hardware' | 'operating' | 'trouble' | 'reference'
 
 export interface DocGroup {
   /** Key into `Copy['docs']['groups']` for the heading. */
@@ -21,21 +21,34 @@ export interface DocGroup {
   docs: PublishedDoc[]
 }
 
-/** Every entry names a document under `docs/user/`, in Chinese and English unless narrowed. */
-function userDoc(name: string, locales: readonly LocaleCode[] = ['zh', 'en']): PublishedDoc {
+/** One entry of the allowlist file. */
+interface AllowlistDoc {
+  name: string
+  /** The directory under the documentation root; `user` when the entry omits it. */
+  dir?: string
+  /** The site slug, when it should not be `<dir>/<name>`. */
+  slug?: string
+  locales?: readonly string[]
+}
+
+/**
+ * Resolves one entry to its sources. English is `<dir>/<name>.md` and Chinese
+ * `zh/<dir>/<name>.md`, which is how `docs/` lays out every translated tree,
+ * so a tree is published by being named here and nowhere else.
+ */
+function sourceDoc(entry: AllowlistDoc): PublishedDoc {
+  const { name, dir = 'user', slug = `${dir}/${name}`, locales = ['zh', 'en'] } = entry
   const sources: Partial<Record<LocaleCode, string>> = {}
   if (locales.includes('en'))
-    sources.en = `user/${name}.md`
+    sources.en = `${dir}/${name}.md`
   if (locales.includes('zh'))
-    sources.zh = `zh/user/${name}.md`
-  return { slug: `user/${name}`, sources }
+    sources.zh = `zh/${dir}/${name}.md`
+  return { slug, sources }
 }
 
 export const DOC_GROUPS: DocGroup[] = allowlist.groups.map(group => ({
   id: group.id as GroupId,
-  docs: group.docs.map(doc =>
-    userDoc(doc.name, 'locales' in doc ? (doc.locales as LocaleCode[]) : undefined),
-  ),
+  docs: group.docs.map(doc => sourceDoc(doc as AllowlistDoc)),
 }))
 
 export const PUBLISHED_DOCS: PublishedDoc[] = DOC_GROUPS.flatMap(group => group.docs)

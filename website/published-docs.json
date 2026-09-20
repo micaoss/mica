@@ -1,5 +1,5 @@
 {
-  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is a document under docs/user/; `locales` defaults to both; narrow it only when the English original is genuinely missing. Groups are the sidebar's, in order.",
+  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is the document; `dir` is its directory under the documentation root and defaults to `user`; `slug` overrides the site path, which is otherwise `<dir>/<name>`; `locales` defaults to both, and is narrowed only when one original is genuinely missing. Groups are the sidebar's, in order.",
   "groups": [
     {
       "id": "start",
@@ -9,6 +9,16 @@
         { "name": "install" },
         { "name": "flashing" },
         { "name": "first-run" }
+      ]
+    },
+    {
+      "id": "hardware",
+      "docs": [
+        { "name": "README", "dir": "hardware", "slug": "hardware" },
+        { "name": "uefi-x64", "dir": "hardware" },
+        { "name": "uefi-arm64", "dir": "hardware" },
+        { "name": "cx3576", "dir": "hardware" },
+        { "name": "s905x5m", "dir": "hardware" }
       ]
     },
     {

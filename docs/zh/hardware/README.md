@@ -21,6 +21,8 @@
 （Mica OS 自己跑完并拥有合格矩阵）、`integrator-qualified / bring-up`（合约满足，
 现场证据由集成商持有或仍在积累）、`unsupported`（没有档案，不做任何声明）。
 
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`
+
 ## 现在到底是什么状态（2026-09-20）
 
 **发布是通的。**每块板都是发布目标：镜像会被构建、签名、发布，产品会进入版本索引。
@@ -48,6 +50,8 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 的板卡名，并在 1.7 秒时关机（板卡改名了，读这个名字的被 pin 住的客户端没有跟上）。
 请取 `20260919-2356` 或更新的镜像。`cx3576` 从未受影响。这些发布保留不删，修复靠
 取代（[获取发布版](../user/download.md)）。
+
+> status: shipped — evidence: `docs/design/mica-index.md`, `docs/design/build-harness.md`, `docs/user/download.md`
 
 ## 怎么选
 
@@ -82,3 +86,5 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 每页的事实来自三处：英文板卡档案（`docs/boards/<board>.md`）、
 `mica-boards` 仓库里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
 `uefi-x64` 没有板卡档案，它那页会逐条注明来源。
+
+> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-boards:boards`

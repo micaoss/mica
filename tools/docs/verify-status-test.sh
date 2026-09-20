@@ -40,11 +40,14 @@ fail() { FAIL_N=$((FAIL_N + 1)); echo "FAIL: $*"; }
 new_fixture() {
     local dir="$1"
     rm -rf "${dir}"
-    mkdir -p "${dir}/docs/user" "${dir}/docs/website" "${dir}/docs/boards" \
-             "${dir}/docs/plan" "${dir}/docs/task" "${dir}/pkgs"
+    mkdir -p "${dir}/docs/user" "${dir}/docs/hardware" "${dir}/docs/website" \
+             "${dir}/docs/boards" "${dir}/docs/plan" "${dir}/docs/task" "${dir}/pkgs"
     mkdir -p "${dir}/tools/docs"
     cp "${VERIFIER}" "${dir}/tools/docs/"
     : >"${dir}/pkgs/artifact.json"
+    # A second artifact, so that deleting the first is a single-page defect:
+    # two pages citing one path would report the same deletion twice.
+    : >"${dir}/pkgs/board.json"
     printf '# 20260101-0000-fixture-plan\n' >"${dir}/docs/plan/20260101-0000-fixture-plan.md"
     printf '# 20260101-0001-fixture-task\n' >"${dir}/docs/task/20260101-0001-fixture-task.md"
     printf '# Plans\n\n- [ ] [**20260101-0000-fixture-plan Fixture plan**](20260101-0000-fixture-plan.md) `2026-01-01`\n' \
@@ -61,6 +64,11 @@ EOF
 > status: shipped — evidence: `pkgs/artifact.json`, `docs/plan/`
 
 > status: unsupported
+EOF
+    cat >"${dir}/docs/hardware/page.md" <<'EOF'
+# fixture hardware page
+
+> status: board-dependent — evidence: `pkgs/board.json`
 EOF
     cat >"${dir}/docs/website/page.md" <<'EOF'
 # fixture website page
