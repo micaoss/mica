@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-20 06:56 [finding]
+
+**The `latest` marker is a recommendation, and it is accepted as the second
+instance — recorded at its point of use, not promoted to a rule.** It says
+*take this one* to anything that resolves a release without naming one, so it
+carries the same dependency on later findings that a sentence in
+`download.md` does. Two things make it worse than the prose version rather
+than better: it is in the mechanism, so no review reads it and no CI job
+asserts it, and it moves automatically after every scoped release, so no
+person revisits it. If an index were found defective after being marked
+latest, the marker would keep recommending it.
+
+Written into `docs/design/mica-index.md` beside the no-deletion rule, with the
+remedy that follows from that rule instead of fighting it: **cut the corrected
+index and let the marker move**, never delete the defective one — and the
+consequence worth stating, that the marker cannot un-recommend anything until
+a successor exists, which is why a corrected index is cut promptly rather than
+when convenient.
+
+The shape is the same and the medium is not, which is the only reason it was
+worth thinking about: *a marker, not a sentence* would have been a fair
+refusal. What decided it is that the difference cuts the wrong way — being
+mechanical removes the review the prose version at least could have had. Two
+instances, so it stays at its point of use; the rule about recommendations is
+still unwritten as a rule.
+
+**Two stale claims fixed in `docs/design/release-artifacts.md`** while reading
+it for the marker: it still said `s905x5m` is not a release target, and still
+gave the index tag in the slash form. Both are now current, with the dot
+cut-over cited.
+
 ## 2026-09-20 06:53 [finding]
 
 **The hold covers seven kinds of artefact and two of them are covered by

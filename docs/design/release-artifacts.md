@@ -115,8 +115,11 @@ releases carry `full` archives for every product and `kernel` archives for
 products were removed entirely on 2026-09-16
 (`docs/decisions/2026-09-16-minimal-products-removed.md`), and the minimal
 assets of `x64/20260915-1458` and `cx3576/20260915-1515` stay as they are.
-`s905x5m` is not a release target.
-A Mica version is the index release `mica/<YYYYMMDD-HHMM>`, cut automatically
+All four boards are release targets; `s905x5m` became one on 2026-09-19 and
+published `s905x5m.20260920-0033`.
+A Mica version is the index release `mica.<YYYYMMDD-HHMM>` — the dot form
+since 2026-09-16, and the indexes cut before that keep their slash
+(`docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`) — cut automatically
 after every successful scoped release: it carries only `mica-build.lock`,
 `mica-index.json` and `SHA256SUMS`, references the newest scoped release of
 every published product, and is the GitHub latest release, so the greatest

@@ -395,6 +395,25 @@ reporting a population. Enumerating releases here matches both separators
 any of the numbers: it is that each was one query away, and that a boundary
 sentence would have been checkable in a way none of the counts were.
 
+**The `latest` marker is a recommendation, and nothing re-checks it**
+*(2026-09-20)*. GitHub marks the newest index release *latest*, which is the
+forge saying *take this one* to anything that resolves a release without
+naming one. It therefore carries the same dependency a sentence like *take
+`20260919-2356`* does: it is correct about the defects known when it was set
+and says nothing about the ones found afterwards. Two differences make it
+worse rather than better — it lives in the mechanism rather than in prose, so
+no review reads it and no CI job asserts it, and it moves automatically after
+every scoped release, so it is never revisited by a person at all. If an index
+release were found defective after being marked latest, the marker would keep
+recommending it.
+
+The remedy follows from the rule above rather than contradicting it: **cut the
+corrected index and let the marker move**; do not delete the defective one.
+Deletion would trade a defect for a permanently unverifiable record, while a
+newer index takes the marker with it by construction. What the marker cannot
+do is un-recommend something without a successor existing, which is the reason
+a corrected index is cut promptly rather than when convenient.
+
 **The one exception, named so that it is not taken silently: withdrawal for
 safety.** The rule above is about a defect in *content*, where a superseding
 release is the whole remedy and the counter protects devices. It does not
