@@ -104,6 +104,13 @@ appear in the version index. **It is not a claim that the board boots on
 hardware** — that claim lives in the dossier, and for `s905x5m` the dossier
 still says four physical rows untested with `RFCT-922` open.
 
+**A hardware boot of `cx3576` was reported by the user on 2026-09-20**, the
+first physical boot report here. It changes no row in this table: a pass row
+carries a date and an evidence reference, and this arrived as a sentence with
+no artefact, so `cx3576` keeps "physical rows not tested" until `mica-boards`
+records one. What it would satisfy, and what the person who booted it would
+have to keep, is `mica-boards`'s to state.
+
 `s905x5m` was opened as a release target by user decision on 2026-09-19 and
 published its first release, `s905x5m.20260920-0033`, on 2026-09-20; its tier
 does not move and stays bring-up with the same evidence column.
@@ -131,8 +138,8 @@ UEFI boards: since
 and per release, while `uefi-arm64` carries none: the gate's boot step is
 amd64-only and was skipped for both its products
 ([harness](../design/build-harness.md) section 4). And between UEFI and FIT:
-the `cx3576` and `s905x5m` images have never been booted by anything, because
-no suite boots a FIT image at all — `tests/lifecycle-uboot-fit/` runs on the
+the `cx3576` and `s905x5m` images are started by nothing in these
+repositories, because no suite boots a FIT image at all — `tests/lifecycle-uboot-fit/` runs on the
 host and carries no QEMU, and both suites that do start a guest refuse a FIT
 board by name. The FIT side is checked on every push; it is unstarted, not
 unattended. Four of the eight published products are on that

@@ -90,9 +90,9 @@ images are published and its products are indexed; it is not a claim that the
 board boots on hardware — `uefi-arm64`'s qualification stays QEMU-only, and
 `s905x5m` stays at the bring-up tier with its physical rows untested
 ([support tiers](../boards/support-tiers.md#current-boards)). It is not even a
-claim that the image has been started: nothing starts a FIT image, so the four
-`cx3576` and `s905x5m` products have never been booted by anything
-([download](download.md#1-what-exists-to-download)). The product set is a
+claim that the image has been started by anything automatic: no suite boots a
+FIT image, so the four `cx3576` and `s905x5m` products are started by nothing
+in this tree ([download](download.md#1-what-exists-to-download)). The product set is a
 `dev` and a `prod` product for each of the four boards, eight in all. There
 are no minimal products
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)).

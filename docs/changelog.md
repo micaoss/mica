@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-20 05:08 [finding]
+
+**A hardware boot of `cx3576` was reported by the user on 2026-09-20** — the
+first physical boot report this project has had, hours after these pages were
+rewritten around what nothing starts. It is recorded as a report and nothing
+more: a pass row carries a date and an evidence reference, this arrived as a
+sentence with no artefact, and `mica-boards` owns the dossier and what would
+turn it into a row. No tier row moves, `cx3576` keeps "physical rows not
+tested", and the pages that a reader meets say the same.
+
+**What it did expose is an overclaim of my own, and that is fixed.** Several
+pages said the four FIT products "have never been started by anything". What
+was measured is narrower: no suite boots a FIT image, and both suites that
+boot refuse a FIT board by name. Automation is what this tree can speak for; a
+person on a bench is a different claim with a different kind of evidence. The
+sentences now say *started by nothing automatic* / *nothing in this tree*, in
+`build-harness.md`, `support-tiers.md`, `download.md`, `overview.md`,
+`flashing.md` and the Chinese pages. `flashing.md` also stops asserting that
+no physical board has booted one, which it cannot know, and says instead that
+no physical boot has an evidence row.
+
+The two facts are not in tension and the records keep the distinction visible:
+**a board that has booted on a bench and a catalogue that nothing automated
+starts are different claims.** When the row exists they sit side by side.
+
 ## 2026-09-20 00:55 [finding]
 
 **Unstarted, not unrun — and the distinction is load-bearing.** `ci.yml` runs

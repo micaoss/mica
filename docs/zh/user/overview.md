@@ -74,8 +74,8 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 这块板的镜像会被发布、它的产品会进入版本索引；它不是“这块板能在实机上启动”的断言**
 ——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行未测
 （[支持层级](../../boards/support-tiers.md#current-boards)）。它甚至不是“这个镜像被
-启动过”的断言：没有任何东西会启动 FIT 镜像，所以 `cx3576` 与 `s905x5m` 这四个产品
-从未被任何东西启动过（[获取发布版](download.md)）。产品集合是四块板各一个 `dev`
+启动过”的断言：没有任何套件会启动 FIT 镜像，所以 `cx3576` 与 `s905x5m` 这四个产品
+在这棵树里没有任何东西会启动它们（[获取发布版](download.md)）。产品集合是四块板各一个 `dev`
 与一个 `prod`，共八个。没有 minimal 产品
 （[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。
 

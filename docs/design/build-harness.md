@@ -308,8 +308,11 @@ the boot machinery (`boot.sh`, `timed-boot.py`, `runtime-build.sh`,
 `kernel-faults.sh`) is in `tests/lifecycle-uefi/`.
 
 **The number, since it is half the catalogue.** Of eight published products,
-**four have never been started by anything**: `cx3576-dev`, `cx3576-prod`,
-`s905x5m-dev`, `s905x5m-prod`. `cx3576` is not a new-board exception — it has
+**four are started by nothing in this tree**: `cx3576-dev`, `cx3576-prod`,
+`s905x5m-dev`, `s905x5m-prod`. The claim is about suites and automation, which
+is what can be measured from here; a person starting one on a bench is a
+different claim with a different kind of evidence, and one was reported on
+2026-09-20 (below). `cx3576` is not a new-board exception — it has
 been a release target since before the rename, with six published releases
 behind it; it is the rule for its whole boot backend. The other four have boot
 evidence of two different ages: `uefi-x64` from the CI gate, per push and per
@@ -343,6 +346,17 @@ of use, wrong in the direction that manufactures a capability — and it is
 worth looking for such a source before concluding that a wrong belief was
 simply careless. A name is not evidence of behaviour either: the check is one
 `grep` for the machinery, not a reading of the directory listing.
+
+**A bench boot was reported the same day, and it does not move this.** The
+user reported on 2026-09-20 that `cx3576` booted successfully on hardware —
+the first physical boot report this project has had. It arrives with no
+artefact attached, so it is a report rather than a qualification row: the
+dossier rule is that a pass row carries a date and an evidence reference, and
+`mica-boards` owns what would make it one. Nothing in the paragraphs above
+changes either way. *No suite boots a FIT image* and *a person booted one* are
+different claims about different things, and when the row exists they will sit
+side by side: a board that has booted on a bench, and a catalogue that nothing
+automated starts.
 
 This is consistent with the decision that a release target publishes images
 and asserts nothing about hardware

@@ -14,8 +14,11 @@ procedure yet.
   [update packages](update-packages.md).
 
 **What is qualified, stated once.** Every boot anyone here has seen was QEMU.
-No Mica OS image has been written to a USB stick, a SATA disk, an NVMe drive
-or an eMMC, and no physical board has booted one. The QEMU sections below are
+No Mica OS image written to a USB stick, a SATA disk, an NVMe drive or an
+eMMC is on record here, and no physical boot has an evidence row. The user
+reported on 2026-09-20 that a `cx3576` booted on hardware; it is a report with
+no artefact attached, so it is not a row and this page does not treat it as
+one ([support tiers](../boards/support-tiers.md)). The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
 where they are not verified. The dates matter: the three `uefi` rounds
 published between the board rename and 2026-09-19 (`20260916-0845`,
@@ -24,8 +27,8 @@ booting. Take an image from `20260919-2356` or later; since that round every
 amd64 product is booted automatically — on each push and again in its release
 run — while a `uefi-arm64` image is built and verified but started by nothing
 automatic, and a `cx3576` or `s905x5m` image has never been started by
-anything at all: no suite boots a FIT image — the FIT suite runs on the host
-and carries no QEMU ([download](download.md) section 1).
+anything automatic: no suite boots a FIT image — the FIT suite runs on the
+host and carries no QEMU ([download](download.md) section 1).
 
 > status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 

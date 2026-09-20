@@ -49,9 +49,11 @@ round were built and statically verified but not started.
 
 **A published image is not a booted image**, and the catalogue is split in
 half on that: four of the eight products — `cx3576-dev`, `cx3576-prod`,
-`s905x5m-dev`, `s905x5m-prod` — have never been started by anything, because
-no suite boots a FIT image. They are checked on every push, in ways that never
-start them. The `uefi-x64` images are booted on every push and
+`s905x5m-dev`, `s905x5m-prod` — are started by nothing automatic, because no
+suite boots a FIT image. They are checked on every push, in ways that never
+start them. (A hardware boot of `cx3576` was reported by the user on
+2026-09-20; it is a report, not a qualification row —
+[support tiers](../boards/support-tiers.md).) The `uefi-x64` images are booted on every push and
 in every release, and the `uefi-arm64` ones carry hand-run QEMU rows that
 predate the board rename ([harness](../design/build-harness.md) section 4). Being a release target means the images are built, published and
 indexed; it is not a claim about hardware
