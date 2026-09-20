@@ -51,9 +51,13 @@
 # AND A SIXTH, ABOUT THE FIXTURES RATHER THAN THE CHECKER: a refused fixture
 # that could be refused by two rules tests neither. A negative case must break
 # exactly the rule it names, or it passes for the wrong reason and keeps
-# passing after the rule it was written for is broken. Checkable by inspection
-# and by no gate, which is why it is written where someone writing fixtures
-# will read it.
+# passing after the rule it was written for is broken.
+#
+# IT IS MECHANICALLY CHECKABLE AND THE HARNESS DOES NOT EXIST YET: repair the
+# named defect in each refused fixture and require the result to become valid;
+# anything still refused was testing two rules at once. "No gate can check
+# this" is a permanent limit and "no harness exists yet" is a piece of work,
+# and only one of those ever gets built -- so it is recorded as the second.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"

@@ -255,6 +255,15 @@ this cost is the argument for 9.1 in one line: **the artefact a repository
 asked for cannot reach it through a lock until it implements a row it did not
 know had been specified.**
 
+**The first release carrying them exists and the chain checks end to end**
+*(verified here from the artefacts, 2026-09-20)*: `mica-system-base`
+`20260920-0832` publishes four assets — the lock, `SHA256SUMS` **listing only
+the lock**, and two `mica-system-base-unowned.<arch>.tsv` files named by `data`
+rows whose sha256 match the files as downloaded. Line 51 of the amd64 file is
+`/etc/systemd/system/getty.target.wants/getty@tty1.service` with writer
+`systemd.postrm` — **the row that settled the console question is now a
+published artefact rather than a claim in a report.**
+
 **What a consumer may assume about a `data` row it does not understand**: that
 the file exists in that release and hashes to that value, that it is needed
 for nothing, and that skipping it is always safe. Its meaning belongs to the
@@ -1003,6 +1012,33 @@ row**, and the edited copy would also have been refused for an invalid release
 value — so it could pass for the wrong reason. That is a property of every
 negative fixture here, checkable by inspection and by no gate: **each refused
 vector must break exactly the rule it names.**
+
+**The two-rule property is mechanically checkable, and the harness does not
+exist** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
+named defect and require the result to become valid; anything that stays
+refused was testing two rules at once.** That is a definition rather than an
+inspection, and the distinction matters — *no gate can check this* is a
+permanent limit, *no harness exists yet* is a piece of work, and **only one of
+those ever gets built.** The audit belongs here, once, at the source: forty-odd
+refused vectors in one pass rather than five repositories doing it five times,
+since `mica-build`'s copy is byte-identical to canonical after one rename, so
+a finding would be a finding about the vectors themselves
+([task](../task/20260920-0851-negative-vector-audit.md)).
+
+**Two facts about the one known instance, kept visible because they bound what
+it proves.** It was found **by accident** — `mica-core` comparing blobs, not
+anyone hunting double faults — so nobody knows whether it is a one-off or a
+pattern in a set written over months by people thinking about the positive
+case. And it is **local rather than inherited**: the same file is
+byte-identical to canonical in `mica-build`'s pre-rename copy, the oldest in
+the workspace, so the edit happened downstream of the oldest ancestor in one
+tree.
+
+*(That oldest copy is also the only one the `bun` artefact could not reach,
+because the sweep that introduced it came after the copy — an accident rather
+than a virtue, and the reason "everyone is behind" was never the right frame:
+**being behind and being wrong are different axes**, and tonight they pointed
+in opposite directions at least once.)*
 
 **And a provenance comment nobody checks is not provenance** *(the rule's
 first live test, 2026-09-20)*. `mica-system-base`'s 133 vector blobs were

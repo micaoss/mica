@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 08:49 [finding]
+
+**"Checkable by inspection and by no gate" was wrong in the useful
+direction, and the amendment is the point**: `mica-build` gave the property a
+mechanical definition — **for each refused vector, repair the named defect and
+require the result to become valid; anything that stays refused was testing
+two rules at once.** *No gate can check this* is a permanent limit; *no
+harness exists yet* is a piece of work, and **only one of those ever gets
+built**. Recorded as the second, in `release-lock.md` 9.1, in the `Makefile`'s
+property list and as `docs/task/20260920-0851-negative-vector-audit.md` — the audit is
+one pass here rather than five elsewhere, because `mica-build`'s copy is
+byte-identical to canonical after one rename, so a finding would be a finding
+about the vectors.
+
+**Two facts bound what the one known instance proves**, and both stay visible:
+it was found **by accident** — blobs compared, not double faults hunted — so
+nobody knows whether it is a one-off or a pattern in a set written over months
+by people thinking about the positive case; and it is **local rather than
+inherited**, since the same file is byte-identical to canonical in the
+workspace's oldest copy. That oldest copy is also the only one the `bun`
+artefact could not reach, the sweep having come after it — an accident rather
+than a virtue, and the reason *everyone is behind* was never the right frame:
+**being behind and being wrong are different axes.**
+
+**And the `data` row's first release exists, verified here from the
+artefacts**: `mica-system-base` `20260920-0832`, four assets, `SHA256SUMS`
+listing **only the lock**, and two `unowned.<arch>.tsv` files whose `data` row
+digests match the files as downloaded. Line 51 of the amd64 file is
+`/etc/systemd/system/getty.target.wants/getty@tty1.service` with writer
+`systemd.postrm` — **the row that settled the console question is now a
+published artefact rather than a claim in a report.**
+
 ## 2026-09-20 08:43 [finding]
 
 **The canonical vectors carried a rename artefact, and it is fixed before any
