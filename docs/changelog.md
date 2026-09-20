@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-20 21:04 [finding]
+
+**A valid citation whose premise is false.** A plan table here cites
+`mica-build:tests/lifecycle-uefi/firmware.sh` — repository-qualified, path
+resolves, file is real — **and nothing in that repository calls it**. The
+citation gives its reader no reason to doubt, because the citation is
+**correct**; what is absent is the only property that made citing it worth
+doing. So the citation rule gains its second qualifier: the form **assumes the
+instrument runs** and cannot say *cited and not invoked*.
+
+**The claim in that table turns out to be the true one, and it now says which
+it is.** The heading is *call sites of `IMAGE_BUN_1`* — files that break if
+the key moves — **not** *cases that are exercised*. For a key survey an
+uninvoked call site still counts, because it breaks the moment somebody wires
+it up; for a reader looking for coverage the same row means nothing. The plan
+now says so, and does **not** drop the citation: whether that instrument is
+dead or merely unwired is `mica-build`'s open question, and nine other
+uncalled scripts there read as gaps rather than dead code.
+
+**And the sweep-key rule gets the instance it predicted, inside a sweep**: a
+search for `trust.sh` returned five hits that were all `embed-trust.sh` and
+`embed-fit-trust.sh` — names that **end in** the key. **A bare substring
+supplies the nearest subject exactly as a bare path does**, the count would
+have travelled where the lines did not, and it happened *inside the sweep that
+exists because of bare paths*.
+
 ## 2026-09-20 20:46 [finding]
 
 **The hardest denominator to get right is the one inside a direct

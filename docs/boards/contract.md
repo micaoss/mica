@@ -708,7 +708,16 @@ qualifier the next hour supplied: checkable only if the commit is fetchable.**
 A citation into history that predates a repository's root answers 422, which a
 reader reads as a false claim rather than as an unreachable one, so such a
 citation carries its own unreachability
-([containers.md](../design/containers.md) section 8 has the instance).*
+([containers.md](../design/containers.md) section 8 has the instance).
+**And a second qualifier, from a citation correct in every respect**
+*(2026-09-20)*: the form assumes the instrument **runs**, and it cannot say
+*cited and not invoked*. A records table naming
+`mica-build:tests/lifecycle-uefi/firmware.sh` is repository-qualified, the
+path resolves and the file is real — **and nothing in that repository calls
+it**. **A valid citation whose premise is false gives its reader no reason to
+doubt**, because the citation is correct; what is absent is the only property
+that made citing it worth doing, and the repair is not in the citation but in
+**the sentence the citation supports**.*
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written

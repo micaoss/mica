@@ -274,7 +274,13 @@ English source.
   little, but one that **answers too much**. Three states, wanting three
   different things: **no key** — wait, and let the next invention specify its
   own fixture; **a discriminating key** — sweep; **an over-answering key** —
-  *sort the hits into kinds before counting them*. Sorting is what made that
+  *sort the hits into kinds before counting them*. **A bare substring supplies the nearest subject exactly as a
+  bare path does**, which is that state met inside a sweep: a search for
+  `trust.sh` returned five hits that were all `embed-trust.sh` and
+  `embed-fit-trust.sh` — files whose names **end in** the key — and **the
+  count would have travelled where the lines did not**. Read the lines, not
+  the count, and note where it happened: *inside the sweep that exists because
+  of bare paths*. Sorting is what made that
   class closeable: historical record that must keep the old names or stop
   being history, the records **of** the defect that quote it to name it, and
   the nickname. Its author's sentence is the test of a closed class: **"no

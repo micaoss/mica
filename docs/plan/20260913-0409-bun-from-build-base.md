@@ -37,6 +37,22 @@ Call sites of `IMAGE_BUN_1` (code, re-surveyed 2026-09-13 after the split):
 | mica-core | `apid/ui/build.sh`, `gate/apid-ui-build-contract-test.sh` | `--ref`; the gate greps for the key |
 | mica-debian | `docker.sh`, `tests/debian-base-test.sh`, `tests/debian-lock-test.sh` | `--ref`, `docker run ... bash run.sh` |
 
+**What this table is a census of, and what it is not** *(2026-09-20)*. It
+lists **call sites of the key** — files that would break if `IMAGE_BUN_1`
+moved — and says nothing about whether each one is invoked.
+`mica-build:tests/lifecycle-uefi/firmware.sh` **has no caller anywhere in that
+repository** *(swept across 151 shell scripts by `mica-build`; checked here
+only that its `Makefile`, `tests/lifecycle-uefi/run.sh` and the three
+workflows do not name it)*. **For this table's purpose that changes nothing**
+— an uninvoked call site still breaks the moment somebody wires it up, which
+is exactly what a key survey must catch. **For a reader looking for coverage
+it changes everything**, and this table cannot tell them: a file is listed
+here because it *mentions the key*, never because it runs. Whether that
+instrument is dead or merely unwired is `mica-build`'s question and it is
+open; nine other uncalled scripts there are named `reset`, `large-root`,
+`dirty-system`, `read-system` and so on, which read as gaps rather than as
+dead code.
+
 Why not the local tag (revision 1 of this plan): a `LOCAL_` key resolves only
 from the local store, so CI and every fresh host would have to build the base
 first, and the cross composition (`FROM --platform=$TARGETPLATFORM`) would need
