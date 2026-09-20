@@ -93,6 +93,7 @@ docs-verify-test:
 	bash tools/docs/verify-status-test.sh
 	bash tools/docs/verify-coverage-test.sh
 	bash tools/docs/verify-board-test.sh
+	bash tools/docs/verify-release-lock-test.sh
 	bash tools/docs/verify-world-test.sh
 	bash tools/docs/record-test.sh
 	bash tools/docs/shell-lint.sh

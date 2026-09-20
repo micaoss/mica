@@ -13,7 +13,15 @@ set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
-V=docs/design/release-lock/vectors
+# The vectors directory is injectable SO THIS GATE CAN BE SHOWN TO FAIL. It ran
+# for six days with 355 assertions and no negative test, which made every
+# "355/355 PASS" in these records a number nobody had watched go red; the two
+# times it was bite-tested, a person mutated a real vector and restored it from
+# /tmp, which proves the gate once and leaves nothing behind. Never quote a
+# check you have not seen fail -- tools/docs/verify-release-lock-test.sh copies
+# the tree, breaks it five ways and requires this script's own message each
+# time.
+V="${MICA_VECTORS:-docs/design/release-lock/vectors}"
 FAIL=0
 CHECKS=0
 

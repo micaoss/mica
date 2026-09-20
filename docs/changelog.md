@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 16:20 [finding]
+
+**The candidate rule *never quote a check you have not seen fail* was offered
+with a checkable negative — *the probe is the only check today that was
+trusted without anybody seeing it fail* — and testing it against this
+repository's own ledger broke it immediately: `verify-release-lock.sh` had
+**355 assertions and no negative test**, and every commit report here has been
+quoting `355/355 PASS` for six days.** It had been bite-tested twice by hand —
+mutate a real vector, watch it refuse, restore from `/tmp` — which proves a
+gate at that moment and leaves nothing a later reader can re-run.
+
+**So the rule stands and the counterexample was mine.** The gate's vectors
+directory is now injectable (`MICA_VECTORS`) **so that it can be shown to
+fail**, and `tools/docs/verify-release-lock-test.sh` breaks a copy of the tree
+eight ways and requires the gate's own message each time: a positive control, a
+wrong expected result, an unlisted vector on disk, an `expected.tsv` with no
+vectors, an empty `derived-from.tsv`, an empty `refusal-sets.tsv`, a wrong
+recorded refusal set, and an unknown repair column. It is in
+`make docs-verify-test`, which is what makes *seen to fail* mean something a
+later reader can repeat.
+
+**Two of its own cases failed first, which is the argument for writing it.**
+The refusal-set mutation wrote `header` over a row whose rule already *was*
+`header` — **an inert fixture in the test written to prove the gate reaches
+the seam** — and the unlisted-vector case used `find | head -1`, which this
+repository's shell lint refuses as an early-exiting reader on the right of a
+pipe. **The lint caught its own author's new script on its first run**, which
+is the third gate today to fire first on the person who wrote it.
+
 ## 2026-09-20 16:14 [finding]
 
 **A requested-off symbol has four possible outcomes and the request can
