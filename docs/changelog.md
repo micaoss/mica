@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-09-20 06:22 [decision]
+
+**Three more things that lived in one place are in the tree**, placed by the
+test rather than by category — *could someone check this without asking the
+holder?*
+
+`docs/decisions/2026-09-16-consolidated-round-pause.md`: the pause of
+2026-09-16 and its lifting on 2026-09-19, recorded because **it ended the way
+a constraint should not — work resumed and nobody said the word.** Same decay
+as the format freeze, caught one step earlier. With the clause that survives
+it and is most likely to be assumed spent: nothing is pruned in any `ghcr`
+package and no workflow run is deleted until the collector's snapshots are in
+the bucket and a retention policy is agreed.
+
+`docs/decisions/2026-09-20-device-captures-are-not-committed.md`: a capture
+carrying a SoC serial is not committed to a public repository, because the
+hostname and MAC derive from that serial, so committing one publishes a device
+identity for the life of the board. Repositories cite the sha256; the bytes
+stay in coordination until the user decides where captures live. It also says
+what it does *not* ask for — redaction in place, since a capture with the
+serial removed is a different artefact from the one that was taken.
+
+**Two standing rules into `build-harness.md` section 4**, where the other
+rules about reading evidence already are. *A gate reports before it refuses,
+and the count that matters is unexplained, not dropped* — a gate relaxed to
+pass converts an open question into a green tick, so the refusal arrives when
+the unexplained count reaches zero and stays there; 703 paths left behind is
+not a failure condition, 703 unexplained would be. And `mica-core`'s
+**unchosen-property test**: count how many independent things would have to
+change for a property nobody chose to stop holding — *one is luck and needs a
+gate, several is structure and needs a record* — with its two instances,
+Dropbear without PAM and D-Bus activation being unreachable.
+
+**The aperture rule stops being a footnote in two specs.** It has five
+instances across four repositories and three tools, so section 4 now carries
+the single statement — *a negative claim inherits the aperture of the query
+that produced it*, whether the aperture was a filter, a file or a name — and
+`release-lock.md` 1.3 keeps its operational tag-separator instruction but
+cites the general rule instead of restating it. The fifth instance is the FIT
+suite: a name is an aperture too.
+
 ## 2026-09-20 06:18 [decision]
 
 **Two things that existed only in someone's head are now in the tree.**

@@ -40,3 +40,5 @@ Kinds:
 | [Naming: what is a board, what is a product, what is an image kind](2026-09-16-board-and-product-naming.md) | engineering decision | 2027-03-16 |
 | [Toolchains live in the build-env images; a consumer build reaches no archive](2026-09-16-toolchains-live-in-build-env.md) | engineering decision | 2027-03-16 |
 | [`mica-podman` pins its own build snapshot, not the Base apt row's](2026-09-16-podman-pins-its-own-snapshot.md) | deliberate deviation | 2027-03-16 |
+| [The consolidated-round pause, and when it ended](2026-09-16-consolidated-round-pause.md) | coordination decision | 2026-12-20 |
+| [A hardware capture carrying a SoC serial is not committed to a public repository](2026-09-20-device-captures-are-not-committed.md) | working practice | 2027-03-20 |

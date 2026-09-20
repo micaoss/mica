@@ -259,7 +259,10 @@ mirroring nothing while releases existed; and the index count in
 [mica-index](mica-index.md) was first taken with a `mica.` prefix test, which
 could not match `mica/20260915-2242` and returned nine of ten. The character
 class is four characters longer than the prefix test and was the difference
-between nine and ten.
+between nine and ten. The general rule this is the tag-form instance of — **a
+negative claim inherits the aperture of the query that produced it** — is
+stated once, in [build-harness](build-harness.md) section 4, with its other
+instances.
 
 ### 1.4 Order
 

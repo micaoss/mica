@@ -38,9 +38,28 @@ host: use the actual host project path and mount only required directories.
 | Shared component contract | the fixtures, diffed byte for byte between the two repositories |
 | Host/toolchain boundaries | `make os-host-toolchain-lint os-host-toolchain-lint-test` |
 
+**A gate reports before it refuses, and the count that matters is
+*unexplained*, not *dropped*.** A gate that is relaxed to make it pass is
+worse than no gate: it converts an open question into a green tick. So a new
+gate starts by reporting its number, the number is split into what is
+explained and what is not, and the refusal arrives when the unexplained count
+reaches zero and stays there. The composition drops are the instance: 703
+paths left behind is not a failure condition, 703 *unexplained* would be.
+
+**The unchosen-property test: count how many independent things would have to
+change for it to stop being true.** When you find a property nobody chose —
+something that happens to hold — **one is luck and needs a gate; several is
+structure and needs a record.** Dropbear working without PAM is the first
+kind: one package, one build flag, and it stops. D-Bus activation being
+unreachable is the second: several independent facts hold it, so it is a
+property of the design and belongs written down rather than guarded. The test
+is `mica-core`'s and it answers a question that otherwise turns into taste.
+
 **A query's aperture must be at least as wide as the claim built on it.**
-Four times now a narrow query has been read as a fact about the world, the
-fourth of them while correcting the third:
+*This is the general statement; where a spec needs the operational form, it
+cites this paragraph rather than restating it (`release-lock.md` 1.3).* Five
+instances now, across four repositories and three tools, the fourth of them
+while correcting the third:
 `mica-res`'s reader followed the spec's slash form and silently ignored every
 dot-form release; the index count was taken with a `mica.` prefix test that
 could not match the slash-form index and returned nine of ten; and the boot
@@ -56,6 +75,13 @@ run on push. True of that file, false of the system — a reusable workflow
 inherits the trigger of whoever calls it, so the aperture had to include the
 callers. When the claim is *when* something runs, one file is never the
 aperture.
+
+The fifth came from the opposite direction and is the reason this is stated
+once rather than twice: a suite named for FIT lifecycle tests the FIT boot
+path and boots nothing, so *no suite boots a FIT image* could only be
+established by reading every suite, not by trusting the one named for it. A
+negative claim inherits the aperture of the query that produced it, whether
+the aperture was a filter, a file or a name.
 
 **Identical wrong bytes are a pass.** The shared component-contract fixtures
 are diffed byte for byte between `mica-core` and `mica-build`; on the board
