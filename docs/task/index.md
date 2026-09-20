@@ -91,6 +91,6 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260920-0610-producer-data-assets Where a producer publishes data about its own output**](20260920-0610-producer-data-assets.md) `P1`
 - [ ] [**20260920-0627-feature-declaration-promises What a feature declaration promises, and the symbols that would keep it**](20260920-0627-feature-declaration-promises.md) `P2`
 - [ ] [**20260920-0752-uefi-arm64-framebuffer `uefi-arm64` gets a framebuffer back, and a page changes when it lands**](20260920-0752-uefi-arm64-framebuffer.md) `P2`
-- [ ] [**20260920-0851-negative-vector-audit Audit the negative vectors for double faults**](20260920-0851-negative-vector-audit.md) `P2`
+- [x] [**20260920-0851-negative-vector-audit Audit the negative vectors for double faults**](20260920-0851-negative-vector-audit.md) `P2`
 - [x] [**20260920-0629-release-deletion-question Open question: may an agent delete an empty or superseded release without asking**](20260920-0629-release-deletion-question.md) `P1`
 - [x] [**20260920-0700-hardware-pages-in-english Publish the hardware list: English pages and an allowlist that can name them**](20260920-0700-hardware-pages-in-english.md) `P2`

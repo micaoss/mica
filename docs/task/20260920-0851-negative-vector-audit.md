@@ -1,6 +1,8 @@
 # 20260920-0851-negative-vector-audit Audit the negative vectors for double faults
 
-- **status**: open — the definition exists, the harness does not
+- **status**: done 2026-09-20 — the mode is built, the whole set is measured
+  and the measurement is gated; three vectors stay unresolved for a recorded
+  reason rather than for want of work
 - **priority**: P2
 - **owner**: `mica` (the vectors are here, so the audit is one pass rather than
   five)
@@ -93,6 +95,31 @@ proof and it needs no re-parse: two repositories hold the same fixture, one
 with `pool.amd64.x`, and **that one would still have been refused after the
 same repair**. Same fixture, two trees, one of them testing nothing.
 
+## What the audit found, which is not what it was looking for
+
+**The definition this task is built on tests the wrong one of two properties.**
+Repairing the named defect by hand was measured on the eleven vectors that were
+not plain single-rule reports, and **all eleven became valid — the six recorded
+pairs among them**. *Repair → valid* asks whether a fixture carries a **second
+incidental defect**; the failure everyone is afraid of is a fixture that
+**keeps passing after the rule it names is broken**, and that is a question
+about which rules refuse the file *unrepaired*. The two agree on the 45 and
+disagree on exactly the six, which is how an audit runs against the wrong
+property without anybody noticing.
+
+**Final state**: 45 isolating, **8** inherent pairs in five families, 3
+unresolved. Two of the five stops carry a second rule found before the stop —
+a stop **truncates rather than taints**, because everything before it was
+raised under the same discipline as a completed run. The three that remain
+(`update-kind`, `index-product-source`, `image-registry`) have one defect
+confirmed by hand and would need a second reader to say more, because
+**suppression is not repair**: suppressing leaves the malformed value for the
+next check to read, which is exactly what the stop is.
+
+All of it is recorded in `vectors/refusal-sets.tsv` and re-run by
+`verify-release-lock.sh` (release-lock.md 9.4), so the numbers above are a
+gate's output rather than a paragraph's claim.
+
 **Decided 2026-09-20**: the second option, in the shape `mica-system-base`
 proposed — an optional **collect mode** in this repository's reader plus a
 second column in `expected.tsv`, with the short-circuit as the default because
@@ -102,11 +129,12 @@ structural refusal alone or the set of semantic refusals**, never a mixture,
 because suppressing a structural rule runs the semantic checks over malformed
 rows and manufactures the very pairs the mode exists to find.
 
-Neither is an afternoon, and neither is blocked. What is done is the cheap
-half, which found a real gap.
+Both were an afternoon in the end, and the expensive half found more than the
+cheap one: the cheap half found an untested rule, the expensive half found
+that the property being audited was not the property that was stated.
 
 ## Dependencies
 
-- **blocked by**: nothing; the harness is the work
+- **blocked by**: nothing; the harness is the work, and it is built
 - **blocks**: nothing — the vectors are usable today and the property is a
   quality of the set rather than a defect in it

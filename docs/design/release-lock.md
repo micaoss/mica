@@ -1216,8 +1216,11 @@ The first pass over the 56 refused vectors found **40 isolating the rule they
 name, 9 breaking more than one and 7 stopping early**; classifying
 `release-row` as structural — everything after it reads `rows[0]` as the
 release, so suppressing it leaves no readable file either — turned two of
-those stops into clean single-rule reports, and the set stands at **45
-isolating, 6 pairs, 5 unknown**. Three of the nine were
+those stops into clean single-rule reports, and the mode's own tally stands at
+**45 single-rule reports, 6 multi-rule reports and 5 stops**. What that tally
+says about the fixtures took one more measurement, below, and it moves two of
+the stops: the answer to the property is **45 isolating, 8 pairs, 3
+unresolved**. Three of the nine were
 **consequential** — changing a field that is part of the sort key moved the
 row out of order, so `sort-order` fired as well, which the named defect never
 required. All three are repaired (`lock/refused/image-source`,
@@ -1232,8 +1235,40 @@ testing it behind `image-source`. It is the only repair in the set that
 changed **what the fixture is about**, which a later reader cannot see from
 the diff, so it is said here.
 
-The six that remain are **inherent pairs**, and the record is the pair rather
-than a repair:
+**The definition everybody quoted — this one included — passes every fixture
+that fails the property.** Repairing the named defect by hand was measured on
+the eleven vectors that were not plain single-rule reports, and **all eleven
+became valid**, the six recorded pairs among them. That is not a
+contradiction; it is two different properties wearing one sentence:
+
+| | The question it asks | How it is measured | What it misses |
+|---|---|---|---|
+| **One defect** | does the fixture carry a second, *incidental* defect? | repair the named defect, require `valid` | a single token that breaks two rules |
+| **One refusal** | which rules refuse *this* file? | the collect mode | nothing, where it can run |
+
+The failure the property exists to catch is **a fixture that keeps passing
+after the rule it names is broken**, and that is the second question. Repair
+answers the first: it removes the defect and *both* rules with it, so a pair
+can never show up in it. The two verdicts agree on the 45 and disagree on
+exactly the six, which is why the disagreement went unnoticed — **a definition
+that is right about most of a set is how a set gets audited against the wrong
+property.**
+
+**And suppression is not repair**, which is what the five stops are saying.
+Suppressing a rule leaves the malformed value in place and lets the following
+code read it; repairing replaces the value. Where the two diverge the reader
+walks into a check the suppressed rule was protecting and the mode stops. So a
+stop is **the approximation's boundary, not a suspicious fixture** — and it
+**truncates rather than taints**: every refusal raised before a stop was raised
+under the same discipline as a completed run, which is why two of the five
+carry a second rule that stands. Three remain unresolved
+(`lock/refused/update-kind`, `lock/refused/index-product-source`,
+`lock/refused/image-registry`), each with one defect confirmed by hand and no
+way, short of a second reader, to see whether the same token breaks a rule the
+stop preempts.
+
+The eight that remain are **inherent pairs** — five families, one of them with
+three fixtures — and the record is the pair rather than a repair:
 
 | Vector | Names | Also breaks | Why they cannot be separated |
 |---|---|---|---|
@@ -1243,6 +1278,8 @@ than a repair:
 | `upstream/refused/image-without-digest` | `reference-digest` | `field-value` | as above |
 | `upstream/refused/release-row` | `upstream-release-row` | `kind-unknown` | a `release` row in an upstream lock is a kind that file may not carry |
 | `lock/refused/index-only-inputs` | `index-only-inputs` | `index-input` | an input row an index lock may not hold is also an input no `index` row names |
+| `lock/refused/index-without-index-rows` | `index-scope` | `index-product-source` | a lock with no `index` rows has no product with a source either |
+| `lock/refused/reference-without-digest` | `reference-digest` | `field-value` | the third fixture of the digest pair, found only when its stop was read |
 
 **No single fixture can separate an inherent pair**, so demanding isolation
 would push someone to contort a fixture until it tested less than it does now.
@@ -1263,7 +1300,11 @@ subtraction and the collect mode **report rather than refuse**.
 built** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the
 named defect and require the result to become valid; anything that stays
 refused was testing two rules at once.** That is a definition rather than an
-inspection, and the distinction matters — *no gate can check this* is a
+inspection, and it is kept in the words it was proposed in, because measuring
+it is what showed it defines **one defect** rather than **one refusal**: all
+six pairs above satisfy it. A definition is not made right by being
+mechanical, and this one was quoted, adopted and built before anyone ran it.
+The distinction it does draw is still the useful one — *no gate can check this* is a
 permanent limit, *no harness exists yet* is a piece of work, and **only one of
 those ever gets built.** The audit belongs here, once, at the source: forty-odd
 refused vectors in one pass rather than five repositories doing it five times,
@@ -1307,3 +1348,34 @@ between a record that needs an owner and one that needs a command.
 
 `mica-res` reads pins and now locks and carries no copy; that is the one row
 of the table with nothing behind it.
+
+### 9.4 `refusal-sets.tsv`: every rule a refused vector breaks
+
+`expected.tsv` names **one** rule per vector, because that is the contract of
+a short-circuiting reader. The collect mode answers a different question, and
+its answers are recorded beside the vectors in
+`vectors/refusal-sets.tsv` rather than in a page, so a gate reads them:
+
+```text
+<vector>	<set|stopped>	<rules, sorted, space separated>	<valid|unmeasured>
+```
+
+- **column 2** is which form the mode returned: a complete set, or a stop;
+- **column 3** is the rules it found, sorted — *sorted*, because discovery
+  order is an artefact of the mode's own ordering and nothing should be
+  asserted about it;
+- **column 4** is whether repairing the named defect was measured, by hand, to
+  make the file valid. It is **hand-measured and the gate cannot re-derive
+  it**: the repairs are not stored, so the gate checks only that the word is
+  one of the two it may be. `unmeasured` is a word this column must be able to
+  say — a column that can only say `valid` records nothing.
+
+`verify-release-lock.sh` re-runs the mode over every refused vector and
+compares. It **pins a measurement, it does not prove a property**: the mode
+under-reports by construction, so a matching row means *today's reader finds
+what yesterday's reader found*, and a mismatching one is a finding either way
+round — a vector that starts breaking a second rule, or stops breaking one it
+did, both turn a silent change into a red gate. The row count is checked
+against the refused vectors of `expected.tsv` in both directions, because a
+table that can silently cover fewer files than it claims is the failure this
+whole section is about.

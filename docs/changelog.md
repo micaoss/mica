@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 14:50 [finding]
+
+**The negative-vector audit finished, and the definition it was built on tests
+the wrong property.** `mica-build`'s form — *repair the named defect and
+require the result to become valid* — was measured by hand on the eleven
+vectors that were not plain single-rule reports, and **all eleven became
+valid, the six recorded pairs among them**. Repair asks whether a fixture
+carries a **second incidental defect**; the failure the property exists to
+catch is a fixture that **keeps passing after the rule it names is broken**,
+which is a question about the *unrepaired* file. The two verdicts agree on 45
+of 56 vectors and disagree on exactly the six, which is how a set gets audited
+against the wrong property and reported as clean.
+
+**And suppression is not repair** — which is what the five stops were saying.
+Suppressing a rule leaves the malformed value for the next check to read;
+repairing replaces it. A stop is the approximation's boundary, not a
+suspicious fixture, and it **truncates rather than taints**: two of the five
+carry a second rule that was found before the stop and stands. Final state
+**45 isolating, 8 inherent pairs in five families, 3 unresolved**, up from the
+6 pairs recorded this morning.
+
+**The numbers are now a gate's output rather than a paragraph's claim**:
+`vectors/refusal-sets.tsv` records every rule each refused vector breaks, and
+`verify-release-lock.sh` re-runs the collect mode over all 56 and compares
+(355 checks, up from 298). It pins a measurement rather than proving a
+property — a vector that starts breaking a second rule *or stops breaking one*
+is a finding either way round. Column 4 carries the hand-measured repair
+result and can say `unmeasured`, because **a column that can only say `valid`
+records nothing**.
+
 ## 2026-09-20 14:42 [finding]
 
 **One more relayed number was wrong, and I had already copied it into the

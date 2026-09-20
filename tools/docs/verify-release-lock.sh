@@ -100,6 +100,42 @@ while IFS=$'\t' read -r vector relation sibling; do
     esac
 done <"$DERIV"
 
+# Every rule each refused vector breaks, not just the first. The collect mode
+# under-reports by construction, so this pins a measurement rather than proving
+# a property: a vector that starts breaking a second rule, or stops breaking one,
+# turns a recorded set into a finding instead of a quiet change (release-lock.md
+# 9.4). Column 4 is hand-measured and only its vocabulary can be checked here.
+SETS="$V/refusal-sets.tsv"
+[ -s "$SETS" ] || fail "$SETS is missing or empty"
+while IFS=$'\t' read -r vector outcome rules repaired; do
+    case "$vector" in '#'*|'') continue ;; esac
+    CHECKS=$((CHECKS + 1))
+    case $vector in
+        lock/*)     got=$(python3 tools/docs/release-lock-check.py collect lock "$V/$vector") ;;
+        upstream/*) got=$(python3 tools/docs/release-lock-check.py collect upstream "$V/$vector") ;;
+        *) fail "refusal-sets.tsv names $vector, which is not a lock vector"; continue ;;
+    esac
+    head=${got%% *}
+    sorted=$(echo "${got#* }" | tr ' ' '\n' | sort | tr '\n' ' ')
+    sorted=${sorted% }
+    case $outcome in
+        set)     want_head=refused-set ;;
+        stopped) want_head=collect-stopped ;;
+        *) fail "$vector: unknown outcome '$outcome'"; continue ;;
+    esac
+    [ "$head" = "$want_head" ] || fail "$vector: expected $want_head, got '$got'"
+    [ "$sorted" = "$rules" ] || fail "$vector: expected rules '$rules', got '$sorted'"
+    case " $rules " in *" $(awk -F'\t' -v v="$vector" '$1==v {print $3}' "$V/expected.tsv") "*) ;;
+        *) fail "$vector: the rule expected.tsv names is not in its refusal set '$rules'" ;;
+    esac
+    case $repaired in valid|unmeasured) ;; *) fail "$vector: unknown repair column '$repaired'" ;; esac
+done <"$SETS"
+
+recorded=$(grep -vc '^#' "$SETS" || true)
+refused_count=$(awk -F'\t' '!/^#/ && $2=="refused" && ($1 ~ /^lock\// || $1 ~ /^upstream\//)' "$V/expected.tsv" | wc -l)
+CHECKS=$((CHECKS + 1))
+[ "$recorded" = "$refused_count" ] || fail "refusal-sets.tsv has $recorded rows for $refused_count refused lock vectors"
+
 while IFS= read -r vector; do
     CHECKS=$((CHECKS + 1))
     listed_in_derivation=1
