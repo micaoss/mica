@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-20 16:41 [finding]
+
+**The three coordination rules are landed as a section of the decision that
+owns them**, in their author's words, with the verification split written into
+the section rather than into a covering note: *a conditional ruling is not a
+ruling when the condition is itself work*; *route techniques, not
+conclusions*, whose cost is **not a slower result but no result**; and *send a
+correction before the repository acts, not after it reports* — **late is not
+wrong, it is expensive, and the expense lands on whoever was mid-work**, which
+is the one cost in this workspace no gate measures.
+
+**The count in it is this repository's because its author left it out on
+purpose**, having relayed a wrong one earlier the same day: the multiset
+argument came from `mica-system-base` and, run over these fixtures, **eight
+were repaired across `0a4a13f`, `c4efe00` and `653f641` — five the missing
+comment line, three whose named defect dragged `sort-order` with it**. The
+other three instances exist only in the coordination channel and are marked as
+their author's, which is **the subject of the decision they are a section
+of**, not a caveat on it.
+
 ## 2026-09-20 16:38 [finding]
 
 **Six offered rules, four homes, and the set is the widening.** A day's

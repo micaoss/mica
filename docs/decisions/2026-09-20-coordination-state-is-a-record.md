@@ -99,6 +99,59 @@ check stops the accident; the record stops the argument.* Where a detector is
 available it belongs in the CI of the repository whose files it guards, which
 is its owner's to add rather than this page's to impose.
 
+### Three rules a coordinator learns and nothing else records
+
+*Written by the coordinator, landed here verbatim. The verification split is
+at the end of the section: one instance is checkable in this repository's own
+commits and three exist only in the coordination channel, which is this
+decision's own subject.*
+
+The state these rules are about is a working state — who is mid-round, what
+has been sent, which version somebody is acting on — and the decision above
+is that it lives in a record because nobody else can read it. These three are
+what that costs when it is not written down.
+
+**A conditional ruling is not a ruling when the condition is itself work.**
+"Do X, provided Y is checkable" is a sentence a repository correctly reads as
+unresolved, and it waits. It happened twice on 2026-09-20, hours apart, in the
+same repository, and the second time was after the coordinator had written the
+sentence naming the first. Both times the repository was right to wait and
+both times a decision had been available. The repair is not to avoid
+conditions: it is that a condition the recipient must *do work to evaluate*
+makes the ruling theirs, and if it was meant to be theirs the message should
+say so.
+
+**Route techniques, not conclusions.** A conclusion arrives as something to
+believe; a technique arrives as something to run, and belief is where
+measurement stops. On 2026-09-20 an argument about what a refused vector
+*cannot* differ by was carried from the repository that invented it to the one
+holding the largest fixture set, and it found defects in that set within the
+hour — defects that the same repository's own conclusion, routed alone, would
+not have found, because there would have been nothing to run. The cost of
+routing the conclusion is not a slower result; it is no result.
+
+**Send a correction to the repository about to act on the wrong version before
+it acts, not after it reports.** Late is not wrong, it is expensive, and the
+expense lands on whoever was mid-work. This is the one cost in this workspace
+that no gate measures: a repository that has already pushed a change based on a
+superseded instruction has spent a round, and the coordinator who knew and
+waited spent nothing. The corollary is that a coordinator's queue is not
+ordered by importance. It is ordered by whether somebody is about to act.
+
+**What is checkable here, and what is not.** The technique-routing instance is
+this repository's on both ends and the count is supplied here rather than in
+the text above, because the author left it out deliberately after relaying a
+wrong one earlier the same day: the argument came from `mica-system-base`, it
+was run over these fixtures, and **eight fixtures were repaired across three
+commits — `0a4a13f`, `c4efe00` and `653f641` — five of them the missing
+comment line and three whose named defect dragged `sort-order` with it**. The
+other three instances — both conditional rulings, and the
+correction-before-acting case where `mica-podman` was told that a pin move is
+not one line where a copy is pinned to it, before it pushed a change a gate
+would have refused — **exist only in the coordination channel and are recorded
+on their author's authority.** That is not a caveat on this section; it is the
+thing the decision above is about.
+
 ## Why it is written as a rule rather than as an incident
 
 Five instances across two days is a claim about how the role works, not a
