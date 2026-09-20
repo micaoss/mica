@@ -569,6 +569,38 @@ exact-image guest or board acceptance is still pending. A merge is neither a
 release nor an acceptance pass; authentication, signature and release gates
 are unchanged.
 
+**The composer's declaration model has two proof mechanisms and a third
+category neither covers** *(2026-09-20, `mica-build`, from the 626 sweep)*. It
+proves a path by **package ownership** and keeps a library by **`DT_NEEDED`**.
+**Neither sees a runtime load by name.** Every `dlopen` family in the root is
+carried because somebody wrote a rule naming it — NSS, PAM, the OpenSSL
+providers, all named in `consumers.json` — so that third category is held
+together **entirely by human foresight**, and last night measured how far
+foresight got: **eleven families right, one missed.**
+
+The one missed is the illustration and it is the purest form of a shape these
+records keep meeting: `/usr/bin/stdbuf` is carried and
+`/usr/libexec/coreutils/libstdbuf.so` is dropped. `stdbuf`'s whole mechanism
+is to put that library in `LD_PRELOAD` and `exec`, so without it **the command
+runs, exits zero, and silently does not buffer** — a tool that is present,
+executes, succeeds and does nothing. It was found by reading the shipped
+binary's own strings rather than a manual, which is the output rather than the
+input.
+
+This is a **boundary of the model, not a defect in it**, which is why it is
+stated where the rules are: a reader of `consumers.json` today would
+reasonably conclude that ownership plus `DT_NEEDED` is the whole model, and
+would be wrong in the one direction that produces a silent no-op.
+
+**And test a proposed check against the case that made you want it, before
+proposing it.** The first check drafted for this enumerated carried binaries
+whose dynamic symbols include `dlopen` — and `stdbuf` does not `dlopen`
+anything, it sets `LD_PRELOAD` and execs, so the check would have produced a
+tidy list **not containing the one defect anyone knew about**. That is the
+worst kind of check: **one that looks complete and omits the instance that
+motivated it.** The second draft keys on the **name** rather than the
+mechanism, because the mechanism is what varies.
+
 Each acceptance round uses one immutable candidate image:
 
 1. Preflight the whole input set: package ownership, generated files, symlinks

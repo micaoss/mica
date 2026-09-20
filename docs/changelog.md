@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 08:20 [finding]
+
+**The composer has two proof mechanisms and a third category neither covers**,
+recorded where the composition rules are because it is their **boundary**
+rather than a defect in them: ownership proves a path, `DT_NEEDED` keeps a
+library, and **neither sees a runtime load by name**. Every `dlopen` family in
+the root — NSS, PAM, the OpenSSL providers — is carried because somebody named
+it in `consumers.json`, so that category is held together entirely by human
+foresight, and the sweep measured how far foresight got: **eleven families
+right, one missed.**
+
+**The illustration is the purest form of tonight's shape**: `/usr/bin/stdbuf`
+is carried and `/usr/libexec/coreutils/libstdbuf.so` is dropped, and since
+`stdbuf`'s whole mechanism is to put that library in `LD_PRELOAD` and `exec`,
+the command **runs, exits zero, and silently does not buffer**. A tool that is
+present, executes, succeeds and does nothing — found by reading the shipped
+binary's strings rather than a manual, which is the output and not the input.
+A reader of `consumers.json` today would conclude ownership plus `DT_NEEDED`
+is the whole model, and would be wrong in exactly the direction that produces
+a silent no-op.
+
+**And a method rule with its own failed attempt attached**: *test a proposed
+check against the case that made you want it, before proposing it.* The first
+draft enumerated carried binaries whose dynamic symbols include `dlopen` —
+and `stdbuf` does not `dlopen` anything, so it would have produced a tidy list
+**not containing the one defect anyone knew about**. That is the worst kind of
+check: **one that looks complete and omits the instance that motivated it.**
+The second keys on the name rather than the mechanism, because the mechanism
+is what varies.
+
 ## 2026-09-20 08:16 [finding]
 
 **A fourth kind of aperture: a resolution.** The three named so far — a
