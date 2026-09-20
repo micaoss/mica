@@ -1,6 +1,6 @@
 # 20260914-2042-release-lock-offline-build Move every repository to the release lock format and build the chain offline
 
-- **status**: in_progress
+- **status**: in_progress — clause A reachable and unproven (2026-09-20 17:26; before that, unreachable since 2026-09-20 12:00)
 - **priority**: P1
 - **owner**: olea2l5k (step 0 and records); each step by its repository owner
 - **createdAt**: 2026-09-14 20:42

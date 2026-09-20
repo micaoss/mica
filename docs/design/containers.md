@@ -851,6 +851,14 @@ where it was looking. **A reader who sees somebody thinking carefully about
 one trap has no reason to check for another**, which is a cost of a good
 comment that these records had not priced.
 
+**And its hardest variant, met the same evening: borrowed evidence supporting
+a true conclusion.** A paragraph elsewhere in these records credited two saves
+to an instrument when one of them was a person's habit — **the conclusion was
+right, nothing downstream would ever have failed, and the sentence would have
+been quoted for years with a two in it.** A wrong number inside a correct
+argument has no failure mode of its own, which is what makes it the version
+that survives review.
+
 **The repair took three versions in one evening, and the third is different in
 kind.** Version 1 read `/sys/fs/cgroup/cpu.max` — a file that can **never**
 exist. Version 2 moved into `system.slice`, where systemd delegates what it

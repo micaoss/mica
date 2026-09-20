@@ -326,6 +326,18 @@ English source.
   and not the outcomes they produced. Where two independent measurements agree
   on a count, the class is closed; where only one exists, say which side it
   was taken from.
+- **A status line is a cached summary of the notes below it, and nothing in
+  the file says which was updated last** *(2026-09-20)*. A record can change
+  **in the note** while the status reads the same: the offline-build task's
+  acceptance line was untouched all day while a note four paragraphs down went
+  from *unreachable* to *the seam was crossed* — **the sentence that changed
+  was not the sentence anybody was looking at**. A reader who trusts the
+  status is reading a summary that may predate the thing it summarises. The
+  cheap repair is a format rather than a rule: **when a note changes the
+  state, the status line says so and carries the date it was decided**, which
+  turns *which of these two is newer* from unanswerable into readable. Applied
+  to that task today; making it a required form across every task file is a
+  proposal and not something to impose on 48 records by fiat.
 - **Do not rewrite a page to the later fact when the earlier one taught
   something** *(2026-09-20)*. A claim was published at 16:24 with its subject
   named — a re-pin that answered 422 at `origin` — and by 16:28 the push had

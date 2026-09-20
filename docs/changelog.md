@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 17:30 [finding]
+
+**Exactly one cell of the defence table reports itself.** A format's save
+leaves an artefact other people read; a habit's save leaves nothing and is
+known only if the person narrates it; a failure is counted only when somebody
+later catches the wrong sentence; a defence never tried leaves no trace at
+all. **So the argument for formats is not that they work better — it is that
+they are the only defence whose effectiveness is measurable at all.** A habit
+might be the better defence on a given day and nobody could ever find out.
+And the arithmetic runs the counter-intuitive way: an unreported habit save
+adds to the denominator and not to the format count, so **a quarter is the
+ceiling, not the estimate**.
+
+**A status line is a cached summary of the notes below it, and nothing in the
+file says which was updated last.** The offline-build task's acceptance line
+was untouched all day while a note four paragraphs down moved from
+*unreachable* to *the seam was crossed* — **the sentence that changed was not
+the sentence anybody was looking at**. The repair is a format: when a note
+changes the state, the status line says so **and carries the date it was
+decided**. Applied to that task; making it a required form across 48 records
+is a proposal, not something to impose by fiat.
+
+**And the hardest variant of the armoured comment, met the same evening:
+borrowed evidence supporting a true conclusion.** Two saves were credited to
+an instrument when one was a person's habit — the conclusion was right,
+nothing downstream would have failed, and the sentence would have been quoted
+for years with a two in it. **A wrong number inside a correct argument has no
+failure mode of its own**, which is why it survives review.
+
 ## 2026-09-20 17:28 [finding]
 
 **A sentence published here an hour ago counted two survivals as one kind, and
