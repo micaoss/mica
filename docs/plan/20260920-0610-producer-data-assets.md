@@ -1,9 +1,10 @@
 # 20260920-0610-producer-data-assets Where a producer publishes data about its own output
 
-- **status**: proposed
+- **status**: implemented in the spec (2026-09-20); the producing and
+  consuming repositories follow
 - **createdAt**: 2026-09-20 06:10
-- **approvedAt**: (pending — the user decides; this changes a rule the
-  workspace instructions state)
+- **approvedAt**: 2026-09-20 (user: "按建议处理" — proposal A, the new `data`
+  row, with `SHA256SUMS` unchanged and the exception list closed)
 - **relatedTask**: 20260920-0610-producer-data-assets
 
 ## Context

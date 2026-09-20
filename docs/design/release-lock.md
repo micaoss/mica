@@ -31,6 +31,14 @@ image files (1.0), and its index releases `mica.<YYYYMMDD-HHMM>`, which carry
 exactly `mica-build.lock`, `mica-index.json` and a `SHA256SUMS` listing both
 (1.2.3, `docs/design/mica-index.md`).
 
+**Any repository may also carry producer data, each file named by a `data` row
+of its own lock** *(user, 2026-09-20)*. `SHA256SUMS` still lists exactly one
+file, the lock, and the exception list above is unchanged: the chain a
+consumer follows is `SHA256SUMS` → lock → the row's sha256 → the file, which
+is the chain `mica-build`'s images already use (1.2.2). What a `data` asset
+may be is bounded in 1.2.4, and what it may not be is the point of the
+bound.
+
 ### 1.0 Scoped releases
 
 Two repositories release by scope instead of all at once (user, 2026-09-15);
@@ -89,6 +97,7 @@ row carries the scoped tag (1.2), OCI tags carry the scope before the release
 | `origin` | `origin mica-build.<scope> <commit>` | input | the commit of an indexed scoped release (1.2.3); index locks only |
 | `built` | `built mica-build.<scope> <repository>[.<scope>] <release> <sha256>` | input, name | one input row of an indexed scoped release's lock, verbatim (1.2.3); index locks only |
 | `index` | `index <product> mica-build.<scope>` | product | the scoped release an indexed product comes from (1.2.3); index locks only |
+| `data` | `data <name> <file> <sha256>` | name | one producer-data release asset, published by any repository (1.2.4) |
 
 Values *(fixed here)*: `<arch>` is `amd64` or `arm64`; names are
 `[a-z0-9][a-z0-9.+-]*`, except an `upstream` image name (1.2.1); versions
@@ -205,6 +214,42 @@ and the previous index) are done when the index is cut and by the verifier,
 not by a file reader. `mica-index.json` is specified in
 `docs/design/mica-index.md`.
 
+#### 1.2.4 Producer data: the `data` row
+
+A producer that computes something about its **own output** which a consumer
+must be able to read reproducibly from a pinned release publishes it as a
+release asset named by a `data` row *(user, 2026-09-20)*:
+
+```text
+data <name> <file> <sha256>
+```
+
+`<name>` is the producer's own identifier for the datum and is the row's key;
+`<file>` is the asset's file name; `<sha256>` is its digest. Both are
+`[a-z0-9][a-z0-9.+-]*`. The instance it was approved for is
+`mica-system-base`'s list of the paths in its root that no package owns, each
+with its writer named — data a consumer needs and cannot derive.
+
+**Why a new kind rather than a wider `asset` row.** `asset` is
+product-shaped — `asset <product> image|update <kind> <file> <sha256>`, tied
+to a `bundle` row by `asset-without-bundle` — and widening it would give one
+kind two column layouts, which `column-count` exists to prevent. The
+mechanism is reused; the row is new.
+
+**What a `data` asset may not be.** Not a package: packages live only in the
+pools (section 2). Not an image, archive or anything a device installs: those
+are 1.2.2's rows. **Not a build input** — a build reads pools and lock rows,
+never another repository's `data` file — so no repository's build may come to
+depend on one. And not mutable: like every other asset it is fixed at its
+release, and a correction is the next release.
+
+**What a consumer may assume about a `data` row it does not understand**: that
+the file exists in that release and hashes to that value, that it is needed
+for nothing, and that skipping it is always safe. Its meaning belongs to the
+producer, not to the format. `kind-unknown` is unchanged, so a reader that
+does not know the kind still refuses the lock: readers and writers move
+together, as they did for the format itself.
+
 ### 1.3 References
 
 A reference of a `pool`, a `board` or a repository's image is
@@ -268,7 +313,7 @@ instances.
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,
 `package`, `board`, `upstream`, `apt`, `input`, `origin`, `built`, `index`,
-`product`, `bundle`, `asset`), then by key, compared as bytes. The
+`product`, `bundle`, `asset`, `data`), then by key, compared as bytes. The
 same inputs therefore give the same bytes.
 
 ### 1.5 Refusal rules
@@ -280,7 +325,7 @@ the ones the vectors use:
 |---|---|
 | `header` | line 1 is not `# mica-lock v1` |
 | `encoding` | not UTF-8, CR, missing final LF, empty line, leading space, trailing tab |
-| `kind-unknown` | the first column is not one of the fourteen kinds |
+| `kind-unknown` | the first column is not one of the fifteen kinds |
 | `image-source` | an `image` row whose source is neither `upstream` nor a repository name, or a repository other than the release row's |
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
@@ -303,6 +348,7 @@ the ones the vectors use:
 | `bundle-without-product` | a `bundle` or `asset` row whose product has no `product` row |
 | `asset-without-bundle` | an `asset` row without a `bundle` row of its product and type |
 | `update-full` | an update `bundle` without the product's `full` update asset |
+| `data-file` | two `data` rows naming the same `<file>` |
 | `board-components` | a `mica-boards` lock without a `board` row for the `board` component or one for `kernel` |
 | `sort-order` | rows out of the order of 1.4 |
 

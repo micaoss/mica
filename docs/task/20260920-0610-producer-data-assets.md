@@ -1,6 +1,7 @@
 # 20260920-0610-producer-data-assets Where a producer publishes data about its own output
 
-- **status**: proposed — the user decides
+- **status**: approved 2026-09-20 and landed in the spec; `mica-system-base`
+  wires its artefact into its next release
 - **priority**: P1
 - **owner**: `mica` (the specification); raised by `mica-system-base`, routed by the coordinator
 - **createdAt**: 2026-09-20 06:10
@@ -38,9 +39,13 @@ release?** A CI artifact is not content-addressed, expires and cannot be
 pinned, so it cannot serve a consumer that must read the data at the release
 it already pins.
 
-The proposal is `docs/plan/20260920-0610-producer-data-assets.md`. Nothing is wired into any
-release until the user decides: this touches a constraint written into the
-workspace instructions themselves.
+The proposal is `docs/plan/20260920-0610-producer-data-assets.md`. **Approved
+by the user on 2026-09-20** ("按建议处理"): the `data` row is specified in
+`docs/design/release-lock.md` 1.2.4, sorts last (1.4), refuses as
+`data-file`, `column-count`, `field-value`, `duplicate-key` and `sort-order`
+(1.5), and is proven by six new vectors — the gate is 168/168. `SHA256SUMS`
+still lists exactly one file and the exception list is unchanged.
+`mica-system-base` can wire its unowned artefact into its next release.
 
 ## ActiveForm
 

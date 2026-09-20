@@ -24,7 +24,8 @@ class Refused(Exception):
 
 
 KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5,
-                "input": 4, "origin": 3, "built": 5, "index": 3, "product": 8, "bundle": 4, "asset": 6}
+                "input": 4, "origin": 3, "built": 5, "index": 3, "product": 8, "bundle": 4, "asset": 6,
+                "data": 4}
 KIND_ORDER = list(KIND_COLUMNS)
 BASE_ONLY = {"upstream", "apt"}
 BUILD_ONLY = {"input", "origin", "built", "index", "product", "bundle", "asset"}
@@ -212,6 +213,14 @@ def check_lock(path):
             if not index_lock:
                 field(asset_file(row, release))
             key = (row[1], row[2], row[3])
+        elif kind == "data":
+            # 1.2.4: any repository may name producer-data assets. The file is
+            # the second key: two names for one file would make the asset's
+            # meaning depend on which row a reader happened to take.
+            field(NAME.match(row[1]) and NAME.match(row[2]) and SHA256.match(row[3]))
+            if any(r[0] == "data" and r[2] == row[2] and r is not row for r in rows):
+                raise Refused("data-file")
+            key = (row[1],)
         else:
             raise Refused("release-row")
         if (kind,) + key in keys:

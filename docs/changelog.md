@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 07:55 [spec]
+
+**The `data` row is approved and in the spec.** The user took proposal A
+("按建议处理"), so `docs/design/release-lock.md` carries
+`data <name> <file> <sha256>` in 1.2.4: any repository may publish producer
+data as a release asset named by a row of its own lock, and **`SHA256SUMS`
+still lists exactly one file, the lock** — the chain is the one
+`mica-build`'s images already use, `SHA256SUMS` → lock → row → file, with the
+exception list closed.
+
+**The correction that made it a new kind rather than a wider one is kept
+where the row is defined**, because the next reader will ask: `asset` is
+product-shaped and tied to a `bundle` by `asset-without-bundle`, and widening
+it would give one kind two column layouts, which `column-count` exists to
+prevent. The bounds are there too — not a package, not anything a device
+installs, **not a build input** (no repository's build may depend on
+another's `data` file), not mutable — and what a consumer may assume about a
+row it does not understand: the file exists at that digest, it is needed for
+nothing, skipping it is safe. `kind-unknown` is unchanged, so readers and
+writers move in one round.
+
+**Proven, not asserted**: six vectors — one valid lock carrying two rows and
+five refusals (`data-file`, `column-count`, `field-value`, `duplicate-key`,
+`sort-order`) — take `make docs-verify` from 156 to **168/168**, with every
+pre-existing vector unchanged, which is the check that this is a widening and
+not a new format.
+
+`mica-system-base` can wire its unowned-paths artefact into its next release.
+
 ## 2026-09-20 07:52 [decision]
 
 **Three more user answers recorded, each where it changes something.**
