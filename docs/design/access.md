@@ -66,6 +66,51 @@ preferences or history rather than a mechanism.
 | Rescue (all-deployments-failed boot entry) | chroot repair environment | physical access (cmdline / boot failure) | **not implemented.** There is no rescue boot entry and no offline repair environment; the emergency BusyBox binary lives in the same root that would be damaged and is deliberately not one (`docs/design/recovery.md` §6.3). An unbootable device needs an external service host or a whole-disk reflash, which replaces its data and its identity |
 | Factory (rockusb / SoC loader mode) | full reflash | physical access | hardware-level; see §9.2 |
 
+**The two accounts, and why neither has a password.** The root has exactly two
+accounts and neither can log in with one: `root` is `*` in `/etc/shadow` and
+the operator `mica` (uid and gid 1000) is `!`. A signed root is byte-identical
+on every device, so a password inside it would be one secret shared by the
+whole fleet; `mica-shadow-reconcile` rebuilds the shadow file in RAM at every
+boot and re-locks anything that is not locked. The only password that can
+exist is a transient root password set through micad, and it is gone at the
+next boot. **The console is for reading**; interactive access is micad's to
+grant, and granting it is also what enables `dropbear` at runtime. Three
+consequences that a reader cannot reconstruct from the files *(decided
+2026-09-20; source `mica-system-base:README.md` at `b66a358d`, lifted here
+because it is workspace policy rather than one repository's build detail)*:
+
+- **`/home/mica` is not in the root, deliberately.** The postinst creates the
+  account with `useradd --no-create-home`; `mica-seed-home` creates
+  `/mica/home/mica` on DATA owned `1000:1000` mode `0700` and leaves an
+  existing one alone; `home.mount` binds it onto `/home` after that service. A
+  home in the image would be a home nobody can keep, which is also why the uid
+  and gid are fixed. **Diagnostic:** if the home is missing on a device, the
+  fault is `mica-seed-home.service` or `home.mount`, never the account.
+- **`uidmap` is absent on purpose.** `newuidmap` and `newgidmap` are not
+  installed: nothing in the base root maps a user namespace, and rootless
+  containers are deliberately unsupported. If a later stage ever wants
+  rootless, `uidmap` is a row of `mica-system-base:upstream.pkgs` — pinned for
+  later stages, not installed in the root — rather than a change to the base
+  root.
+- **`/etc/subuid` and `/etc/subgid` are kept, inert by design.**
+  `mica:100000:65536` is what `useradd` writes from `login.defs`; no code asks
+  for it, and with no `uidmap` in the root the ranges do nothing. They stay
+  because suppressing them would be inventing a policy to undo a Debian
+  default.
+
+**What the published images actually do today, which is none of the above**
+*(2026-09-20)*. `mica-build`'s composer proves a declaration by package
+ownership, so a path no rule names is dropped even when a package owns it;
+`/etc/pam.d/login` and the four generated `common-*` files were dropped, and
+**every published image of every board has no console login** as a result. The
+measurement from a real compose is 2980 paths carried and 703 left behind, 626
+of them owned by a package and claimed by nothing and 77 shipped by no package
+at all. The rows above describe the design; until a release carries those
+files, a login prompt on any published image cannot succeed. `mica-build` owns
+the fix and `mica-system-base` publishes the list of unowned paths that makes
+the second class reasonable about
+([proposal](../task/20260920-0610-producer-data-assets.md)).
+
 **One policy source.** The image carries **Dropbear**, and micad renders the only
 file that configures it — `/run/mica/dropbear.env`, one `DROPBEAR_ARGS` line —
 and drives `dropbear.service` (§3). That ownership is what keeps the SSH policy

@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-20 06:18 [decision]
+
+**Two things that existed only in someone's head are now in the tree.**
+
+`docs/decisions/2026-09-16-podman-pins-its-own-snapshot.md`: `mica-podman`'s
+`pins/snapshot` is deliberately not the Base `apt` row's snapshot, because the
+build-env images carry packages newer than the Base snapshot and `apt` will
+not resolve against them without downgrades. The intent of the rule is kept
+where it binds — the declared `Depends` floors, verified by `make base-check`
+on both architectures every run, which snapshot equality never was — and the
+measurement at the time is cited rather than restated: all seven engine
+binaries byte-identical to the previous build, no-cache rebuild identical,
+evidence in the `20260916-0846` release notes. Sunset 2027-03-16, with the
+condition that would end it named. The deviation was accepted and explained on
+2026-09-16; what was missing is that a release note is a note about one
+release, and a reader asking *why do these two files disagree* reads
+`docs/decisions/`.
+
+**The operator account policy, lifted from `mica-system-base:README.md`
+(`b66a358d`) into `docs/design/access.md` section 2**, where a person looking
+for console access will meet it: two accounts, neither with a password, a
+signed root being byte-identical across the fleet; `/home/mica` absent on
+purpose with the DATA mechanism and its one-line diagnostic (a missing home is
+`mica-seed-home.service` or `home.mount`, never the account); `uidmap` absent
+on purpose with where it would come from if rootless were ever wanted; and
+`/etc/subuid`/`subgid` kept inert by design rather than suppressed. It is
+workspace policy, not one repository's build detail, which is why it is here
+and not only there.
+
+**And the sentence those rows needed beside them**: every published image of
+every board has **no console login**, because the composer's ownership proof
+dropped `/etc/pam.d/login` and the generated `common-*` files — 2980 paths
+carried, 703 left behind, 626 owned and unclaimed, 77 owned by nothing. The
+design rows describe the design; a login prompt on a published image cannot
+succeed until a release carries those files. Recorded where the channels are
+described rather than as an incident note.
+
 ## 2026-09-20 06:12 [spec]
 
 **The 2026-09-14 format freeze is spent, checked rather than recalled.** Its
