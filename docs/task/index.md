@@ -89,3 +89,4 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260916-1653-root-only-archive The root-only update archive, first exercised on real releases**](20260916-1653-root-only-archive.md) `P1`
 - [x] [**20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board**](20260917-1033-zh-hardware-list.md) `P2`
 - [ ] [**20260920-0610-producer-data-assets Where a producer publishes data about its own output**](20260920-0610-producer-data-assets.md) `P1`
+- [ ] [**20260920-0627-feature-declaration-promises What a feature declaration promises, and the symbols that would keep it**](20260920-0627-feature-declaration-promises.md) `P2`

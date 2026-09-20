@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-20 06:27 [progress]
+
+A placeholder with a fact in it, `docs/task/20260920-0627-feature-declaration-promises.md`:
+the feature-to-symbols mapping authorised across `mica-podman`, `mica-build`
+and `mica-boards` will need a home here, and the part worth writing when it
+lands is not the mapping. It is that **a feature declaration had never been
+defined as promising anything, which is why nothing could check it** — a
+declaration that promises nothing cannot be violated, so no gate can exist for
+it, and the gap surfaces only when someone measures a kernel. That is how
+`CONFIG_CFS_BANDWIDTH` came to be missing on both UEFI boards, where a CPU
+quota therefore cannot be enforced, found by a `mica-boards` control build
+that reproduces the published `bzImage` byte for byte.
+
+The record exists now rather than when the proposal lands for the reason the
+rest of this evening kept demonstrating: an expected record held in one head
+is a record that arrives late or not at all. No mapping is written here and
+nothing is pre-empted.
+
 ## 2026-09-20 06:22 [decision]
 
 **Three more things that lived in one place are in the tree**, placed by the
