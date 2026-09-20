@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-20 20:11 [finding]
+
+**The candidate recorded an hour ago is dangerous without its other half, and
+the half is this: the same property that makes a wrong reason travel is the
+only thing that makes a claim correctable at all.** Both of the evening's
+`cannot` errors were in **reasons**, and both were caught **because** they
+were reasons — *the UKI has no keyless fingerprint* could only be believed or
+disbelieved, while *signing is part of producing it rather than a wrapper
+around it* is a checkable statement about PE files, and checking it turned
+*two of four* into *three of four* **before it was published**.
+
+**So the rule is neither *give reasons* nor *beware reasons*: the trade is
+worth taking, because a bare claim's errors are permanent.** A conclusion
+offered without a reason cannot be argued with, only overruled. And the credit
+for tonight's catch belongs there rather than to the hold — **holding the pen
+only delayed it; the stated reason is what gave the hold something to grip.**
+
 ## 2026-09-20 20:08 [finding]
 
 **The hold is released and the number changed: three of four components are

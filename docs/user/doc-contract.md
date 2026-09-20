@@ -289,6 +289,19 @@ English source.
   **the conclusion protected them and the reason sent them.** The test: **ask
   what a reader would do with the reason, not with the conclusion** — a
   conclusion is consumed once, in place; a reason travels.
+  **And the other half, which this entry would be dangerous without: the same
+  property that makes a wrong reason travel is the only thing that makes a
+  claim correctable at all.** Both of the evening's `cannot` errors were in
+  **reasons**, and both were caught **because** they were reasons: the claim
+  *the UKI has no keyless fingerprint* could only have been believed or
+  disbelieved, while *signing is part of producing it rather than a wrapper
+  around it* is a checkable statement about PE files, and checking it turned
+  *two of four* into *three of four* before it was published. **Stating a
+  reason exposes you to being wrong in a new place and is the only thing that
+  lets anybody find it.** So the rule is not *give reasons* and not *beware
+  reasons*: **the trade is worth taking, because a bare claim's errors are
+  permanent — a conclusion offered without a reason cannot be argued with,
+  only overruled.**
   *(Kept separate from a **check** right for the wrong reason, which these
   records already hold, and separated by repair as the membership rule
   requires: a check is repaired by making it read the right thing and fails
