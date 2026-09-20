@@ -43,3 +43,4 @@ Kinds:
 | [The consolidated-round pause, and when it ended](2026-09-16-consolidated-round-pause.md) | coordination decision | 2026-12-20 |
 | [A hardware capture carrying a SoC serial is not committed to a public repository](2026-09-20-device-captures-are-not-committed.md) | working practice | 2027-03-20 |
 | [A coordinator's working state is a record nobody else can read](2026-09-20-coordination-state-is-a-record.md) | working practice | 2027-03-20 |
+| [Development-phase release deletion](2026-09-20-development-phase-release-deletion.md) | user decision | the development phase |

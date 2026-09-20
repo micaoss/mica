@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 07:52 [decision]
+
+**Release deletion is answered, and the answer is usable because the question
+was.** The user allowed it on 2026-09-20 — *"可以删除，现在还是开发阶段"* — for
+two cases: a release whose assets are absent because its workflow failed, and
+a release superseded by a later one of the same scope.
+`docs/decisions/2026-09-20-development-phase-release-deletion.md` records that
+with its authority and a sunset that is the development phase itself.
+
+**Two exclusions are marked as what they are: coordination's narrowing of a
+broad yes, flagged to the user rather than granted by them.** A release a
+published index references — because `--full` verification of every index
+naming it fails forever, and that is the case where two rules disagree and the
+index rule wins. And any **`ghcr` package version**, a different blast radius:
+`ghcr` holds the only copy of every pool and every board component, so
+deletion there is unrecoverable and a pinned consumer breaks at once, as
+`20260915-0030` and `20260914-1129` did.
+
+**And the reason the exclusions are not arbitrary is in the decision**:
+**there is no way to withdraw a recommendation except by superseding it**, so
+deleting a defective release neither un-recommends it nor corrects what it
+said — it only removes the evidence. Deletion is about tidiness and never
+about correcting what a release recommends.
+
+The question record stays, marked answered and still authorising nothing,
+because its five scope questions are why a yes could be acted on: one that did
+not distinguish them would have covered `ghcr` package versions in the same
+breath as an empty failed release.
+
 ## 2026-09-20 07:25 [finding]
 
 **The instruction I wrote in a message was contradicted by the tree, in the

@@ -1,11 +1,26 @@
 # 20260920-0629-release-deletion-question Open question: may an agent delete an empty or superseded release without asking
 
-- **status**: waiting — the user's answer; **nothing here authorises anything**
+- **status**: answered 2026-09-20 — the decision is
+  `docs/decisions/2026-09-20-development-phase-release-deletion.md`; this file
+  is kept for the question's shape, and **still authorises nothing**
 - **priority**: P1
 - **owner**: `mica` (the record); the answer is the user's
 - **createdAt**: 2026-09-20 06:29
 
-## The rule that holds today, unchanged by this record
+## Answered
+
+The user allowed it on 2026-09-20 — *"可以删除，现在还是开发阶段"* — for two
+cases: a release whose assets failed to publish, and a release superseded by a
+later one of the same scope. Two exclusions were **proposed as a narrowing of
+a broad yes** and flagged as such: a release a published index references, and
+any `ghcr` package version. The scope, the authority and the reasons are in
+`docs/decisions/2026-09-20-development-phase-release-deletion.md`.
+
+**The five scope questions below are why the answer is usable.** A yes that
+did not distinguish them would have covered `ghcr` package versions, where the
+bytes have no second copy, in the same breath as an empty failed release.
+
+## The rule that held until it was answered
 
 The workspace instructions say: *deleting or re-cutting a published release
 happens only on the user's explicit instruction*, and a release is cut only
