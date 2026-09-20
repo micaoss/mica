@@ -14,7 +14,7 @@
 # world moves and nothing here would have said so.
 #
 # THE LIMIT OF THIS FILE, STATED HERE BECAUSE NOTHING ELSE CAN STATE IT: its
-# COMPLETENESS is unchecked. The six rows below are compared against the
+# COMPLETENESS is unchecked. The rows below are compared against the
 # world; nothing compares the records against this file, so a seventh standing
 # claim written into a page tomorrow is stale-able and invisible here. That is
 # the same shape as a declaration nobody compares to the thing it declares --
@@ -75,6 +75,28 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/kernel/config/ue
 # rows above say what the next board release will carry; these say what the
 # products being built carry today. A re-pin flips these and not those, which is
 # the distinction a capability measured from a build output needs.
+#
+# AND THE STEP BETWEEN THEM, WHICH NOTHING WATCHED. The config rows flip when
+# mica-boards records a symbol; the pin rows flip when mica-build moves to a
+# release that carries it. THE RELEASE ITSELF IS A THIRD STEP and it moved
+# neither: on 2026-09-20 the newest tag of every board was already exactly what
+# locks/ named, so "mica-build cannot re-pin, there is nothing to re-pin to"
+# was true and invisible. These rows name today's newest tag per board and go
+# red when a board is released, which is the moment that sentence stops being
+# true. Expect them red BEFORE the pin rows, never after.
+board-release.uefi-x64	newest-tag	micaoss/mica-boards:uefi-x64	^uefi-x64[.]20260916-0857$	docs/design/containers.md
+board-release.uefi-arm64	newest-tag	micaoss/mica-boards:uefi-arm64	^uefi-arm64[.]20260916-0857$	docs/design/containers.md
+board-release.cx3576	newest-tag	micaoss/mica-boards:cx3576	^cx3576[.]20260917-1007$	docs/design/containers.md
+board-release.s905x5m	newest-tag	micaoss/mica-boards:s905x5m	^s905x5m[.]20260919-2259$	docs/design/containers.md
+#
+# The floor itself is now more than one symbol, and these three are the shape
+# of the decision rather than of a scatter: PSI and IOCOST are ON for every
+# board because a unit key a product can set reaches the file they create, and
+# TASKSTATS is OFF for every board because nothing does. A defconfig bump that
+# re-scatters any of them turns this red.
+psi-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/design/containers.md
+iocost-floor	line	micaoss/mica-boards:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/design/containers.md
+taskstats-floor-off	line	micaoss/mica-boards:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/design/containers.md
 board-pin.uefi-x64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-x64.pin	RELEASE=20260916-0857	docs/design/containers.md
 board-pin.uefi-arm64	line	micaoss/mica-build:locks/pins/mica-boards.uefi-arm64.pin	RELEASE=20260916-0857	docs/design/containers.md
 board-pin.cx3576	line	micaoss/mica-build:locks/pins/mica-boards.cx3576.pin	RELEASE=20260917-1007	docs/design/containers.md

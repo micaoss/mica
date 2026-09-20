@@ -412,59 +412,145 @@ the board is a line systemd logs and then skips — the unit starts, unlimited,
 and the only evidence is in the journal. `/dev/mmcblk0` is the eMMC on the
 cx3576; check the board before copying it.
 
-**A ceiling is only a kernel controller if the controller is compiled in.**
-`MEMCG`, `CFS_BANDWIDTH` and `CGROUP_PIDS` are set on **all four boards**, so
-`memory.high`, `memory.max`, `cpu.max` and `pids.max` are real there.
-`BLK_DEV_THROTTLING` was set on **none** of them when this paragraph was first
-written that morning, which made `io.max` the one ceiling of the table
-available nowhere; `mica-boards` `3970753b` (2026-09-20 14:45Z, *io.max exists
-on no board: `BLK_DEV_THROTTLING` joins the floor*) put it in
-`common/kernel/mica-required.fragment`, the board-independent baseline every
-board merges and asserts against its final `.config`.
+**A ceiling is only a kernel controller if the controller is compiled in, and
+a controller that is not compiled in is not a weaker limit — it is a file that
+does not exist.** `podman run --memory=512m` against a kernel without
+`CONFIG_MEMCG` does not round the limit off: there is no `memory.max` to
+write, and the run fails at the write. So this section is true only of an
+image whose kernel carries the controller, and the rest of it says which
+images those are.
 
-**And the same symbol now has three different answers depending on which
-artefact you read**, which is the pin-and-tree distinction below at a third
-resolution:
+**A capability measured from a build output is a statement about a pin, not
+about a board.** The table below was read from
+`mica-build:_out/boards/<board>/kernel/config` — the kernel inside the
+products that repository builds, which comes from the board releases
+`mica-build:locks/` names — and every cell was then re-read here from the
+config **committed at each pinned release** (`97aca03d` for both UEFI boards,
+`48d995b1` for `cx3576`, `a15dbf8c` for `s905x5m`). A symbol in `mica-boards`'
+tree at `main` and a symbol in a running kernel are different claims and
+neither settles the other: the second follows the first only after a board
+release **and** a re-pin. The release is therefore part of the measurement and
+is written beside it, because a reader given two such measurements without
+their subjects concludes that one of them is wrong.
+
+**To bound — not uniform today, and the asymmetry is inherited rather than
+chosen.** Measured in the products built from the board releases pinned on
+2026-09-20 (`uefi-x64` and `uefi-arm64` at `20260916-0857`, `cx3576` at
+`20260917-1007`, `s905x5m` at `20260919-2259`):
+
+| Controller | File | `uefi-x64` | `uefi-arm64` | `cx3576` | `s905x5m` |
+|---|---|---|---|---|---|
+| `CGROUP_PIDS` | `pids.max` | yes | yes | yes | yes |
+| `CFS_BANDWIDTH` | `cpu.max` | **no** | **no** | yes | yes |
+| `MEMCG` | `memory.max` | **no** | yes | yes | yes |
+| `BLK_DEV_THROTTLING` | `io.max` | **no** | **no** | **no** | **no** |
+
+Of the five ceiling keys this section promises, one is real on every board and
+one is real on none. The `MEMCG` column is not a decision anybody made about
+`uefi-x64`: `mica-boards`' own floor records the cause — arm64's `defconfig`
+carries `MEMCG` and `x86_64_defconfig` does not, and nothing ever compared
+that floor against what the products declare. Two upstream defconfigs
+disagreeing, inherited.
+
+`mica-boards` put `MEMCG` and `CFS_BANDWIDTH` into the shared container floor
+at `04e0fae` and `BLK_DEV_THROTTLING` at `3970753b` (both 2026-09-20), so
+`common/kernel/mica-required.fragment` — the board-independent baseline every
+board merges and asserts against its final `.config` — now requires all three
+of every board. **That reaches a device only through a board release and a
+re-pin, and at the time of writing neither has happened**: the newest release
+of every board is exactly what `locks/` names, so there is nothing to re-pin
+to, and the chain is *four board releases, then a re-pin, then a product that
+carries `memory.max`*.
+
+**So the same symbol has three answers depending on which artefact is read**,
+which is the pin-and-tree distinction at a third resolution:
 
 | Artefact | What it is | `BLK_DEV_THROTTLING` today |
 |---|---|---|
 | `common/kernel/mica-required.fragment` | the **requirement**, asserted at every board build | set, for all four boards |
-| `boards/<board>/kernel/config/…` | the **last build's output**, committed | set on `uefi-x64` and `uefi-arm64`, both re-recorded in that commit; the two FIT boards are not re-recorded yet |
+| `boards/<board>/kernel/config/…` | the **last build's output**, committed | set on `uefi-x64` and `uefi-arm64`, re-recorded with the floor; the two FIT boards are not re-recorded yet |
 | the board releases `mica-build` pins | what **ships today** | set on none |
 
-None of the three is stale and none contradicts another: a symbol added to the
-floor is true for every board at its next build, visible in the boards
-re-recorded since, and absent from everything already released. **A reader who
-takes any one of the three for the others gets a defensible wrong answer**, so
-the question *does this board have `io.max`* is not well posed without naming
-the artefact.
+None of the three is stale and none contradicts another, so **every wrong
+answer a reader takes from them is defensible** — which is worse than a stale
+number, because a stale number can be caught by a date and a defensible wrong
+answer can be caught by nothing except naming the artefact. The question *does
+this board have `io.max`* is not well posed without one.
 
 That is worth reading beside the warning above it, which is careful and true
 and one level too high: a missing **device path** is logged and skipped, but
-the reason IO was unlimited on every board this morning is that the
-**controller was absent**, which produces no journal line at all. A correct warning about the near cause is
-exactly what stops the next reader from looking for the far one.
+the reason IO is unlimited on every Mica board is that the **controller is
+absent**, which produces no journal line at all. A correct warning about the
+near cause is exactly what stops the next reader from looking for the far one.
 
-**A capability measured from a build output is a statement about a pin, not
-about a board.** Two measurements of these controllers disagreed on
-2026-09-20 and **neither was stale**: the configs at `mica-boards` `main`
-carry `MEMCG` and `CFS_BANDWIDTH` on all four boards since `04e0fae`
-(08:35:36Z, *the floor carries the container limits*), while `mica-build`'s
-table — read from `_out/boards/<board>/kernel/config`, the kernel in the
-products it builds — describes the board releases it **pins** — read from
-`mica-build:locks/pins/` rather than relayed: `uefi-x64` and `uefi-arm64` at
-`20260916-0857`, `cx3576` at `20260917-1007`, `s905x5m` at `20260919-2259`,
-all cut before that commit. **One describes what `main`
-builds, the other what ships today, and the gap between them is exactly one
-re-pin.** A reader given both without their dates concludes one is wrong, so
-each column names the release it was measured from.
+**To run — uniform, and measured.** Overlayfs, the user, pid and net
+namespaces, seccomp filtering, veth, the bridge, the pids controller, the
+device cgroup and `CGROUP_BPF` are set on all four boards. This half is no
+longer an assumption: on 2026-09-20 a session probe booted a product image and
+ran a container **with no flag at all**, from inside the running system, for
+the first time in this project's history. So the section now says which of its
+claims are measured — *a container runs* is measured, while *a ceiling is a
+kernel controller* was an assumption until the same week, and one fifth of it
+was wrong. A document that says which of its claims are measured is worth more
+than one that is uniformly confident.
 
-*(The configs are the input; a published kernel carries what the release that
-built it carried. The ruling to set the missing symbol on all four boards —
-the user's decision that container behaviour is uniform unless the kernel
-cannot support it — landed in `mica-boards` at 14:45Z on 2026-09-20 and is
-what the table above records. This section's promise becomes true as written
-for a given board when a release built after it is pinned.)*
+**To firewall — the one category anybody had decided about, because it had
+already broken.** `cx3576` once shipped without `NFT_FIB_*` and every bridged
+container failed;
+`mica-build:tests/netavark-kernel-config-test.sh` now asserts the symbols
+netavark programs rules against, on every board config, and requires each
+board's post-`olddefconfig` loop to name the same symbols so that a silently
+dropped symbol fails the kernel build. The other categories have no gate and
+no failure yet, and that is the only difference between them.
+
+**To measure — a scatter that has since been decided, and the test that
+decided it is the transferable part.** In the pinned releases it is scattered:
+`PSI` on `s905x5m` alone, `TASKSTATS` and `CGROUP_PERF` off on `cx3576` alone,
+`BLK_CGROUP_IOCOST` on two of four. Nobody chose `y` on one board and `n` on
+another — the defconfigs differed. At `main` it is no longer a scatter but a
+decision, taken by asking of each symbol **whether a unit key a product can
+set, or a podman flag, reaches the file it creates**: `ManagedOOMSwap=` and
+`ManagedOOMMemoryPressure=` reach `/proc/pressure`, so `PSI` is on for all
+four; `IOWeight=` reaches `io.weight`, which `blk-iocost` registers, so
+`BLK_CGROUP_IOCOST` is on for all four; nothing a product can set reaches
+`io.prio`, `hugetlb.*`, `rdma.max`, `misc.max`, `net_prio.ifpriomap`,
+`net_cls.classid`, delay accounting or a `perf_event` cgroup, so those eight
+are off uniformly **with the reason recorded beside them** rather than left
+`y` on two boards by accident. An arbitrary per-board split is the one answer
+that is wrong whichever way the symbol goes, because nobody chose it.
+
+**And the floor states the distinction this section needs everywhere:
+`PSI` on is the capability; running `systemd-oomd` and setting those keys is a
+policy the kernel does not decide and does not enable.** A capability makes a
+bound *possible*; something else has to make one *exist*.
+
+**Container storage is bounded, and the chain crosses three repositories** —
+no single one of them can state it:
+
+- `mica-core` mounts DATA `rw,noatime,prjquota` as PID 1, before systemd
+  exists, from a literal on the single code path that mounts it — reading
+  nothing from the product, profile, board, kernel command line or signed
+  policy, and constrained by an allowlist of five permitted data mount options.
+- `mica-system-base` then assigns project IDs and sets limits on the mounted
+  filesystem (`chattr -p +P`, `setquota -P`), after growfs.
+- `mica-build`'s session probe observes the result from inside a booted guest:
+  `findmnt /mica/containers` reports
+  `ext4 rw,nosuid,nodev,noatime,prjquota,mb_optimize_scan=0`. The container
+  store is a bind of DATA and binds share a superblock, so the option is
+  DATA's seen through the bind — which is why no product declaration mentions
+  `prjquota`, and why reading the container mount's own declaration would
+  never have found it.
+
+Read those three with the capability-and-policy split, because the word
+*bounded* spans it: `prjquota` makes a quota **possible** and is what the
+first and third bullets measure; the project-id assignment in the second is
+what makes a bound **exist**. `mica-core` declined to write the conclusion
+from its own tree for exactly that reason, and it was right to.
+
+**This one is uniform for a stronger reason than agreement: nothing varies.**
+One literal, one code path, no input from the product. A measurement of one
+product would normally be a measurement of one product; here the other three
+cannot differ.
 
 **Four hours is how long the dated sentence lasted, and it did not go stale
 quietly.** The six claims this section was given in `docs/world-claims.tsv`
@@ -491,6 +577,8 @@ controller, so `podman run --memory=` has no file to write. A reader who finds
 one instrument and assumes it covers the other gets the wrong answer in both
 directions — the world job cannot see a product, and the probe cannot see a
 change in `mica-boards` until it has been released, pinned, built and booted.
+**The gap between their two answers is exactly the re-pin**, which is why both
+are quoted with the release they were measured from.
 
 The probe's memory branch reaches this section's own rule from the other side.
 **Both** of its branches call `pass()`, with the comment that *a branch that
@@ -503,23 +591,21 @@ pass is the same instrument.
 **And each instrument says in advance which way it will go red**, which is
 what lets a red be read without an investigation:
 
-| What moves next | `io-throttling*`, `memcg*` | `board-pin.*` | the session probe |
-|---|---|---|---|
-| `mica-boards` re-records the two FIT kernel configs | the `-unrecorded` rows go red | green | unchanged |
-| `mica-build` re-pins the boards | green | red | unchanged until a product is rebuilt |
-| a product built from those pins is booted | green | green | its absent branches stop being reached |
+| What moves next | `io-throttling*`, `memcg*` | `board-release.*` | `board-pin.*` | the session probe |
+|---|---|---|---|---|
+| `mica-boards` re-records the two FIT kernel configs | the `-unrecorded` rows go red | green | green | unchanged |
+| the four board releases are cut | green | **red** | green | unchanged |
+| `mica-build` re-pins the boards | green | green | **red** | unchanged until a product is rebuilt |
+| a product built from those pins is booted | green | green | green | its absent branches stop being reached |
 
-If the config rows and the pin rows ever go red on the same run, something
-moved that neither prediction covers, and that is an investigation rather than
-an edit.
-
-**And the section does not distinguish what is measured from what was
-assumed, so it does here**: *a container runs with no flag* is **measured** —
-the ten "to run" symbols are uniform across the four boards, and the session
-probe has seen a container run on a booted image. *A ceiling is a kernel
-controller* was an **assumption** until it was checked, and one fifth of it
-was wrong. A document that says which of its claims are measured is worth more
-than one that is uniformly confident.
+The middle row is there because it was missing: the release is a step of the
+chain that **no instrument saw**, so a page could have said *the repair has
+shipped* on the day the tags were cut and been wrong by a re-pin. The
+`board-release.*` rows name today's newest tag per board and go red when a
+board is released, which is the moment the sentence above about *nothing to
+re-pin to* stops being true. And if two of these columns ever go red on the
+same run, something moved that no row of this table predicts, which is an
+investigation rather than an edit.
 
 **Nothing requires any of this.** A `.container` file with no `[Service]`
 section at all is accepted, generates a unit with no ceilings, and Mica OS adds

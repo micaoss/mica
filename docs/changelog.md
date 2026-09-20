@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-09-20 15:12 [finding]
+
+**The capability text for section 8 landed merged rather than appended, and
+the sentence the section was missing is the opening one**: a controller that
+is not compiled in is not a weaker limit, it is **a file that does not
+exist** — `podman run --memory=512m` against a kernel without `CONFIG_MEMCG`
+does not round the limit off, it fails at the write.
+
+**Every cell of the handed-over table was re-read here before it was
+published**, from the kernel config committed at each pinned release
+(`97aca03d`, `48d995b1`, `a15dbf8c`) rather than from the build output it was
+measured in, and all sixteen agree: `pids.max` on four boards, `cpu.max` on
+two, `memory.max` on three, `io.max` on none. A second artefact is not a proof
+— two copies agreeing says they travelled — but a claim about another
+repository that nobody here has read is weaker than one somebody has.
+
+**A scatter became a decision, and the test that decided it is the part worth
+carrying.** In the pinned releases `PSI` is on `s905x5m` alone, `TASKSTATS`
+and `CGROUP_PERF` off on `cx3576` alone, `BLK_CGROUP_IOCOST` on two of four —
+nobody chose any of it, the defconfigs differed. At `main` each symbol was
+settled by asking **whether a unit key a product can set, or a podman flag,
+reaches the file it creates**: `ManagedOOMSwap=` reaches `/proc/pressure`, so
+`PSI` is on for all four; `IOWeight=` reaches `io.weight`, so
+`BLK_CGROUP_IOCOST` is; nothing reaches `io.prio` or a `perf_event` cgroup, so
+those are off uniformly with their reasons beside them. **An arbitrary
+per-board split is the one answer that is wrong whichever way the symbol
+goes**, because nobody chose it.
+
+**And the floor states the distinction the whole section needed:** `PSI` on is
+a **capability**; running `systemd-oomd` and setting those keys is a
+**policy** the kernel neither decides nor enables. Applied to the storage
+paragraph, where the word *bounded* spans the seam: `prjquota` makes a quota
+possible, and `mica-system-base`'s project-id assignment is what makes a bound
+exist. `mica-core` declined to write the conclusion from its own tree for that
+reason and was right to.
+
+**The step nothing watched now has four rows.** The config rows flip when
+`mica-boards` records a symbol and the pin rows flip when `mica-build` moves
+to a release carrying it — **the release itself is a third step, and it moved
+neither**. Measured today: the newest tag of every board already *is* what
+`locks/` names, so *there is nothing to re-pin to* was true and invisible, and
+a page could have said *the repair has shipped* on the day the tags were cut
+and been wrong by a re-pin. `board-release.*` names today's newest tag per
+board and goes red when a board is released — before the pin rows, never
+after — and the prediction table in section 8 gains that middle row. Three
+more rows hold the floor's own decisions (`PSI`, `IOCOST`, `TASKSTATS` off),
+so a defconfig bump that re-scatters them is red rather than quiet. 24 of 24.
+
 ## 2026-09-20 15:05 [finding]
 
 **An acceptance clause of these records is unsatisfiable, and the repair is in
