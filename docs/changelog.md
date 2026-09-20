@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-20 07:23 [finding]
+
+**Named at its third instance, beside the noise floor: testing instead of
+asserting protects you from the wrong story, not from the wrong cause.** A
+comparison whose two cases differ in *two* things attributes the effect to
+whichever one the comparer had in mind, and because a run was performed it
+feels measured. The three, each paid for: the `-C metadata` diff, where code
+and disambiguator both moved and the result was read as codegen; *emulation
+changes bytes*, where host and toolchain both moved and the cause was
+cross-compilation; and the self-edit experiment of 2026-09-20, where one case
+was late and length-preserving and the other early and length-changing, and
+the report named length — separating them showed the cause is **how far the
+bytes before the interpreter's position moved**.
+
+The remedy is the control build's rule one level up: **move one variable, or
+name every variable that moved and refuse the attribution.** A second case
+that differs in two ways is not a control, however carefully the first was
+run.
+
+This one is worth having because every instance passed the bar that usually
+catches this — somebody did run the test. What it did not do is vary one
+thing.
+
 ## 2026-09-20 07:21 [decision]
 
 **A better reason to keep a pair than the count**, in `doc-contract.md`

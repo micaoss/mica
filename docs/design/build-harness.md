@@ -259,6 +259,26 @@ cannot, the only honest statement available is that the difference is below the
 noise floor. Reporting codegen without doing this is how someone eventually
 reports a compiler bug that is not there.
 
+**Testing instead of asserting protects you from the wrong story, not from
+the wrong cause.** A comparison whose two cases differ in *two* things
+attributes the effect to whichever one the comparer had in mind — and a run
+was performed, so it feels measured. Three instances, each one paid for:
+
+- the `-C metadata` case above — code and disambiguator both moved, and the
+  difference was read as codegen;
+- *emulation changes bytes* — the compared builds differed in host **and** in
+  toolchain, and the effect was attributed to emulation until `mica-core`'s
+  own evidence named cross-compilation;
+- a self-edit experiment on 2026-09-20 — one case edited **late and
+  length-preserving**, the other **early and length-changing**, reported as
+  *length decides*. Separating them showed a small late change is silent
+  either way and a large early insertion is loud, so the cause is how far the
+  bytes before the interpreter's position moved.
+
+The remedy is the control build's, one level up: **move one variable, or name
+every variable that moved and refuse the attribution.** A second case that
+differs in two ways is not a control, however carefully the first was run.
+
 Use the native pinned Rust builder's `aarch64-linux-gnu-gcc` for cross C test
 helpers on an x86-64 host. The C-only builder is native-only. Use QEMU full-system
 acceptance for the target kernel and service behavior. A qemu-user smoke
