@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-20 16:12 [finding]
+
+**Every sentence claiming a booted guest confirmed `cpu.max`, `memory.max` or
+`io.max` is out of section 8: the probe was reading the root cgroup.** In
+cgroup v2 the root never carries those files — they exist in a cgroup whose
+parent has enabled the controller in `cgroup.subtree_control` — so *absent* is
+true on every Linux system ever built, with or without `MEMCG`. The product
+side of that section is **unanswered**, not confirmed.
+
+**What is untouched is what the table rests on**: the kernel-config numbers
+were read from the build tree and were never the probe's. `uefi-x64` genuinely
+had no `MEMCG` and genuinely has it now. The config measured it; the probe
+only looked as though it did.
+
+**A repair landed and a measurement did not move, which is how it survived.**
+Two instruments agreed all evening **for different reasons** — one because the
+kernel lacked the controller, the other because the file is never there — and
+the agreement read as corroboration. Beside the replica rule: **agreement
+between two instruments is not corroboration unless they could have disagreed,
+and one of these two was constant.** It is the same statement as *a branch
+that always passes is a measurement*, which the probe's author wrote the same
+evening about the **other** branch of the same test.
+
+**And a good comment armoured the mistake.** The probe warned that `cpu`
+appears in `cgroup.controllers` on a kernel without `CFS_BANDWIDTH`, *"the
+identifier that lies"* — true, careful, about the wrong cheap identifier, and
+sitting directly above a read of a file that cannot exist where it was
+looking. **A reader who sees somebody thinking carefully about one trap has no
+reason to check for another**, which is a cost of a good comment these records
+had not priced.
+
 ## 2026-09-20 16:09 [finding]
 
 **The sentence under six of today's rules, in its author's words**

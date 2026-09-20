@@ -505,8 +505,9 @@ board have `io.max`* is not well posed without naming the rung.
 **Which instrument reads which rung** is the other half, since an instrument
 reading rung one says nothing about rung four: `docs/world-claims.tsv` reads
 rungs one and two and `mica-build`'s pins; `mica-build`'s own table was read
-from the build tree; the session probe reads the running kernel's behaviour,
-which is downstream of the shipped artefact. **The top rung is unguarded for the symbols this section is about — and it
+from the build tree; the session probe reads a running system, which is
+downstream of the shipped artefact — though for the three limit files it was
+reading the root cgroup and therefore nothing (below). **The top rung is unguarded for the symbols this section is about — and it
 was guarded until 2026-09-09.** None of the **61** files under
 `mica-build:verify/src/` mentions `/boot/`, checked here by reading every one
 of them rather than by grepping for a name, and the two places that do read a
@@ -713,35 +714,61 @@ question.** The `world` job reads another repository's `main`: the
 `io-throttling.*` and `memcg.*` rows say what the **next** board release will
 carry, the `board-pin.*` rows what the products being built carry **today**,
 and no row of it can reach a build output.
-`mica-build:tests/session-probe/probe.sh` reads the machine: `mica-build`
-reports 9 of 9 on a booted `uefi-x64-prod` image on 2026-09-20, including
-`memory.max` **absent** — from `/sys/fs/cgroup` on a running system, not
-inferred from a config. That is the third row of the table above confirmed
-from the other end, for `MEMCG` on one product: what ships today has no memory
-controller, so `podman run --memory=` has no file to write. A reader who finds
-one instrument and assumes it covers the other gets the wrong answer in both
-directions — the world job cannot see a product, and the probe cannot see a
-change in `mica-boards` until it has been released, pinned, built and booted.
-**The gap between their two answers is exactly the re-pin**, which is why both
-are quoted with the release they were measured from.
+`mica-build:tests/session-probe/probe.sh` reads the
+machine, which is the right **shape** for the second question — and until
+2026-09-20 it was not answering it. **The product side of this section is
+currently unanswered, and the instrument that looked like the answer was
+reading the root cgroup.** It tested `/sys/fs/cgroup/cpu.max` and
+`/sys/fs/cgroup/memory.max`; in cgroup v2 the **root** never carries
+`cpu.max`, `memory.max` or `io.max` — those files exist in a cgroup whose
+parent has enabled the controller in `cgroup.subtree_control` — so *absent* is
+true on every Linux system ever built, with or without `MEMCG`. A reader who
+finds one instrument and assumes it covers the other gets the wrong answer in
+both directions, and here the second instrument was not covering its own
+question either.
 
-The probe's memory branch reaches this section's own rule from the other side.
-**Both** of its branches call `pass()`, with the comment that *a branch that
-always passes is a measurement and not an assertion*, written that way
-deliberately until the kernel floor is uniform — at which point the absent
-branch becomes a `fail()`, "because the promise will then be one promise". A
-column that can only say `valid` records nothing, and a branch that can only
-pass is the same instrument.
+**What the mistake does not touch is what the table rests on.** The
+kernel-config measurements were read from
+`mica-build:_out/boards/<board>/kernel/config` and were never the probe's:
+`uefi-x64` genuinely had no `MEMCG` and genuinely has it at `main` now. The
+config measured it; the probe only looked as though it did. The table, the pin
+rows, the release rows and the re-pin chain stand, and **every sentence saying
+a booted guest confirmed one of the three files is gone from this page.**
+
+**A repair landed and a measurement did not move, which is how it survived.**
+Two instruments agreed all evening **for different reasons** — one because the
+kernel lacked the controller, the other because the file is never there — and
+the agreement read as corroboration to everybody who saw it. The general form
+belongs beside the replica rule: **agreement between two instruments is not
+corroboration unless they could have disagreed, and one of these two was
+constant.** That is the same statement as *a branch that always passes is a
+measurement and not an assertion* — which the probe's author wrote, the same
+evening, about the **other** branch of the same test, without connecting it to
+the branch that was always taken.
+
+**And the comment above it armoured the mistake.** The probe warned that `cpu`
+appears in `cgroup.controllers` on a kernel without `CFS_BANDWIDTH`, *"which
+is the identifier that lies"* — true, careful, about the wrong cheap
+identifier, and sitting directly above a read of a file that cannot exist
+where it was looking. **A reader who sees somebody thinking carefully about
+one trap has no reason to check for another**, which is a cost of a good
+comment that these records had not priced.
+
+The repair keeps the shape and moves the subject: ask inside `system.slice`,
+where systemd has delegated what it manages, and print `cgroup.subtree_control`
+and `cgroup.controllers` beside the three files, so **the controller is
+available** and **the file exists** are two visible facts rather than one
+collapsed one.
 
 **And each instrument says in advance which way it will go red**, which is
 what lets a red be read without an investigation:
 
 | What moves next | `io-throttling*`, `memcg*` | `board-release.*` | `board-pin.*` | the session probe |
 |---|---|---|---|---|
-| a board's committed config changes | the row for that board goes red | green | green | unchanged |
-| the four board releases are cut | green | **red** | green | unchanged |
-| `mica-build` re-pins the boards | green | green | **red** | unchanged until a product is rebuilt |
-| a product built from those pins is booted | green | green | green | its absent branches stop being reached |
+| a board's committed config changes | the row for that board goes red | green | green | says nothing |
+| the four board releases are cut | green | **red** | green | says nothing |
+| `mica-build` re-pins the boards | green | green | **red** | says nothing |
+| a product built from those pins is booted | green | green | green | answers, once it asks in a delegated cgroup |
 
 The middle row is there because it was missing: the release is a step of the
 chain that **no instrument saw**, so a page could have said *the repair has
