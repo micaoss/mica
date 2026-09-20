@@ -57,6 +57,11 @@ its own branch. That was legible only because the report prints the head it
 read. **Every other instance of this shape today cost somebody a wrong
 sentence; this one cost a re-run** — which is the whole argument for a format
 in one comparison, and the first time today it has had a price on both sides.
+*(By the end of that day the shared checkout had answered about a different
+tree **four** times: its `main` was measured a full day behind the
+`origin/main` the chain actually ran at. **Four is not an incident**, and the
+instrument survived two of the four for one reason only — it prints the head
+it read.)*
 
 **And the honest boundary of all of this, found the day it was argued: some
 false results are distinguishable only by somebody who knows what they did,

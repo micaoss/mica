@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 17:26 [finding]
+
+**The aligned chain completed, `rc=0`, and clause A moves from *unreachable*
+to *reachable and unproven* — not to proven.** Decided against the clause's
+own words rather than taken from the report: the acceptance line says
+*reproduces the online bytes*, which the A/B table spells out as **equals the
+published release**. Tonight proves **B** at alignment — `mica-core`
+`c1a046b1`, `mica-podman` `ad9deb09`, `mica-boards` `2bfa259e`, **release
+commits rather than checkout heads**, each producer built from source with no
+release artefact fetched, in 123 s. The seam that made A unreachable this
+morning was crossed.
+
+**A could not have been proven tonight for two reasons that are not about the
+chain**: there is no published product release at these board pins to compare
+against, and the image carries an **offline version stamp** rather than a
+release name, so byte equality is impossible **by construction** until the
+chain can be given the release stamp as an input. That is the next holder's
+question, and what closes it is a product release cut at these pins compared
+against this same chain — a release decision.
+
+**And the builder drew that bound itself, unasked**: evidence for the
+mechanism, completely, and not for byte equality with a published product. **A
+run that states what it is not evidence for is the only kind whose green can
+be quoted.**
+
+**The shared checkout answered about a different tree for the fourth time**,
+its `main` a full day behind the `origin/main` the chain ran at. **Four is not
+an incident**, and the instrument survived two of the four for one reason
+only: it prints the head it read.
+
 ## 2026-09-20 17:23 [finding]
 
 **The count came back four-for-four: *read the artefact, not the account* has

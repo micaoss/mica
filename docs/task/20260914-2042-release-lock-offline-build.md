@@ -32,6 +32,34 @@ Moving the repositories to the release lock format
 
 ## Notes
 
+- 2026-09-20, evening: **the aligned chain completed, `rc=0`, and the state of
+  clause A changes from *unreachable* to *reachable and unproven* — not to
+  proven.** Decided against the clause's own words rather than taken from the
+  report: the acceptance line says *reproduces the online bytes*, and the A/B
+  table below spells that out as **an offline build equals the published
+  release**. Tonight's run proves **B**, at alignment, which is what was
+  missing: `mica-core` `c1a046b1`, `mica-podman` `ad9deb09`, `mica-boards`
+  `2bfa259e` — **release commits, not checkout heads** — each producer built
+  from source, no release artefact fetched for any of it, producing
+  `mica-uefi-x64-20260920-172201.img` (1 881 145 344 B) and an 81 589 337 B
+  update in 123 s. The seam that made A unreachable this morning was crossed.
+
+  **A is not proven and could not have been tonight, for two reasons that are
+  not about the chain.** There is **no published product release at these
+  board pins** — the newest is `uefi-x64.20260916-0845`, four days and two
+  board rounds back — so there is nothing to compare against. And the image
+  carries an **offline version stamp** rather than a release name, so it could
+  not be byte-identical to a release even if one existed: **A is unsatisfiable
+  by construction until the chain can be given the release stamp as an
+  input**, which is a question for whoever takes A next and not a defect in
+  the run. What would close it is a product release cut at these pins and this
+  same chain compared against it — a release decision, which is the user's.
+
+  *(The builder drew that bound itself and unasked, which is the half worth
+  recording above the result: **evidence for the mechanism, completely, and
+  not for byte equality with a published product**. A run that states what it
+  is not evidence for is the only kind whose green can be quoted.)*
+
 - 2026-09-20, after the clause repair: **clause A is running against a fetched
   board bundle, one product, with the static check done first**, and the tool
   says what that is worth without being asked: `local-pins.sh` reads
