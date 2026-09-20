@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 00:50 [progress]
+
+**All four boards are release targets, and the catalogue now has two kinds of
+backing.** `s905x5m.20260920-0033` and the index `mica.20260920-0046` are
+published from `e92dc5d`; both trust hashes were read back and match, the
+release carries an image and a full archive per product plus the lock and
+`SHA256SUMS`, and the index carries four boards, eight products and `full=8` —
+no partial archive anywhere. `docs/boards/support-tiers.md` drops the
+"decided 2026-09-19" qualifier and the paragraph that said the flag had not
+been flipped; `docs/user/download.md` and its Chinese page name all four
+boards; `docs/user/update-packages.md` now shows both full-only reasons in one
+file, six products because everything compared moved and two because there was
+nothing to compare against.
+
+**The boundary, recorded as one pair in `build-harness.md` section 4, beside
+the boot gate**: four boards are release targets, eight products are published
+and indexed, the UEFI images boot, and the `s905x5m` images have never been
+booted by anything. Nor have the `cx3576` ones. That is sharper than the tier
+table, which is about qualification: this is about whether anything has ever
+started what we publish. It is consistent with the user's decision that a
+release target asserts nothing about hardware, and what to do about the FIT
+side is a question for the user rather than a suite to schedule.
+
+**One of my own sentences was wrong and is corrected in the same edit.** This
+section listed three suites that boot a guest, `lifecycle-uboot-fit` among
+them. It carries no QEMU at all — checked file by file at `e92dc5d` — and runs
+firmware IO, signatures, records and dirty-filesystem behaviour on the host.
+The suites that start a guest are `lifecycle-uefi` and the `apid-api`
+harness, which is why the FIT half of the catalogue has no boot behind it.
+
 ## 2026-09-20 00:21 [finding]
 
 **Correction, and it understated the gate: the boot runs on every push to

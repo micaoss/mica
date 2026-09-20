@@ -35,9 +35,11 @@ for all six products because `mica-deploy` is in every root and
 `mica-lifecycle` ships the `mica-runkit` packed into the initramfs as `/init`,
 part of the authenticated kernel identity, so both ids moved everywhere — or
 **there is nothing to compare against**, which is what a board's first release
-will look like, `s905x5m`'s among them. A full-only round is not evidence of a
-defect in either case; what distinguishes them is whether a previous release
-exists. The `root` case first ran on
+looks like, as `s905x5m.20260920-0033` did on 2026-09-20. Both pairings are
+visible in one file: the index `mica.20260920-0046` carries eight products and
+every archive in it is `full`, six for the first reason and two for the
+second. A full-only round is not evidence of a defect in either case; what
+distinguishes them is whether a previous release exists. The `root` case first ran on
 real releases on 2026-09-16, on all six products at once and against the
 devices that exist
 ([record](../task/20260916-1653-root-only-archive.md)). A `root` archive carries the

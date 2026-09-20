@@ -198,9 +198,11 @@ that ships; the package, lock and reuse gates prove what a release may
 contain; and the docs gates prove the records. The only QEMU in the tree that
 CI touches is `binfmt`, so that amd64 packaging tools run on an arm64 runner.
 
-What none of them does is start the guest. The three suites that boot one —
-`lifecycle-uefi`, `lifecycle-uboot-fit` and the `apid-api` harness — are
-`make` targets run by hand. `privileged.yml`, the one workflow that would
+What none of them does is start the guest. The suites that boot one —
+`lifecycle-uefi` and the `apid-api` harness — are `make` targets run by hand;
+`lifecycle-uboot-fit` is not one of them despite the name, and carries no QEMU
+at all (checked at `e92dc5d`): it exercises firmware IO, signatures, records
+and dirty-filesystem behaviour on the host. `privileged.yml`, the one workflow that would
 cover it, **has never run**: it is `workflow_dispatch` plus a Monday cron that
 has not fired since it was written.
 
@@ -291,6 +293,26 @@ every push to `main` and every pull request with `upload: false`, and
 renames a board, which was the point of asking for it. Measured on the push of
 `f46b64a6`: in that `ci` run, `release-products (uefi-x64-prod, amd64)` booted
 and passed while the `uefi-arm64` and `cx3576` jobs skipped the step.
+
+#### The catalogue now has two kinds of backing
+
+Stated as one pair, because the halves are only useful together *(2026-09-20,
+after `s905x5m.20260920-0033` and the index `mica.20260920-0046`)*: **four
+boards are release targets, eight products are published and indexed, the UEFI
+images boot, and the `s905x5m` images have never been booted by anything.**
+Nor have the `cx3576` ones: the only suite that starts a guest is UEFI, its
+FIT counterpart runs on the host, and the automated boot covers the amd64 UEFI
+path alone.
+
+This is consistent with the decision that a release target publishes images
+and asserts nothing about hardware
+([support tiers](../boards/support-tiers.md)), and it is a **different and
+sharper statement than the tier table makes**: that table is about
+qualification, this is about whether anything has ever started the thing we
+publish. Half the catalogue moved from inference to evidence on 2026-09-19;
+the other half has not moved at all, and a reader picking a product should be
+able to see which half it is in. What to do about the FIT side is a question
+for the user, not a suite to schedule here.
 
 ## 5. Complete-image acceptance
 

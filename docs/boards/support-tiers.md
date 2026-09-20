@@ -96,7 +96,7 @@ physical qualification row.
 | `uefi-x64` | generic amd64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU lifecycle: API, power actions, reboot, runtime, updates and reset | bring-up (QEMU baseline) |
 | `uefi-arm64` | generic arm64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU API, update, fault and reboot rows — [uefi-arm64.md](uefi-arm64.md) | bring-up (QEMU reference) |
 | `cx3576` | Rockchip RK3576, U-Boot with a signed FIT | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | physical rows not tested — [cx3576.md](cx3576.md) | bring-up |
-| `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | yes, decided 2026-09-19 | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
+| `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
 
 "Release target" is `BOARD_RELEASE_TARGET` in the board's `board.env`. It
 says that the board's images are built and published and that its products
@@ -104,8 +104,9 @@ appear in the version index. **It is not a claim that the board boots on
 hardware** — that claim lives in the dossier, and for `s905x5m` the dossier
 still says four physical rows untested with `RFCT-922` open.
 
-`s905x5m` was opened as a release target by user decision on 2026-09-19, and
-its tier does not move: it stays bring-up with the same evidence column.
+`s905x5m` was opened as a release target by user decision on 2026-09-19 and
+published its first release, `s905x5m.20260920-0033`, on 2026-09-20; its tier
+does not move and stays bring-up with the same evidence column.
 That combination is not a contradiction, because being a release target has
 never meant being qualified on hardware here — `cx3576` has published images
 at the bring-up tier, with the same "physical rows not tested", since before
@@ -114,9 +115,8 @@ the decision removes an inconsistency rather than lowering a bar. The flag in
 `board.env` and the first release follow from `mica-boards`, and `mica-build`
 re-pins and publishes its products after that.
 
-The flag has not been flipped yet, and the reason is worth reading: **the
-board has no `evidence.json`**, and `mica-build`'s release manifest requires
-one — `schemaVersion` 2, the board name, a known `bootAssurance`, a non-empty
+The flag took a while to flip, and the reason is worth reading: **the board
+had no `evidence.json`**, and `mica-build`'s release manifest requires one — `schemaVersion` 2, the board name, a known `bootAssurance`, a non-empty
 qualification, at least one `evidenceRef` and `physicalBoundaries`. Flipping
 today would produce a product whose release manifest cannot be built, so
 `mica-boards` writes the document first, on the `cx3576` model that states its
@@ -124,12 +124,16 @@ own pending physical rows. That document is where the distinction this table
 draws — a release target is not a hardware claim — gets stated for this
 board.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
-It is also dated evidence, and it is now uneven between the two: since
+It is also dated evidence, and it is uneven in two directions. Between the
+UEFI boards: since
 2026-09-19 every amd64 product is booted automatically — on each push to
 `main` and again in its release run — so `uefi-x64` carries a boot per push
 and per release, while `uefi-arm64` carries none: the gate's boot step is
 amd64-only and was skipped for both its products
-([harness](../design/build-harness.md) section 4). The three `uefi`
+([harness](../design/build-harness.md) section 4). And between UEFI and FIT:
+the `cx3576` and `s905x5m` images have never been booted by anything, because
+the only suite that starts a guest is the UEFI one. A published image is not a
+booted image, and for these two boards that gap is the whole distance. The three `uefi`
 rounds published before it fail at PID 1 and power down. These rows describe
 what the boards were qualified to do, not what any particular published image
 does.

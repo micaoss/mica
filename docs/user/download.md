@@ -23,10 +23,9 @@ have to walk the release list.
 ## 1. What exists to download
 
 Images and update archives exist only for products whose board is a release
-target — `uefi-x64`, `cx3576`, and `uefi-arm64` since 2026-09-16, whose first
-product images are in `uefi-arm64.20260916-1653`. `s905x5m` was opened as a
-release target on 2026-09-19 and publishes from its first release on. Every published product is
-a `dev` or `prod` product; the minimal products were removed on 2026-09-16
+target, which since `s905x5m.20260920-0033` is all four: `uefi-x64`,
+`uefi-arm64`, `cx3576` and `s905x5m`, eight products in the index
+`mica.20260920-0046`. Every published product is a `dev` or `prod` product; the minimal products were removed on 2026-09-16
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
 releases cut before that date keep their minimal assets.
 
@@ -46,8 +45,15 @@ ships accepts the current names: the `mica-core` release it pins,
 absence produced the refusal. Both `uefi-x64` products of that round were
 **booted in their release run** and reached the guest's own pass marker. The
 boot step is amd64-only, so the `uefi-arm64` and `cx3576` products of the same
-round were built and statically verified but not started
-([harness](../design/build-harness.md) section 4).
+round were built and statically verified but not started.
+
+**A published image is not a booted image**, and the catalogue is split on
+that: the UEFI images are booted automatically, while the `cx3576` and
+`s905x5m` images have never been started by anything, the only suite that
+boots a guest being the UEFI one ([harness](../design/build-harness.md)
+section 4). Being a release target means the images are built, published and
+indexed; it is not a claim about hardware
+([support tiers](../boards/support-tiers.md)).
 
 Per product a release carries:
 
