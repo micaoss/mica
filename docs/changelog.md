@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-20 08:03 [decision]
+
+**The most reliable quality mechanism here is imitation, and imitation has no
+quality filter** — so the file to copy is now named. The `Makefile` header
+says a new checker starts from `tools/docs/verify-board.sh` and its test, and
+names the four properties to carry rather than the shape: assert nothing until
+the set is non-empty; keep a positive control, so a red case is known to be
+the mutation and not the fixture; one refusal per enforcement clause, each
+failing with its own message; and refuse rather than pass when the checker
+cannot reach what it checks.
+
+**Why naming it is the only action available.** Every checker here after the
+first got its empty-set refusal by copying, not by anyone reading a rule —
+that is how the standards travel, faster than they are written down. The other
+half is the caution: had the first file in that position been sloppy — a
+refusal suite with no valid case, an empty set passing green — the same
+mechanism would have propagated it just as fast and just as invisibly, and
+nobody could have pointed at a decision that caused it. *Choose good things to
+copy* is not a rule anyone can follow; **naming which file to start from is**.
+
 ## 2026-09-20 08:02 [finding]
 
 **Five layers of one distinction, written as a table rather than as a

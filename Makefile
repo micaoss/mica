@@ -18,6 +18,21 @@
 # that test drives the checker through an injectable reader and touches no
 # network. A "world" test inside the offline target looks like a violation of
 # the rule above and is not one.
+#
+# START A NEW CHECKER FROM tools/docs/verify-board.sh AND ITS TEST, and take
+# the four properties with it rather than only the shape: assert nothing until
+# the set being checked is non-empty (a check over an empty set reports green
+# without having checked anything); keep a positive control so a red case is
+# known to be the mutation and not the fixture; drive one refusal per
+# enforcement clause, each failing with its own message; and refuse -- never
+# pass -- when the checker cannot reach what it checks.
+#
+# The naming is deliberate. Every checker here after the first got its
+# empty-set refusal by IMITATION, not by anyone reading a rule, which is how
+# this workspace's standards actually travel -- and imitation has no quality
+# filter: a sloppy first file would have propagated just as fast and just as
+# invisibly, and nobody could have pointed at the decision that caused it. So
+# the file to copy is named instead of left to whichever one is open.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"
