@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 17:14 [finding]
+
+**The held instance has its subject and lands: `mica-build` `81005ea6` fails
+on a product built from `uefi-x64.20260916-0857` and passes on one built from
+`20260920-1536`.** Same file, no injected defect, two products this workspace
+publishes pins for. **The five recorded instances prove a gate reads its
+inputs; this one proves a check can tell two worlds apart** — the property the
+thing it replaced failed at three times.
+
+**And the order is the argument**: the falsification **found a defect in the
+check first** — a verdict printed over an error string — and the corrected
+file **then proved the capability**. One experiment did both jobs, in that
+order, which was not available when the rule was written this afternoon. The
+two claims from that episode also separate cleanly, as they were recorded to:
+**the defect is history and keeps its date; the capability is a property of
+the current file, and the file now has a name.**
+
+**And the honest boundary of the whole format-over-rule argument, found on the
+day it was made: some false results are distinguishable only by somebody who
+knows what they did.** Two results in the same round were **false and
+plausible** — two guests run at once against a harness that names its
+container with a fixed name, so both died at exit 137 and read as a broken
+harness; and a symlinked `meta/` in a temporary worktree, accepted by the
+build and unfollowable from inside the container. **Both were caught only
+because the operator knew what they had just done.** Every other repair
+recorded today moved a judgement into an instrument; this is the residue that
+cannot be moved, and a page that recommends formats without naming it is
+selling the argument rather than making it.
+
 ## 2026-09-20 17:07 [finding]
 
 **The sweep rule landed an hour ago was incomplete in this tree, and the

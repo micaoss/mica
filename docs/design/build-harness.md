@@ -49,6 +49,19 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**And the honest boundary of all of this, found the day it was argued: some
+false results are distinguishable only by somebody who knows what they did,
+and no format reaches them** *(2026-09-20)*. In the same round, two results
+were **false and plausible**: two guests were run at once and the harness
+names its container with a **fixed** name, so they collided and both died at
+exit 137 — two *the probe never finished* results that read as a broken
+harness; and a symlinked `meta/` in a temporary worktree was accepted by the
+build and unfollowable from inside the container. **Both were caught only
+because the operator knew what they had just done.** Every other repair on
+this page moves a judgement into an instrument; this is the residue that
+cannot be moved, and a page that recommends formats without naming it is
+selling the argument rather than making it.
+
 **A reading that is the arithmetic consequence of its input carries its own
 corroboration** *(2026-09-20)*. `--memory=64m` producing `memory.max=67108864`
 and `--cpus=0.5` producing `cpu.max=50000 100000` are not two facts; they are
@@ -105,6 +118,17 @@ and this repository's own vectors gate, which had **355 assertions and no
 negative test for six days** while every commit report quoted `355/355 PASS`.
 The counterexample was found by applying the rule to the ledger used to test
 it.
+
+**A sixth arrived by experiment and is different in kind from the other
+five**: `mica-build` `81005ea6` **fails** on a product built from board
+release `20260916-0857` and **passes** on one built from `20260920-1536` —
+same file, no injected defect, two products the workspace actually publishes
+pins for. The five above prove a gate **reads its inputs**; this one proves a
+check **can tell two worlds apart**, which is the property the thing it
+replaced failed at three times. And the order is the argument: **the
+falsification found a defect in the check first** — a verdict printed over an
+error string — **and the corrected file then proved the capability. One
+experiment did both jobs, in that order.**
 
 **And the falsification's first run found a defect rather than confirming the
 check**, which is the argument made by the experiment instead of about it: the

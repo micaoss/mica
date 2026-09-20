@@ -788,9 +788,13 @@ with a false pass — on the exact experiment designed to prove the check could
 tell two worlds apart.** **A correct verdict reached by an accident of
 ordering is indistinguishable from a correct verdict**, which is the
 eight-of-nine shape again: nothing in the output separates the luck from the
-judgement. *(The corrected file is being run against both worlds — old must
-fail, new must pass — and this section will name that result when it exists
-rather than quoting one produced by a file that has since changed.)*
+judgement. *(The corrected file — `mica-build` `81005ea6`, *one verdict per ceiling, and
+none of them read if the run failed* — was then run against both worlds. On
+the **old** pins, `uefi-x64` at board release `20260916-0857` with
+`# CONFIG_MEMCG is not set` confirmed in the fetched config before the build,
+it **fails**: 10 pass, 1 fail, `crun` naming the cause. On the **new** pins it
+**passes**, 12 claims, with the numbers above. **The same file, no injected
+defect, two products this workspace built and published pins for.**)*
 
 **And the line added to make a wrong answer legible paid for itself as
 evidence**: the probe prints the root cgroup's `available:` list beside its
