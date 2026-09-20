@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-09-20 06:59 [finding]
+
+**Corrected before it set: the unmirrored pools are a decision's consequence,
+not a defect, and the table is eight rows.** The accepted scope of 2026-09-16
+lists our package pools, `mica-boards` board components, release locks and
+`SHA256SUMS` as *"out of scope and not to be re-added"*, so *nobody had a
+reason to look* was wrong about the cause and is gone from
+`release-lock.md` 2.1. The table is now transcribed **verbatim** from
+`mica-res`'s record, because every count in it is a query result and a
+re-worded query result is a sentence. The eighth row — `mica-boards` board
+components, `ghcr` holding the only copy of every kernel, U-Boot and board
+package — was added by the repository unasked, and its reason is the one to
+keep: **seven rows would have left it out by accident, which is how the pools
+stayed unnoticed.**
+
+**The finding is a missing consequence, not a missing mirror.** The scope said
+what would not be mirrored; nobody wrote down that this means `ghcr` holds the
+only copy of every Debian package this workspace publishes. That implication
+is now a query (`cli.ts coverage`) rather than something each reader has to
+derive. And the policy constraint cuts both ways, which is why it is stated as
+one: the three `NOTHING` rows may not be treated as *protected*, and may not
+be quietly reversed either — **both moves are the user's.**
+
+**Recommendation withdrawn and re-recorded as a scope change.** Mirroring the
+locks was recommended here without knowing a user decision said not to. It is
+priced — under 5 MB against 1.8 GB held, 150 to 250 lines with tests inside
+the existing `sync.yml`, no new workflow or credential — and its limit travels
+attached to it: the chain from the mirror would end at the lock, whose
+`package` rows point into pools nothing mirrors. **It makes the binding
+survivable, not the packages.**
+
+**And the better answer to tonight's rule is recorded beside it**, in
+`2026-09-20-coordination-state-is-a-record.md`: `coverage` computes
+`poolsCovered()`, false today, so a retention proposal naming a `pool.*`
+package can be refused mechanically and the refusal disappears by itself when
+something mirrors the pools. **A constraint that verifies itself cannot decay,
+and it retires itself when its reason ends.** With the limit of that answer
+stated too — it needs the constraint's reason to be computable from the world
+rather than from intent, which is rarer than it looks.
+
 ## 2026-09-20 06:56 [finding]
 
 **The `latest` marker is a recommendation, and it is accepted as the second

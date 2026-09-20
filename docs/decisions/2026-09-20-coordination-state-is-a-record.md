@@ -58,6 +58,20 @@ by the repository being told, not by the one telling.
 - A queued record — "I will write it when the work lands" — is an unrecorded
   constraint with a good intention attached.
 
+## Better than a record, where the constraint can compute itself
+
+A record still needs someone to read it at the right moment. A check does not.
+`mica-res`'s `coverage` computes `poolsCovered()`, false today, so a retention
+proposal naming a `pool.*` package can be **refused mechanically** while that
+is false — and the refusal **disappears by itself** when something mirrors the
+pools. So: **a constraint that verifies itself cannot decay, and it retires
+itself when its reason ends.**
+
+That is the better answer to this whole page wherever it is available, and it
+is available less often than it looks: it needs the constraint's reason to be
+computable from the world rather than from intent. Where it is not, the rule
+above stands and the record is what there is.
+
 ## Why it is written as a rule rather than as an incident
 
 Five instances across two days is a claim about how the role works, not a

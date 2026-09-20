@@ -65,12 +65,23 @@ level down, because it would be satisfied by an instrument covering one `ghcr`
 package out of many. **The condition that is true of the world is per
 artefact.**
 
-The fork is the user's: either the policy says the pools are never pruned
-while nothing mirrors them, or mirroring the pools becomes a phase and the
-condition waits on it. The recommendation put to them is both, in an order —
-mirror the **locks** first, because they are the binding and they are
-kilobytes, and declare the pools unprunable while nothing mirrors them, not as
-a stopgap but as the honest statement of the world.
+The fork is the user's, and it is a **scope** question rather than a
+repository's to take: the accepted scope of 2026-09-16 put the pools, the
+board components and the locks *out of scope and not to be re-added*
+([release-lock](../design/release-lock.md) 2.1). So either the policy says the
+pools are never pruned while nothing mirrors them, or that scope is changed
+and the condition waits on the mirroring.
+
+**Mirroring the locks is priced, and it is a scope reversal rather than a
+recommendation anyone can act on**: under 5 MB against the 1.8 GB already
+held, and 150 to 250 lines with tests inside the existing `sync.yml` — no new
+workflow, no new credential, since the enumerator already downloads every
+producer lock it reads, and the `mica-pin v1` digest makes publishing a
+**verification** rather than a copy. **Its limit travels attached to it or not
+at all:** the chain from the mirror would end at the lock, whose `package`
+rows point into pools nothing mirrors. It makes the **binding** survivable,
+not the packages — and a reader who skips that sentence draws exactly the
+wrong conclusion.
 
 **The early-warning number is in, and the bound first asked for was the wrong
 one.** It is not GitHub's run retention: the collector reads one page of 100

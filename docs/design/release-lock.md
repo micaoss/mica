@@ -433,31 +433,52 @@ collector alone would delete images that nothing had captured. What protects
 image history is the mirror, and only for what the mirror holds — today
 `20260916-0735` and not `20260915-0138`.
 
-**Nor is it two instruments covering two artefacts.** Measured against the
-mirror's own catalogue by `mica-res`'s read-only `coverage` command on
-2026-09-20 (run `35495033872`), the picture is seven kinds and **two of them
-are covered by nothing**:
+**Nor is it two instruments covering two artefacts.** Eight kinds, measured by
+`mica-res`'s read-only `coverage` command and transcribed from its record
+(`mica-res:docs/task/20260917-0852-public-resource-framework.md`, 2026-09-20)
+**verbatim, because every count in it is a query result and a re-worded query
+result is a sentence**:
 
-| Artefact | What holds a copy |
-|---|---|
-| workflow run and job metadata | the collector's snapshots — unbroken, 427 over five days, holes zero |
-| workflow **logs and artifacts** | **nothing** |
-| build-env image bytes | the mirror, 115 objects |
-| `mica-build` product images and update archives | the mirror, 12 + 18 objects |
-| third-party `deb`, source and git inputs | the mirror, 324 + 23 + 43 objects |
-| **OCI pools — every Debian package this workspace publishes** | **nothing; `ghcr` holds the only copy** |
-| release locks and `SHA256SUMS` | not in the bucket: the producer's release and its consumers' git |
+```text
+artefact                                        instrument that protects it
+----------------------------------------------  ---------------------------------------------
+workflow run and job metadata                   the collector's snapshots: 427 over
+                                                2026-09-15T01:55Z..2026-09-20T01:06Z, holes 0,
+                                                page-one recovery margin 48 h or better
+workflow logs and artifacts                     NOTHING -- a snapshot is the record of a run,
+                                                never an archive of it
+build-env image bytes                           the mirror, 115 objects; the ONLY ghcr package
+                                                whose bytes the mirror holds
+mica-build product images and update archives    the mirror, 12 + 18 objects (`asset` rows)
+third-party debs, source archives, git trees    the mirror, 324 + 23 + 43 objects
+our published Debian packages (the OCI pools)   NOTHING -- ghcr holds the only copy
+mica-boards board components                    NOTHING -- ghcr holds the only copy
+release locks and SHA256SUMS                    NOT IN THE BUCKET -- the release-to-digest
+                                                binding survives only in the producer's GitHub
+                                                release and in consumers' committed `locks/`
+                                                and `locks/pins/`
+```
 
-Three of those are findings rather than restatements. **The pools are
-mirrored nowhere**: no `package` row and no `pool` row has ever existed in the
-mirror's catalogue, nothing regressed, and the gap was simply never looked at
-until a retention condition started depending on it. **The snapshots are
-metadata, not an archive**: logs and artifacts are never copied, so deleting a
-run still destroys its log bytes — a policy that permits deleting runs is
-permitting that loss and should say so rather than leaning on the word
-*protected*. And **the binding is not in the bucket**: zero lock-named and
-zero `SHA256SUMS` objects, while for every producer except `mica-build` a
-release's only unique bytes **are** the lock.
+**The three `NOTHING` rows are a decision's consequence, not a defect in the
+mirror.** The accepted scope of 2026-09-16 lists our package pools,
+`mica-boards` board components, release locks and `SHA256SUMS` — with the
+upstream `docker.io` images and the device update service — as *"out of scope
+and not to be re-added"*. Nothing failed and nothing regressed. The eighth row
+is there because `mica-res` added it unasked: seven rows would have left the
+board components out **by accident, which is how the pools stayed unnoticed**.
+
+**What was actually missing was the consequence, not the mirror.** The scope
+said what would not be mirrored; nobody wrote down that this means `ghcr`
+holds the **only** copy of every Debian package this workspace publishes and
+of every kernel, U-Boot and board package. That implication is now a query
+(`bun packages/mica-sync/src/cli.ts coverage`) rather than something a reader
+has to derive, which is the difference between a decision and its blast
+radius being knowable.
+
+**So the retention policy has a constraint, and it cuts both ways:** those
+three rows may not be treated as *protected*, and they may not be quietly
+reversed either. Both moves are the user's — treating them as protected
+misreads a decision, and mirroring them anyway overturns one.
 
 **The trap, because the shape of the data invites it:** those 324 `deb`
 objects read exactly like package coverage and are not. Every one is upstream
