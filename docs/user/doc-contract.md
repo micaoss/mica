@@ -277,6 +277,24 @@ English source.
   the rule above does not reach it. **Naming a class is not counting it**, and
   writing the general sentence can close the question as firmly as a fix
   does.
+- **A second candidate at two instances, and this one has a failure mode: a
+  right conclusion resting on a wrong reason** *(2026-09-20, both instances
+  this repository's)*. The `subuid` ranges are inert (right) *because no code
+  asks for it* (wrong); clause A was unsatisfied (right) *because nobody had
+  done the work* (wrong — nobody can). **The failure is remote, which is why
+  review cannot catch it: the reason is what a reader generalises from.**
+  Nobody re-derives a conclusion; they carry the reason to the next case. An
+  integrator who reads *no code asks* carries forward *I cannot reach it*,
+  reaches it with `--userns=auto`, and meets a failure instead of a mapping —
+  **the conclusion protected them and the reason sent them.** The test: **ask
+  what a reader would do with the reason, not with the conclusion** — a
+  conclusion is consumed once, in place; a reason travels.
+  *(Kept separate from a **check** right for the wrong reason, which these
+  records already hold, and separated by repair as the membership rule
+  requires: a check is repaired by making it read the right thing and fails
+  **when the world changes**; a statement is repaired by fixing the reason and
+  fails **when a reader travels**. Two classes, not one — decided with
+  instances of both in hand rather than by how alike they sound.)*
 - **A candidate recorded at two instances, with its test written in advance —
   deliberately not named** *(2026-09-20)*. Two defects share a property
   narrower than *no failure mode*: **the deliverable is correct and stays
@@ -353,6 +371,15 @@ English source.
   an edit, never an artefact cut to turn it green. *(This is why a prediction
   table is worth more than an alert: it says which red means "go and change
   the page", and none of them means "go and change the world".)*
+  **And when this collides with *a record must describe the artefact
+  accurately*, neither gives** *(2026-09-20; the collision stayed invisible
+  tonight only because a comparison point turned out to be already published,
+  which is luck)*. A restatement that genuinely needs an artefact change meets
+  both rules at once, and *you may not write it* is not an answer. The
+  resolution is a third thing: **the record states what it cannot say and why,
+  and the artefact's owner decides whether to move. A record naming its own
+  limit is not driving anything** — it is the only form that keeps the
+  accuracy without spending somebody else's artefact.
 - **Ask the membership question from both sides** *(2026-09-20)*. The third
   guard says to enumerate the instances and test each against the class; this
   is its other half, because **a count taken from one side is a sample that

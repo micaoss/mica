@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-20 20:03 [finding]
+
+**Two rules of this page can collide, and tonight they did not only by luck.**
+*A record may not drive the artefact it describes* and *a record must describe
+the artefact accurately* are both satisfiable only while the artefact happens
+to support the accurate sentence — a restatement that genuinely needed a
+format change would have met both at once, and *you may not write it* is not
+an answer. The resolution is a third thing: **the record states what it cannot
+say and why, and the artefact's owner decides whether to move. A record naming
+its own limit is not driving anything.** Written now because the collision was
+invisible tonight and will not be next time.
+
+**And the second candidate at two instances has a failure mode, which makes it
+a different kind from the first: a right conclusion resting on a wrong
+reason.** The `subuid` ranges are inert (right) because *no code asks for it*
+(wrong); clause A was unsatisfied (right) because *nobody had done the work*
+(wrong — nobody can). **The failure is remote, and that is why review cannot
+catch it: the reason is what a reader generalises from.** Nobody re-derives a
+conclusion; they carry the reason onward. An integrator reading *no code asks*
+carries forward *I cannot reach it*, reaches it with `--userns=auto`, and
+meets a failure instead of a mapping — **the conclusion protected them and the
+reason sent them.** The test: **ask what a reader would do with the reason,
+not with the conclusion.**
+
+**Kept separate from a *check* right for the wrong reason, by repair rather
+than by resemblance**: a check is repaired by making it read the right thing
+and fails **when the world changes**; a statement is repaired by fixing the
+reason and fails **when a reader travels**. Two classes, decided with
+instances of both in hand.
+
 ## 2026-09-20 20:00 [finding]
 
 **The keyless-fingerprint number is not a zero, and the comparison point was
