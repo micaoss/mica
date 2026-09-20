@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-20 15:14 [finding]
+
+**A claim these records made about another repository's *set* was measured
+false, and the repair keeps the sentence about the file.** Section 9 said
+`mica-build`'s vector copy was byte-identical to canonical after one rename —
+the reading available when it was written, and the ground for auditing the
+vectors *here, once, at the source*. The copy held 127 files against 143. The
+audit's conclusion stands, because it was run against this repository's own
+set and the missing files are the copy's, but the reason given for running it
+here had to be replaced with the one that does not depend on a tree nobody had
+diffed: a finding about the vectors is a finding about the vectors.
+
+**And the repair test stays, relabelled.** *No vector carries an incidental
+defect beyond the one it names* is a real property of this corpus — it is what
+the comment-line repairs restored — and **no other repository can check it**,
+because the repair has to be made in the fixture. A fixture-hygiene test
+mislabelled as an isolation test is worth relabelling and not worth deleting;
+what the relabelling buys is that nobody reads its green as *every rule is
+isolated* again.
+
 ## 2026-09-20 15:12 [finding]
 
 **The capability text for section 8 landed merged rather than appended, and

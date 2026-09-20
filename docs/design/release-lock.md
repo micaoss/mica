@@ -1308,18 +1308,34 @@ The distinction it does draw is still the useful one — *no gate can check this
 permanent limit, *no harness exists yet* is a piece of work, and **only one of
 those ever gets built.** The audit belongs here, once, at the source: forty-odd
 refused vectors in one pass rather than five repositories doing it five times,
-since `mica-build`'s copy is byte-identical to canonical after one rename, so
-a finding would be a finding about the vectors themselves
+so a finding is a finding about the vectors themselves
 ([task](../task/20260920-0851-negative-vector-audit.md)).
+
+**And keep the test, for the property it does check.** *No vector carries an
+incidental defect beyond the one it names* is a real property of this corpus —
+it is what the comment-line repairs restored — and **no other repository
+can check it**, because the repair has to be made in the fixture. A
+fixture-hygiene test mislabelled as an isolation test is worth relabelling and
+not worth deleting; what the relabelling buys is that nobody reads its green
+as *every rule is isolated* again.
 
 **Two facts about the one known instance, kept visible because they bound what
 it proves.** It was found **by accident** — `mica-core` comparing blobs, not
 anyone hunting double faults — so nobody knows whether it is a one-off or a
 pattern in a set written over months by people thinking about the positive
 case. And it is **local rather than inherited**: the same file is
-byte-identical to canonical in `mica-build`'s pre-rename copy, the oldest in
-the workspace, so the edit happened downstream of the oldest ancestor in one
-tree.
+byte-identical to canonical in `mica-build`'s copy, so the edit happened
+downstream of the oldest ancestor in one tree.
+
+*(That copy was described here as byte-identical to canonical after one
+rename, which was the reading available when it was written and was measured
+false on 2026-09-20: it held **127 files against 143**, the five `data-*`
+vectors and `derived-from.tsv` among the missing, with its own suite green
+because it walked its own `expected.tsv`. What the correction costs is the
+**set**: *byte-identical after one rename* was a claim about a whole tree, and
+a claim about one file in it has to be made about that file. The difference
+between those two sentences is the whole of why a copy now carries a pin and a
+`diff -r` ([harness](build-harness.md) section 2).)*
 
 *(That oldest copy is also the only one the `bun` artefact could not reach,
 because the sweep that introduced it came after the copy — an accident rather
