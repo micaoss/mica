@@ -14,7 +14,8 @@ package owns is dropped unless a rule names it — and a path a package *does*
 own is dropped too, unless a rule names it. That is how `/etc/pam.d/login` and
 the four generated `common-*` files left every published image of every board,
 which is why no published Mica OS image has a console login. The measurement
-from a real compose: **2980 paths carried, 703 left behind — 626 owned by a
+from a real compose of `uefi-x64`, the only product the report has run on:
+**2980 paths carried, 703 left behind — 626 owned by a
 package and claimed by nothing, 77 shipped by no package at all.**
 
 The 77 are the ones no consumer can reason about unaided, so `mica-system-base`

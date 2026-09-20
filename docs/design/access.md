@@ -126,7 +126,8 @@ among them, with every include resolving. Deliberately still not there:
 drops them, and **carrying inert files to close a gap is not a fix** while
 rootless containers are unsupported by decision (the `subuid` bullet above is
 about the base root, not about a product root). The measurement from a real
-compose that started all of this — 2980 paths carried, 703 left behind, 626
+compose that started all of this — on `uefi-x64`, the only product the
+report has run on: 2980 paths carried, 703 left behind, 626
 owned by a package and claimed by nothing, 77 shipped by no package at all —
 is what `mica-system-base` now publishes as a list with each writer named
 ([proposal](../task/20260920-0610-producer-data-assets.md)).

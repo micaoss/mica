@@ -36,6 +36,12 @@ class Refused(Exception):
 SUPPRESS = set()
 # `release-row` joins them because everything after it reads rows[0] as the
 # release: suppressing it does not leave a readable file either.
+#
+# THIS LIST IS ENUMERATED, NOT DERIVED, so re-derive it rather than trusting
+# it: a rule belongs here when suppressing it would leave the rest of the file
+# unreadable. `release-row` was missing from the first version and the reason
+# was right the whole time -- a correct class with a hand-enumerated membership
+# is the defect that survives review (build-harness.md section 4).
 STRUCTURAL = {"header", "encoding", "kind-unknown", "column-count", "release-row"}
 
 

@@ -108,6 +108,17 @@ output. Five layers, five repositories, one distinction *(2026-09-19/20)*:
 The table is the argument and the sentence is only its title. Each row cost
 something to learn, and the fifth arrived the same day as the fourth.
 
+**A correct class with a hand-enumerated membership is the defect that
+survives review**, because every reviewer checks the **reason**, and the
+reason is right. Two instances, different domains, the same day: the
+collect mode's structural set left `release-row` out although everything after
+it reads `rows[0]` as the release; and `e2fsprogs` carries a hand-written rule
+keeping `/etc/e2scrub.conf` *to preserve existing configured defaults for the
+retained `e2scrub`* — which **stopped at one of two retained binaries**. The
+repair is the same in both and neither found it from the other: **derive the
+membership from the class, or say in the rule that the list is enumerated, so
+a reader knows to re-derive it.**
+
 **A value that cannot express *not measured* is indistinguishable from a
 measurement.** Three instances, in three places: a vector copy's **size**,
 where 64 rows is either a deliberate subset or last month's copy and the file
@@ -629,7 +640,17 @@ proves a path by **package ownership** and keeps a library by **`DT_NEEDED`**.
 carried because somebody wrote a rule naming it — NSS, PAM, the OpenSSL
 providers, all named in `consumers.json` — so that third category is held
 together **entirely by human foresight**, and last night measured how far
-foresight got: **eleven families right, one missed.**
+foresight got: **eleven families right, one missed** — and then a second
+missed, `libpcsclite.so.1`, a shim that `dlopen`s `libpcsclite_real.so.1` by
+name from the same package, out for the same two reasons: `DT_NEEDED` does not
+name it and ownership does not claim it.
+
+**Those counts are one product's.** The drops report and the composed-root
+assertions have only ever run on `uefi-x64`, so **2980 carried, 703 left
+behind, 626 owned-and-unclaimed and 77 owned by nothing are `uefi-x64`
+numbers**, not workspace ones — running the scan on all four products turned
+up **eight names one product had been hiding**. *A scan that answers about one
+product answers about one product.*
 
 The one missed is the illustration and it is the purest form of a shape these
 records keep meeting: `/usr/bin/stdbuf` is carried and

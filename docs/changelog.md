@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-20 14:31 [finding]
+
+**One rule with two instances from different domains on the same day: a
+correct class with a hand-enumerated membership is the defect that survives
+review**, because every reviewer checks the **reason** and the reason is
+right. Mine: the collect mode's structural set left `release-row` out while
+everything after it reads `rows[0]` as the release. `mica-build`'s:
+`e2fsprogs` keeps `/etc/e2scrub.conf` *to preserve existing configured
+defaults for the retained `e2scrub`* — and **stops at one of two retained
+binaries**. The repair is the same and neither found it from the other:
+**derive the membership from the class, or say in the rule that the list is
+enumerated so a reader knows to re-derive it.** Applied to my own list in the
+same commit: the structural set now says it is enumerated and how to
+re-derive it.
+
+**And a correction to numbers these records have been carrying as
+workspace-wide: they are `uefi-x64`'s.** The drops report and the
+composed-root assertions have only ever run on that product, so **2980
+carried, 703 left behind, 626 owned-and-unclaimed, 77 owned by nothing** are
+one product's figures — scoped now in `build-harness.md`, `access.md` and the
+producer-data task. Running the scan on all four turned up **eight names one
+product had been hiding**, which is the rule in its own words: *a scan that
+answers about one product answers about one product.*
+
+**With a second instance of the `libstdbuf` blind spot**: `libpcsclite.so.1`
+is a shim that `dlopen`s `libpcsclite_real.so.1` by name from the same
+package, and it fell out for the same two reasons — `DT_NEEDED` does not name
+it, ownership does not claim it. Same two proofs, same gap, different package.
+
 ## 2026-09-20 14:28 [finding]
 
 **Two more instances of *identical wrong bytes are a pass*, recorded as
