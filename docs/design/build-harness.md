@@ -213,27 +213,21 @@ getting this wrong is not a repeated discussion, it is that **the second
 repository pays the discovery again**, at whatever hour it lands.
 
 **And the hazard is located rather than general, which took a run rather than
-a reading.** In `mica-boards`' CI it does not occur: run `35500637534` on
-`58dee40` failed inside the kernel job at the recorded-config gate **with the
-prefix cache warm from the previous push** — the config stage ran anyway and
-refused. The mechanism is worth the line, because it is a correctness property
-taken from the build tool rather than from a hand-maintained key: the fragment
-is **not** in the cache key and does not need to be, since the config stage
-`COPY`s it and BuildKit's content addressing then keys that layer on the
-fragment's bytes, so a fragment change misses from the `COPY` forward. What
-the hazard needs is an `_out/boards/<board>/kernel/` that **persists across a
-fragment change and is consumed as an input rather than rebuilt** — the
-image-assembly side, and a developer's working tree.
+a reading**: it needs an `_out/boards/<board>/kernel/` that persists across a
+fragment change and is consumed as an input rather than rebuilt — the
+image-assembly side and a developer's working tree, not `mica-boards`' CI,
+where a run with a warm prefix cache still failed at the recorded-config gate.
+The measurement, the CI demonstration and the BuildKit mechanism are recorded
+in their author's words in [the board contract](../boards/contract.md) section
+4.6, rather than paraphrased here.
 
 **Same path, two hazards, different repairs**, which is the part a reader who
 learns one will get wrong about the other: `mica-boards`'
-`_out/boards/<board>/kernel/` can be stale relative to a **fragment**, because
-that repository builds from one; `mica-build`'s is **fetched from a pinned
-board release**, so its staleness is the **pin's** and not the fragment's. One
-is answered by BuildKit's content addressing, the other by comparing a
-report's mtime against the signed root it claims to describe. Neither would
-have helped the other, and both are called *the `_out` problem* by anybody
-describing them quickly.
+`_out/boards/<board>/kernel/` can be stale relative to a **fragment**;
+`mica-build`'s is fetched from a **pinned board release**, so its staleness is
+the **pin's**. BuildKit's content addressing answers the first, comparing a
+report's mtime against the signed root it describes answers the second, and
+**neither would have helped the other**.
 
 **And there is a kind none of these are: no aperture at all in the direction
 that mattered** *(2026-09-20, `mica-build`)*. Its copy of the

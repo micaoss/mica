@@ -634,6 +634,54 @@ fact, not the mechanism protecting current storage. A future kernel capability
 change must still preserve the explicit mount policy and pass complete boot,
 service-namespace and shutdown checks.
 
+### 4.6 A built kernel tree is an input, and an input can be older than the rule it is checked against
+
+*Written by `mica-boards`, landed here verbatim so the measurement lives in a
+record rather than in a file header. One paragraph, about which instrument
+reads the shipped `/boot/config-*`, was withheld by the coordinator pending a
+`mica-build` answer and will be added in its author's words. Checked here
+before landing: the fragment's contents and the two FIT boards' lack of a
+`kernel-config` target, read at `mica-boards` `main`; the `# CONFIG_SECURITY
+is not set` line in `cx3576`'s committed config, read at the pinned release.
+Taken on its author's authority: the CI run and the cx3576 `Image` dates.*
+
+`mica-boards` asserts its shared kernel floor
+(`mica-boards:common/kernel/mica-required.fragment`) in two places: over each
+board's committed config, and over the RESOLVED config after `olddefconfig`,
+in the board's own kernel build. Both run when a kernel is BUILT.
+
+**Neither runs when a kernel is not built.** A board's
+`_out/boards/<board>/kernel/` is an INPUT to image assembly: an assembly that
+finds one does not rebuild it, so neither the config test nor the
+post-olddefconfig assertions execute, and both stay green over a kernel
+compiled before the fragment they are checking.
+
+**Measured on cx3576**: an `Image` built on 2026-08-31 rode every image built
+for the following week, while the fragment gained dm-crypt, the
+eBPF/firewall/bridge floor and `NF_CONNTRACK_MARK` / `NF_NAT_MASQUERADE`. The
+gates were green throughout, because the thing they check was not rebuilt.
+
+**Where the hazard is NOT**: `mica-boards`' own CI. Every job starts from a
+clean checkout with no `_out`, the kernel targets are `.PHONY`, and the only
+cache is the build's PREFIX stage, whose key excludes the fragment while
+BuildKit's content addressing keys the config layer on the fragment's bytes —
+so a fragment change misses from the `COPY` forward. Demonstrated rather than
+argued: CI run 35500637534 on `58dee40` failed INSIDE the kernel job at the
+recorded-config gate with the prefix cache warm from the previous push.
+
+**Two hazards share one directory name, and a reader who learns one will
+assume the other**: a `_out/.../kernel/` in `mica-boards` can be stale
+relative to a FRAGMENT, because that repository builds from one. The
+identically named tree in `mica-build` is fetched from a PINNED BOARD RELEASE,
+so its staleness is the PIN's. Same path, different question.
+
+**The general rule this came from**: a constraint in a header warns whoever is
+already reading that file, which is nobody who needs it. This one was written
+in `mica-boards:common/kernel/kernel-config-test.sh`'s header, with its
+measurement, weeks before another repository met the same hazard and built a
+staleness guard for it — and the repository that had written it down could not
+warn the one that hit it.
+
 ## 5. cx3576 fixed FIT policy
 
 The Mica OS U-Boot build pins required FIT configuration verification and embeds the

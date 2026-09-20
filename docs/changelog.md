@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-20 15:41 [finding]
+
+**`mica-boards`' cx3576 measurement is landed in its author's words**, as
+`docs/boards/contract.md` section 4.6 rather than as a paraphrase: the two
+assertion sites, the not-rebuilt hazard, the `Image` from 2026-08-31 that rode
+a week of images while the fragment moved, the CI run that demonstrates where
+the hazard is **not**, and the two-hazards-one-directory-name distinction. One
+paragraph — which instrument reads the shipped `/boot/config-*` — was withheld
+by the coordinator pending an answer, and the withholding is named in the
+record rather than left as a silence. The build harness now points at that
+section instead of restating it, keeping each fact in one place.
+
+**Landing somebody else's measurement means saying which half was checked**,
+so the section does: the fragment's contents and the two FIT boards' missing
+`kernel-config` target were read here at `main`, the `# CONFIG_SECURITY is not
+set` line at the pinned release; the CI run id and the `Image` dates are taken
+on their author's authority. A record that does not distinguish the two is a
+record whose reader has to trust all of it equally.
+
 ## 2026-09-20 15:37 [finding]
 
 **The row written to watch a step nobody watched fired twenty minutes after it
