@@ -93,6 +93,15 @@ proof and it needs no re-parse: two repositories hold the same fixture, one
 with `pool.amd64.x`, and **that one would still have been refused after the
 same repair**. Same fixture, two trees, one of them testing nothing.
 
+**Decided 2026-09-20**: the second option, in the shape `mica-system-base`
+proposed — an optional **collect mode** in this repository's reader plus a
+second column in `expected.tsv`, with the short-circuit as the default because
+the table names one rule per vector and that is its contract. The
+implementation constraint is specified with it: the mode reports **either a
+structural refusal alone or the set of semantic refusals**, never a mixture,
+because suppressing a structural rule runs the semantic checks over malformed
+rows and manufactures the very pairs the mode exists to find.
+
 Neither is an afternoon, and neither is blocked. What is done is the cheap
 half, which found a real gap.
 

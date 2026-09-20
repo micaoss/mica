@@ -1028,7 +1028,11 @@ COMMIT=<40 lowercase hex>
 Exactly those two keys, in that order. **Comment lines (`#`) may follow the
 header** and carry nothing the gate acts on — the first real pin used one to
 record that its commit carries a known inert defect, and forbidding it would
-have pushed that into nowhere. Anything else is refused. `COMMIT` is the full
+have pushed that into nowhere. **A comment naming a defect is removed in the
+commit that moves the pin past it**: the file that argued for this allowance
+deleted its own comment within the hour, when the defect was repaired
+upstream, with the reason worth keeping — **a comment that outlives its defect
+is the next stale comment.** Anything else is refused. `COMMIT` is the full
 commit, never a short one: **the file is read by a gate rather than by a
 person**, which fetches the vectors at that commit and refuses a difference.
 Refusals, in the vocabulary of 1.5: `header`, `encoding` (no final newline, a
@@ -1110,6 +1114,18 @@ with complete confidence, leaving the bound untested and a fixture apparently
 covering it. **The real product of naming the rule is not better labels, it is
 the list of rules nothing tests.**
 
+**And one category makes *every rule has a vector* the wrong rule to gate**
+*(`mica-core`, 2026-09-20)*: **a refusal no input can reach.** Of the 35 its
+component reader can produce, two cannot be triggered at all —
+`serde_json::to_value` of a struct with string keys and finite numbers cannot
+fail, and the strict base64 engine refuses a noncanonical encoding outright,
+so the re-encode comparison after it can never disagree. Both are kept,
+because **deleting either widens the check above it**. That is the inverse of
+dead code: **a refusal no input can reach is not a gap and not waste — it is
+the floor under the check above it**, and a coverage rule that treats it as
+either would push somebody to delete a guard to make a number go green. The
+subtraction below reports; it does not refuse.
+
 That list is a subtraction: **the refusal rules the reader can produce, minus
 the rules the fixtures name** — set equality in both directions applied to
 *rules* rather than to files. Run here on 2026-09-20, the moment it was
@@ -1125,6 +1141,28 @@ fixture named for a rule it does not exercise**, beside a suite named for a
 thing it does not do and a test named for a chain it does not run. **The name
 keeps doing the work a measurement should have done**, and every instance was
 found by *running* the thing rather than by reading it.
+
+**The shape the second half will take, decided here because it is one spec
+decision rather than five local ones** *(proposed by `mica-system-base`,
+2026-09-20)*: **an optional collect mode in this repository's reference reader,
+plus a second column in `expected.tsv`.** The short-circuit stays the default,
+because `expected.tsv` names **one** rule per vector and a reader returning a
+set would stop answering the question the table asks — **the first-rule
+behaviour is the table's contract, not an implementation detail.** No
+repository builds a second, non-short-circuiting reader of its own: that is a
+private copy of somebody else's truth, which is the thing this section exists
+to remove.
+
+**And the constraint that keeps it from manufacturing its own findings**,
+which is why it is specified before it is written: suppressing a rule to see
+what fires next is only safe where the continuation is safe. A **structural**
+refusal — encoding, header, column count, unknown kind — makes the rest of the
+file unreadable, so a mode that suppressed one would run the semantic checks
+over malformed rows and report pairs that are artefacts of its own ordering.
+So the mode reports **either a structural refusal alone, or the set of
+semantic refusals**, and never mixes them. A partially built version is the
+one thing that must not be shipped here: a gate whose noise is
+indistinguishable from its findings is worse than no gate.
 
 **The two-rule property is mechanically checkable, and the harness does not
 exist** *(`mica-build`, 2026-09-20)*: **for each refused vector, repair the

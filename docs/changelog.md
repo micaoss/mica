@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-20 14:16 [decision]
+
+**The second half has a shape and this repository owns it**: an optional
+**collect mode** in the reference reader plus a second column in
+`expected.tsv`, proposed by `mica-system-base` and taken because it is **one
+spec decision rather than five local ones**. The short-circuit stays the
+default — `expected.tsv` names one rule per vector, so a reader returning a
+set would stop answering the question the table asks, and **the first-rule
+behaviour is the table's contract, not an implementation detail**. Its refusal
+to build a second reader locally is the better half of the argument: **a
+private copy of somebody else's truth** is what this section exists to remove.
+
+**And the constraint that stops it manufacturing its own findings is specified
+before it is written**: suppressing a rule to see what fires next is only safe
+where the continuation is safe. A structural refusal — encoding, header,
+column count, unknown kind — makes the rest unreadable, so the mode reports
+**either a structural refusal alone or the set of semantic refusals**, never a
+mixture.
+
+**A category nobody expected makes *every rule has a vector* the wrong thing
+to gate** (`mica-core`): **a refusal no input can reach.** Two of its 35
+cannot be triggered at all — `serde_json::to_value` over string keys and
+finite numbers cannot fail, and the strict base64 engine refuses a
+noncanonical encoding before the re-encode comparison can disagree. Both are
+kept, because **deleting either widens the check above it**. It is the inverse
+of dead code: **not a gap and not waste, but the floor under the check above
+it** — and a coverage rule treating it as either would push somebody to delete
+a guard to make a number go green. The subtraction here reports; it does not
+refuse.
+
+**And the comment allowance outlived its own instance within the hour**, which
+is recorded beside it: the pin that argued for comments deleted its comment
+when the defect was repaired upstream. **A comment that outlives its defect is
+the next stale comment**, so a comment naming a defect is removed in the
+commit that moves the pin past it.
+
 ## 2026-09-20 14:14 [finding]
 
 **The borrowed argument found the same defect in five more fixtures, and it is
