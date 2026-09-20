@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-20 16:26 [finding]
+
+**Landed: never quote a check you have not seen fail**, with five instances
+reached by four repositories — a vectors-pin gate checked red three ways, an
+identity check shown to refuse the banner it used to accept, a refusal proved
+against a mutated copy, a floor loop with eight negative fixtures, and this
+repository's vectors gate, which had 355 assertions and no negative test for
+six days. **The counterexample was found by applying the rule to the ledger
+used to test it**, which is a better outcome for a candidate than surviving
+one.
+
+**The operational half is what turns it from a virtue into a build target: a
+bite test by hand proves a gate once and proves nothing tomorrow.** *Seen to
+fail* has to mean a case that runs, or the evidence dies with the session that
+saw it.
+
+**How the instances arrived is recorded with its limit.** Channel
+independence is verified — the seat that carries every cross-repository
+message has none relaying the practice, and one repository was already
+describing this shape in an unrelated suite beforehand. **Tree-level influence
+cannot be excluded**: these repositories read each other's `tests/`
+directories and one demonstrably did today. So the record says *reached
+without being told* and names what that does not cover, which is worth more
+than the word *independently*.
+
+**And the test's own header now carries the case that caught itself**: its
+refusal-set mutation first wrote `header` over a row whose rule already *was*
+`header`, so the fixture was inert, the gate passed, and the case reported
+FAIL — **the defect it exists to prevent, inside the test written to prevent
+it**. Written the other way round it would have shipped a case that could
+never fire.
+
 ## 2026-09-20 16:23 [finding]
 
 **`memory.max` is present in a running product — the far end of a chain that

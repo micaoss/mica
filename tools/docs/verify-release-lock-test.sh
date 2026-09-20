@@ -13,6 +13,13 @@
 # CHECK YOU HAVE NOT SEEN FAIL, and "seen" has to mean something a later reader
 # can re-run.
 #
+# AND THIS FILE CAUGHT ITSELF ON ITS FIRST RUN, WHICH IS THE ONLY REASON TO
+# TRUST THE REST OF IT: the refusal-set case below first wrote `header` over a
+# row whose rule already WAS `header`, so the fixture was inert, the gate
+# passed and the case reported FAIL. That is the defect it exists to prevent --
+# a check that cannot fail -- inside the test written to prevent it. Written
+# the other way round it would have shipped a case that could never fire.
+#
 # NO NETWORK AND NO WRITES OUTSIDE THE COPY: the gate reads MICA_VECTORS, so
 # every case here runs against a temporary tree and the real vectors are never
 # touched.

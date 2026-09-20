@@ -69,6 +69,36 @@ only be answered by a kernel that has the controller. **A proxy can be wrong
 in ways the promise cannot**, and the promise is usually one command further
 on.
 
+**Never quote a check you have not seen fail** *(2026-09-20, five instances)*.
+A gate that has only ever been green is a gate whose red nobody has
+witnessed, and a green from it is a number rather than evidence. The
+instances, each reached by a different repository: a vectors-pin gate checked
+**red three ways** — tampered, deleted, wrong commit — before it was trusted;
+an identity check shown to **refuse the banner it used to accept**; a refusal
+proved against a **mutated copy** rather than assumed; a kernel floor loop
+with **eight negative fixtures**, which also refuses if it read zero lines;
+and this repository's own vectors gate, which had **355 assertions and no
+negative test for six days** while every commit report quoted `355/355 PASS`.
+The counterexample was found by applying the rule to the ledger used to test
+it.
+
+**The operational half is what makes it a build target rather than a virtue:
+a bite test by hand proves a gate once and proves nothing tomorrow.** This
+one had been mutated and restored twice, by a person, at a terminal — *seen to
+fail* has to mean **a case that runs**, or the evidence dies with the session
+that saw it. `tools/docs/verify-release-lock-test.sh` is that repair: eight
+cases against a copy of the vectors, each required to produce the gate's own
+message.
+
+*(On how the instances arrived: the practice was **reached without being
+told** — the coordinating seat carries every cross-repository message and has
+none relaying it, and one repository was already describing this shape in an
+unrelated suite before the round began. What cannot be excluded is
+**tree-level** influence: these repositories read each other's `tests/`
+directories, and one demonstrably did so today. Channel independence is
+verified; the stronger claim is not available, and the difference is worth
+more than the word *independently* would have been.)*
+
 **A tightened check is verified by showing it would now refuse what it used to
 accept** *(2026-09-20)*. The session probe's identity test was a `Mica OS *`
 prefix match, which a component's banner satisfies; the anchored version
