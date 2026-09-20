@@ -49,6 +49,15 @@ while it reports without refusing, say what it is: **a report is a necessary
 condition, not a proof** — the drops gate tells you what the composition left
 behind and proves nothing about whether the root is right.
 
+**And the third time one format paid, with the cost of the alternative
+measured** *(2026-09-20)*. The offline chain's first aligned run refused, and
+the refusal was **correct while its subject was not the workspace being
+tested**: the chain reads the *shared* checkout's `locks/`, which was behind
+its own branch. That was legible only because the report prints the head it
+read. **Every other instance of this shape today cost somebody a wrong
+sentence; this one cost a re-run** — which is the whole argument for a format
+in one comparison, and the first time today it has had a price on both sides.
+
 **And the honest boundary of all of this, found the day it was argued: some
 false results are distinguishable only by somebody who knows what they did,
 and no format reaches them** *(2026-09-20)*. In the same round, two results

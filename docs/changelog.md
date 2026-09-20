@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-20 17:19 [finding]
+
+**The clause repair was tested by the world moving and survived both states.**
+All four boards now name one commit, so *one working tree cannot be at three
+commits* is true of the state it measured and false tonight. **Per pinned
+input does not care which world it is in**: written against the afternoon's
+three-commit state it would already be wrong; written against tonight's
+one-commit state it would break at the first board released alone. *Repair on
+the shape, not on the counterexample* — measured six hours after it was
+recorded.
+
+**And the converse arrived from the implementation side without having seen
+it**: *an impossibility observed on a given afternoon is not a property of the
+design.* One half says a clause may not depend on today's luck; the other says
+a constraint may not be inferred from it.
+
+**A format paid for itself a third time, and this one has a price on both
+sides.** The offline chain's first aligned run refused, correctly, with a
+subject that was not the workspace under test — the chain reads the shared
+checkout's `locks/`, behind its own branch — and that was legible only because
+the report prints the head it read. **Every other instance of this shape today
+cost somebody a wrong sentence; this one cost a re-run.**
+
+**And a cost nobody would have called a defect**: *one clone per board* was
+approved as a unit, while the script it drives builds every board and takes no
+board argument — four kernels built to keep one, four times over, fifty
+minutes a run with three-quarters discarded. **A cost with no failing output**
+is the same family as a check that is right for the wrong reason, and the
+repair is the page's own: read the artefact, not the account of it — **a unit
+of work is an artefact too**.
+
 ## 2026-09-20 17:14 [finding]
 
 **The held instance has its subject and lands: `mica-build` `81005ea6` fails

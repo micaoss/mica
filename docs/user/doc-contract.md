@@ -217,6 +217,16 @@ English source.
   is why the sweep has to be booked at the moment of the find rather than
   after it. Third time in one day that a class was mistaken for its first
   member.
+- **Approving a design is reading what it drives, not reading the report that
+  describes it** *(2026-09-20)*. *One clone per board* was approved as a unit;
+  the script it drives builds **every** board and takes no board argument, so
+  the approved design would have built four kernels to keep one, four times
+  over — fifty minutes a run with three-quarters discarded. **Nobody would
+  have called that a defect**, which is what makes it the expensive kind: it
+  is a cost with no failing output, in the same family as a check that is
+  right for the wrong reason. The repair is the one this page keeps arriving
+  at from other directions — read the artefact, not the account of it — and
+  the variant worth naming is that **a unit of work is an artefact too**.
 - **And a sweep requires a key** *(2026-09-20, the qualifier the rule above
   needs)*. The rename defect had one — the string `x64`, and one `grep` found
   eight siblings. Where the question is *which incidental property of a valid

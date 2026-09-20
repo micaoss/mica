@@ -81,6 +81,22 @@ Moving the repositories to the release lock format
   satisfiable clause — the boards diverge again at the next release anybody
   cuts alone.)*
 
+  **And the world moved six hours later, which is the test the repair could
+  not have had when it was made.** All four boards now name one commit,
+  `2bfa259e`, so *one working tree cannot be at three commits* is true of the
+  state it measured and false tonight. **Per pinned input does not care which
+  world it is in**: written against the afternoon's three-commit state it
+  would already be wrong, and written against tonight's one-commit state it
+  would break at the first board released alone. *Repair on the shape, not on
+  the counterexample* — measured rather than argued.
+
+  `mica-build` reached the converse from the implementation side while
+  building the per-board clone, without having seen this note: **an
+  impossibility observed on a given afternoon is not a property of the
+  design.** Same fact from the other end, and the pair is worth more than
+  either half — one says a clause may not depend on today's luck, the other
+  says a constraint may not be inferred from it.
+
   And what the chain does in the meantime is worth more than the repair
   (`mica-build` `31b28d55`, 14:46Z): it **prints, per producer, its checkout
   head against the commit `locks/` names**, `--at-release-commits` **refuses
