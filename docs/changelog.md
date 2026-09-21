@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-21 12:04 [finding]
+
+**An expected red gets a home, because the reader who needs it is in neither
+repository that holds the facts.** `s905x5m` is parked on the user's
+instruction; its newest release still carries a forced kernel command line that
+disagrees with the board's own `board.env`, and the repair sits on
+`mica-boards` `main` (`e1e8231`) **in no release** — so `s905x5m-prod` is red
+on `mica-build`'s `main`, **expected, indefinite and correct**. The refusal
+message serves every FIT board and would rot carrying a fact about one of them;
+the producing repository's task status is right for its own readers; **the
+person staring at a permanently red job in a third repository goes to the
+workspace record**, which is the board dossier.
+
+**It is written because of the decay path**: an expected red that somebody is
+waiting on gets treated as flaky, and then it gets muted — **waiting,
+familiar, flaky, muted — and the mute outlives the reason.**
+
+**And it names what would end it** — a new `s905x5m` release and a pin move —
+**so that when it ends the paragraph is visibly stale rather than quietly
+wrong**, which is the shape these records spent yesterday removing.
+
+**The boot question is recorded as open**: nobody established that this defect
+has anything to do with the board failing to boot, the device boots the old
+known-good line, and **no console capture exists**. *The investigation is
+paused rather than closed, which is exactly when that assumption hardens into
+a fact nobody remembers doubting.*
+
 ## 2026-09-21 07:35 [finding]
 
 **A third kind of rule, and it is this corpus's least defensible one.** *Go
