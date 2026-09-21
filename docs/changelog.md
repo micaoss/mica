@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-21 07:18 [finding]
+
+**Report the zero — the inverse of every rule in this corpus, and missing from
+all of them.** These records say a zero must carry the boundary it was
+measured inside; **they never said it must be reported at all**, and **an
+unreported zero is re-measured by everybody who wonders**. One sweep here for
+stale product names, discoverability claims and a Bluetooth PIN found nothing
+and cost one pass; unreported, the next three readers pay three. **And sorting
+is what makes a zero believable**: three hits, three kinds — deliberate
+history, an AP SSID that is hostapd and not mDNS, a future plan — **none of
+them the thing looked for, which is a stronger result than *no hits*.**
+
+**A relay does not only carry a sentence; it changes its scope, and the change
+is invisible to whoever wrote it.** A probe's verdict about **one run**
+arrived across a boundary as a sentence about **the product**, reported as a
+chain *closed end to end* — a claim neither the probe's file nor this page had
+made. **The page then made the relayed scope the answer**, which is not a
+defect in the page but the reason a relay has to be right: a record landing a
+relayed sentence asks **what it was a sentence about**, not only whether it is
+true.
+
 ## 2026-09-21 07:16 [finding]
 
 **An attribution in a landed record was wrong, and it was an admission.** The

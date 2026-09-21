@@ -155,6 +155,28 @@ English source.
   as an identifier was `process.pid`. **The value looked like the thing it was
   not, and nothing about its appearance was wrong.** Before citing a number as
   a decision, find who wrote it.
+- **Report the zero.** *(2026-09-21; the inverse of every rule here and
+  missing from all of them.)* These records already say a zero must carry the
+  boundary it was measured inside — **they never said it must be reported at
+  all**, and **an unreported zero is re-measured by everybody who wonders**.
+  One sweep of this tree for stale product names, discoverability claims and a
+  Bluetooth PIN found nothing and cost one pass; unreported, the next three
+  readers pay three. **And sort rather than count, because that is what makes
+  a zero believable**: the surviving `x64-dev` mentions are two Chinese
+  flashing pages naming a pre-rename image **on purpose**, the one
+  *advertising* sentence is `wifi.md` on the AP SSID — **hostapd, not mDNS** —
+  and the Bluetooth hits are a future bring-up plan and a line about stored
+  pairing keys. **Three hits, three kinds, none of them the thing looked for,
+  which is a stronger result than *no hits*.**
+- **A relay does not only carry a sentence; it changes its scope, and the
+  change is invisible to whoever wrote it** *(2026-09-21)*. A probe's verdict
+  was a sentence about **one run**; carried across a repository boundary it
+  arrived as a sentence about **the product**, reported as a chain *closed end
+  to end* — a claim neither the probe's file nor this page had ever made. The
+  page then did what a page does: **it made the relayed scope the answer.**
+  That is not a defect in the page, it is why a relay has to be right — and
+  why a record landing a relayed sentence asks **what it was a sentence
+  about**, not only whether it is true.
 - **A ratio needs a denominator somebody would defend, and a modest-sounding
   one is the hardest error to refuse** *(2026-09-20)*. *The root hash covers
   65 MB of a 1.8 GB artefact* is a **byte** ratio, and the 1.8 GB is mostly
