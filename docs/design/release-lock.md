@@ -637,6 +637,39 @@ One lock replaces `system-base.lock`, `system-base-packages.lock` and
 
 The policy stays `docs/decisions/2026-09-14-base-pins-upstream-packages.md`.
 
+**What a release's own green covers, and what it does not** *(2026-09-21)*.
+This section says what a release **carries**; it says nothing about what its
+CI verdict **means**, and a consumer deciding whether to pin reads that
+verdict. **A release's green says the release job ran.** The `ci.yml` run on
+the commit the release targets is a **different run**, and **nothing connects
+them** — a release cut from a commit whose CI nobody watched looks exactly
+like any other release.
+
+**Measured on 2026-09-21, and it is a near miss rather than an incident**,
+which is the only time this is cheap to write down: `mica-core`'s `main` has
+had **no successful `ci` run since `c1a046b1` at 2026-09-20 05:38:57Z** — the
+runs at 06:09, 08:48, 14:10, 14:44 and 23:01 failed, two others were
+cancelled, and the run started 07:05Z today had no conclusion when this was
+written. **No release was cut in that window**, so nothing shipped from a red
+commit; had one been, **it would have carried a green release job and a red
+commit and looked ordinary.** *(`mica-build` reports three commits pushed
+during it on a green **local** `make check`; that part is its account.)*
+
+**The consumer-side rule, stated by one consumer for itself**: *read the run
+of the commit the release targets, not the release's own green.* It is
+recorded here rather than left there because **a habit one consumer adopts
+protects one consumer, and six repositories pin somebody.** This is a fact
+about the process, not a mechanism: no gate, pre-flight or change to how a
+release is cut is proposed by it — those belong to the release owner and the
+user, and the fact is worth having **before** anybody designs around it.
+
+**And it is one artefact along from the defect this workspace spent yesterday
+on**: *green* names a **verdict** and not what produced it, so **a reader
+supplies the most complete gate they know of, which is never the one that
+ran.** At a release boundary the reader is a different repository and cannot
+check. *(Whether any release here was ever cut from a red commit is
+**unmeasured**: nobody has asked, and this paragraph does not guess.)*
+
 ## 4. The consumer: `locks/` and `mica-pin v1`
 
 A consumer keeps its inputs at its root, one lock and one pin per producing

@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-21 07:11 [finding]
+
+**A release's own green says the release job ran — the `ci.yml` run on the
+commit it targets is a different run, and nothing connects them.** The lock
+design says what a release *carries*; it said nothing about what its verdict
+*means*, and that is the thing a consumer reads when deciding whether to pin.
+Recorded in section 4 as a fact about the process: **no gate, pre-flight or
+change to how a release is cut is proposed by it.**
+
+**The near miss, measured here rather than relayed**: `mica-core`'s `main` has
+had **no successful `ci` run since `c1a046b1` at 2026-09-20 05:38:57Z** — five
+failures between 06:09 and 23:01, two cancellations, and today's 07:05Z run
+unfinished as this was written. **No release was cut in that window.** Had one
+been, it would have carried a green release job and a red commit **and looked
+ordinary**.
+
+**And it is yesterday's defect one artefact along**: *green* names a verdict
+and not what produced it, so **a reader supplies the most complete gate they
+know of, which is never the one that ran** — and at a release boundary that
+reader is a different repository and cannot check. Whether any release here
+was ever cut from a red commit is **unmeasured**, and the record says so
+rather than guessing.
+
 ## 2026-09-20 21:09 [finding]
 
 **A reason published here an hour ago was too generous to breakage, and the
