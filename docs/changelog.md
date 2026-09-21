@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-21 07:35 [finding]
+
+**A third kind of rule, and it is this corpus's least defensible one.** *Go
+and look* inspects an artefact; *go and ask* queries the party who owns it;
+**say it first** — state the question before choosing the query — acts
+**before any artefact exists**, on the order of one's own thinking. **A read
+leaves a read behind and an ask leaves a message; this leaves nothing**, which
+makes it **a habit by construction and impossible to turn into a format** — and
+by this workspace's own table a habit protects one person on one day. **The
+cheapest rule here is also the weakest**, written down rather than left for
+whoever relies on it to discover.
+
+**And remedies are now ranked, because the reader prices them with less
+information than the writer**: three unordered remedies are a menu, three
+ordered ones are advice.
+
+**The two days do not close in a circle, and the smaller claim is the one the
+evidence supports.** The class did not shrink: a relayed pin whose subject was
+wrong began it, and *which product was that measurement of* is the last open
+question. **What changed is where the question sits in the sequence** — on day
+one the subject error was undetected and caught afterwards; today the subject
+question is asked **first, before anybody builds on the measurement**. The
+defect is as available as it was; **the reflex arrives earlier.** And the
+remedies differ at the two ends: the first was a pin somebody could have read
+correctly, the last is a measurement **nobody in the conversation can
+resolve** — the go-and-look / go-and-ask split turning up in its own history.
+
 ## 2026-09-21 07:32 [finding]
 
 **The cheapest fix for the wrong-field defect is one step earlier than either

@@ -171,6 +171,17 @@ English source.
   artefact but of the **claim about** it, and it lives only in the claimer's
   head and the reader's — which is why the rule for it ends in **go and ask**
   and why no amount of care at the reading end reaches it.
+  **And there is a third kind, which the wrong-field defect produced: *say it
+  first*.** Stating the question before choosing the query acts **before any
+  artefact exists**, on the order of one's own thinking — there is nothing to
+  inspect and nobody to ask. **That is why it is the only free rule here and
+  also the only one nothing can verify**: a *go and look* rule leaves a read
+  behind and a *go and ask* rule leaves a message, while this one **leaves
+  nothing, which makes it a habit by construction and impossible to turn into
+  a format** — and by this page's own table a habit protects the person who
+  has it, on the day they have it. **The cheapest rule in this corpus is also
+  its least defensible**, written here rather than discovered by whoever
+  relies on it.
   **And that is also why nobody routes that way by default: a *go and look*
   rule is paid by the person applying it, while a *go and ask* rule spends
   another party's attention — and spends it on somebody with nothing to gain
@@ -192,6 +203,12 @@ English source.
   counterexample was in a file its own claimant maintains. The working version
   of that is the plainest rule here — **read your own artefact before
   asserting what it contains.**)*
+- **Rank remedies, because the reader prices them with less information than
+  the writer** *(2026-09-21)*. Three unordered remedies are a **menu**; three
+  ordered ones are **advice**. The wrong-field defect has three fixes and they
+  are recorded cheapest first — say the question, then change the query, then
+  name the field beside the value — so that a reader who can afford one takes
+  the one that costs nothing.
 - **An abstention names what it abstained from** *(2026-09-21)*. Declining to
   assert a figure is right, and **silently** declining costs what an
   unreported zero costs: this page once carried a true, weaker sentence
