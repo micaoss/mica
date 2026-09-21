@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-21 12:17 [finding]
+
+**A gate has a domain, and `make docs-verify`'s is the working tree rather
+than the commit.** `3f2926a` pushed an index entry for a research page that
+exists only in another session's working tree: the local gate passed 243/243,
+and `ci` failed on the clean checkout with `indexes
+'2026-09-19-functional-architecture-audit.md' … does not exist`, 1 FAILED,
+241 passed. Removing the entry then failed the **inverse** way locally, since
+the file was still on disk. Neither state satisfies both readers, which is
+`verify-index.sh` correctly reporting that **an index entry and the file it
+names have to land in one commit** — the symmetry is the feature, not the
+obstacle.
+
+The repair (`162081b`) drops the entry and was verified by running the gate
+on `git archive HEAD | tar -x`, an export that reproduces what CI builds and
+touches nothing in a shared checkout belonging to somebody else. Every other
+repair required moving or deleting another writer's untracked file, trading a
+red job for an afternoon's work. Written into `docs/design/build-harness.md`
+§6 because **this is a red I watched, not one I predicted**: the instrument
+that only ever passes has no witnessed failure to quote, and this one now has
+one in both directions.
+
+The narrower rule it leaves: **a path being mine to edit does not make its
+contents mine.** `docs/README.md` is a file I own edits in, and it had
+accumulated a line I did not write. Staging an owned path is not the same as
+staging an owned diff — read every hunk of `git diff HEAD -- <path>` before
+`git add` in a tree other sessions write to.
+
 ## 2026-09-21 12:11 [finding]
 
 **The coordinator is paused on the user's instruction and cross-repository

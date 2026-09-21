@@ -923,6 +923,38 @@ Engineering proposals belong in plan/task tracking. Product instructions must
 describe the current contract; superseded operating procedures remain in Git
 history rather than beside current instructions.
 
+**A gate has a domain, and `docs-verify`'s is the working tree, not the
+commit.** `verify-index.sh` compares `docs/README.md` against the files it can
+see on disk, and it refuses in both directions: an entry without a file, and a
+file without an entry. That symmetry is right, and it means the instrument
+answers a question about *this checkout* while CI asks the same question of
+*the pushed tree*. The two agree whenever the tree is clean. They disagree the
+moment an untracked file is present, and then the local green is not a weaker
+form of the CI green — it is an answer to a different question.
+
+This was measured on 2026-09-21 rather than reasoned about, which is the only
+reason it is worth a paragraph. `3f2926a` landed an index entry for a research
+page that existed only in a working tree; `make docs-verify` passed 243/243
+before the push and `ci` failed on the clean checkout with `indexes
+'2026-09-19-functional-architecture-audit.md' … does not exist`, 1 FAILED, 241
+passed. Removing the entry then failed the *inverse* way locally, because the
+file was still on disk. Neither state satisfies both readers at once, which is
+the gate correctly reporting that **an index entry and the file it names have
+to land in one commit**.
+
+The repair is available whenever a gate's domain is the tree and the artefact
+is the commit: build the artefact and run the gate on it.
+
+```sh
+T=$(mktemp -d); git archive HEAD | tar -x -C "$T"; make -C "$T" docs-verify
+```
+
+An export reproduces what CI builds byte for byte, needs no network, and — the
+property that mattered here — touches nothing in a shared checkout that
+belongs to somebody else. The alternative repairs all required moving or
+deleting another writer's file, which would have traded a red job for a lost
+afternoon's work.
+
 ## 7. Development integration and acceptance workflow
 
 Source integration and image qualification are separate. A reviewed source
