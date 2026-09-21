@@ -177,6 +177,13 @@ English source.
   That is not a defect in the page, it is why a relay has to be right — and
   why a record landing a relayed sentence asks **what it was a sentence
   about**, not only whether it is true.
+  **And the remedy for the attribution half is a form rather than more care: a
+  quoted sentence carries its speaker; a summarised one takes its speaker from
+  the paragraph it lands in.** Twice in two days a claim crossing paragraph
+  boundaries took its subject from the **nearest name** rather than from the
+  sentence — once a bare path, once an admission that landed on the wrong
+  repository. Both times the sentence was true of somebody. **Quote an
+  admission; summarise a fact.**
 - **A ratio needs a denominator somebody would defend, and a modest-sounding
   one is the hardest error to refuse** *(2026-09-20)*. *The root hash covers
   65 MB of a 1.8 GB artefact* is a **byte** ratio, and the 1.8 GB is mostly

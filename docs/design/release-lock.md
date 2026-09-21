@@ -662,10 +662,15 @@ than a rewrite.)*
 
 **And the one instance anybody can check came out clean, which the hazard
 needs beside it**: `c1a046b1` is both the **last green run** and exactly the
-commit `mica-core`'s release `20260920-0552` targets — published
-2026-09-20T05:52:38Z, with the run that succeeded having started at
-05:38:57Z — **and that is the release `mica-build` pins today** (all read back
-here). So the gap **did not bite here, measured rather than hoped**. A record
+commit `mica-core`'s release `20260920-0552` targets, **and that is the
+release `mica-build` pins today** (all read back here). The run **concluded
+success at 05:52:13Z** and the release **published at 05:52:38Z**:
+**twenty-five seconds**, which is not *after* a green run but **on** it.
+*(Each timestamp carries the field it came from, because the first reading of
+this said* fourteen minutes *— the gap from the run's **start**, narrated as
+though it were the gap from its outcome. `created` is not `concluded`, and a
+duration taken from the wrong field looks exactly like one taken from the
+right field.)* So the gap **did not bite here, measured rather than hoped**. A record
 that states a hazard without its one measured instance invites the reader to
 assume the worst about it.
 

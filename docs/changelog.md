@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-21 07:20 [finding]
+
+**The number this page declined to write was wrong, and the corrected one is
+stronger.** The run **concluded** success at 05:52:13Z and the release
+published at 05:52:38Z — **twenty-five seconds**, not fourteen minutes. The
+fourteen was the gap from the run's **start**, narrated as though it were the
+gap from its outcome. So the clean instance is sharper than it looked: the
+release did not go out *after* a green run, it went out **on** it.
+
+**Each timestamp in that paragraph now carries the field it came from**,
+because `created` is not `concluded` and **a duration taken from the wrong
+field looks exactly like one taken from the right one**. Declining to assert
+the figure was not caution in principle; it kept a wrong number out of a
+design page on a fact nobody would have questioned.
+
+**And the remedy for the attribution half is a form, not more care: a quoted
+sentence carries its speaker; a summarised one takes its speaker from the
+paragraph it lands in.** Twice in two days a claim crossing paragraph
+boundaries took its subject from the nearest name — a bare path once, an
+admission on the wrong repository once — and both times the sentence was true
+of somebody. **Quote an admission; summarise a fact.**
+
 ## 2026-09-21 07:18 [finding]
 
 **Report the zero — the inverse of every rule in this corpus, and missing from
