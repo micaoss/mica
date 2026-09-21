@@ -185,7 +185,9 @@ English source.
   name the population — while this one says *stop trying harder at the relay
   and route differently*. A corpus in which every rule demands more effort is
   a corpus that gets abandoned**, so the one that gives some back is worth
-  protecting when somebody later trims for weight.
+  protecting when somebody later trims for weight — **it is the one most
+  likely to be cut for looking like an exception, and it now says why it is
+  not. A cost stated survives an editor; a cost implied does not.**
   *(And *ask the owner* sometimes resolves to *ask yourself*: one
   counterexample was in a file its own claimant maintains. The working version
   of that is the plainest rule here — **read your own artefact before

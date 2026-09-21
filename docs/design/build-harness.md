@@ -80,13 +80,23 @@ and the quarter that is load-bearing is the format.
 run's **start** as its outcome **three times**: the first two were corrected
 by two different repositories, the distinction was written down twice, and the
 third happened anyway — **in the sentence declaring the window closed, in the
-thread about that exact substitution.** The cause was not attention: **the
-query selected `.created_at` and was never changed**, so the instrument kept
-handing back start times and the reader kept believing them. **Knowledge acts
-on the reading; the defect was upstream of the reading.** A habit cannot reach
-that. The format — **the field name beside every timestamp** — reaches it
-without anybody remembering anything, and so does changing the query to ask
-for `updated_at` and `conclusion` together.
+thread about that exact substitution.** **The query selected `.created_at` and was
+never changed**, so the instrument kept handing back start times and the
+reader kept believing them. **Knowledge acts on the reading; the defect was
+upstream of the reading** — for the second and third, which were the
+instrument repeating itself. **The first was a choice**, and its author says
+so: a query written to *list runs* was pressed into answering *when did the
+window close*. **A value obtained for one purpose and reused for another, with
+nothing marking the change** — the same act as a count reused without its
+population or a verdict reused without its subject, arriving in a query.
+
+**So the cheapest fix is one step earlier than either of the others: state the
+question before choosing the query, and re-state it when the question
+changes.** A list written for *what happened* does not answer *when did it
+end*, **and nothing in its output says so**. The field name beside every
+timestamp catches this at the **reader**; asking for `updated_at` and
+`conclusion` together catches it at the **query**; stating the question
+catches it **before the query exists**, which is where it is free.
 
 **And the test for which column a save belongs in is whether the reading was
 optional**, demonstrated the same day on the author of a format: a status line

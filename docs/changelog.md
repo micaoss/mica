@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-21 07:32 [finding]
+
+**The cheapest fix for the wrong-field defect is one step earlier than either
+of the two recorded: state the question before choosing the query, and
+re-state it when the question changes.** A list written for *what happened*
+does not answer *when did it end*, **and nothing in its output says so**. The
+field name beside each timestamp catches it at the reader; `updated_at` with
+`conclusion` catches it at the query; **the question catches it before the
+query exists, which is where it is free.**
+
+**And the entry landed ten minutes ago over-generalised, corrected at its
+subject's own request.** *The cause was not attention* is true of the second
+and third instances — the instrument repeating itself — and **generous about
+the first**, which was **a choice**: a query written to list runs, pressed
+into answering when a window closed. **A value obtained for one purpose and
+reused for another, with nothing marking the change** — the same act as a
+count reused without its population, arriving in a query.
+
+**And the rule that asks for less now says why it is not an exception**: it is
+the one most likely to be cut for looking like one. **A cost stated survives
+an editor; a cost implied does not.**
+
 ## 2026-09-21 07:29 [finding]
 
 **A defect that lives in a query survives knowing about it — three times in a
