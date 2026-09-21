@@ -280,7 +280,12 @@ English source.
   `embed-fit-trust.sh` — files whose names **end in** the key — and **the
   count would have travelled where the lines did not**. Read the lines, not
   the count, and note where it happened: *inside the sweep that exists because
-  of bare paths*. Sorting is what made that
+  of bare paths*. **And where the misses will
+  be is knowable in advance: a rename sweep's residue is prose.** Four places
+  one sweep missed on 2026-09-19 were all sentences — a table row, a design
+  page, records citing the old name — and **none of them is read by anything
+  that runs**, which is why code and fixtures moved and the sentences did not.
+  **That is a population to search, not four accidents.** Sorting is what made that
   class closeable: historical record that must keep the old names or stop
   being history, the records **of** the defect that quote it to name it, and
   the nickname. Its author's sentence is the test of a closed class: **"no

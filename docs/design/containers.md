@@ -752,7 +752,8 @@ both directions, and here the second instrument was not covering its own
 question either.
 
 **And the product column has an answer: three of the five ceilings are
-enforced, measured inside a running product.** From a booted `uefi-x64-prod`
+*enforceable*, measured inside a running product — which is not the same
+claim as *enforced*, and this page collapsed the two for a day.** From a booted `uefi-x64-prod`
 guest built on `20260920-1536`, `podman run --memory=64m --cpus=0.5
 --pids-limit=42` returns `memory.max=67108864`, `cpu.max=50000 100000` and
 `pids.max=42` — 64 MiB exactly, half a CPU exactly, 42 — answers only a kernel
@@ -762,6 +763,22 @@ began at 08:35 the same day: the fragment, four board releases at
 configs read from `_out/boards/<board>/kernel/config` **after deleting the
 directory and re-fetching** — which is what makes them a measurement of the
 released artefact rather than of a build tree that was already there.
+**Those three numbers were set by the probe** in order to prove the kernel
+applies them; nothing in the product asked for them.
+
+**Nothing in the product sets any of them, and no operator can ask it to**
+*(`mica-core`, 2026-09-21)*. The container surface — `ContainerUnit` — carries
+image, command, environment, published ports, volumes, restart policy and
+`autoStart`, and **no memory, CPU, pids or IO field at all**: there is nothing
+an operator could set through it and **no default `micad` writes into a
+Quadlet unit**. The five-key table above is what a **hand-written** unit
+*could* carry; the product's own writer carries none of them. Both halves are
+true and they are different sentences.
+
+**So the split this section has to keep, because *bounded* would otherwise be
+read as both**: **container storage has a bound** — DATA is mounted with
+`prjquota` by `mica-core`'s init while Base assigns the project ids — and
+**container memory and CPU have none, declared nowhere by anybody.**
 
 **`io.max` stays a kernel-config claim, and the reason is this section's own
 warning.** No IO limit was passed, because an `IO*` key needs a **device

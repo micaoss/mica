@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-21 07:14 [finding]
+
+**Section 8 collapsed *enforceable* and *enforced* for a day, and the
+correction is that nothing in the product sets a ceiling.** The three numbers
+— `memory.max=67108864`, `cpu.max=50000 100000`, `pids.max=42` — **were set by
+the probe** to prove the kernel applies them. `mica-core`'s container surface,
+`ContainerUnit`, carries image, command, environment, published ports,
+volumes, restart policy and `autoStart` and **no memory, CPU, pids or IO field
+at all**: nothing an operator can set through it, **no default `micad` writes
+into a Quadlet unit**. The five-key table is what a **hand-written** unit could
+carry; the product's own writer carries none of them.
+
+**So the split the section now keeps, because *bounded* would be read as
+both**: container **storage** has a bound — DATA mounted with `prjquota` by
+init while Base assigns the ids — and container **memory and CPU have none,
+declared nowhere by anybody.**
+
+**And a rename sweep's residue is prose, which makes it a population to search
+rather than four accidents.** Four places one sweep missed were all sentences,
+**none of them read by anything that runs** — which is exactly why the code
+and the fixtures moved and the sentences did not. Swept here on the
+discriminating key: the surviving `x64-dev` mentions are the two Chinese
+flashing pages naming a **pre-rename image on purpose**, which is history that
+must keep the old name, and no document here claims a device is discoverable
+or describes a Bluetooth pairing PIN — **checked, so the next person does not
+have to.**
+
 ## 2026-09-21 07:11 [finding]
 
 **A release's own green says the release job ran — the `ci.yml` run on the
