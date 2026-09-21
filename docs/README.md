@@ -162,7 +162,6 @@ work in progress lives in `plan/` and `task/`.
   - `licensing.md` — page brief: the license facts the site must carry
   - `support.md` — page brief: what support exists and who owns what
 - `research/` — measurements and external references
-  - `2026-09-19-functional-architecture-audit.md` — workspace functional and architecture audit: evidenced risks, capability gaps, ownership and closure priorities
   - `root-closure.md` — what the read-only root is made of, which packages are deletable, and whether micad could own network configuration
   - `ssd202d-lite.md` — draft: Mica OS on SigmaStar SSD202D and the 16 MiB / 128 MiB flash fork
   - `venus-gui-v2.md` — Venus OS gui-v2 functional reference, mapped to apid and dashboard owners
