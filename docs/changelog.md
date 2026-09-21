@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-21 07:24 [finding]
+
+**An abstention names what it abstained from.** Declining to assert a figure
+was right; declining **silently** cost what an unreported zero costs — this
+page carried a true, weaker sentence and **nothing in it signalled a stronger
+one was available**, because the reasoning was in a message and the message
+scrolled. The form is the empty-slot rule arriving at abstention: **a blank is
+visible, a wrong figure is not, and an unstated omission is neither.**
+
+**A derived number carries no trace of its inputs, and the more arithmetic it
+took the more it looks like a measurement.** *Fourteen minutes* announced
+neither which timestamps produced it nor that one was a **start** narrated as
+an outcome; the repair is the field name travelling with the value.
+
+**A boundary of the data is not a state of the world.** *No success since the
+last green began* is about the rows in hand; *red since 05:39* is about the
+branch and needs a fact the rows do not contain — the red began half an hour
+later, at 06:09:06Z. Both come from one reading and only one survives it.
+
+**And the window has closed**, which that paragraph now says: run
+`35571307304` concluded success at 2026-09-21T07:19:59Z, so the branch was
+without a green from the first failure at 2026-09-20T06:09:06Z until then.
+
 ## 2026-09-21 07:22 [finding]
 
 **Re-deriving what you relay catches a wrong fact and does nothing about a

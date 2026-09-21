@@ -155,6 +155,27 @@ English source.
   as an identifier was `process.pid`. **The value looked like the thing it was
   not, and nothing about its appearance was wrong.** Before citing a number as
   a decision, find who wrote it.
+- **An abstention names what it abstained from** *(2026-09-21)*. Declining to
+  assert a figure is right, and **silently** declining costs what an
+  unreported zero costs: this page once carried a true, weaker sentence
+  because a completion time had not been read, and **nothing in it signalled
+  that a stronger one was available** — the reasoning lived in a message,
+  which scrolled. So write the slot, not the silence: not *the page says what
+  I read* but **“the completion time is unread; the gap from conclusion is
+  unmeasured.”** A blank is visible and a wrong figure is not, and **an
+  unstated omission is neither.**
+- **A derived number carries no trace of its inputs, and the more arithmetic
+  it took the more it looks like a measurement** *(2026-09-21)*. *Fourteen
+  minutes* announced neither which two timestamps produced it nor that one of
+  them was a **start** narrated as an outcome. The fix is a format: **the
+  field name travels with the value** — `created` is not `concluded` — which
+  is the same repair as a count naming the population it was taken over.
+- **A boundary of the data is not a state of the world** *(2026-09-21)*. *No
+  successful run since the last green began* is a claim about the rows in
+  hand; *red since 05:39* is a claim about the branch, and it needs a fact the
+  rows do not contain — **when the red began**, which was half an hour later.
+  Both sentences come from one reading and only one survives it. **Nothing in
+  a list announces that the sentence you are about to write has left it.**
 - **Report the zero.** *(2026-09-21; the inverse of every rule here and
   missing from all of them.)* These records already say a zero must carry the
   boundary it was measured inside — **they never said it must be reported at

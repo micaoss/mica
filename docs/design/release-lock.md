@@ -649,8 +649,14 @@ like any other release.
 which is the only time this is cheap to write down: `mica-core`'s `main` has
 had **no successful `ci` run since `c1a046b1` at 2026-09-20 05:38:57Z** — the
 runs at 06:09, 08:48, 14:10, 14:44 and 23:01 failed, two others were
-cancelled, and the run started 07:05Z today had no conclusion when this was
-written. **No release was cut in that window**, so nothing shipped from a red
+cancelled. **The window has since closed**: run `35571307304` on `275b72bc`
+concluded **success at 2026-09-21T07:19:59Z**, so the branch was without a
+green run from the **first failure** at 2026-09-20T06:09:06Z until then. *(The
+first sentence of this paragraph is deliberately about the rows — *no success
+since the last green began* — because *red since 05:39* would have been a
+claim about the branch that the run list does not contain: **when the red
+began is a different field from when the green ended**, and nothing in a list
+of runs announces that a sentence has left the data.)* **No release was cut in that window**, so nothing shipped from a red
 commit; had one been, **it would have carried a green release job and a red
 commit and looked ordinary.** *(**`mica-core` says of itself** that it pushed three
 of those commits on a green **local** `make check` without waiting for the
