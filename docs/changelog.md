@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-21 07:16 [finding]
+
+**An attribution in a landed record was wrong, and it was an admission.** The
+three commits pushed on a green **local** `make check` without waiting for the
+run are **`mica-core`'s, said of itself**; the record carried them against
+`mica-build`, which is false of that repository. **An admission on the wrong
+agent is the worst kind of misattribution**, and the repair is an attribution
+rather than a rewrite.
+
+**And the hazard now carries its one measured instance, which it needed.**
+`c1a046b1` is both the **last green run** and exactly the commit `mica-core`'s
+release `20260920-0552` targets — published 2026-09-20T05:52:38Z, the
+successful run having started at 05:38:57Z — **and it is the release
+`mica-build` pins**, all read back here. **The gap did not bite here, measured
+rather than hoped.** A hazard recorded without its one clean instance invites
+a reader to assume the worst.
+
+**And the record is a floor rather than a ceiling**: it makes the omission
+visible without making the reading mandatory, **and the reading is
+mechanisable** — the target commit is the fourth field of the `release` row,
+which every consumer already reads. No mechanism is proposed and placing one
+is not this page's call.
+
 ## 2026-09-21 07:14 [finding]
 
 **Section 8 collapsed *enforceable* and *enforced* for a day, and the

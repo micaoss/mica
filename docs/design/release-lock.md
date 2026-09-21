@@ -652,8 +652,22 @@ runs at 06:09, 08:48, 14:10, 14:44 and 23:01 failed, two others were
 cancelled, and the run started 07:05Z today had no conclusion when this was
 written. **No release was cut in that window**, so nothing shipped from a red
 commit; had one been, **it would have carried a green release job and a red
-commit and looked ordinary.** *(`mica-build` reports three commits pushed
-during it on a green **local** `make check`; that part is its account.)*
+commit and looked ordinary.** *(**`mica-core` says of itself** that it pushed three
+of those commits on a green **local** `make check` without waiting for the
+run, having waited on every earlier push. Attributed here to the repository
+that made the admission: this record first carried it against `mica-build`,
+which is false of that repository — **an admission on the wrong agent is the
+worst kind of misattribution**, and the correction is an attribution rather
+than a rewrite.)*
+
+**And the one instance anybody can check came out clean, which the hazard
+needs beside it**: `c1a046b1` is both the **last green run** and exactly the
+commit `mica-core`'s release `20260920-0552` targets — published
+2026-09-20T05:52:38Z, with the run that succeeded having started at
+05:38:57Z — **and that is the release `mica-build` pins today** (all read back
+here). So the gap **did not bite here, measured rather than hoped**. A record
+that states a hazard without its one measured instance invites the reader to
+assume the worst about it.
 
 **The consumer-side rule, stated by one consumer for itself**: *read the run
 of the commit the release targets, not the release's own green.* It is
@@ -662,6 +676,13 @@ protects one consumer, and six repositories pin somebody.** This is a fact
 about the process, not a mechanism: no gate, pre-flight or change to how a
 release is cut is proposed by it — those belong to the release owner and the
 user, and the fact is worth having **before** anybody designs around it.
+
+**This record is a floor and not a ceiling.** It makes the omission visible;
+it does not make the reading mandatory — and the reading **is** mechanisable,
+because the target commit is not a lookup at all: it is the fourth field of
+the `release` row (1.2), which **every consumer already reads**. No mechanism
+is proposed here and placing one is not this page's call; the point is that
+the record is where somebody would start, not where the matter has to end.
 
 **And it is one artefact along from the defect this workspace spent yesterday
 on**: *green* names a **verdict** and not what produced it, so **a reader
