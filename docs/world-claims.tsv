@@ -50,6 +50,15 @@
 # CLAIM ABOUT A TOOL AGAINST THE TOOL. Note the difference from the rows
 # below: those are claims about another repository's STATE, which a query can
 # settle; this is a claim about its BEHAVIOUR, which one probably cannot.
+#
+# AND SINCE NO ROW CAN HOLD A BEHAVIOUR CLAIM, IT HAS A ROUTE INSTEAD: IT GOES
+# TO THE REPOSITORY IT IS ABOUT, even when that repository did not ask and has
+# nothing to do about it. Routing by who NEEDS a fact sends it downstream, and
+# downstream cannot check upstream's behaviour BY CONSTRUCTION -- so routing by
+# need sends every such claim away from the only party that can falsify it.
+# Twice in two days the counterexample was held by somebody not in the
+# conversation: once the repository that owns the surface, once the claimant's
+# own locks directory.
 # Recorded in docs/task/20260914-2042-release-lock-offline-build.md.
 release-target.uefi-x64	line	micaoss/mica-boards:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.uefi-arm64	line	micaoss/mica-boards:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md

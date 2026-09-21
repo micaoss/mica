@@ -161,7 +161,10 @@ English source.
   all**, and **an unreported zero is re-measured by everybody who wonders**.
   One sweep of this tree for stale product names, discoverability claims and a
   Bluetooth PIN found nothing and cost one pass; unreported, the next three
-  readers pay three. **And sort rather than count, because that is what makes
+  readers pay three — **and none of them would know the others had already
+  done it, which is a habit save's invisibility one artefact along**: neither
+  leaves anything behind, and both get paid for repeatedly by people who
+  cannot see each other. **And sort rather than count, because that is what makes
   a zero believable**: the surviving `x64-dev` mentions are two Chinese
   flashing pages naming a pre-rename image **on purpose**, the one
   *advertising* sentence is `wifi.md` on the AP SSID — **hostapd, not mDNS** —
@@ -184,6 +187,13 @@ English source.
   sentence — once a bare path, once an admission that landed on the wrong
   repository. Both times the sentence was true of somebody. **Quote an
   admission; summarise a fact.**
+  **And the obvious defence does not work on the scope half: re-deriving what
+  you relay catches a wrong *fact* and does nothing about a wrong *scope*.**
+  The probe could have been re-run by anybody and would have printed the same
+  numbers, because the run is real and its output says so — **the artefact is
+  consistent with both readings**, which is why reading it saved nobody. Scope
+  is checked by asking **who owns the subject**, not by looking harder at the
+  evidence.
 - **A ratio needs a denominator somebody would defend, and a modest-sounding
   one is the hardest error to refuse** *(2026-09-20)*. *The root hash covers
   65 MB of a 1.8 GB artefact* is a **byte** ratio, and the 1.8 GB is mostly

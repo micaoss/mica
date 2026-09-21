@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-21 07:22 [finding]
+
+**Re-deriving what you relay catches a wrong fact and does nothing about a
+wrong scope** — which corrects the defence these records have leaned on all
+day. The probe could have been re-run by anybody and would have printed the
+same numbers, because the run is real and its output says so: **the artefact
+is consistent with both readings**, so reading it saved nobody. **Scope is
+checked by asking who owns the subject, not by looking harder at the
+evidence.**
+
+**And that gives a behaviour claim a route, since no row can hold one**: it
+goes to **the repository it is about**, even when that repository did not ask
+and has nothing to do. Routing by who *needs* a fact sends it downstream, and
+**downstream cannot check upstream's behaviour by construction** — so routing
+by need sends every such claim away from the only party that can falsify it.
+Twice in two days the counterexample was held by somebody not in the
+conversation: once the repository that owns the surface, once the claimant's
+**own locks directory**.
+
+**And the unreported zero has the same invisibility as a habit save, one
+artefact along**: neither leaves anything behind, and both get paid for
+repeatedly by people who cannot see each other.
+
 ## 2026-09-21 07:20 [finding]
 
 **The number this page declined to write was wrong, and the corrected one is
