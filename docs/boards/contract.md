@@ -1,13 +1,17 @@
 # Design: Board Support (BSP) Contract
 
 > How a board joins Mica OS: what it must produce, what the OS build consumes, and
-> the hard assertions between them. Reference implementation: `mica-boards:boards/cx3576`.
+> the hard assertions between them. Reference implementation: `mica-build:boards/cx3576`.
 
 ## 1. Separation rule
 
-BSP layers produce **artifacts**; the OS build consumes **artifacts**. Neither
-side reaches into the other's build. Yocto is permitted only inside a board
-directory (when a vendor ships BSP solely as Yocto layers, run
+A board directory produces **artifacts**; the OS build consumes **artifacts**.
+Neither side reaches into the other's build. Since 2026-09-21 both live in one
+repository, `mica-build` (`docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`;
+`mica-boards` is retired): the boundary is the board directory, held by
+`mica-build:tests/board-contract-test.sh` on the board's side and by the
+board-name lint on the engine's, not a repository. Yocto is permitted only
+inside a board directory (when a vendor ships BSP solely as Yocto layers, run
 `bitbake virtual/kernel virtual/bootloader` and export the deploy dir) — never
 in the OS build chain.
 
@@ -45,18 +49,18 @@ products `uefi-x64-dev`, `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`,
 published before 2026-09-16 — `x64`, `virt-arm64`, their products and the
 slash tag form — are history and are not rewritten.
 
-> status: shipped — evidence: `docs/decisions/2026-09-16-board-and-product-naming.md`, `docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`, `mica-boards:boards/boards.tsv`
+> status: shipped — evidence: `docs/decisions/2026-09-16-board-and-product-naming.md`, `docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`, `mica-build:boards/boards.tsv`
 
 ## 2. Board directory layout
 
-A board is a directory under `mica-boards:boards/`, discovered by its
+A board is a directory under `mica-build:boards/`, discovered by its
 `board.env`, and it carries its whole build: there are no families, and what
-every board takes unchanged is under `mica-boards:common/`
-(`mica-boards:boards/README.md` is the layout's contract). A board directory
+every board takes unchanged is under `mica-build:common/`
+(`mica-build:boards/README.md` is the layout's contract). A board directory
 is grouped by what reads it:
 
 ```
-mica-boards/boards/<board>/
+mica-build/boards/<board>/
   board.env             geometry, architecture, capabilities; BOARD_FEATURES
   images.tsv            the board's flashing formats: image <kind> <packer> <runtime image> <suffix>
   Makefile              names the board; its kernel and firmware targets and its own
@@ -71,19 +75,19 @@ mica-boards/boards/<board>/
   kernel/control/, package/control/   the bundle's and the board package's control templates
   evidence.json         the board evidence, where the board keeps one
   tests/                the board's own tests; flash/, userland/, components/ what a board keeps beside them
-mica-boards/producers/
+mica-build/producers/
   board/                ONE producer for every board's package (FOR_EACH=boards/*/board.env)
-  kernel/               ONE producer for every board's bundle
-mica-boards/common/
+  radio-wifi/, radio-bluetooth/   the radio packages every board with the feature installs
+mica-build/common/
   kernel/               mica-required.fragment (the shared floor), floor-check.sh, kernel-config-test.sh, export-regdb-certs.py
   uboot/                mica-records.h, embed-fit-trust.sh
   trust/                stage.sh with stage-inner.sh: validate and stage the public VERITY_TRUST_CERT / FIT_TRUST_CERT
   package/, scripts/    fstab.in and copyright; the builders' shared steps
 ```
 
-A board carries no producer: `producers/board` and `producers/kernel` are
-matrix producers of `build-env` (`FOR_EACH`), run once per `board.env`,
-whose assignments name the instance (`PACKAGES="mica-board-${LAYOUT_BOARD}"`,
+A board carries no producer: `producers/board` is a matrix producer of
+`build-env` (`FOR_EACH`), run once per `board.env`, whose assignments name
+the instance (`PACKAGES="mica-board-${LAYOUT_BOARD}"`,
 `ARCHES="${MICA_ARCH}"`, `ENABLEMENT` from `BOARD_PACKAGE_ENABLEMENT`). What
 the board package ships is read out of `package/`: the rendered storage
 policy, the overlay wholesale, and for every concern in `BOARD_HWINIT_CONFS`
@@ -104,125 +108,115 @@ inputs unless a component producer names them.
 (`docs/decisions/2026-09-14-mica-boot-split.md`): systemd-boot is built by
 `mica-system-base` as `mica-systemd-boot` (the unsigned loader in the Base
 pool); the signed kernel packaging, the initramfs tools and the private
-signing keys belong to `mica-build`; and the kernel floor every board merges,
-the U-Boot trust helpers and the trust staging (`mica-boards:common/`) belong
-to `mica-boards`, which takes only the public `VERITY_TRUST_CERT` and
-`FIT_TRUST_CERT` and has no `boot/` source pin. The assembly still reads its
-tools from the `boot/` pin until its own import lands. `mica-deploy` builds native init and the
-runtime installer. The image path has no root-owned kernel Debian package and
+signing keys are the assembly's (`mica-build:boot/`); and the kernel floor
+every board merges, the U-Boot trust helpers and the trust staging are
+`mica-build:common/`, which the board builds take with only the public
+`VERITY_TRUST_CERT` and `FIT_TRUST_CERT`. `mica-deploy` builds native init
+and the runtime installer. The image path has no root-owned kernel Debian package and
 no persistent boot command script.
 
 ## 3. The board bundle
 
-Everything the assembly takes from a board travels as the board's component
-artifacts (2026-09-15, agreed by `mica-boards` and `mica-build`), published
-by `mica-boards:tools/publish-boards.sh` in a per-board `mica-boards` release
-`<board>/<YYYYMMDD-HHMM>` beside `pool.<board>.<arch>.<YYYYMMDD-HHMM>`
-(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`; the first
-per-board releases were `<board>/20260915-0824`, the first under the
-package-version rules `<board>/20260915-1128` (deleted), the current ones are
-`<board>/20260915-1926`, and the earlier unscoped `20260914-1603` is
-deleted). Each component is the OCI artifact
-`ghcr.io/micaoss/mica-boards:<component>.<board>.<YYYYMMDD-HHMM>`:
+Everything the assembly reads of a board is assembled into one board tree,
+`mica-build:_out/boards/<board>/`, by `mica-build:tools/board-pool.sh --fetch`
+(since 2026-09-21, `docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`):
+the board's definition, manifests, flashing formats, outputs, evidence and
+trust certificate are staged from `boards/<board>/` of the checkout, its
+firmware files likewise, and its **built** components -- the kernel, and the
+U-Boot where the board has one -- come from a local build under
+`_out/<board>/` (`make <board>-kernel`, `make <board>-firmware`) or, when
+there is none, from the latest release of this repository that published
+them with the same inputs hash (`tools/inputs.sh`, the `mica.inputs`
+annotation; `tools/reuse.sh`), read by digest. Neither present is a refusal
+naming the make target, never a silent build.
+
+A scoped release publishes the built components as the OCI artifacts
+`ghcr.io/micaoss/mica-build:<component>.<board>.<YYYYMMDD-HHMM>` beside the
+board's pool `pool.<board>.<arch>.<YYYYMMDD-HHMM>` (before 2026-09-21,
+`mica-boards` published them per board with `board` and `packer` components
+beside; those tags and releases stay as they are):
 
 | Component | `artifactType` | Content |
 |---|---|---|
 | `kernel` | `application/vnd.mica.board.kernel` | UEFI boards: `kernel/`; FIT boards: `kernel/dev/` and `kernel/prod/` with the DTB |
 | `uboot` | `application/vnd.mica.board.uboot` | FIT boards only: the U-Boot binaries, the control dtb, the config and the FIT host tools, kept x86-64 (`uboot-package/` on s905x5m) |
 | `firmware` | `application/vnd.mica.board.firmware` | `firmware.tar` and `component-copyright`, when the board carries firmware |
-| `board` | `application/vnd.mica.board` | `board.env`, `manifests/`, `outputs.tsv`, `images.tsv`, the trust certificate and `evidence.json` |
-| `packer` | (not fixed yet) | when `images.tsv` names a non-builtin packer: the packer tools and the board-level pieces they need (a Rockchip loader and `idblock.img`, an Amlogic packer binary and its ini), kept x86-64; absent while the board has only `disk` |
 
 Each has one layer per file (`firmware.tar` as one layer) and is annotated
 `mica.board`, `mica.arch`, `mica.component`, `mica.inputs=<sha256>` (the
-component's input key), `mica.source-commit` and `mica.source-repo` (always
-`mica-boards`: a package holds only its own repository's artifacts, and the
-assembly refuses any other value). `mica.verity-cert-sha256` is required on
-the `board` and `kernel` components, which carry the verity trust; a `uboot`
-or `firmware` component may carry it, and then it must match
-(`mica-build:tools/board-pool.sh`, as the per-board releases publish it).
-A board release reuses an unchanged component by digest: the same manifest
-bytes under the new release's tag, never a re-pointed tag. The board's lock
-names each component as a `board` row (`docs/design/release-lock.md` 1.2).
-The `mica-kernel-<board>` packages are retired: the pools hold
-`mica-board-<board>`, the radio packages and s905x5m's component packages,
-and the assembly takes the kernel files from the `kernel` artifact.
-The publisher checks the complete annotation set when it reads the pushed
-manifest back. The
-assembly pins the manifest's digest (`mica-build:deps/boards/<board>.json`)
-and reads the board out of the artifacts, assembling the components into one
-board tree with the paths below. A pin recorded before the move to
-per-repository packages may still name the historical
-`mica-board:<board>.build-<commit12>`; that artifact stays published and
-immutable for it (`docs/decisions/2026-09-13-ghcr-artifact-registry.md`).
+component's input key), `mica.source-commit` and `mica.source-repo`
+(`mica-build`; the fetch refuses any other value). `mica.verity-cert-sha256`
+is required on the `kernel` component, which embeds the verity trust; a
+`uboot` or `firmware` component may carry it, and then it must match
+(`mica-build:tools/board-pool.sh`). A release reuses an unchanged component
+by digest: the same manifest bytes under the new release's tag, never a
+re-pointed tag, and the release lock names each as a `board` row
+(`docs/design/release-lock.md` 1.2.2). The `mica-kernel-<board>` packages
+are retired: the pools hold `mica-board-<board>`, the radio packages and
+s905x5m's component packages, and the assembly takes the kernel files from
+the `kernel` artifact.
 
-| Path | Component | Required | Consumer in the assembly |
+| Path | Staged from | Required | Consumer in the assembly |
 |---|---|---|---|
-| `board.env` | `board` | yes | every host-time reader, through `_out/boards/<board>/` |
-| `evidence.json` | `board` | when the board carries one | the release manifest |
-| `manifests/board.pkgs` | `board` | yes | the resolver |
-| `manifests/radio-<r>.pkgs` | `board` | when the radio needs board transport packages | the resolver |
-| `manifests/component-<c>.pkgs` | `board` | per optional component | the resolver |
-| `kernel/{Image\|bzImage,config,kernel.release,modules.tar,<dtb>}` | `kernel` | UEFI boards: yes, one kernel with an empty `CONFIG_CMDLINE` | the kernel component |
-| `kernel/dev/`, `kernel/prod/` | `kernel` | `BOOT_BACKEND=uboot-fit` boards: both, and no top-level `kernel/` | the kernel component, which takes `kernel/<product profile>/` |
-| `firmware/*` (from `firmware.tar`), `component-copyright` | `firmware` | when `BOARD_FIRMWARE_FILES` is non-empty | the support image |
-| `uboot/*` (`uboot-package/` on s905x5m) | `uboot` | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
-| `trust/verity-signer.cert.pem` | `board` | yes | refused when it is not the assembly's |
-| `outputs.tsv` | `board` | yes | the check of the components and the board's packages |
-| `images.tsv` | `board` | yes | the image executor (section 3.1) |
-| `packer/*` | `packer` | when `images.tsv` names a non-builtin packer | the image executor (section 3.1) |
+| `board.env` | `boards/<board>/` | yes | every host-time reader, through `_out/boards/<board>/` |
+| `evidence.json` | `boards/<board>/` | when the board carries one | the release manifest |
+| `manifests/board.pkgs` | `boards/<board>/` | yes | the resolver |
+| `manifests/radio-<r>.pkgs` | `boards/<board>/` | when the radio needs board transport packages | the resolver |
+| `manifests/component-<c>.pkgs` | `boards/<board>/` | per optional component | the resolver |
+| `kernel/{Image\|bzImage,config,kernel.release,modules.tar,<dtb>}` | the `kernel` build | UEFI boards: yes, one kernel with an empty `CONFIG_CMDLINE` | the kernel component |
+| `kernel/dev/`, `kernel/prod/` | the `kernel` build | `BOOT_BACKEND=uboot-fit` boards: both, and no top-level `kernel/` | the kernel component, which takes `kernel/<product profile>/` |
+| `firmware/*`, `component-copyright` | `boards/<board>/firmware/` | when `BOARD_FIRMWARE_FILES` is non-empty | the support image |
+| `uboot/*` (`uboot-package/` on s905x5m) | the `uboot` build | when `BOOT_BACKEND=uboot-fit` | the firmware package and the image |
+| `trust/verity-signer.cert.pem` | `meta/verity/` | yes | refused when it is not the assembly's |
+| `outputs.tsv` | `boards/<board>/` | yes | the check of the assembled tree and the board's packages |
+| `images.tsv` | `boards/<board>/` | yes | the image executor (section 3.1) |
 
 On a `uboot-fit` board each of `kernel/dev/` and `kernel/prod/` is a complete
 kernel directory (`Image`, the dtb, `config`, `System.map`, `kernel.release`,
 `modules.tar`, `regdb-certs.pem`). Its `CONFIG_CMDLINE` is the board's line
 plus exactly one `mica.profile=<profile>` token, with `CONFIG_CMDLINE_FORCE=y`;
 a board line that already names `mica.profile` or `mica.recovery` is refused
-(`mica-boards:boards/cx3576/kernel/configure.sh`,
-`mica-boards:producers/kernel/prepare.sh`). The user chose this shape (option
-A, 2026-09-14).
+(`mica-build:boards/cx3576/kernel/configure.sh`). The user chose this shape
+(option A, 2026-09-14).
 
 The board list and each board's expected outputs are machine-readable
-(`mica-boards` `ce44907`, read by `mica-boards:tools/boards.sh`):
+(`mica-boards` `ce44907`, read by `mica-build:tools/boards.sh`; the file
+formats keep the `mica-boards` name they were specified under):
 
-- `mica-boards:boards/boards.tsv`: line 1 `# mica-boards boards v1`, then one
+- `mica-build:boards/boards.tsv`: line 1 `# mica-boards boards v1`, then one
   tab-separated row per supported board, sorted by board,
   `<board> <arch> <boot backend>` (`cx3576 arm64 uboot-fit`,
   `s905x5m arm64 uboot-fit`, `uefi-arm64 arm64 systemd-boot`,
   `uefi-x64 amd64 systemd-boot`).
-- `mica-boards:boards/<board>/outputs.tsv`: line 1
+- `mica-build:boards/<board>/outputs.tsv`: line 1
   `# mica-boards board outputs v1`, then rows `package <name>` (an archive of
   `pool.<board>.<arch>.<release>`) and `file <component> <path>` (a file of
-  that component artifact, at its assembled path in the table above, for
-  example `file firmware firmware/<file>`; `outputs.tsv` itself included),
-  sorted by kind, then value. It travels in the `board` component, so every
-  board release carries its own expected outputs.
-
-A consumer reads the board list from `boards/boards.tsv` and a board's
-expected outputs from the `outputs.tsv` of its `board` component; the
-assembly checks each pinned component and the board's packages against it.
+  the assembled board tree, at its path in the table above, for example
+  `file firmware firmware/<file>`; `outputs.tsv` itself included), sorted by
+  kind, then value; the assembled tree must be exactly its file rows
+  (`tools/boards.sh bundle-is`).
 
 ### 3.1 Flashing formats: `images.tsv` and the packer interface
 
-`mica-boards` declares a board's flashing formats and supplies their packers;
-`mica-build` only executes them (user, 2026-09-15,
-`docs/decisions/2026-09-15-board-image-packers.md`).
+The board declares its flashing formats and supplies their packers; the
+engine only executes them (user, 2026-09-15,
+`docs/decisions/2026-09-15-board-image-packers.md`; both in `mica-build`
+since 2026-09-21, the packers run from the checkout).
 
-`mica-boards:boards/<board>/images.tsv`, in the `board` component: line 1
+`mica-build:boards/<board>/images.tsv`: line 1
 `# mica-boards images v1`, then `image <kind> <packer> <runtime image>
 <suffix>` rows. `<kind>` is for example `disk`, `rockchip-update` or
 `amlogic-burn`; `<packer>` is `builtin` (the assembly's own raw disk image,
 only for `disk`) or a path inside the `packer` component; `<runtime image>`
 is an `image` row of `locks/mica-build-env.lock` (such as
 `mica-build-env:base`), or `-` for a `builtin` packer (`image disk builtin -
-img`); `<suffix>` is the output file's suffix. `mica-boards` still ships
-`mica-build-env:base` on its `disk` row until its next board release. Rules, held by
-`mica-boards`' board contract test:
+img`); `<suffix>` is the output file's suffix. Rules, held by the board contract
+test:
 
 - `disk` is present: it is the canonical image every other kind derives from;
 - kinds are unique;
-- every non-builtin packer path exists in the `packer` component and is
-  listed in `outputs.tsv` (`file packer <path>`), with the board-level pieces
-  it needs;
+- every non-builtin packer path exists under `boards/<board>/`, executable,
+  with the board-level pieces it needs;
 - the runtime image is named by the build-env lock.
 
 The packer interface, executed by `mica-build`:
@@ -257,8 +251,7 @@ kernel and the system are upgraded independently (user, 2026-09-15;
 `firmware` update kind is refused. A product selects them in
 `mica-build:products/<product>/product.env` `UPDATE_KINDS` (default all,
 `full` always); they are published as release assets and as layers of
-`update.<product>.<YYYYMMDD-HHMM>`. `mica-boards` adds the update rows after
-`mica-core` and `mica-build` implement them.
+`update.<product>.<YYYYMMDD-HHMM>`.
 
 Modules and kernel release must match inside the bundle. Root images contain
 empty mountpoints for modules and firmware; verified support is mounted there
@@ -275,7 +268,7 @@ Every board kernel build validates its resolved configuration before export:
 - Runtime: cgroup v2 set, containerd/netfilter prerequisites (the docker set
   already asserted in cx3576's Dockerfile), seccomp.
 - Shared baseline fragment: maintained once for all boards as
-  `mica-boards:common/kernel/mica-required.fragment` (buildx named context
+  `mica-build:common/kernel/mica-required.fragment` (buildx named context
   `mica-common`),
   merged before olddefconfig — the source of truth for the list above plus the
   pseudo filesystems and security options it also asserts (hugetlbfs, tracing,
@@ -777,7 +770,7 @@ merge the same shared fragment before `olddefconfig`. Board intake tiers:
 
 ## 7. Adding a current board
 
-1. In `mica-boards`: `bash tools/new-board.sh <name> --from <nearest>` copies
+1. In `mica-build`: `bash tools/new-board.sh <name> --from <nearest>` copies
    a board under `boards/`, its build included -- `board.env`,
    `sources.env`, `manifests/board.pkgs`, the kernel build, configuration,
    device tree, patches and hooks under `kernel/`, the loader build and
@@ -792,11 +785,11 @@ merge the same shared fragment before `olddefconfig`. Board intake tiers:
    change in `mica-debian`.
 2. Build the kernel through the family with the public content anchor, and
    the boot firmware where the family has one. Export matching modules,
-   indexes, config and DTB; `make pool`, `make package-gate`, `make publish`.
-3. In the assembly: pin the bundle and the board packages, then compose,
-   sign and assemble a complete image with the component CLI. UEFI needs
-   explicit Secure Boot enrollment; a FIT target needs fixed
-   required-signature firmware policy.
+   indexes, config and DTB; `make board-pool`, `make board-package-gate`.
+3. In the same tree: `make product PRODUCT=<board>-dev` composes, signs and
+   assembles a complete image from that build. UEFI needs explicit Secure
+   Boot enrollment; a FIT target needs fixed required-signature firmware
+   policy.
 4. Verify the explicit image/public-key inputs, then boot through actual
    firmware. Run full services/API, updates, fault recovery, quotas, reset
    and shutdown.

@@ -298,35 +298,14 @@ signed image.
 
 ## 11. Running an update server
 
-The server is `mica-build:update-server/`: Bun, Hono and SQLite in one
-process, with an admin UI and a device-facing surface.
-
-- It is initialised with `bun run init`, which writes a `.env` with a random
-  admin token and refuses to overwrite an existing one, and started with
-  `bun run start` (or as the single binary `bun run build` produces).
-- A release is published in two steps: `bun scripts/import.ts --channel stable
-  --archive <file>.micaupd` (or `--oci <bundle>@sha256:<digest>`, which reads
-  the bundle anonymously and requires exactly one layer annotated
-  `mica.update-kind=full`) creates a **draft**, and publication is a separate
-  action. Publication refuses a release whose deployment envelope no longer
-  verifies against the trusted keys: `409 invalid_deployment`.
-- Devices see `GET /v1/manifest.json` and `GET /v1/objects/<sha256>`, both
-  unauthenticated, with range and conditional-request support. The limits are
-  128 published releases and a 1 MiB catalogue, both answered `409
-  catalog_full`.
-- All state lives under `DATA_DIR` — the SQLite database and the objects — so
-  that directory is the backup. The process speaks plain HTTP on `127.0.0.1`
-  by default, so it needs a TLS proxy and a `PUBLIC_URL` equal to the external
-  origin: that string is baked into the signed object URLs, and a mismatch
-  gives devices URLs they cannot fetch. There is one shared admin token and no
-  user accounts.
-- The server signs the catalogue and checks each release's deployment envelope
-  against the trusted keys, but it is not a trusted party for the payload: the
-  device checks the same signatures itself.
-
-The service's own test suite passes; nobody has deployed or operated it here,
-so the ports, the proxy configuration, the service unit and the backup
-procedure are unverified.
+No update server ships in this repository. Distribution is the fleet
+service's (`micaoss/mica-fleet`): it publishes the catalogue at
+`/v1/manifest.json` and the objects under `/v1/objects/`, and it is
+documented there. What this repository provides is the fleet's input, the
+signed archives of section 1 and the index of section 9, and the contract of
+section 10, which the device enforces against whatever serves it. The
+`mica-build:update-server/` service that once stood in for the fleet was
+removed on 2026-09-21.
 
 > status: unsupported
 

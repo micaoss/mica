@@ -30,14 +30,13 @@ and locks); each says so in `make help`.
 | `mica-system-base` | the four policy packages and the base root | `bun run check`, `bun src/container.ts debs`, `bun src/container.ts rootfs --arch amd64\|arm64` |
 | `mica-core` | the seven packages | `make check` |
 | `mica-podman` | `mica-podman` | `make check` |
-| `mica-boards` | per board: kernel, U-Boot, firmware, board metadata, packages | `make check`; one board with `make <board>-<target>` |
-| `mica-build` | the products: root, signed components, images and update archives | the `make os-*` suites |
+| `mica-build` | per board: kernel, U-Boot, firmware, board metadata, packages (`make <board>-<target>`, `make board-pool`); and the products: root, signed components, images and update archives | `make board-check` and the `make os-*` suites |
 
 Each repository reads its inputs only from `locks/`: a producer's lock and
 its pin. `make offline` exists in every repository and builds its own outputs
 from those locks.
 
-> status: shipped — evidence: `mica-boards:Makefile`, `mica-podman:Makefile`, `mica-core:Makefile`, `mica-system-base:package.json`, `mica-build-env:from.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-podman:Makefile`, `mica-core:Makefile`, `mica-system-base:package.json`, `mica-build-env:from.sh`
 
 ## 3. Online: build a product image
 
@@ -45,7 +44,9 @@ In `mica-build`:
 
 ```sh
 make locks-verify                 # every lock and pin, and what they name
-make board-fetch-all              # the board components of every board row of locks/
+make kernels firmware             # every board's kernel and loader (hours); or one: make <board>-kernel
+make board-pool                   # the board and radio packages, both architectures
+make board-fetch-all              # each board's bundle: the tree, the local build (else the latest release's component)
 make os-pool                      # fetch and verify every pinned archive, index both pools
 make product PRODUCT=uefi-x64-dev      # the product's closure: compose, sign, image, update archive
 make product-verify PRODUCT=uefi-x64-dev
@@ -66,17 +67,20 @@ make product-verify PRODUCT=uefi-x64-dev
 ## 4. Building one package or one board component
 
 - A package: build it in its own repository, with that repository's gates
-  (`make check` in `mica-core`, `mica-podman` and `mica-boards`,
-  `bun src/container.ts debs` in `mica-system-base`). A package is rebuilt
-  only when its declared version is bumped
+  (`make check` in `mica-core` and `mica-podman`, `bun src/container.ts
+  debs` in `mica-system-base`, `make board-pool` with `make
+  board-package-gate` in `mica-build` for the board and radio packages). A
+  package is rebuilt only when its declared version is bumped
   ([package versions](../decisions/2026-09-15-package-versions.md)).
-- One board's components: `make <board>-<target>` in `mica-boards` delegates
-  to that board's `Makefile`; `make check` holds the board to the contract.
-- The assembly reads a board out of its release with
-  `make board-fetch BOARD=<board>` and checks it against the board's
-  `outputs.tsv`.
+- One board's components: `make <board>-<target>` in `mica-build` delegates
+  to that board's `Makefile`; `make board-check` holds the board to the
+  contract.
+- The assembly assembles a board's bundle with `make board-fetch
+  BOARD=<board>` -- the tree, the local kernel and loader build, or the
+  latest release's component with the same inputs -- and checks it against
+  the board's `outputs.tsv`.
 
-> status: shipped — evidence: `mica-boards:Makefile`, `mica-build:Makefile`, `mica-boards:tools/boards.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/boards.sh`, `mica-build:tools/board-pool.sh`
 
 ## 5. Offline: the side-by-side checkouts
 

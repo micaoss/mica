@@ -25,13 +25,13 @@
 | `mica-system-base` | 四个策略包和基础根 | `bun run check`、`bun src/container.ts debs`、`bun src/container.ts rootfs --arch amd64\|arm64` |
 | `mica-core` | 七个软件包 | `make check` |
 | `mica-podman` | `mica-podman` | `make check` |
-| `mica-boards` | 按板卡：内核、U-Boot、固件、板卡元数据、软件包 | `make check`；单块板用 `make <board>-<target>` |
+| `mica-build` | 按板卡：内核、U-Boot、固件、板卡元数据、软件包（`make <board>-<target>`、`make board-pool`）；以及产品：根、签名组件、镜像和更新归档 | `make board-check` 和 `make os-*` 套件 |
 | `mica-build` | 产品：根、签名组件、镜像和更新归档 | `make os-*` 系列 |
 
 每个仓库只从 `locks/` 读取输入：某个生产方的 lock 和它的 pin。每个仓库都有
 `make offline`，它从那些 lock 出发构建自己的产出。
 
-> status: shipped — evidence: `mica-boards:Makefile`, `mica-podman:Makefile`, `mica-core:Makefile`, `mica-system-base:package.json`, `mica-build-env:from.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-podman:Makefile`, `mica-core:Makefile`, `mica-system-base:package.json`, `mica-build-env:from.sh`
 
 ## 3. 在线：构建一个产品镜像
 
@@ -39,7 +39,9 @@
 
 ```sh
 make locks-verify                 # 每个 lock 和 pin，以及它们指向的东西
-make board-fetch-all              # locks/ 里每个 board 行对应的板卡组件
+make kernels firmware             # 每块板的内核与加载器（数小时）；单块板：make <board>-kernel
+make board-pool                   # 板卡包和无线电包，两种架构
+make board-fetch-all              # 每块板的 bundle：源码树、本地构建（否则取最近一次 release 的组件）
 make os-pool                      # 拉取并校验每个固定的归档，索引两个池
 make product PRODUCT=uefi-x64-dev      # 该产品的全部闭包：组合、签名、镜像、更新归档
 make product-verify PRODUCT=uefi-x64-dev
@@ -57,16 +59,18 @@ make product-verify PRODUCT=uefi-x64-dev
 
 ## 4. 只构建一个软件包或一个板卡组件
 
-- 软件包：在它自己的仓库里构建，跑那个仓库的门（`mica-core`、`mica-podman` 和
-  `mica-boards` 里是 `make check`，`mica-system-base` 里是
-  `bun src/container.ts debs`）。只有声明版本被提升时软件包才会重建
+- 软件包：在它自己的仓库里构建，跑那个仓库的门（`mica-core` 和 `mica-podman`
+  里是 `make check`，`mica-system-base` 里是 `bun src/container.ts debs`，
+  板卡包和无线电包在 `mica-build` 里是 `make board-pool` 加
+  `make board-package-gate`）。只有声明版本被提升时软件包才会重建
   （[软件包版本](../../decisions/2026-09-15-package-versions.md)）。
-- 单块板的组件：`mica-boards` 里的 `make <board>-<target>` 委托给该板自己的
-  `Makefile`；`make check` 把板卡按契约约束住。
-- 组装侧用 `make board-fetch BOARD=<board>` 从板卡的 release 读取它，并对照该板的
-  `outputs.tsv` 校验。
+- 单块板的组件：`mica-build` 里的 `make <board>-<target>` 委托给该板自己的
+  `Makefile`；`make board-check` 按契约约束该板。
+- 装配用 `make board-fetch BOARD=<board>` 组装板卡的 bundle——源码树、本地的
+  内核与加载器构建，或最近一次发布中输入相同的组件——并对照该板的 `outputs.tsv`
+  检查。
 
-> status: shipped — evidence: `mica-boards:Makefile`, `mica-build:Makefile`, `mica-boards:tools/boards.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/boards.sh`, `mica-build:tools/board-pool.sh`
 
 ## 5. 离线：并排的检出
 

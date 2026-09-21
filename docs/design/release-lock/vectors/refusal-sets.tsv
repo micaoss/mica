@@ -13,9 +13,6 @@ lock/refused/release-value.lock	set	field-value release-scope	valid
 lock/refused/scoped-release-not-allowed.lock	set	release-scope	unmeasured
 lock/refused/unscoped-release.lock	set	release-scope	unmeasured
 lock/refused/release-slash.lock	set	field-value release-scope	valid
-lock/refused/scope-content-board.lock	set	scope-content	unmeasured
-lock/refused/scope-content-pool.lock	set	scope-content	unmeasured
-lock/refused/scope-content-tag.lock	set	scope-content	unmeasured
 lock/refused/board-component.lock	set	field-value	unmeasured
 lock/refused/board-duplicate-component.lock	set	duplicate-key	unmeasured
 lock/refused/board-components.lock	set	board-components	unmeasured

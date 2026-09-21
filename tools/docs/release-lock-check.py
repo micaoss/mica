@@ -66,8 +66,8 @@ REPOSITORY = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 RELEASE = re.compile(r"^[0-9]{8}-[0-9]{4}$")
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
-SCOPED = {"mica-boards", "mica-build"}
-COMPONENT = {"board", "kernel", "uboot", "firmware", "packer"}
+SCOPED = {"mica-build"}
+COMPONENT = {"kernel", "uboot", "firmware"}
 SCOPE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 ARCH = {"amd64", "arm64"}
 PLATFORM = {"index", "amd64", "arm64", "386"}
@@ -145,8 +145,6 @@ def check_lock(path):
             refuse("reference-repository")
         return m.group("tag") or ""
 
-    board_scope = scope if repository == "mica-boards" else ""
-
     def index_input(name):
         input_repository, _, input_scope = name.partition(".")
         field(input_repository == "mica-build" and SCOPE.match(input_scope))
@@ -175,9 +173,7 @@ def check_lock(path):
             key = (row[1], row[2], row[3])
         elif kind == "pool":
             field(row[1] in ARCH)
-            tag = reference(row[2])
-            if board_scope and not tag.startswith("pool." + board_scope + "." + row[1] + "."):
-                refuse("scope-content")
+            reference(row[2])
             key = (row[1],)
             pools.add(row[1])
         elif kind == "package":
@@ -185,9 +181,7 @@ def check_lock(path):
             key = (row[1], row[2])
         elif kind == "board":
             field(NAME.match(row[1]) and row[2] in COMPONENT and row[3] in ARCH)
-            tag = reference(row[4])
-            if board_scope and (row[1] != board_scope or not tag.startswith(row[2] + "." + row[1] + ".")):
-                refuse("scope-content")
+            reference(row[4])
             key = (row[1], row[2])
         elif kind == "upstream":
             roots = row[6].split(",")
@@ -292,8 +286,10 @@ def check_lock(path):
         refuse("update-full")
     if any(r[0] == "package" and r[2] not in pools for r in rows):
         refuse("package-without-pool")
-    if repository == "mica-boards" and not {"board", "kernel"} <= {r[2] for r in rows if r[0] == "board"}:
-        refuse("board-components")
+    # A board's components (mica-build): the kernel is required, uboot and firmware are the board's to have.
+    for board in {r[1] for r in rows if r[0] == "board"}:
+        if not any(r[0] == "board" and r[1] == board and r[2] == "kernel" for r in rows):
+            refuse("board-components")
     if sort_keys != sorted(sort_keys):
         refuse("sort-order")
     return repository, scope, release

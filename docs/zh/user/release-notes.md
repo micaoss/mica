@@ -24,10 +24,11 @@ root。回退部署共享 DATA，不撤销应用数据。当前契约为 `dataPo
 
 ## 3. 发布状态
 
-服务器向指定渠道发布已认证组件并支持撤回。目录有效期约束获取过程，已安装的
-认证部署仍可离线启动。渠道发布不能替代板卡验收或产品支持承诺。
+`mica-build` 的一次限定范围发布把签名归档和镜像作为 release 资产发布，Mica 版本索引
+指向每个产品的最新发布。向设备的分发——通道及其撤回——属于 fleet 服务，本页不作断言。
+已安装的认证部署无论目录是否过期都可离线启动。一次发布不能替代板卡验收或产品支持承诺。
 
-> status: shipped — evidence: `mica-build:update-server/src`, `mica-deploy:src/acquisition.rs`
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/mica-index.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
 
 本页不承诺公开发布历史、支持期限或停服政策。当前源码构建路径见[获取镜像](download.md)，
 交付记录见[发布产物](../../design/release-artifacts.md)。

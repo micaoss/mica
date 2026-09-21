@@ -18,8 +18,7 @@ the assets. `ci.yml` publishes nothing.
 | Repository | Tag |
 |---|---|
 | `mica-build-env`, `mica-system-base`, `mica-core`, `mica-podman` | `<YYYYMMDD-HHMM>` |
-| `mica-boards` | `<board>.<YYYYMMDD-HHMM>`, one board per release |
-| `mica-build` | `<scope>.<YYYYMMDD-HHMM>`, a board or one product, cut with `--latest=false` |
+| `mica-build` | `<scope>.<YYYYMMDD-HHMM>`, a board or one product, cut with `--latest=false`; the scope's board is built and published in the same release |
 | `mica-build` version index | `mica.<YYYYMMDD-HHMM>`, cut by the index job, never by hand |
 
 The tag forms follow the board and product names, which
@@ -30,14 +29,14 @@ release, with no `v` prefix, no semver and no commit suffix. A scoped tag separa
 `<scope>/<stamp>` form and are not rewritten. Deleting or re-cutting a
 published release happens only on the user's explicit instruction.
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
 
 ## 2. What a release carries
 
 | Release | Assets | OCI |
 |---|---|---|
-| producer (`mica-build-env`, `mica-system-base`, `mica-core`, `mica-podman`, `mica-boards`) | `<repository>.lock` and `SHA256SUMS` listing only it | the images, pools, board components and the base root, tagged `<kind>[.<name>]*.<release>` |
-| `mica-build` scoped | `mica-build.lock`, one `mica-<product>-<stamp>.<suffix>.gz` per image kind, the update archives, and `SHA256SUMS` over all of them | `image.<product>.<release>` and `update.<product>.<release>` |
+| producer (`mica-build-env`, `mica-system-base`, `mica-core`, `mica-podman`) | `<repository>.lock` and `SHA256SUMS` listing only it | the images, pools and the base root, tagged `<kind>[.<name>]*.<release>` |
+| `mica-build` scoped | `mica-build.lock`, one `mica-<product>-<stamp>.<suffix>.gz` per image kind, the update archives, and `SHA256SUMS` over all of them | the board's `pool.<board>.<arch>.<release>` and `<component>.<board>.<release>`, `image.<product>.<release>` and `update.<product>.<release>` |
 | `mica-build` index | `mica-build.lock`, `mica-index.json` and `SHA256SUMS` listing both | none |
 
 The lock names every artifact by digest, so a consumer that verifies
@@ -65,8 +64,8 @@ Packages are locked by their own declared version
 - when no package changed, the pool manifest is byte-identical and the new
   release tag points at the same digest.
 
-`mica-boards` reuses a `kernel` or `uboot` component whose inputs equal the
-board's latest release, in CI and at release, and `mica-build` publishes a
+`mica-build` reuses a `kernel` or `uboot` component whose inputs equal the
+latest release that published it, in CI and at release, and publishes a
 `root` or `kernel` update archive only when the other component's identity is
 unchanged ([update packages](update-packages.md)).
 

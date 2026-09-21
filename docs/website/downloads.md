@@ -27,13 +27,14 @@ or historical update compatibility is offered.
 
 ## Publication
 
-The operator-managed update server publishes authenticated component releases
-and serves channel catalogs. Its UI also handles separate firmware artifacts.
-A running server is not a public product release or physical-board qualification.
-Generate any download list from its actual published metadata and delivered
-artifact records; do not hand-write release identities or claim absent evidence.
+A scoped release publishes the signed archives and images as release assets,
+and the Mica version index names the newest release of every product. The
+channel catalogues devices poll are the fleet service's, not this repository's.
+A release is not a physical-board qualification. Generate any download list
+from the index and the delivered artifact records; do not hand-write release
+identities or claim absent evidence.
 
-> status: shipped — evidence: `mica-build:update-server/src`, `docs/design/updates.md`
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/mica-index.md`
 
 Public hosting, release support windows and a public downloadable release history
 remain unprovided. Link [build instructions](../design/build.md),

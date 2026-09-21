@@ -70,3 +70,8 @@ file cannot take it for an open row.
 - [x] [**20260917-1033-zh-hardware-list Chinese hardware list and current-state guide per board**](20260917-1033-zh-hardware-list.md) `2026-09-17`
 - [x] [**20260920-0610-producer-data-assets Where a producer publishes data about its own output**](20260920-0610-producer-data-assets.md) `2026-09-20`
 - [x] [**20260920-0700-hardware-pages-in-english Publish the hardware list: English pages and an allowlist that can name them**](20260920-0700-hardware-pages-in-english.md) `2026-09-20`
+- [-] [**20260921-1142-merge-boards-into-build Merge mica-boards into mica-build so a board owns its image**](20260921-1142-merge-boards-into-build.md) `2026-09-21`
+- [x] [**20260921-1217-remove-update-server Remove the update server from mica-build**](20260921-1217-remove-update-server.md) `2026-09-21`
+- [ ] [**20260914-0514-workspace-rules-and-build-env Bring mica-boards to the workspace rules and the released build-env**](20260914-0514-workspace-rules-and-build-env.md) `2026-09-21`
+- [ ] [**20260920-0627-kernel-capabilities-beside-each-board The floor, made legible to another repository**](20260920-0627-kernel-capabilities-beside-each-board.md) `2026-09-21`
+- [ ] [**20260920-0730-the-boot-logo-on-every-board-that-can-draw Adding the boot logo, and what it costs per board**](20260920-0730-the-boot-logo-on-every-board-that-can-draw.md) `2026-09-21`

@@ -43,14 +43,13 @@ match authenticated metadata. `MICAUPD1` offline imports carry the same signed
 deployment and at most five unique objects, with no archive paths or links.
 Decided 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and
 implemented in `mica-core` since its release `20260915-0728` (`2a4c98d`;
-written by `mica-build` and served by its update-server since `0094a097`, not
-released yet): an import may carry from 0 to the
+written by `mica-build` since `0094a097`): an import may carry from 0 to the
 descriptor's object count (a `root` or `kernel` archive), and every missing
 object must already be in the store. The `mica/deployment/v2` descriptor's
 required signed `product` field must equal the device's product: the single
 unquoted `PRODUCT=<name>` line of `/usr/lib/mica/product.conf`, a five-line
 file (`PRODUCT`, `BOARD`, `PROFILE`, and the quoted `FEATURES` and
-`COMPONENTS`). The update-server is keyed by product. There is no minimum
+`COMPONENTS`). A catalogue server is keyed by product. There is no minimum
 running release rule.
 
 Installation requires the authenticated running deployment A to be confirmed

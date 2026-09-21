@@ -17,7 +17,6 @@ gh release create <tag> --target <commit of main>
 | 仓库 | 标签 |
 |---|---|
 | `mica-build-env`、`mica-system-base`、`mica-core`、`mica-podman` | `<YYYYMMDD-HHMM>` |
-| `mica-boards` | `<board>.<YYYYMMDD-HHMM>`，一次 release 一块板 |
 | `mica-build` | `<scope>.<YYYYMMDD-HHMM>`，一块板或一个产品，用 `--latest=false` 切 |
 | `mica-build` 版本索引 | `mica.<YYYYMMDD-HHMM>`，由索引 job 切，绝不手工切 |
 
@@ -27,13 +26,13 @@ gh release create <tag> --target <commit of main>
 起，作用域标签用**点号**分隔作用域；在那之前切的 release 仍是旧的 `<scope>/<stamp>`
 形式，不做改写。删除或重切一个已发布的 release，只在用户明确指示时进行。
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`, `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, `docs/decisions/2026-09-15-oci-tags-follow-release-version.md`
 
 ## 2. 一个 release 携带什么
 
 | release | 资产 | OCI |
 |---|---|---|
-| 生产方（`mica-build-env`、`mica-system-base`、`mica-core`、`mica-podman`、`mica-boards`） | `<repository>.lock` 和只列出它的 `SHA256SUMS` | 镜像、池、板卡组件和基础根，标签为 `<kind>[.<name>]*.<release>` |
+| 生产方（`mica-build-env`、`mica-system-base`、`mica-core`、`mica-podman`） | `<repository>.lock` 和只列出它的 `SHA256SUMS` | 镜像、池、板卡组件和基础根，标签为 `<kind>[.<name>]*.<release>` |
 | `mica-build` 作用域 release | `mica-build.lock`、每种镜像类型一个 `mica-<product>-<stamp>.<suffix>.gz`、更新归档，以及覆盖全部这些文件的 `SHA256SUMS` | `image.<product>.<release>` 和 `update.<product>.<release>` |
 | `mica-build` 索引 | `mica-build.lock`、`mica-index.json`，以及同时列出两者的 `SHA256SUMS` | 无 |
 
@@ -56,7 +55,7 @@ lock 用摘要指名每一个产物，所以校验了 `SHA256SUMS` 和 lock 的�
   低于上一个 release 的版本也被拒绝；
 - 当没有软件包变化时，池 manifest 逐字节相同，新的 release 标签指向同一个摘要。
 
-`mica-boards` 复用输入与该板最新 release 相同的 `kernel` 或 `uboot` 组件，CI 和发布时
+`mica-build` 复用输入与最近一次发布它的 release 相同的 `kernel` 或 `uboot` 组件，CI 和发布时
 都如此；`mica-build` 只有在另一个组件标识未变时才发布 `root` 或 `kernel` 更新归档
 （[更新包](update-packages.md)）。
 

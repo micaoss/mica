@@ -33,12 +33,14 @@ accepts `dataPolicy: unchanged` and has no destructive migration path.
 
 ## 3. Publication status
 
-The update server publishes authenticated component releases to a chosen channel
-and supports withdrawal. Its catalog expiry applies to acquisition, while an
-installed authenticated deployment can boot offline. A published channel is not
-a substitute for board qualification or a product support commitment.
+A scoped release of `mica-build` publishes the signed archives and images as
+release assets, and the Mica version index names the newest release of every
+product. Distribution to devices, the channels and their withdrawal, is the
+fleet service's and is not asserted by this page. An installed authenticated
+deployment boots offline whatever the catalogue's expiry. A published release
+is not a substitute for board qualification or a product support commitment.
 
-> status: shipped — evidence: `mica-build:update-server/src`, `mica-deploy:src/acquisition.rs`
+> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/mica-index.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
 
 No public release history, support window or end-of-life commitment is asserted
 by this page. See [obtaining an image](download.md) for the current source-build

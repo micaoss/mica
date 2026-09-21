@@ -241,28 +241,11 @@ jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.
 
 ## 11. 运行一台更新服务器
 
-服务器是 `mica-build:update-server/`：Bun、Hono 和 SQLite 在同一个进程里，带一个管理
-界面和一个面向设备的接口面。
-
-- 用 `bun run init` 初始化，它写出带随机管理 token 的 `.env`，并拒绝覆盖已有文件；
-  用 `bun run start` 启动（或用 `bun run build` 产出的单一二进制）。
-- 发布一个 release 分两步：`bun scripts/import.ts --channel stable
-  --archive <file>.micaupd`（或 `--oci <bundle>@sha256:<digest>`，它匿名读取该
-  bundle，并要求恰好有一层带注解 `mica.update-kind=full`）创建一个**草稿**，
-  发布是另外一个动作。若某个 release 的部署信封已无法用受信任密钥验证，发布会被拒绝：
-  `409 invalid_deployment`。
-- 设备看到的是 `GET /v1/manifest.json` 和 `GET /v1/objects/<sha256>`，两者都不需要
-  认证，支持 range 和条件请求。限额是 128 个已发布 release 和 1 MiB 的目录，超出都
-  回 `409 catalog_full`。
-- 所有状态都在 `DATA_DIR` 下——SQLite 数据库和对象——所以那个目录就是备份对象。进程
-  默认在 `127.0.0.1` 上讲明文 HTTP，因此需要一个 TLS 反向代理，并把 `PUBLIC_URL`
-  设成对外的 origin：这个字符串会被烧进签名过的对象 URL 里，不一致就会给设备一批它们
-  取不到的 URL。只有一个共享的管理 token，没有用户账户。
-- 服务器给目录签名，并在发布前用受信任密钥校验每个 release 的部署信封，但对载荷而言
-  它不是受信任方：设备自己会校验同样的签名。
-
-该服务自己的测试套件通过；这里没有人部署或运维过它，所以端口、代理配置、服务单元和
-备份流程都未经验证。
+本仓库不再附带更新服务器。分发由 fleet 服务（`micaoss/mica-fleet`）负责：它在
+`/v1/manifest.json` 发布目录、在 `/v1/objects/` 下提供对象，其文档在那边。本仓库提供
+的是 fleet 的输入——第 1 节的签名归档与第 9 节的索引——以及第 10 节的契约，设备会对
+任何服务方强制执行这份契约。曾经代替 fleet 的 `mica-build:update-server/` 已于
+2026-09-21 移除。
 
 > status: unsupported
 

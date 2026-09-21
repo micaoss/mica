@@ -78,14 +78,13 @@ digests are lowercase hex.
 - `previous` is the index this one was cut from, with `trust` the sha256 of
   its `SHA256SUMS`; it is omitted only on the first index.
 - `inputs` has one entry per distinct `built` row of the lock, with
-  `id` = `<built name>/<release>` (for example `mica-boards.uefi-x64/<release>`
-  or `mica-core/<release>`), the repository, the scope where the name has
-  one, the release and its `trust`. **The id keeps its slash** *(fixed here,
-  2026-09-16)*: it joins a built name to a release rather than naming a git
-  tag, and the name already separates repository from scope with a dot, so
-  `mica-boards.uefi-x64/<release>` stays readable while the release tag it
-  refers to is `uefi-x64.<release>`. One `id` with two trust hashes is
-  refused. The lock itself keeps every `built` row verbatim per release.
+  `id` = `<built name>/<release>` (for example `mica-core/<release>`), the
+  repository, the scope where the name has one, the release and its `trust`.
+  **The id keeps its slash** *(fixed here, 2026-09-16)*: it joins a built
+  name to a release rather than naming a git tag, and a scoped name would
+  separate repository from scope with a dot (no input is scoped since the
+  boards became `mica-build`'s own on 2026-09-21). One `id` with two trust
+  hashes is refused. The lock itself keeps every `built` row verbatim per release.
 - `releases` has one entry per `input` row: the scoped release, its `trust`,
   its `commit` (the `origin` row) and its inputs as `id`s.
 - `products` has one entry per `index` row, with the identities of the copied

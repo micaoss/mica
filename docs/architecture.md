@@ -23,7 +23,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
 | Application data | `mica-mqttd` bridges only exact package-enrolled `com.mica.<class>[.<suffix>]` application item trees to MQTT; `com.mica.micad` is forbidden | `mica-core:crates/mica-mqttd/`, `mica-core:crates/mica-mqtt-broker/`, `docs/design/bus.md` |
 | A/B installer | Native durable file transactions with UEFI/FIT trial records | `mica-core:crates/mica-deploy/`, `docs/design/uboot-ab-handshake.md` |
 | Update trust | Signed deployment/catalog envelopes and kernel-enforced root/support signatures | `mica-core:crates/mica-deploy/`, `docs/design/release-signing.md` |
-| BSP artifacts | per-board kernel, device tree and loader inputs, built into a board bundle | `mica-boards:boards/`, `docs/boards/contract.md` |
+| BSP artifacts | per-board kernel, device tree and loader inputs, built into a board bundle | `mica-build:boards/`, `docs/boards/contract.md` |
 | Workloads | podman plus the Quadlet systemd generator, off by default | `mica-podman:deb/`, `docs/design/containers.md` |
 
 ## 2. Component inventory (runtime)
@@ -159,8 +159,7 @@ by reaching into another's build tree.
 | `mica-system-base` | the board-independent base: the pinned Debian lock, the Base's own packages, the base root | `mica-build-env` |
 | `mica-core` | the management plane as Debian packages: `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` | `mica-build-env`, `mica-system-base` |
 | `mica-podman` | `mica-podman`, the container engine package, from pinned upstream source | `mica-build-env`, `mica-system-base` |
-| `mica-boards` | per board: kernel, device tree, loader, firmware and the board package; plus the radio packages | `mica-build-env`, `mica-system-base` |
-| `mica-build` | the products: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
+| `mica-build` | per board: kernel, device tree, loader, firmware, the board package and the radio packages (`boards/`); and the products: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
 
 The interfaces between them are files, not directories:
 
@@ -169,10 +168,14 @@ The interfaces between them are files, not directories:
   Debian pools by digest and the archive any other package resolves from
   ([release lock](design/release-lock.md)).
 - **The Debian pool** — every `.deb` a product installs is imported at its pin from the
-  release of the repository that produces it. `mica-build` builds no package.
-- **The board bundle** — `mica-boards` publishes a board's kernel, firmware and board
-  package; `mica-build` consumes them and never reaches into a board's build
-  (`docs/boards/contract.md`).
+  release of the repository that produces it, except the board and radio
+  packages, which `mica-build` builds from `boards/` and `producers/` into the
+  same pool.
+- **The board bundle** — a board directory under `mica-build:boards/` produces a
+  board's kernel, loader, firmware and board package; the engine consumes them
+  and never reaches into a board's build (`docs/boards/contract.md`; one
+  repository since 2026-09-21,
+  `decisions/2026-09-21-mica-boards-merged-into-mica-build.md`).
 - **The signed deployment envelope** — what `mica-build` signs and what `mica-deploy`
   authenticates on the device ([release signing](design/release-signing.md)).
 
@@ -188,7 +191,7 @@ are kept in one table: [support tiers](boards/support-tiers.md#current-boards).
 
 A board produces artifacts and the OS build consumes artifacts; neither side
 reaches into the other's build. Kernel configs must satisfy the shared
-assertion set `mica-boards:common/kernel/mica-required.fragment`
+assertion set `mica-build:common/kernel/mica-required.fragment`
 (`docs/boards/contract.md`).
 
 ## 8. Where to read next

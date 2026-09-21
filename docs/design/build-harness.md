@@ -33,7 +33,6 @@ host: use the actual host project path and mount only required directories.
 | Rust services and native deployment tools | `make os-rust-gate` |
 | Built-in dashboard | `bash apid/ui/build.sh --check` (in `micad`) |
 | API contract expectations | `make os-apid-api-spec-pins` |
-| Update server | `bun run --cwd update-server check` |
 | Documentation | `make docs-verify docs-verify-test` |
 | Shared component contract | the fixtures, diffed byte for byte between the two repositories |
 | Host/toolchain boundaries | `make os-host-toolchain-lint os-host-toolchain-lint-test` |
@@ -547,7 +546,7 @@ All four are the same rule. Naming a new one for each would inflate the
 taxonomy and hide which rules are load-bearing
 ([doc-contract](../user/doc-contract.md) section 6).
 
-The update-server command runs in its pinned Bun environment. Consult
+Consult
 `.github/workflows/check.yml` for the full CI gate set. Local success and remote
 CI status are recorded separately; test counts belong to a dated delivery
 record, not to the permanent invocation contract.

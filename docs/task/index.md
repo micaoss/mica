@@ -94,3 +94,25 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260920-0851-negative-vector-audit Audit the negative vectors for double faults**](20260920-0851-negative-vector-audit.md) `P2`
 - [x] [**20260920-0629-release-deletion-question Open question: may an agent delete an empty or superseded release without asking**](20260920-0629-release-deletion-question.md) `P1`
 - [x] [**20260920-0700-hardware-pages-in-english Publish the hardware list: English pages and an allowlist that can name them**](20260920-0700-hardware-pages-in-english.md) `P2`
+- [-] [**20260921-1140-merge-boards-into-build Merge mica-boards into mica-build so a board owns its image**](20260921-1140-merge-boards-into-build.md) `P1`
+- [x] [**20260921-1216-remove-update-server Remove the update server from mica-build**](20260921-1216-remove-update-server.md) `P1`
+- [ ] [**20260914-0514-workspace-rules-and-build-env Workspace rules and the released build-env**](20260914-0514-workspace-rules-and-build-env.md) `P2`
+- [ ] [**20260916-0620-s905x5m-uboot-not-reproducible The s905x5m U-Boot is not reproducible**](20260916-0620-s905x5m-uboot-not-reproducible.md) `P2`
+- [x] [**20260916-1643-s905x5m-packer-without-i386 The s905x5m packer stage drops the i386 platform**](20260916-1643-s905x5m-packer-without-i386.md) `P2`
+- [x] [**20260916-1720-fetch-time-mirror-hook The fetch-time mirror, archives and git packs**](20260916-1720-fetch-time-mirror-hook.md) `P2`
+- [x] [**20260919-1945-shared-radio-packages-stay-per-board The board-independent radio packages stay in each board's pool**](20260919-1945-shared-radio-packages-stay-per-board.md) `P2`
+- [ ] [**20260919-2130-s905x5m-as-a-release-target What opening s905x5m for release costs**](20260919-2130-s905x5m-as-a-release-target.md) `P2`
+- [x] [**20260920-0640-can-these-boards-render-a-virtual-terminal The kernel half of the VT question**](20260920-0640-can-these-boards-render-a-virtual-terminal.md) `P2`
+- [x] [**20260920-0700-container-requirements-coverage The engine's requirement list against the four shipped kernels**](20260920-0700-container-requirements-coverage.md) `P2`
+- [x] [**20260920-0720-the-logo-vt-policy-is-cx3576s Whose policy the tty1 logo and tty2 console are**](20260920-0720-the-logo-vt-policy-is-cx3576s.md) `P2`
+- [x] [**20260920-0800-cross-and-native-agree-per-tree-not-per-rule A correction to my own reproducibility rule**](20260920-0800-cross-and-native-agree-per-tree-not-per-rule.md) `P2`
+- [x] [**20260920-0810-pstore-backends-per-board Can these boards say why they rebooted**](20260920-0810-pstore-backends-per-board.md) `P2`
+- [x] [**20260920-0820-my-vectors-are-a-stale-copy Which mica commit this repository's lock vectors came from**](20260920-0820-my-vectors-are-a-stale-copy.md) `P2`
+- [ ] [**20260920-0900-tier-two-uniformity-and-pstore The scattered cgroup symbols, and what pstore costs uefi-x64**](20260920-0900-tier-two-uniformity-and-pstore.md) `P2`
+- [x] [**20260920-1600-a-fragment-off-line-is-a-request A fragment off-line is a request, and twenty had been denied**](20260920-1600-a-fragment-off-line-is-a-request.md) `P2`
+- [x] [**20260920-1700-the-floor-travels-with-the-config The shared floor is a file row of every board bundle**](20260920-1700-the-floor-travels-with-the-config.md) `P2`
+- [x] [**20260920-1730-the-vectors-are-read-from-mica-at-a-pin The lock vectors are mica's, at a pinned commit, checked both ways**](20260920-1730-the-vectors-are-read-from-mica-at-a-pin.md) `P2`
+- [ ] [**20260920-cx3576-first-hardware-capture What the first cx3576 console capture establishes**](20260920-cx3576-first-hardware-capture.md) `P2`
+- [x] [**20260920-the-floor-and-the-declared-features What the kernel floor would cost if it served the products' declared features**](20260920-the-floor-and-the-declared-features.md) `P2`
+- [x] [**20260920-user-namespaces-and-container-kernel-facts User namespaces on the four boards, and two differences found beside them**](20260920-user-namespaces-and-container-kernel-facts.md) `P2`
+- [x] [**20260921-0911-s905x5m-forced-line-and-its-declaration The board declared a command line its kernel was not built with**](20260921-0911-s905x5m-forced-line-and-its-declaration.md) `P2`
