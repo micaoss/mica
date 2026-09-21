@@ -145,8 +145,12 @@ DATA/meta lockdown is designed, and marked not implemented
 
 ## 6. Repository map
 
-Mica OS is seven repositories. Each produces one thing, and consumes the others only at a
-pinned release — never by reaching into another's build tree.
+Mica OS is seven repositories **on this map, which is a count and not a
+boundary**: an eighth, `micaoss/mica-fleet`, is checked out in the workspace
+(`f048a4ae`) and is **not placed here, because whether it belongs to this
+architecture is the user's call and not this page's**. Each of the seven
+produces one thing, and consumes the others only at a pinned release — never
+by reaching into another's build tree.
 
 | Repository | Produces | Consumes |
 |---|---|---|

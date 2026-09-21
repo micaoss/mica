@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-21 12:11 [finding]
+
+**The coordinator is paused on the user's instruction and cross-repository
+traffic goes to the user.** Recorded here because of the shape it would
+otherwise take: **an unread channel and a slow one look identical from the
+sending end**, which is the failure these records spent two days removing —
+so the stand-down was announced rather than enacted by silence.
+
+**Two pages counted the repositories and neither said whether the count was a
+boundary.** `micaoss/mica-fleet` is checked out (`f048a4ae`, 2026-09-20),
+private, with no entry in the workspace file and no issue. **Whether it
+belongs to this documentation's scope is the user's call**, so `README.md` and
+`architecture.md` now say *seven as this page counts them, and the set is not
+closed* rather than adding an eighth row or leaving the count to read as a
+boundary — **the rule landed this morning, applied to its author within the
+day.**
+
+**And the second expected red has landed and is named**: `os-build-test`, four
+failures, all four of the parked board's kernels, beside
+`release-products s905x5m-prod`. **Two expected reds, and the dossier now says
+that is the whole set** — with the operational line: **check the pinned
+release rather than the board's branch**, because the branch carries the
+repair and the pin does not.
+
 ## 2026-09-21 12:07 [finding]
 
 **A third placement question, and it is the one the other two cannot answer:

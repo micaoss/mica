@@ -32,8 +32,13 @@ and path names use the `mica` prefix — `micad`, `mica-deploy`, `com.mica.micad
 
 ## Where documentation lives
 
-Mica OS is seven repositories. **This one holds the product documentation; each module's
-documentation lives in the repository that produces it.**
+Mica OS is seven repositories **as this page counts them, and the set is not
+closed**: `micaoss/mica-fleet` exists and is checked out
+(`f048a4ae`, 2026-09-20), carries no entry here and no issue, and **whether it
+is in this documentation's scope is the user's call** — recorded so the count
+reads as a measurement rather than as a boundary. **This one holds the product
+documentation; each module's documentation lives in the repository that
+produces it.**
 
 | Here | In the module's repository |
 |---|---|
@@ -157,6 +162,7 @@ work in progress lives in `plan/` and `task/`.
   - `licensing.md` — page brief: the license facts the site must carry
   - `support.md` — page brief: what support exists and who owns what
 - `research/` — measurements and external references
+  - `2026-09-19-functional-architecture-audit.md` — workspace functional and architecture audit: evidenced risks, capability gaps, ownership and closure priorities
   - `root-closure.md` — what the read-only root is made of, which packages are deletable, and whether micad could own network configuration
   - `ssd202d-lite.md` — draft: Mica OS on SigmaStar SSD202D and the 16 MiB / 128 MiB flash fork
   - `venus-gui-v2.md` — Venus OS gui-v2 functional reference, mapped to apid and dashboard owners
