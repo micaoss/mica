@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-21 07:29 [finding]
+
+**A defect that lives in a query survives knowing about it — three times in a
+row, the third inside the thread about that exact substitution.** A run's
+**start** was narrated as its outcome; the first two were corrected by two
+different repositories and the distinction was written down twice. The cause
+was not attention: **the query selected `.created_at` and was never changed**,
+so the instrument kept handing back start times. **Knowledge acts on the
+reading, and the defect was upstream of the reading** — which a habit cannot
+reach and a format can: the field name beside every timestamp, and a query
+that asks for `updated_at` and `conclusion` together.
+
+**And it makes one sentence true in a way it was not meant**: *care at the
+relay improves what you send; it cannot produce a fact you do not hold.* The
+conclusion time had never been asked for, so no amount of care would have
+manufactured it.
+
+**The corpus note that follows is about the corpus's own survival**: every
+other rule here adds work — count the members, read the call sites, open each
+hit, print the subject, name the population — and **this is the only one that
+asks for less**. A set of rules that all demand more effort is a set that gets
+abandoned, so the one giving some back is worth protecting when somebody
+trims.
+
 ## 2026-09-21 07:27 [finding]
 
 **Three dates, not two: written, released, in a product.** A feature is on

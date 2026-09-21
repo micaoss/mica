@@ -75,6 +75,19 @@ never heard of that evening. Counting them as one kind records this workspace
 as **half protected** when it is **a quarter protected and a quarter lucky** —
 and the quarter that is load-bearing is the format.
 
+**And a defect that lives in a query survives knowing about it**
+*(2026-09-21, the sharpest evidence this table has)*. One party narrated a
+run's **start** as its outcome **three times**: the first two were corrected
+by two different repositories, the distinction was written down twice, and the
+third happened anyway — **in the sentence declaring the window closed, in the
+thread about that exact substitution.** The cause was not attention: **the
+query selected `.created_at` and was never changed**, so the instrument kept
+handing back start times and the reader kept believing them. **Knowledge acts
+on the reading; the defect was upstream of the reading.** A habit cannot reach
+that. The format — **the field name beside every timestamp** — reaches it
+without anybody remembering anything, and so does changing the query to ask
+for `updated_at` and `conclusion` together.
+
 **And the test for which column a save belongs in is whether the reading was
 optional**, demonstrated the same day on the author of a format: a status line
 that must carry the date it was decided was filled in from the rhythm of the

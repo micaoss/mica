@@ -179,7 +179,13 @@ English source.
   correct rule lands on a party with no interest in it**, which makes it
   structural rather than an oversight, and means it will keep feeling
   expensive every time somebody does it. Written here so that it is recognised
-  as the cost of a rule rather than discovered later as reluctance.
+  as the cost of a rule rather than discovered later as reluctance. **And it is the only
+  rule in these records that asks for *less*: every other one adds work —
+  count the members, read the call sites, open each hit, print the subject,
+  name the population — while this one says *stop trying harder at the relay
+  and route differently*. A corpus in which every rule demands more effort is
+  a corpus that gets abandoned**, so the one that gives some back is worth
+  protecting when somebody later trims for weight.
   *(And *ask the owner* sometimes resolves to *ask yourself*: one
   counterexample was in a file its own claimant maintains. The working version
   of that is the plainest rule here — **read your own artefact before
