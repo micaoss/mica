@@ -564,6 +564,32 @@ English source.
   has every reason to believe what they conclude. So a table that could be
   read either way says which it is **inside the table**, not in a note above
   it: a note is read by somebody who is reading notes.
+  **And a third placement question, which the other two cannot answer: what
+  will the reader have *in hand* when they arrive?** *Where do they stand* and
+  *what are they about to do* both assume they have a **purpose**; this one
+  assumes only a **symptom**. A permanently red job is a symptom — the reader
+  holds **one token and no question yet** — so a fact placed by purpose is
+  invisible to them and a fact placed where the **token** leads is not. The
+  red job named a board, so it went in that board's dossier: **a task record
+  answers *what is somebody doing*, a dossier answers *what is true of this
+  board***, which is why a correct fact in a correct record can still be
+  unreachable. There were two readers and one home each, not one home and a
+  mistake.
+- **When you explain some of a set, say whether the set is closed**
+  *(2026-09-21; a writing rule at two instances, not a claim about the
+  world)*. **A partial enumeration inside an explanatory artefact actively
+  misdirects about its complement**: a reader who meets two red jobs on one
+  parked board and finds **one** of them explained does not conclude the other
+  is unexplained — they conclude it is the **live defect**, certified by the
+  existence of the explanation beside it. Same shape as a changelog sentence
+  naming one route of several, which is **worse than no sentence, because it
+  reads as a complete answer to the question it raises**.
+- **An implication from a decision is not a measurement of an artefact**
+  *(2026-09-21)*. *The board is parked* implies *no new release*, and the
+  implication is not the tag list. Read the artefact and cite it, **because
+  the one place the difference bites is exactly where somebody later cuts a
+  release and nobody updates the prose** — at which point an inference reads
+  identically to a measurement and is wrong.
 - **A status line is a cached summary of the notes below it, and nothing in
   the file says which was updated last** *(2026-09-20)*. A record can change
   **in the note** while the status reads the same: the offline-build task's

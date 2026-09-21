@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-21 12:07 [finding]
+
+**A third placement question, and it is the one the other two cannot answer:
+what will the reader have *in hand* when they arrive?** *Where do they stand*
+and *what are they about to do* assume a **purpose**; a permanently red job is
+a **symptom** — the reader holds one token and no question yet. **A fact
+placed by purpose is invisible to them; place it where the token leads.** The
+job named a board, so the fact went in that board's dossier: **a task record
+answers *what is somebody doing*, a dossier answers *what is true of this
+board*** — which is how a correct fact in a correct record stays unreachable.
+Two readers, one home each.
+
+**When you explain some of a set, say whether the set is closed** — a writing
+rule at two instances. **A partial enumeration inside an explanatory artefact
+actively misdirects about its complement**: a reader meeting two reds on one
+parked board and finding one explained concludes the other is the **live
+defect**, certified by the explanation beside it. Same shape as a sentence
+naming one route of several, **worse than no sentence because it reads as a
+complete answer to the question it raises**.
+
+**An implication from a decision is not a measurement of an artefact.** *The
+board is parked* implies *no new release*; the implication is not the tag
+list. **The difference bites exactly where somebody later cuts a release and
+nobody updates the prose**, at which point an inference reads identically to a
+measurement and is wrong.
+
+**And the doubt stays in the same paragraph as the culprit**: separation is
+what lets the association form, because **a doubt on another page is not a
+doubt, it is a footnote to a fact.**
+
 ## 2026-09-21 12:04 [finding]
 
 **An expected red gets a home, because the reader who needs it is in neither
