@@ -680,6 +680,13 @@ right field.)* So the gap **did not bite here, measured rather than hoped**. A r
 that states a hazard without its one measured instance invites the reader to
 assume the worst about it.
 
+**And the property's first exercise is clean, on the day after it was
+written** *(2026-09-21)*: `mica-core` is cutting a release targeting
+`275b72bc` — whose run concluded **success** — **and not `ee4fba5f`**, the
+commit carrying the feature, **whose own run failed**. Targeting the feature
+commit would have shipped a tree whose run was red: **the hazard above,
+avoided by the party that caused the red, using this rule.**
+
 **The consumer-side rule, stated by one consumer for itself**: *read the run
 of the commit the release targets, not the release's own green.* It is
 recorded here rather than left there because **a habit one consumer adopts

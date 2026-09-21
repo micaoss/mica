@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-21 07:27 [finding]
+
+**Three dates, not two: written, released, in a product.** A feature is on
+`main` at the first, carried by a release at the second, and reaches a device
+only at the third — **the assembly's re-pin**, separate and often unscheduled.
+**A page saying *the device does X* is true at the third and false at the
+first two**, and nothing in a record distinguishes them. Named before the
+updating starts, because the tense error is far cheaper to avoid than to
+correct: by the time it is wrong, it has been read.
+
+**And why this corpus is almost entirely *go and look* rules.** Nearly every
+defect in it was recoverable by opening something — a stale path, a wrong
+count, a dead tool, a false `cannot`, an uncalled script, a field that means
+`created` and not `concluded`. **Scope is not in anything**: it is a property
+of the claim about the artefact, living only in the claimer's head and the
+reader's, which is why its rule ends in **go and ask**.
+
+**The cost of that rule, written down so it is not discovered later as
+reluctance**: a *go and look* rule is paid by the person applying it; a *go
+and ask* rule **spends another party's attention, on somebody with nothing to
+gain from the answer.** The owner of a surface has no stake in whether another
+repository's page describes it correctly — **structural, not an oversight**,
+and it will keep feeling expensive.
+
+**And the release-green property's first exercise is clean, the day after it
+was written**: `mica-core` targets `275b72bc`, whose run concluded success,
+**and not `ee4fba5f`**, the commit carrying the feature, **whose own run
+failed** — the hazard avoided by the party that caused the red, using the rule
+the page states.
+
 ## 2026-09-21 07:24 [finding]
 
 **An abstention names what it abstained from.** Declining to assert a figure

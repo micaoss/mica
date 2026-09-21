@@ -155,6 +155,35 @@ English source.
   as an identifier was `process.pid`. **The value looked like the thing it was
   not, and nothing about its appearance was wrong.** Before citing a number as
   a decision, find who wrote it.
+- **Three dates, not two: written, released, in a product** *(2026-09-21)*.
+  A feature is on `main` at the first, carried by a release at the second, and
+  reaches a device only at the third — **when the assembly re-pins**, which is
+  a separate and often unscheduled date. **A page that says *the device does
+  X* is true at the third and false at the first two**, and nothing in a
+  record distinguishes them, so a sentence about behaviour names which date it
+  is about or waits for the third. The tense error is far cheaper to avoid
+  than to correct: by the time it is wrong, it has been read.
+- **Why this page is almost entirely *go and look* rules, and what the one
+  exception costs** *(2026-09-21)*. Nearly every defect these records hold was
+  recoverable by **opening something** — a stale path, a wrong count, a dead
+  tool, a false `cannot`, an uncalled script, a field that means `created` and
+  not `concluded`. **Scope is not in anything.** It is not a property of the
+  artefact but of the **claim about** it, and it lives only in the claimer's
+  head and the reader's — which is why the rule for it ends in **go and ask**
+  and why no amount of care at the reading end reaches it.
+  **And that is also why nobody routes that way by default: a *go and look*
+  rule is paid by the person applying it, while a *go and ask* rule spends
+  another party's attention — and spends it on somebody with nothing to gain
+  from the answer.** The repository that owns a surface has no stake in
+  whether another repository's page describes it correctly. **The cost of the
+  correct rule lands on a party with no interest in it**, which makes it
+  structural rather than an oversight, and means it will keep feeling
+  expensive every time somebody does it. Written here so that it is recognised
+  as the cost of a rule rather than discovered later as reluctance.
+  *(And *ask the owner* sometimes resolves to *ask yourself*: one
+  counterexample was in a file its own claimant maintains. The working version
+  of that is the plainest rule here — **read your own artefact before
+  asserting what it contains.**)*
 - **An abstention names what it abstained from** *(2026-09-21)*. Declining to
   assert a figure is right, and **silently** declining costs what an
   unreported zero costs: this page once carried a true, weaker sentence
