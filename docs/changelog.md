@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-22 17:40 [progress]
+
+P3 of the one-language plan has started in `mica-build` (`9f94575d`): the
+image resolver, the upstream-lock reader and the source checkout are
+`src/locks/{from,upstream,source}.ts`, reached as `bun src/cli.ts from|
+upstream|source` by seventy callers that used to say `bash tools/*.sh`;
+`src/image` and `src/verify` import the resolver rather than spawning it.
+Message-for-message parity over the real `locks/` (39 image rows, 12
+upstream rows, the Base checkout). On the way, two repairs the day's CI
+runs measured: the host-toolchain lint now takes a whole-file container
+declaration in TypeScript (`64509ba1`, since P2 made `.ts` files container
+scripts), and a stray line in two BSP kernel Dockerfiles from the fourth
+slice's edit (`801b220f`). `801b220f` also committed the three scripts'
+deletions twenty minutes before their callers moved -- a staged `git rm`
+rides along with a path-limited commit -- so main's pool jobs were red for
+that window; `9f94575d` completes it.
+
 ## 2026-09-22 16:10 [decision]
 
 **The bsp image's helpers become resources the base image's bun computes**

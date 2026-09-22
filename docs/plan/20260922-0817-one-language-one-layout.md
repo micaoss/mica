@@ -639,6 +639,37 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   chose) and the inline heredocs of the shell gates (P4). python3 stays in
   the bsp image for the kernel's own scripts, which is not this tree's
   Python. The open question is closed by this answer.
+- 2026-09-22 17:40: **P3, first slice: `from`, `upstream`, `source`** (`9f94575d`;
+  87 files, +373/-295), after three CI-measured repairs on the way:
+  `64509ba1` (the host-toolchain lint takes `// mica-build-side: container
+  -- <why>` in a TypeScript file's leading comment, since P2 made `.ts`
+  files container scripts; run `35741753681` had flagged
+  `export-regdb-certs.ts` for its `openssl`), `801b220f` (the lint's
+  declared-file counting, pushed before its fix the first time; and a stray
+  line the fourth slice's edit had left at the top of the two BSP kernel
+  Dockerfiles, which docker refused as an instruction) -- and `801b220f`
+  also carried the deletions of `tools/from.sh`, `upstream.sh` and
+  `source.sh` ahead of their callers, because a staged `git rm` rides along
+  with a path-limited commit; main's pool jobs read "tools/from.sh: No such
+  file or directory" for the twenty minutes until `9f94575d`. The slice:
+  `src/locks/{from,upstream,source}.ts` (`bun src/cli.ts from|upstream|source`),
+  message for message -- the 39 image rows resolve to the same references,
+  `--check`, the `--build-arg` pairs and every refusal read the same but for
+  the prefix, the 12 upstream rows answer the same fields, the
+  mica-system-base checkout is the same commit; `from.ts` reads `locks/`
+  once where the shell spawned `locks image` per selector.
+  `src/image/images.ts` and `src/verify/tools.ts` import the resolver
+  instead of spawning the script, so the two subprocess guards (absent
+  script, empty answer), their tests and the `FROM_SH` anchor of `paths.ts`
+  are gone; seventy call sites across the Makefiles, workflows, `tools/`,
+  `boot/`, `rootfs/`, `common/trust`, the gates and the suites go through
+  `bin/bun.sh`; `BUILD_FILES` hashes `src/locks/from.ts` and `upstream.ts`
+  in the scripts' place (the inputs-hash move the plan expected at the
+  phase end, taken now because the deleted files could not stay in the
+  list). Green: `from --check`, the amd64 pool fetch, the three lints,
+  board-contract-test, os-pool-test, os-boot-test, the images, paths,
+  verity-signing, verify tools, release-manifest and stages suites. Next in
+  the order: `oci`, `local-pins`, then `pool` and `deb/*`.
 
 ## Annotations
 
