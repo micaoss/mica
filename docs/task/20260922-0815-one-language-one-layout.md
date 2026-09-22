@@ -1,8 +1,8 @@
 # 20260922-0815-one-language-one-layout One language and one layout for the mica-build engine
 
-- **status**: pending
+- **status**: in_progress
 - **priority**: P1
-- **owner**: unassigned
+- **owner**: claude/session-b7e5abcf
 - **createdAt**: 2026-09-22 08:15
 
 ## Description

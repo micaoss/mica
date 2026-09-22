@@ -94,7 +94,7 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260920-0851-negative-vector-audit Audit the negative vectors for double faults**](20260920-0851-negative-vector-audit.md) `P2`
 - [x] [**20260920-0629-release-deletion-question Open question: may an agent delete an empty or superseded release without asking**](20260920-0629-release-deletion-question.md) `P1`
 - [x] [**20260920-0700-hardware-pages-in-english Publish the hardware list: English pages and an allowlist that can name them**](20260920-0700-hardware-pages-in-english.md) `P2`
-- [ ] [**20260922-0815-one-language-one-layout One language and one layout for the mica-build engine**](20260922-0815-one-language-one-layout.md) `P1`
+- [-] [**20260922-0815-one-language-one-layout One language and one layout for the mica-build engine**](20260922-0815-one-language-one-layout.md) `P1`
 - [-] [**20260921-1140-merge-boards-into-build Merge mica-boards into mica-build so a board owns its image**](20260921-1140-merge-boards-into-build.md) `P1`
 - [x] [**20260921-1216-remove-update-server Remove the update server from mica-build**](20260921-1216-remove-update-server.md) `P1`
 - [ ] [**20260914-0514-workspace-rules-and-build-env Workspace rules and the released build-env**](20260914-0514-workspace-rules-and-build-env.md) `P2`
