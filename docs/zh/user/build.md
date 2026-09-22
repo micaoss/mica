@@ -95,9 +95,9 @@ make offline-chain PRODUCTS=uefi-x64-dev
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
 
-`mica-build:tools/local-pins.sh` 让开发期间用并排检出自己的池顶替它的 release。
+`mica-build:src/cli.ts local-pins` 让开发期间用并排检出自己的池顶替它的 release。
 
-> status: shipped — evidence: `mica-build:tools/local-pins.sh`
+> status: shipped — evidence: `mica-build:src/cli.ts local-pins`
 
 ## 6. 校验你构建出来的东西
 

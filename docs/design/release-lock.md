@@ -924,7 +924,7 @@ inside that checkout's `_out/offline/oci/`.
 checkout's OCI layout, writes `locks/<repository>[.<scope>].lock` unchanged
 and the offline pin `locks/pins/<repository>[.<scope>].pin`. It is refused under GitHub Actions and in every
 release build. Its result is committed on a local branch that is never pushed,
-so a composer still binds to a clean commit. It replaces `local-pins.sh` in
+so a composer still binds to a clean commit. It replaces `local-pins` in
 `mica-build`.
 
 ## 8. The workspace driver: `mica-build:tools/offline-chain.sh`

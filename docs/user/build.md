@@ -110,10 +110,10 @@ published one; `mica-core` is that case today. An offline build is a
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
 
-`mica-build:tools/local-pins.sh` lets a sibling checkout's own pools stand in
+`mica-build:src/cli.ts local-pins` lets a sibling checkout's own pools stand in
 for its release while developing, instead of the pinned release.
 
-> status: shipped — evidence: `mica-build:tools/local-pins.sh`
+> status: shipped — evidence: `mica-build:src/cli.ts local-pins`
 
 ## 6. Verifying what you built
 
