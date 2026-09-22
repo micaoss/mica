@@ -318,6 +318,50 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   Makefile, `flash/` out). The kernel rebuild that P1b's `common/` move
   forces is compared against the merged tree's builds under
   `tmp/wt-merge2/_out/built/`.
+- 2026-09-22 09:37: **P1a on `main`** (`e26ee3cf`, `6b7b991e`, `336fb2e7`, `44993e32`;
+  270 files, +5,642/-6,091). One Bun package at the root (`package.json`,
+  `bun.lock`, `tsconfig.json`, `eslint.config.js`; gates `lint`,
+  `typecheck`, `test`): `build/src` is `src/image`, `verify/src` is
+  `src/verify`, `shared/` is `src/shared`, `tests/apid-api` and
+  `tests/lifecycle-uefi` are `tests/suites/`, `tools/qemu-seed-data.ts` is
+  `src/image/qemu-seed-data.ts`; `src/cli.ts` is the one entry (its
+  commands: `test`, `components`, `release`, `build-rootfs`,
+  `compare-roots`, `seed-data`, `lint`, `verify`, `smoke`,
+  `smoke-negative`, `spec-pins`) and `bin/bun.sh` the one bootstrap in place
+  of the four launchers (`build/run.sh`, `verify/run.sh`,
+  `tests/lifecycle-uefi/bun.sh`, `tests/apid-api/spec-pins.sh`): bun on the
+  host or the pinned image plus the docker client (`bin/Dockerfile`), the
+  tree, the socket and the git metadata (read-only) mounted,
+  `safe.directory` set. The lint is `mica-system-base`'s eslint
+  configuration with four rules off for this tree (named in
+  `eslint.config.js`); its auto-fix reformatted the TypeScript once (the
+  bulk of the line count). Measured before the push, all on the moved tree:
+  `bun run lint` and `typecheck` clean; the image suite 584, the verify
+  suite 958, the apid spec pins 43 (its literal check reads both quote
+  styles and bare keys now), `os-release-test` 65, `publish-test` 21,
+  `version-guard-test` 16, `os-board-bundle-test` 23, `os-pool-test` 23,
+  `os-offline-chain-test` 18, `os-rootfs-manifest-test` 48,
+  `os-product-test` 33, the board contract 44, `os-image-kinds-test` 29,
+  `ci-outputs-test` 16, `trust-stage-test` 10, the vectors pin (131), the
+  layout lint, the three shell lints and both lint self-tests; the
+  release-shaped `uefi-x64-prod` build, `product-verify` (106), the QEMU
+  runtime boot and the session probe (12 claims). **Byte identity** against
+  the same product built at `b76b23fe` before the move: `root/` (the
+  squashfs, the root hash and its signature), `kernel/`, `firmware/`,
+  `deployments/`, `update.micaupd` and `updates/` identical; the records
+  that carry the source commit and build time differ as they must
+  (`release/manifest.json`, `provenance.json`, `sbom.cdx.json`,
+  `licenses.json`, `rootfs-report.runtime.json`, `receipt.txt`, the image
+  name); and `image/data.img` differs in 40 bytes (8 in block 0, 32 in
+  block 37), a DATA-image reproducibility gap of the producer that predates
+  this plan and is measured here for the first time -- open, not this
+  plan's. Found and fixed on the way: the four `boards/<board>/meta`
+  symlinks (`e26ee3cf`); the lifecycle suite's three unit test files
+  (`api-launcher`, `native-input`, `bun-identity`) were never run by any
+  target and fail on `main` before the move (20 of 25 at `b76b23fe`), so
+  `src/cli.ts test` runs `src/` and `tests/gates/` and a suite's own tests
+  run with the suite (P4). The workspace `AGENTS.md` and the living records
+  name the new paths (`ac4c02d`). CI run `35711365754`.
 
 ## Annotations
 

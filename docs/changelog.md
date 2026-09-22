@@ -9558,3 +9558,15 @@ that runs inside a container left as it is. The board directory comes
 under one management: data and vendor inputs, no per-board Makefile,
 flashing as documentation. P1 begins with one Bun package.
 
+## 2026-09-22 09:37 [progress]
+
+`mica-build` is one Bun package (`20260922-0815-one-language-one-layout`,
+P1a; `e26ee3cf`..`44993e32`): `src/image`, `src/verify`, `src/shared`,
+`src/cli.ts` the one entry, `bin/bun.sh` the one bootstrap, the QEMU and
+API suites under `tests/suites/`, the gates `lint`, `typecheck` and `test`
+at the root; every reader of the old paths, the workspace instructions
+and the living records follow. The signed components of `uefi-x64-prod`
+are byte-identical to the build before the move; the DATA image differs
+in 40 bytes of timestamps, a producer gap recorded in the plan. Next: P1b
+(`tests/` split and `stages/`), P1c (the board directory).
+
