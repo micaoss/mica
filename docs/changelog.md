@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-22 18:30 [progress]
+
+P3, second slice (`mica-build` `1c2387b9`): the OCI reader and the offline
+pins are `src/pool/oci.ts` and `src/pool/local-pins.ts` (`bun src/cli.ts
+oci|local-pins`), byte-identical to the shell over a real pool manifest and
+blob and over a fixture checkout's offline layout, lock and pin. Two seam
+facts came with it: the pool gate's fake registry is handed to the reader
+as `MICA_CURL` under the tree rather than through `PATH`, which the
+bootstrap's container never inherits; and the bootstrap now names its
+route inside (`MICA_BUN_ROUTE`) and mounts every offline pin's checkout
+read-only, so an offline pool reads on that route while `local-pins`,
+which writes outside the tree, refuses it by name.
+
 ## 2026-09-22 17:40 [progress]
 
 P3 of the one-language plan has started in `mica-build` (`9f94575d`): the

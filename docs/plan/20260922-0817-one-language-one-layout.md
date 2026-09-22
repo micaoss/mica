@@ -670,6 +670,30 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   board-contract-test, os-pool-test, os-boot-test, the images, paths,
   verity-signing, verify tools, release-manifest and stages suites. Next in
   the order: `oci`, `local-pins`, then `pool` and `deb/*`.
+- 2026-09-22 18:30: **P3, second slice: `oci`, `local-pins`** (`1c2387b9`; 15
+  files, +317/-243). `tools/oci.sh` is `src/pool/oci.ts`, message for
+  message: over the real mica-core amd64 pool the manifest lands at the
+  same cache path with the same bytes, the first layer's blob is
+  byte-identical (4,128,140 bytes), the second read is the cache, the six
+  refusals read the same but for the prefix. The transport stays the curl
+  on PATH or the one `MICA_CURL` names -- `tests/gates/pool-test.sh`
+  answers the registry with a curl of its own, which now lives under the
+  tree and is handed over as `MICA_CURL` rather than through `PATH`, since
+  the container never inherits a host `PATH` and the gate would have gone
+  to the real ghcr.io in CI; 23/23 on both routes. The reader that goes
+  through `fetch` arrives with that gate's port to bun (P4), where the
+  registry is the test process. `tools/local-pins.sh`, embedded Python
+  included, is `src/pool/local-pins.ts`, the archives' control fields read
+  by `src/pool/deb.ts` on the host where the shell ran `dpkg-deb` in the
+  base image: over a fixture checkout with an indexed pool of three
+  archives, two of them the repository's, the shell and the TypeScript
+  write the same eight-file offline layout and install the same lock and
+  pin, and their refusals read the same. `bin/bun.sh` passes
+  `MICA_BUN_ROUTE=container` and mounts every offline pin's `CHECKOUT`
+  read-only at its own path, so an offline pool is readable on that route;
+  `local-pins`, which writes outside the tree, refuses that route by name.
+  Next in the order: `pool` and `deb/*`, whose gate (`pool-test.sh`,
+  `package-gate`, `version-guard`) goes with them.
 
 ## Annotations
 
