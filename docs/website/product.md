@@ -40,7 +40,7 @@ candidate has three attempts before the retained deployment is selected. Normal
 updates preserve shared DATA and never replace boot firmware. Physical-board
 power-loss and watchdog qualification remain separate from VM evidence.
 
-> status: shipped — evidence: `mica-deploy:src`, `docs/design/uboot-ab-handshake.md`, `mica-build:rootfs/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-deploy:src`, `docs/design/uboot-ab-handshake.md`, `mica-build:stages/compose/90-pack.Dockerfile`
 
 **One management plane owns the device.** `micad` holds the settings tree and
 reconciles it into systemd units — networking, Wi-Fi, SSH, containers, MQTT —
@@ -70,7 +70,7 @@ the image, not an untrusted app marketplace.
   no interactive package installation, and no expectation that a user logs in
   to administer it.
 
-> status: shipped — evidence: `mica-build:rootfs/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`
 
 - **Not a cloud or server CoreOS.** Mica OS leads with boards, factory and offline
   setup, bounded flash and field recovery — see

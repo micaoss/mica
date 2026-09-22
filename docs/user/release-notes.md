@@ -15,7 +15,7 @@ The image also carries `/usr/share/mica/manifest.tsv` and immutable build identi
 A dirty development source stamp remains visible; it is not evidence that a
 clean source commit reproduces those bytes.
 
-> status: shipped — evidence: `mica-build:src/image/components.ts`, `mica-deploy:src/deployments.rs`, `mica-build:rootfs/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-build:src/image/components.ts`, `mica-deploy:src/deployments.rs`, `mica-build:stages/compose/90-pack.Dockerfile`
 
 ## 2. Release-note facts
 

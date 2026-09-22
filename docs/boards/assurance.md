@@ -13,7 +13,7 @@ blocks on demand. Corrupt unread content is detected when accessed; boot does no
 scan the complete root image. Native init authenticates the selected deployment
 and geometry before creating the mappings.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:tests/signed-boot-lab/init-matrix.sh`
+> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:tests/suites/signed-boot-lab/init-matrix.sh`
 
 ## I2 — authenticated normal updates
 
@@ -37,7 +37,7 @@ UEFI enforcement is exercised with disposable OVMF/AAVMF enrollment. cx3576 FIT
 signature and native policy tests run against its built firmware. These software
 results do not establish enforcement on an untested physical board.
 
-> status: board-dependent — evidence: `mica-build:tests/lifecycle-uboot-fit/signatures.sh`, `mica-build:tests/signed-boot-lab/uefi-uki.sh`, `docs/design/release-signing.md`
+> status: board-dependent — evidence: `mica-build:tests/suites/lifecycle-uboot-fit/signatures.sh`, `mica-build:tests/suites/signed-boot-lab/uefi-uki.sh`, `docs/design/release-signing.md`
 
 ## I4 — hardware root and debug policy
 

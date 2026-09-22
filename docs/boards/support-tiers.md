@@ -141,7 +141,7 @@ and per release, while `uefi-arm64` carries none: the gate's boot step is
 amd64-only and was skipped for both its products
 ([harness](../design/build-harness.md) section 4). And between UEFI and FIT:
 the `cx3576` and `s905x5m` images are started by nothing in these
-repositories, because no suite boots a FIT image at all — `tests/lifecycle-uboot-fit/` runs on the
+repositories, because no suite boots a FIT image at all — `tests/suites/lifecycle-uboot-fit/` runs on the
 host and carries no QEMU, and both suites that do start a guest refuse a FIT
 board by name. The FIT side is checked on every push; it is unstarted, not
 unattended. Four of the eight published products are on that

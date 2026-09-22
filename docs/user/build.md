@@ -26,7 +26,7 @@ and locks); each says so in `make help`.
 
 | Repository | Build | Gates |
 |---|---|---|
-| `mica-build-env` | the five build images, `bsp` among them | `bash from.sh --check`, `bash tests/publish-test.sh` |
+| `mica-build-env` | the five build images, `bsp` among them | `bash from.sh --check`, `bash tests/gates/publish-test.sh` |
 | `mica-system-base` | the four policy packages and the base root | `bun run check`, `bun src/container.ts debs`, `bun src/container.ts rootfs --arch amd64\|arm64` |
 | `mica-core` | the seven packages | `make check` |
 | `mica-podman` | `mica-podman` | `make check` |

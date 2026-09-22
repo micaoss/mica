@@ -92,7 +92,7 @@ A report that can be acted on cites, in this order:
    ([troubleshooting.md](troubleshooting.md)); a reflash destroys evidence,
    so capture first.
 
-> status: shipped — evidence: `mica-build:rootfs/compose/90-pack.Dockerfile`, `docs/user/troubleshooting.md`
+> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/user/troubleshooting.md`
 
 ## 5. Where to ask
 

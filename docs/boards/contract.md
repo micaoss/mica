@@ -9,7 +9,7 @@ A board directory produces **artifacts**; the OS build consumes **artifacts**.
 Neither side reaches into the other's build. Since 2026-09-21 both live in one
 repository, `mica-build` (`docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`;
 `mica-boards` is retired): the boundary is the board directory, held by
-`mica-build:tests/board-contract-test.sh` on the board's side and by the
+`mica-build:tests/gates/board-contract-test.sh` on the board's side and by the
 board-name lint on the engine's, not a repository. Yocto is permitted only
 inside a board directory (when a vendor ships BSP solely as Yocto layers, run
 `bitbake virtual/kernel virtual/bootloader` and export the deploy dir) — never
@@ -357,7 +357,7 @@ back-end** — §4.2.1 measures it unreachable through anything the image select
 And `NF_NAT_MASQUERADE`, which `NFT_MASQ` selects, so a line for it would state
 a consequence rather than a requirement.
 
-The two floors overlap: `tests/netavark-kernel-config-test.sh` asserts that
+The two floors overlap: `tests/gates/netavark-kernel-config-test.sh` asserts that
 every symbol it cites which the fragment also states is stated there as `=y`,
 so a weaker statement in the shared file cannot hide behind cx3576's own
 Dockerfile loop.
@@ -682,7 +682,7 @@ author's words, where *this file* is
 > `DM_VERITY_VERIFY_ROOTHASH_SIG`, `SYSTEM_TRUSTED_KEYRING`, `EXT4_FS`,
 > `SQUASHFS`, `WATCHDOG_NOWAYOUT` and the per-family boot symbols, plus the
 > embedded trust anchor and, on a FIT board, `CONFIG_CMDLINE` equal to the
-> packaged command line; `rootfs/compose/compose-install.sh` lines 203-207
+> packaged command line; `stages/compose/compose-install.sh` lines 203-207
 > re-read `/boot/config-<release>` in the composed root for `DM_INIT`,
 > `BLK_DEV_DM`, `DM_VERITY` and `SQUASHFS`. Both lists are about boot and
 > verity, `verify/` there contains no reference to `/boot/` at all, and no
@@ -756,7 +756,7 @@ hash tree, described by one `dm-mod.create=` table on the kernel command line �
 dm-init on a board whose kernel has it and by this script on a board whose kernel
 does not" — above a userland that
 is "Debian trixie + systemd" — the digest-pinned base
-`rootfs/compose/10-compose.Dockerfile` installs onto, with systemd arriving
+`stages/compose/10-compose.Dockerfile` installs onto, with systemd arriving
 as `mica-system`'s `Depends`. Every board therefore
 has to carry the §4 assertion set built in — `=y`, never `=m`, because nothing
 can load a module before the root is there. Both shipped boards do, and both
@@ -777,7 +777,7 @@ merge the same shared fragment before `olddefconfig`. Board intake tiers:
    inputs under `loader/` with
    `bsp.env` naming them, the package inputs under `package/` -- with
    fresh identities; the Makefile discovers it. `make check` proves the contract
-   (`tests/board-contract-test.sh`) and the kernel floor. The board package
+   (`tests/gates/board-contract-test.sh`) and the kernel floor. The board package
    provides and conflicts with the virtual `mica-board`, so it excludes its
    siblings without naming them, and it may depend on the Debian packages
    the `mica-board-*` consumer family of `mica-debian:consumers.pkgs`

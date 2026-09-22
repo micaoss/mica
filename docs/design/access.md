@@ -911,7 +911,7 @@ image's boot medium and marked `factory-seeded`. The `micad` reader is
 validated and not composed.
 
 The `ROOT_PASSWORD` build arg is **v1-only** and is not selected by the profile
-on Mica OS: `rootfs/build.sh` and `rootfs/compose/` carry no such plumbing,
+on Mica OS: `rootfs/build.sh` and `stages/compose/` carry no such plumbing,
 because the pack stage unconditionally fails any build whose factory shadow
 holds a usable hash — for every account and on both profiles — and both
 verifiers assert the same about the packed artifact. A baked Mica OS root credential

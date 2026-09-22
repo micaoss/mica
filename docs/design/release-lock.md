@@ -1025,7 +1025,7 @@ correct counts of one file differed by one until someone said which**: a
 |---|---|---|---|---|
 | `mica` (owner) | `docs/design/release-lock/vectors/` | 85 | 84 | 6 |
 | `mica-system-base` | `tests/vectors/` | 85 | 84 | 6 — byte-identical to the canonical file |
-| `mica-build` | `tests/release-lock/vectors/` | 79 | 78 | 0 — exactly the six short |
+| `mica-build` | `tests/fixtures/release-lock/vectors/` | 79 | 78 | 0 — exactly the six short |
 | `mica-core` | `tests/vectors/` | 52 | 51 | 0 |
 | `mica-podman` | `tests/vectors/` | 49 | 48 | 0 |
 | `mica-res` | none | — | — | — |

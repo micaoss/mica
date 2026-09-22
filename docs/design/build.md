@@ -15,7 +15,7 @@ SquashFS/ext4/GPT makers, signing tools and archive assembly belong to the pinne
 build environment. Orchestration selects inputs and commands. A judge reads an
 artifact to report a result; image judges also use their declared pinned tools.
 Do not substitute host filesystem/signing tools merely because they are present.
-`tests/host-toolchain-lint.sh` and its negative suite enforce these boundaries.
+`tests/gates/host-toolchain-lint.sh` and its negative suite enforce these boundaries.
 
 The Docker daemon may be a sibling-container host. Bind the narrow project or
 artifact path using its actual host path. Paths under `/srv` are identical in
@@ -48,7 +48,7 @@ the Dockerfile and copied files; the FIT tools image adds its FIT and regdb
 scripts, the board's U-Boot tool binaries and the regdb source), and
 `src/image/kernel-package.ts` refuses an image without it; `ukify` and
 `sbsign` run under `faketime` frozen at `SOURCE_DATE_EPOCH`, so two signings
-are byte-identical (`tests/boot-signing-test.sh`); and `release.sh collect`
+are byte-identical (`tests/gates/boot-signing-test.sh`); and `release.sh collect`
 refuses a kernel that has the previous scoped release's `buildId` but
 another identity. A release
 that changes only a board or only the release metadata keeps both
@@ -304,11 +304,11 @@ copied release image. The harness copies the image, enlarges the virtual medium,
 units, enrolls disposable Secure Boot variables and boots through firmware.
 It does not edit the signed kernel command line. `tests/suites/lifecycle-uefi/` covers
 runtime/update/fault/shutdown and large-root measurements for current images.
-`tests/lifecycle-uboot-fit/` covers parser, signer and dirty-filesystem behavior.
+`tests/suites/lifecycle-uboot-fit/` covers parser, signer and dirty-filesystem behavior.
 
 The DATA growth test uses the actual packed root policy and a disposable loop
 disk. Pass board, complete image and matching root image to
-`tests/repart-loader-test.sh`; it checks identities and every protected firmware,
+`tests/gates/repart-loader-test.sh`; it checks identities and every protected firmware,
 counter and SYSTEM byte around growth.
 
 Record exact image and component identities with the acceptance run that used

@@ -7,7 +7,7 @@ other and what survives an update are yours to describe — in systemd's terms,
 not in a mica-specific format.
 
 This document is the integrator's guide to doing that. Every example below is
-extracted by `tests/quadlet-doc-test.sh` and fed to the Quadlet generator this
+extracted by `tests/gates/quadlet-doc-test.sh` and fed to the Quadlet generator this
 image actually ships, so an example that stopped working fails the test suite
 rather than sitting here looking correct.
 
@@ -522,7 +522,7 @@ was guarded until 2026-09-09.** None of the **61** files under
 `mica-build:src/verify/` mentions `/boot/`, checked here by reading every one
 of them rather than by grepping for a name, and the two places that do read a
 kernel configuration are `src/image/kernel-package.ts`, over the kernel
-**component**, and `rootfs/compose/compose-install.sh`, over
+**component**, and `stages/compose/compose-install.sh`, over
 `/boot/config-<release>` in the composed root. Both assert the boot and verity
 floor: `DM_INIT`, `BLK_DEV_DM`, `DM_VERITY`, `SQUASHFS`, the trusted keyring,
 the watchdog. **Neither names a container-limit or netavark symbol, and
@@ -581,7 +581,7 @@ than one that is uniformly confident.
 **To firewall — the one category anybody had decided about, because it had
 already broken.** `cx3576` once shipped without `NFT_FIB_*` and every bridged
 container failed;
-`mica-build:tests/netavark-kernel-config-test.sh` now asserts the symbols
+`mica-build:tests/gates/netavark-kernel-config-test.sh` now asserts the symbols
 netavark programs rules against, on every board config, and requires each
 board's post-`olddefconfig` loop to name the same symbols so that a silently
 dropped symbol fails the kernel build. The other categories have no gate and
@@ -743,7 +743,7 @@ into `mica-build` on 2026-09-21 the rows read `mica-build:boards/` and
 step they watched: a board is no input, so what the next release carries and
 what the products are built from are the same committed tree, and the
 `board-release.*` rows name `mica-build`'s newest release per board.)*
-`mica-build:tests/session-probe/probe.sh` reads the
+`mica-build:tests/suites/session-probe/probe.sh` reads the
 machine, which is the right **shape** for the second question — and until
 2026-09-20 it was not answering it. **The product side of this section is
 currently unanswered, and the instrument that looked like the answer was

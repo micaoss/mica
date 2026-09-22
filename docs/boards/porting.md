@@ -69,7 +69,7 @@ physical boot/watchdog/recovery observations are recorded separately. Use
 `make os-fit-records-test` for the cx3576 native C policy and the UEFI QEMU
 harness for actual boot-manager selection.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/build-mica.sh`, `mica-build:boot`, `mica-build:tests/lifecycle-uboot-fit`
+> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/build-mica.sh`, `mica-build:boot`, `mica-build:tests/suites/lifecycle-uboot-fit`
 
 ## Stage 3 — kernel, config and DTS
 
@@ -149,7 +149,7 @@ declare the flashing formats in `<name>/images.tsv`, at least
 ([contract.md](contract.md) section 3.1). `manifests/board.pkgs` names the board package; a radio's
 transport packages and optional components go beside it. `make check` in
 `mica-boards` holds the directory to the contract
-(`tests/board-contract-test.sh`).
+(`tests/gates/board-contract-test.sh`).
 
 > status: shipped — evidence: `mica-build:make os-layout-lint`
 
@@ -185,7 +185,7 @@ board's `dev` product, then the complete image reaches actual firmware boot and
 clean shutdown. The DATA growth test validates the actual packed policy
 against a disposable disk.
 
-> status: shipped — evidence: `mica-build:tools/product-build.sh`, `mica-build:make product-verify`, `mica-build:tests/repart-loader-test.sh`
+> status: shipped — evidence: `mica-build:tools/product-build.sh`, `mica-build:make product-verify`, `mica-build:tests/gates/repart-loader-test.sh`
 
 ## Stage 7 — hwinit
 

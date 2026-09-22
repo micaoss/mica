@@ -362,6 +362,39 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `src/cli.ts test` runs `src/` and `tests/gates/` and a suite's own tests
   run with the suite (P4). The workspace `AGENTS.md` and the living records
   name the new paths (`ac4c02d`). CI run `35711365754`.
+- 2026-09-22 10:12: **P1b on `main`** (`2e68cb3d`, `5bf76bee`, `5151b5af`, with the
+  bootstrap fix `5a91495d`). `tests/` is `gates/` (45 host-side gates and
+  lints, the python runtime tests, the sanctions ledger), `fixtures/`
+  (`component-contracts`, `release-lock` with the vectors pin,
+  `fleet-protocol`, `quadlet-doc`, `runtime-sonames.json`, the two lint
+  registers) and `suites/` (the seven docker and QEMU suites beside
+  `apid-api` and `lifecycle-uefi`); `stages/compose/` is the root's two
+  Dockerfiles, `compose-install.sh`, `compose-capture.sh` and the pack
+  stage's seventeen scripts; `stages/boot/` the boot-tools image's
+  Dockerfiles and the seven scripts they copy in. `boot/` keeps the four
+  host-side tools and `rootfs/` its driver, the package selection, the
+  runtime python and `validate-public-meta.sh` until P2 and P3.
+  `common/scripts` and `common/trust/stage-inner.sh` stay under `common/`
+  (a deviation from the layout as proposed: they are what every board's
+  Dockerfile takes from the tree, hashed into every kernel's inputs, and
+  moving them would rebuild every component for a rename alone; the shell
+  homes are therefore `stages/`, `common/`, `boards/` and the suites'
+  guest directories). Every reader followed (the Makefile, the workflows,
+  the lints' scan roots and registers, the C includes of the FIT records
+  lab, the boards' evidence references, the gates' own expectations),
+  and 39 moved scripts compute the repository root one level deeper.
+  Measured before the push: every Makefile gate green (the list of P1a
+  plus `os-boot-test`, `os-fit-records-test`, `os-rootfs-runtime-test`,
+  `os-quadlet-doc-test` 35, `os-netavark-kernel-test` 121, `uboot-env-test`,
+  `mirror-test` 34, the fixture tests and the boards' tests), the image
+  suite 584 and the verify suite 958, the release-shaped `uefi-x64-prod`
+  build, `product-verify` 106, the QEMU boot and the session probe; byte
+  identity as in P1a (the signed components identical to the `b76b23fe`
+  reference; `board-evidence.json` differs only by the moved evidence
+  paths). P1a's CI (`35711365754`) had two reds of the container route --
+  `.tmp/` absent inside the container, `tmp/` created root-owned by a
+  container and refused to the runner -- fixed by the bootstrap creating
+  the scratch directories as the host user first. CI run `35714638101`.
 
 ## Annotations
 

@@ -74,7 +74,7 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
    逐字引用的拒绝文本（[troubleshooting.md](troubleshooting.md)）；重刷
    会销毁证据，所以先捕获。
 
-> status: shipped — evidence: `mica-build:rootfs/compose/90-pack.Dockerfile`, `docs/user/troubleshooting.md`
+> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/user/troubleshooting.md`
 
 ## 5. 去哪里问
 

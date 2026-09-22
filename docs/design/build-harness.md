@@ -472,7 +472,7 @@ query; that one can only be answered **from outside the artefact**, because
 the artefact is behaving correctly within a scope it states.
 
 **A drift gate diffs where a release gate digests.** The repair
-(`mica-build:tests/vectors-pin-check.sh`) pins the copy to a `mica` commit and
+(`mica-build:tests/gates/vectors-pin-check.sh`) pins the copy to a `mica` commit and
 compares the trees with `diff -r` and not a digest, *"because a digest says
 that they differ and the whole reason this drifted is that nobody could see
 what"*. Both are equality checks and they are not interchangeable: a digest is
@@ -815,7 +815,7 @@ after `s905x5m.20260920-0033` and the index `mica.20260920-0046`)*: **four
 boards are release targets, eight products are published and indexed, the UEFI
 images boot, and no FIT board image has ever been booted by any suite —
 because no suite boots one.** Not "no automation runs it": there is nothing to
-run. `tests/lifecycle-uboot-fit/` carries no QEMU at all — measured file by
+run. `tests/suites/lifecycle-uboot-fit/` carries no QEMU at all — measured file by
 file at `e92dc5d` and verified independently — and tests firmware IO,
 records, signatures, trust and dirty-filesystem behaviour on the host, while
 the boot machinery (`boot.sh`, `timed-boot.py`, `runtime-build.sh`,
@@ -853,7 +853,7 @@ FIT boot suite is a new suite, not the unblocking of an existing one**.
 named `lifecycle-uboot-fit`, it sits beside `lifecycle-uefi`, and it tests the
 FIT boot *path* — firmware IO, signatures, trust. Everything about the name
 and the neighbourhood says the FIT one boots too, and the refusal message says
-it outright: *this suite boots UEFI boards (`tests/lifecycle-uboot-fit` for
+it outright: *this suite boots UEFI boards (`tests/suites/lifecycle-uboot-fit` for
 the other)*. **For the other** reads as though a FIT image were booted
 somewhere. That is where the belief came from — a written source, at the point
 of use, wrong in the direction that manufactures a capability — and it is

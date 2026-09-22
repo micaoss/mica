@@ -34,7 +34,7 @@ by this repository, which are Apache-2.0. The image ships a machine-readable
 inventory of every installed package and its version, so "what is in this
 image" is a recorded fact, not an estimate.
 
-> status: shipped — evidence: `mica-build:rootfs/compose/90-pack.Dockerfile`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/design/build.md`
 
 ### Notices on the device
 

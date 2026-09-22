@@ -98,9 +98,9 @@ authenticated boot receipt.
 no commit is compiled into the binary.
 
 `system.fileEpoch` is the manifest file's mtime: the `SOURCE_DATE_EPOCH` that
-`rootfs/scripts/pack-squashfs.sh` pins every file time in the root to. It is
+`stages/compose/scripts/pack-squashfs.sh` pins every file time in the root to. It is
 **not** a build date and is deliberately not named as one.
-`rootfs/scripts/pack-squashfs.sh` fixes that epoch to a constant so two builds of one
+`stages/compose/scripts/pack-squashfs.sh` fixes that epoch to a constant so two builds of one
 tree are byte-identical, which makes it the same instant — 2020-01-01 — in
 every image this repository has ever produced. It is reported because it is
 what the filesystem actually says, and it answers "what time do this image's

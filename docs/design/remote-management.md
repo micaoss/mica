@@ -98,7 +98,7 @@ credential boundary described in section 1.
 other inbound management port, no outbound management connection, and **no
 operator credential provisioned onto a device**. A signed rootfs is
 byte-identical on every unit, so a credential baked into one would be a
-fleet-wide shared secret (`rootfs/scripts/pack-assert-shadow-chain.sh`)
+fleet-wide shared secret (`stages/compose/scripts/pack-assert-shadow-chain.sh`)
 — the pack step fails the build over that, and the reasoning binds any future
 fleet credential too.
 

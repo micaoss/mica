@@ -9570,3 +9570,13 @@ are byte-identical to the build before the move; the DATA image differs
 in 40 bytes of timestamps, a producer gap recorded in the plan. Next: P1b
 (`tests/` split and `stages/`), P1c (the board directory).
 
+## 2026-09-22 10:12 [progress]
+
+`mica-build`'s tests are split into `tests/gates/`, `tests/fixtures/` and
+`tests/suites/`, and the shell that runs inside the root composer's and
+the boot-tools images lives under `stages/compose/` and `stages/boot/`
+(`20260922-0815-one-language-one-layout`, P1b; `2e68cb3d`..`5a91495d`).
+The living records name the moved paths. Two container-route reds of
+P1a's CI are fixed in the bootstrap. Next: P1c, the board directory under
+one management.
+
