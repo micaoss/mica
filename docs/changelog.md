@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-22 15:05 [finding]
+
+**A gate that runs under sudo can write outside its fixture for months and
+pass.** `mica-build`'s reproducibility gate substituted `/rootfs` once per
+line into the pack scripts it exercises; a line naming it twice kept the
+second, and every run created `/rootfs/var/lib/systemd` on the host. Root
+never noticed; the first unprivileged run (CI `35733135324`, after the
+suite lost its `sudo`) refused it and the gate went red. `8d565d39` bounds
+the substitution at path boundaries and removes the litter here. The
+privilege was the mask: a fixture gate should be run at least once as a user
+who cannot write anywhere but the fixture.
+
 ## 2026-09-22 14:30 [finding]
 
 **A JIT runtime does not survive user-mode emulation, and the boot

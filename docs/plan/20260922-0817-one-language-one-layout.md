@@ -598,6 +598,22 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   announcement goes to a terminal only now, and the release test is 65/65
   through the container route. Both are the same lesson as the two seam
   defects before them: the container route is measured only where it runs.
+- 2026-09-22 15:05: **P2, third slice: the last red** (`8d565d39`). Run
+  `35733135324` on `3fa4e389`: every product and release job green, the
+  149 runtime cases green in CI, and one red left, `tests/gates/rootfs-reproducibility-test.sh`'s
+  two pack-surgery cases. The gate rewrites `/rootfs`, `/runtime` and `/out`
+  in the pack scripts to fixture paths with one substitution per line, so a
+  line naming `/rootfs` twice kept its second one, and `mkdir -p
+  /rootfs/var/lib/dbus /rootfs/var/lib/systemd` created `/rootfs/var/lib/systemd`
+  on the host of every run. Under `sudo`, where the gate ran until
+  `5c770a23`, that succeeded and the gate passed; as the runner user it was
+  refused. A global substitution alone would have rewritten
+  `/rootfs-report.txt` too, so the match is bounded by what follows (a
+  slash, whitespace, the end of the line). Reproduced as uid 1001 in the
+  pinned Ubuntu image before the fix, green after, green as root; this
+  host's `/rootfs` and `/out` from earlier runs are removed. The privilege
+  the old runner granted had hidden a gate that wrote outside its fixture
+  since it was written.
 
 ## Annotations
 
