@@ -2,7 +2,7 @@
 
 - **status**: pending
 - **priority**: P1
-- **owner**: (unclaimed)
+- **owner**: unassigned
 - **createdAt**: 2026-09-22 08:15
 
 ## Description
