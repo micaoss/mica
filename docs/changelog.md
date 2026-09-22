@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-22 16:15 [progress]
+
+P3, fourth slice (`mica-build` `afb1f095`, `b4bfcd4a`): the producer
+discovery, the package inputs hash, the package build driver and the pool
+preflight are `src/pool/{producers,package-inputs,build,preflight}.ts`
+(`bun src/cli.ts producers|package-inputs|pool-build|pool-preflight`),
+their rows, manifests, reports and built archives byte-identical to the
+shell's; the packer stays shell as `stages/pool/pack.sh`. The inputs hash
+moved once, as the plan allows, while no release has published a pool.
+The bootstrap's container is root again -- CI measured a container running
+as the host user failing 79 fixture tests on `lchown` and a sibling's
+root-owned output -- and hands its scratch output to the host user when
+the command ends; it also mounts the docker client's configuration, so a
+buildx builder is one builder on both routes.
+
 ## 2026-09-22 15:47 [progress]
 
 P3, third slice (`mica-build` `2b0285d2`, `08e26e1d`): the package pool is

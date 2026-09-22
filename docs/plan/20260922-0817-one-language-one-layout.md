@@ -732,6 +732,51 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   time of the `mica` commit that added it. Next in the order: `deb/*`
   (`build`, `pack`, `package-gate`, `preflight`, `producers`, `publish`,
   `registry`, `version-guard`, `package-inputs`), then the boards group.
+- 2026-09-22 16:15: **P3, fourth slice: `producers`, `package-inputs`,
+  `pool-build`, `pool-preflight`; the bootstrap's ownership epilogue**
+  (`afb1f095`; `b4bfcd4a`, 30 files, +733/-1004). What CI measured on
+  `08e26e1d` first (run 35749459944, `suites` red, 79 of the build suite's
+  tests): a container running AS the host user cannot `lchown` in a fixture
+  root nor overwrite what a sibling container wrote as root under `.tmp/`,
+  so the user mapping was right for the one symptom and wrong for the
+  class. `bin/bun.sh` runs its container as root again and, when the
+  command ends, hands every root-owned entry under `.tmp tmp _out .work
+  node_modules` to the calling uid and gid (`chown -R --from=0`, so a
+  sibling's output is handed over too; `exec bun` for root, as before).
+  Measured as uid 1001 on a fresh checkout: the pool fetch, the host's
+  `mkdir` beside its cache, the 46 composition fixture tests and the verity
+  signing tests pass on the container route and nothing is root's after.
+  Then the first half of `deb/*`: `tools/deb/producers.sh` is
+  `src/pool/producers.ts` (`bun src/cli.ts producers`), the rows and every
+  `--dir-for`, `--instance-for`, `--control-for` and `--version-for`
+  answer byte-identical, `producer.env` and the instance files read rather
+  than sourced (plain `KEY=value`, `${NAME}` over the instance's and earlier
+  keys as bash under `set -u` left them, a substitution or an unset name
+  refused); `tools/deb/package-inputs.sh` is `src/pool/package-inputs.ts`,
+  the eight producers' manifests identical but for the three tool rows,
+  which now name `src/pool/build.ts`, `stages/pool/pack.sh` and
+  `src/pool/producers.ts` -- the one move of this hash the plan's Risks
+  allow, and free today, since no release of this repository has published
+  a pool (the version guard on every CI run: "has no published release
+  carrying its pool; every archive is built"); `tools/deb/build.sh` is
+  `src/pool/build.ts` (`pool-build`), the radio-wifi archives in both pools
+  and the uefi-x64 board archive byte-identical to the shell's builds, the
+  packer shell as `stages/pool/pack.sh` (it runs inside the base image);
+  `tools/deb/preflight.sh` is `src/pool/preflight.ts` (`pool-preflight`),
+  every board's and producer's report byte-identical. The package gate
+  (still shell) rebuilds through `pool-build`, which on the container route
+  found the host's buildx builder invisible inside (`docker buildx inspect`
+  naming no driver): the bootstrap mounts the docker client's configuration
+  directory at its own path and forwards `BUILDX_BUILDER` and
+  `BUILDKIT_PROGRESS`, and the gate passes 32/32 with its rebuild on both
+  routes. Green: lint, typecheck, the three lints, board-contract-test
+  44/44, os-rootfs-manifest-test 48/48, the runtime suites 149,
+  os-build-test 578, `make board-pool POOL_BOARD=uefi-x64` (same bytes),
+  version-guard-test 16/16 and publish-test 21/21 against a local
+  registry. Next: `package-gate` (`src/pool/gate.ts`, the archives read on
+  the host by `src/pool/deb.ts` where the shell ran `dpkg-deb` in the base
+  image), then `registry`/`oci`/`publish`/`version-guard` with their two
+  gates as bun tests.
 
 ## Annotations
 
