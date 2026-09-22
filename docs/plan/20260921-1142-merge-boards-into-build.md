@@ -409,6 +409,25 @@ with P4.
   the same round; the records of `mica-boards` moved here (changelog
   2026-09-21 13:40). Not in this round: P3 (`layout.tsv` and the dispatch
   rule) and P4 (`mica-core`).
+- 2026-09-22: pushed. `origin/main` had moved 64 commits under the branch
+  (`e13b4f78` to `de476350`, the package-version work among them), so the
+  import and the wiring were replayed as `merge-boards-2` on a worktree cut
+  from `origin/main`; conflicts in the lock reader, the Makefile and the
+  vectors resolved in favour of both sides (main's `getty@tty1` runtime-link
+  declaration of `4cea5665` stands; the vectors are pinned at this
+  repository's `3bddfcb`). On the replayed branch, before the push: every
+  gate of the list above green again, `os-vectors-pin-check` (131 files
+  identical), the `uefi-x64-dev` product built from the tree's own kernel on
+  a clean checkout, `make product-verify PRODUCT=uefi-x64-dev` (106 checks)
+  and `tests/lifecycle-uefi/run.sh uefi-x64-dev --runtime-only` (boot and
+  ordered shutdown in QEMU) pass. Pushed to `mica-build` `main` as
+  `de476350..0e34a1b4` (98 commits), then the update-server removal of
+  `20260921-1216` as `abc59de2` and `90b72919`. The first CI run on the
+  merged main builds every board's kernel and U-Boot (nothing to reuse:
+  no `mica-build` release has published components yet); its outcome is
+  the next thing to read. Open: P3 (`layout.tsv`, the dispatch rule, the
+  fact lint) and P4; the worktree `tmp/wt-merge2` of `mica-build` keeps the
+  built kernels under `_out/` until the first releases publish them.
 
 ## Annotations
 

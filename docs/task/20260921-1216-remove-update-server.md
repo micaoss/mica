@@ -38,3 +38,6 @@ Removing the update server from mica-build and rewriting the documents that name
 - 2026-09-21 12:16: readers measured at `mica-build` `e13b4f78`; see the plan.
 
 - complete: Deleted in mica-build, documents rewritten; docs gates green except the other session's unindexed research page.
+- 2026-09-22 07:30: landed on `mica-build` `main` as `abc59de2` (the server, its CI
+  gate, the four lifecycle files and the guest harness branch) and `90b72919`
+  (one test file added by `f0889059` after the deletion was staged).

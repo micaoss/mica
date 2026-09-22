@@ -42,3 +42,6 @@ Planning the merge of mica-boards into mica-build and the board-owned image cont
 
 - 2026-09-21 11:40: investigation done at `mica-build` `e13b4f78`, `mica-boards`
   `e1e8231`, `mica-core` `b70b1fe`; findings in the plan's context section.
+- 2026-09-22 07:30: P1 and P2 landed on `mica-build` `main` (`0e34a1b4`, 98 commits
+  replayed onto `de476350`); proof and gates in the plan's *Progress*. P3 and
+  P4 open; the task stays in progress for P3.

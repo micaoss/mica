@@ -9496,3 +9496,19 @@ gone; the `board` rows are `mica-build`'s), `boards/contract.md` sections 1,
 2, 3, 3.1 and 7, `architecture.md`, `user/build.md`, `user/releasing.md`
 and their Chinese pages, `design/mica-index.md`, and the workspace
 `AGENTS.md`.
+
+## 2026-09-22 07:30 [progress]
+
+The merge of `mica-boards` into `mica-build` is on `main`
+(`20260921-1140-merge-boards-into-build`): `de476350..0e34a1b4`, 98 commits,
+the import of `mica-boards` at `925e31d` with its history and the wiring
+replayed onto the main that had moved under the branch. Before the push the
+gates of the plan's *Progress* were green on the replayed branch, the
+`uefi-x64-dev` product built from the tree's own kernel, `product-verify`
+passed (106 checks) and the image booted and shut down in QEMU. The update
+server followed as `abc59de2` and `90b72919`
+(`20260921-1216-remove-update-server`). The first CI run of the merged main
+builds every board's components, since no `mica-build` release has published
+any yet. Open in the plan: P3 (`layout.tsv`, the dispatch rule, the fact
+lint) and P4 (`mica-core`).
+
