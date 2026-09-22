@@ -127,7 +127,7 @@ dynamically linked against the same libc as everything else, so a system damaged
 badly enough to lose `/lib` has lost this too — at that point the answer is
 [recovery.md](recovery.md), not a shell.
 
-> status: shipped — evidence: `mica-system:busybox`, `mica-build:verify/src/checks-busybox.ts`, `docs/design/recovery.md`
+> status: shipped — evidence: `mica-system:busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/design/recovery.md`
 
 ## 5. Reading build and verify refusals
 

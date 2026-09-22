@@ -125,7 +125,7 @@ mica-deploy gc | mica-deploy discard
 最多保留两个部署，所以设备始终留着一个回退。安装需要新字节所占空间，加上 SYSTEM 上
 128 MiB、ESP 上 64 MiB 的保留量，并先把垃圾回收能腾出的空间算进去。
 
-> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-build:build/src/file-image.ts`, `docs/design/updates.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-build:src/image/file-image.ts`, `docs/design/updates.md`
 
 ## 6. 重启、确认与回滚
 

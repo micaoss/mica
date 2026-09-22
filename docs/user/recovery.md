@@ -19,7 +19,7 @@ Root, kernel and support references switch together. DATA is shared and is not
 rolled back. A hang also needs a functioning watchdog; physical cx3576 watchdog
 coverage remains a board qualification requirement.
 
-> status: shipped — evidence: `mica-deploy:src/boot.rs`, `mica-system:overlay/usr/lib/mica/mica-health`, `mica-build:tests/lifecycle-uefi/updates.sh`
+> status: shipped — evidence: `mica-deploy:src/boot.rs`, `mica-system:overlay/usr/lib/mica/mica-health`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
 
 ## 2. Exhaustion and shared storage failure
 
@@ -33,7 +33,7 @@ Capture the complete serial trace, native status if available, and the exact
 image/component IDs. Use a full latest-image reflash when shared storage or every
 bootable deployment is unusable. Do not edit counters or import boot commands.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/lifecycle-uefi/faults.sh`
+> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/suites/lifecycle-uefi/faults.sh`
 
 ## 3. The decision tree
 

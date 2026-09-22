@@ -11,7 +11,7 @@
 和 python3——每一个编译器、文件系统工具和签名工具都运行在固定版本的 build-env
 镜像里。
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
 
 ## 2. 取一个已发布的镜像
 
@@ -26,7 +26,7 @@ gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
 选哪个发布、以及如何用版本索引校验解压后的镜像，见[获取发布版](download.md)。
 镜像是一整块 GPT 磁盘——ESP、SYSTEM、DATA——并携带两条签名部署记录。
 
-> status: shipped — evidence: `docs/user/download.md`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:src/image/file-layout.ts`
 
 ## 3. 在 QEMU 里启动它
 
@@ -43,7 +43,7 @@ make lifecycle-uefi PRODUCT=uefi-x64-dev
 
 它启动产品并依次验证运行时、更新、故障、重置和关机。
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
 
 ## 4. 或者先自己构建镜像
 

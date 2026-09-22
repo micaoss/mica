@@ -66,7 +66,7 @@ claimed. See [the licensing brief](../website/licensing.md).
 
 Build the complete image and signed components first using
 [the component build flow](build.md). Pack the release's deployment with
-`build/run.sh --components archive`. The selected update's board and version must
+`bin/bun.sh src/cli.ts components archive`. The selected update's board and version must
 match the release; the independently versioned firmware must match its board.
 
 Extract the package manifest and public defaults from the exact verified root
@@ -76,7 +76,7 @@ that a caller supplied the correct extraction. Image verification and retention
 of the component build records are required alongside this gate.
 
 ```bash
-bash build/run.sh --release assemble \
+bash bin/bun.sh src/cli.ts release assemble \
   --board uefi-x64 --version 1.0.0-dev --channel development --profile dev \
   --image /absolute/build/image/mica-x64-20260909-164233.img \
   --update /absolute/build/update.micaupd \
@@ -145,7 +145,7 @@ verified-boot inputs. There is no `trust.signingKeys` reader.
 
 ## 4. Gate and evidence
 
-`build/src/release-manifest.ts` verifies lengths and SHA-256 with bounded streaming
+`src/image/release-manifest.ts` verifies lengths and SHA-256 with bounded streaming
 reads. It authenticates the update envelope against supplied public keys, checks
 the exact deduplicated object set and every object's digest, and refuses truncated
 or trailing archive data. It independently authenticates the firmware envelope
@@ -183,7 +183,7 @@ file. The following commands are executed by the release fixture test:
 <!-- release-verify-test:start -->
 ```bash
 (cd "$RELEASE" && sha256sum -c SHA256SUMS)
-bash "$REPO/build/run.sh" --release gate --dir "$RELEASE" --public-key "$METADATA_PUBLIC_KEY"
+bash "$REPO/bin/bun.sh" src/cli.ts release gate --dir "$RELEASE" --public-key "$METADATA_PUBLIC_KEY"
 ```
 <!-- release-verify-test:end -->
 
@@ -205,7 +205,7 @@ and prose; the authenticated update/firmware checks do not authenticate arbitrar
 image bytes or notes. Use the independent current image verifier before flashing:
 
 ```bash
-bash verify/run.sh --verify --board uefi-x64 \
+bash bin/bun.sh src/cli.ts verify --board uefi-x64 \
   --image /absolute/new-release-directory/mica-x64-20260909-164233.img \
   --public-key /absolute/metadata.pub
 ```

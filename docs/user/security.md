@@ -179,7 +179,7 @@ directory `/usr/local/lib/systemd/system` like any other native application
 ([applications.md](applications.md)). That is a statement of what the product
 does now, not a recommendation of how to run a firewall.
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:verify/src/checks-firewall.ts`
+> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. Security lifecycle
 

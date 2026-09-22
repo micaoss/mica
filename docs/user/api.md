@@ -71,7 +71,7 @@ of the contract over a real socket — it is also the reference for how the
 surface behaves end to end, including TLS, redirects and auth gating:
 
 ```sh
-bash micad:tests/apid-api/run.sh
+bash micad:tests/suites/apid-api/run.sh
 ```
 
 > status: shipped — evidence: `mica-core:tests/apid-api/run.sh`

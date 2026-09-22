@@ -138,4 +138,4 @@ The full ladder and the cost of each step is [recovery](../user/recovery.md).
 | Automatic boot on each push and each release | pass, since 2026-09-19 | amd64 products boot to the guest's own pass marker |
 | Physical cold boot, write, recovery | not tested | no hardware |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`

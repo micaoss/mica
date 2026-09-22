@@ -6,10 +6,10 @@ explains execution prerequisites.
 
 ## 1. Execution model
 
-`build/run.sh` and `verify/run.sh` orchestrate with Bun. Set
+`bin/bun.sh` runs `src/cli.ts` with Bun. Set
 `MICA_BUILD_CONTAINER=1` or `MICA_VERIFY_CONTAINER=1` to select their pinned
 container routes. Byte-producing tools run in their declared images through
-`build/src/toolbox.ts`; orchestration does not install a host compiler.
+`src/image/toolbox.ts`; orchestration does not install a host compiler.
 
 `IMAGE_BUN_1` and `IMAGE_DOCKER_CLI_28` in `mica-build-env:images.env` pin Bun and the
 Docker CLI/buildx inputs. `build/Dockerfile` also provides Python and libcap
@@ -536,7 +536,7 @@ the healthy arrangement and the pathological one** *(2026-09-20)*.
   vectors here have the opposite arrangement — one original checked by five
   readers — which is why six defects sat in them.
 - The **pathological** arrangement, from `mica-build`:
-  `verify/src/checks-fixture.ts` seeds `50-mica-getty.preset` into a synthetic
+  `src/verify/checks-fixture.ts` seeds `50-mica-getty.preset` into a synthetic
   healthy root, and **three of the four real boards do not have that file**.
   It seeds it to feed a suite deleted on 2026-09-09, with the comment naming
   that suite touched *after* the deletion. **A fixture is never compared to a
@@ -783,7 +783,7 @@ the break.
 **The boundary moved on 2026-09-19 at 23:56 UTC, and it moved in the release
 path rather than in `ci.yml`.** The gate is a step of `release-product.yml`,
 `Boot it, one runtime stage, no faults`, running
-`tests/lifecycle-uefi/run.sh <product> --runtime-only` after the image is
+`tests/suites/lifecycle-uefi/run.sh <product> --runtime-only` after the image is
 built and statically verified; it took three red runs to land, every one of
 them a defect in the harness — container-made root-owned files touched from
 the host, fine on the root host the suite had only ever run on — and none in
@@ -819,7 +819,7 @@ run. `tests/lifecycle-uboot-fit/` carries no QEMU at all — measured file by
 file at `e92dc5d` and verified independently — and tests firmware IO,
 records, signatures, trust and dirty-filesystem behaviour on the host, while
 the boot machinery (`boot.sh`, `timed-boot.py`, `runtime-build.sh`,
-`kernel-faults.sh`) is in `tests/lifecycle-uefi/`.
+`kernel-faults.sh`) is in `tests/suites/lifecycle-uefi/`.
 
 **The number, since it is half the catalogue.** Of eight published products,
 **four are started by nothing in this tree**: `cx3576-dev`, `cx3576-prod`,
@@ -842,9 +842,9 @@ coverage. The true sentence is that **nothing starts a FIT image**.
 
 **And it is explicit in the tree, not inferred from an absence.** Both suites
 that do start a guest refuse a FIT board by name:
-`tests/apid-api/src/qemu.ts` throws
+`tests/suites/apid-api/src/qemu.ts` throws
 `<board> boots a FIT; QEMU acceptance boots UEFI boards`, and
-`tests/lifecycle-uefi/product-inputs.sh` refuses the same case in shell. So
+`tests/suites/lifecycle-uefi/product-inputs.sh` refuses the same case in shell. So
 the position is stated in three places — two refusals and a FIT suite that
 boots nothing — and the consequence for anyone scoping the work is that **a
 FIT boot suite is a new suite, not the unblocking of an existing one**.
@@ -885,20 +885,20 @@ for the user, not a suite to schedule here.
 ## 5. Complete-image acceptance
 
 Build the current package pool and compose the root, then produce signed root,
-kernel/support and deployment artifacts with `build/run.sh --components`.
+kernel/support and deployment artifacts with `bin/bun.sh src/cli.ts components`.
 The `image` command assembles a new three-partition factory image. No test
 upgrades an old-layout image into this layout.
 
-Run `verify/run.sh --verify` with the explicit board, complete image and metadata
+Run `bin/bun.sh src/cli.ts verify` with the explicit board, complete image and metadata
 public key. The API harness (`mica-core:tests/apid-api/README.md`) also
 requires a complete image and public boot trust input. Its dry run checks
 prerequisites without booting (`MICA_PRODUCT=<name>`). `make lifecycle-uefi
-PRODUCT=<name>` (`tests/lifecycle-uefi/run.sh`) assembles the acceptance disk
+PRODUCT=<name>` (`tests/suites/lifecycle-uefi/run.sh`) assembles the acceptance disk
 out of the built product, boots it for the runtime and shutdown evidence,
 then runs the update and fault stages; the privileged lane
 (`.github/workflows/privileged.yml`) is written to build, verify, gate,
 smoke-break and repart-test every product under `products/`, and has never
-run (section 4). Tests under `tests/lifecycle-uefi/` cover both UEFI
+run (section 4). Tests under `tests/suites/lifecycle-uefi/` cover both UEFI
 architectures, full services, updates, interruption, fallback and shutdown.
 
 The API harness does not build its input image. Missing images, signing inputs

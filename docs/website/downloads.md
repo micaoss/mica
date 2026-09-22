@@ -13,7 +13,7 @@ version/generation, deployment/kernel/root IDs, byte lengths and digests. A full
 a signed component deployment update. Firmware has its own maintenance artifact,
 recovery and readback workflow.
 
-> status: shipped — evidence: `mica-build:build/src/component-cli.ts`, `mica-build:build/src/components.ts`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:src/image/component-cli.ts`, `mica-build:src/image/components.ts`, `docs/design/build.md`
 
 ## Verification
 
@@ -23,7 +23,7 @@ served beside an untrusted artifact is insufficient authentication. All current
 development acceptance flashes complete latest images. No old-layout migration
 or historical update compatibility is offered.
 
-> status: shipped — evidence: `mica-build:verify/run.sh`, `docs/design/release-signing.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:bin/bun.sh src/cli.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
 
 ## Publication
 

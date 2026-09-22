@@ -23,7 +23,7 @@
 `cx3576` 与 `s905x5m` 的镜像则没有任何自动流程会启动：没有任何套件会启动 FIT 镜像——
 FIT 那套跑在宿主机上，里面没有 QEMU（[获取发布版](download.md) 第 1 节）。
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. 写入之前
 
@@ -53,7 +53,7 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 - **DATA 小是故意的。** 出厂 256 MiB，首次启动时扩展到介质大小；SYSTEM 恰好 1 GiB，
   同时容纳两个部署。
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:src/image/file-layout.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
 
 ## 2. 各板卡的镜像里有什么
 
@@ -92,7 +92,7 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loader.conf`。
 只要 UEFI 固件启动 `BOOTX64.EFI` 它就能起来，所以整个镜像写到目标介质上。
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
 
 ### 内核能驱动哪些介质
 
@@ -205,12 +205,12 @@ mica-deploy import /run/mica/import/update.micaupd
 make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 普通的发布镜像启动到登录提示符并拉起它的服务。验收控制台上打印的 `FILE_AB_*`
 标记来自套件自己塞进镜像的脚本，不是出厂镜像的行为；在设备上不要指望看到它们。
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`
 
 ## 5. cx3576
 
@@ -315,7 +315,7 @@ loader 处、20 MiB 处和接近末尾处各损坏一个字节都能被发现并
   的 deployment id；用索引映射回去：
   `jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json`。
 
-> status: shipped — evidence: `mica-build:build/src/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:src/image/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
 
 完整的设备周期——写入、首次启动、更新、确认、回滚——没有在硬件上跑过。本节的设备侧
 一半是从 `mica-core` 读出来的，并且是在 QEMU 里而不是在板子上被执行过。

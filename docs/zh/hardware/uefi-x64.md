@@ -117,4 +117,4 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 | 每次推送与每次发布自动启动 | 通过（自 2026-09-19） | amd64 产品启动到 guest 自己的通过标记 |
 | 实体机器冷启动 / 写入 / 恢复 | 未测试 | 没有实机 |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`

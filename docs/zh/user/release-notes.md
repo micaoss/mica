@@ -10,7 +10,7 @@
 回执。镜像还带 `/usr/share/mica/manifest.tsv` 和不可变构建标识。
 开发构建的 dirty 标记保持可见，它不能证明干净源码提交可重现这些字节。
 
-> status: shipped — evidence: `mica-build:build/src/components.ts`, `mica-deploy:src/deployments.rs`, `mica-build:rootfs/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-build:src/image/components.ts`, `mica-deploy:src/deployments.rs`, `mica-build:rootfs/compose/90-pack.Dockerfile`
 
 ## 2. 发布说明需要记录的事实
 
@@ -20,7 +20,7 @@
 root。回退部署共享 DATA，不撤销应用数据。当前契约为 `dataPolicy: unchanged`，
 没有破坏性迁移路径。
 
-> status: shipped — evidence: `docs/user/doc-contract.md`, `mica-build:build/src/components.ts`, `docs/design/updates.md`
+> status: shipped — evidence: `docs/user/doc-contract.md`, `mica-build:src/image/components.ts`, `docs/design/updates.md`
 
 ## 3. 发布状态
 

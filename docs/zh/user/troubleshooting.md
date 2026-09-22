@@ -107,7 +107,7 @@ BusyBox 的 applet 选项更少、行为也与 GNU 版本不同。
 一切动态链接到同一个 libc，所以一个坏到连 `/lib` 都没了的系统同样失去了它——
 到那一步答案是 [recovery.md](recovery.md)，而不是一个 shell。
 
-> status: shipped — evidence: `mica-system:busybox`, `mica-build:verify/src/checks-busybox.ts`, `docs/design/recovery.md`
+> status: shipped — evidence: `mica-system:busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/design/recovery.md`
 
 ## 5. 读懂构建与验证的拒绝
 

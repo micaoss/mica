@@ -7,7 +7,7 @@
 本页给出操作顺序。按板卡的写入过程——以及哪些板卡有过程可循——见
 [刷写](../../user/flashing.md)。
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/user/flashing.md`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:src/image/file-layout.ts`, `docs/user/flashing.md`, `docs/design/storage.md`
 
 ## 1. 选择并校验镜像
 

@@ -457,7 +457,7 @@ byte-reproducible now and may be compared by sha256.**
 The uefi-x64 figure is `=y` payload — permanent kernel RAM carried by each retained
 kernel component — and 8 KiB is not a number that constrains anything. The four `.ko` that stopped being built are
 the same four symbols moving from `=m` to `=y`, so the modules half of
-`verify/src/checks-kernel.ts` keeps four subjects rather than none.
+`src/verify/checks-kernel.ts` keeps four subjects rather than none.
 
 #### 4.2.2 The legacy back-end, measured
 
@@ -531,7 +531,7 @@ it visible at all.
 `CONFIG_NF_TABLES_BRIDGE` builds no object of its own: it is a tristate
 `menuconfig` whose family compiles into `nf_tables.ko` and whose submenu holds
 the per-expression modules (`nft_meta_bridge`, `nft_reject_bridge`), which are
-policy. It takes the same module-less shape in `verify/src/checks-kernel.ts` as
+policy. It takes the same module-less shape in `src/verify/checks-kernel.ts` as
 the inet/ip/ip6 family bools.
 
 **What an operator observes, and it is not the same on both boards.**
@@ -676,7 +676,7 @@ author's words, where *this file* is
 
 > NOTHING CATCHES THAT FOR THESE SYMBOLS. Measured against `mica-build` at
 > `77a124b`: two places read a shipped kernel configuration, and neither reads
-> this list. `build/src/kernel-package.ts` lines 141-149 read the `config`
+> this list. `src/image/kernel-package.ts` lines 141-149 read the `config`
 > file of the board's kernel component and refuse a kernel missing `RD_ZSTD`,
 > `BLK_DEV_LOOP`, `BLK_DEV_DM`, `DM_VERITY`,
 > `DM_VERITY_VERIFY_ROOTHASH_SIG`, `SYSTEM_TRUSTED_KEYRING`, `EXT4_FS`,
@@ -694,7 +694,7 @@ author's words, where *this file* is
 
 *Re-measured here before landing: both readers at their lines, and the
 negative by enumerating the tree and fetching every one of the 61 files under
-`verify/src/` — none mentions `/boot/`. The citation form is the author's and
+`src/verify/` — none mentions `/boot/`. The citation form is the author's and
 is the one to copy for anything crossing a repository boundary: a line number
 and a commit, so a reader can check it and it goes stale visibly — **with the
 qualifier the next hour supplied: checkable only if the commit is fetchable.**
@@ -705,7 +705,7 @@ citation carries its own unreachability
 **And a second qualifier, from a citation correct in every respect**
 *(2026-09-20)*: the form assumes the instrument **runs**, and it cannot say
 *cited and not invoked*. A records table naming
-`mica-build:tests/lifecycle-uefi/firmware.sh` is repository-qualified, the
+`mica-build:tests/suites/lifecycle-uefi/firmware.sh` is repository-qualified, the
 path resolves and the file is real — **and nothing in that repository calls
 it**. **A valid citation whose premise is false gives its reader no reason to
 doubt**, because the citation is correct; what is absent is the only property

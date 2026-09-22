@@ -46,7 +46,7 @@ image label `mica.boot.inputs`, the sha256 of the image's pinned inputs (base
 image digest, apt snapshot row, EFI target, the `mica-systemd-boot` archive,
 the Dockerfile and copied files; the FIT tools image adds its FIT and regdb
 scripts, the board's U-Boot tool binaries and the regdb source), and
-`build/src/kernel-package.ts` refuses an image without it; `ukify` and
+`src/image/kernel-package.ts` refuses an image without it; `ukify` and
 `sbsign` run under `faketime` frozen at `SOURCE_DATE_EPOCH`, so two signings
 are byte-identical (`tests/boot-signing-test.sh`); and `release.sh collect`
 refuses a kernel that has the previous scoped release's `buildId` but
@@ -214,7 +214,7 @@ new board enters through its `locks/mica-boards.<board>.lock` pin and its
 (default `meta/`): verity and boot key pairs, the update signer and its
 public key.
 
-`bash build/run.sh --components --help` lists the component commands the
+`bash bin/bun.sh src/cli.ts components --help` lists the component commands the
 driver runs, for a build that needs one step alone. Their order is:
 
 1. `root`, out of the composition (`rootfs-verity.img` and its parameters).
@@ -235,12 +235,12 @@ writes `SHA256SUMS` beside it, and prints the full image path. Use that actual
 filename in verification and release commands; the timestamps below are examples.
 
 ```sh
-bash build/run.sh --components image --board uefi-x64 \
+bash bin/bun.sh src/cli.ts components image --board uefi-x64 \
   --records /path/to/factory-records.json \
   --public-key BASE64_ED25519_PUBLIC_KEY \
   --firmware /path/to/firmware-package --out /path/to/new-image
 
-bash verify/run.sh --verify --board uefi-x64 \
+bash bin/bun.sh src/cli.ts verify --board uefi-x64 \
   --image /path/to/new-image/mica-x64-20260909-164233.img --public-key /path/to/public.key
 ```
 
@@ -294,7 +294,7 @@ UEFI/FIT key enforcement; boot tests establish that separately.
 QEMU API acceptance requires a full factory image and the public boot signer:
 
 ```sh
-MICA_PRODUCT=uefi-x64-dev bash mica-build:tests/apid-api/run.sh
+MICA_PRODUCT=uefi-x64-dev bash mica-build:tests/suites/apid-api/run.sh
 ```
 
 The product names the board, the image (`_out/products/<name>/image/`) and
@@ -302,7 +302,7 @@ the boot signer (`meta/boot/signer.cert.pem`); `MICA_QEMU_IMAGE` and
 `MICA_QEMU_BOOT_CERT` override the last two for an acceptance run over a
 copied release image. The harness copies the image, enlarges the virtual medium, seeds DATA service
 units, enrolls disposable Secure Boot variables and boots through firmware.
-It does not edit the signed kernel command line. `tests/lifecycle-uefi/` covers
+It does not edit the signed kernel command line. `tests/suites/lifecycle-uefi/` covers
 runtime/update/fault/shutdown and large-root measurements for current images.
 `tests/lifecycle-uboot-fit/` covers parser, signer and dirty-filesystem behavior.
 

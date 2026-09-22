@@ -87,7 +87,7 @@ identity database.
 
 Build the board's signed-policy loader with `make cx3576-uboot-mica`
 and explicit public boot signing inputs; kernel content trust is supplied
-separately. `build/run.sh --components` packages the signed FIT, firmware,
+separately. `bin/bun.sh src/cli.ts components` packages the signed FIT, firmware,
 root, deployments and complete factory disk with explicit inputs.
 
 Full-image flash preflight checks the current GPT and loader placement before

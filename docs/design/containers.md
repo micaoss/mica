@@ -519,9 +519,9 @@ from the build tree; the session probe reads a running system, which is
 downstream of the shipped artefact — though for the three limit files it was
 reading the root cgroup and therefore nothing (below). **The top rung is unguarded for the symbols this section is about — and it
 was guarded until 2026-09-09.** None of the **61** files under
-`mica-build:verify/src/` mentions `/boot/`, checked here by reading every one
+`mica-build:src/verify/` mentions `/boot/`, checked here by reading every one
 of them rather than by grepping for a name, and the two places that do read a
-kernel configuration are `build/src/kernel-package.ts`, over the kernel
+kernel configuration are `src/image/kernel-package.ts`, over the kernel
 **component**, and `rootfs/compose/compose-install.sh`, over
 `/boot/config-<release>` in the composed root. Both assert the boot and verity
 floor: `DM_INIT`, `BLK_DEV_DM`, `DM_VERITY`, `SQUASHFS`, the trusted keyring,
@@ -535,7 +535,7 @@ everything: nothing downstream of the build would notice.
 **It is a regression from a cleanup rather than a rung nobody built**, and
 that reads differently: somebody built it, so the mechanism is known to be
 possible and its cost is known. `mica-build` reports that
-`verify/src/checks-kernel.ts` was 748 lines, read `/boot/config-*` out of the
+`src/verify/checks-kernel.ts` was 748 lines, read `/boot/config-*` out of the
 packed root and asserted the floor — `VETH`, `NFT_FIB_INET`/`IPV4`/`IPV6` with
 the netavark reasons, `BPF`, `BPF_SYSCALL`, `BPF_JIT` and `CGROUP_BPF` with
 the crun citation, `NF_TABLES` and the firewall family — and that it was

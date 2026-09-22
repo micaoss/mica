@@ -299,7 +299,7 @@ at `mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config` carries
 `# CONFIG_RTC_DRV_HYM8563 is not set`; `configure.sh` flips it before
 `olddefconfig`, and the file's own header says the assertions are "on the
 RESOLVED config and not on the committed input". The resolved config is what
-ships as `/boot/config-<release>` and what `verify/src/checks-kernel.ts` reads
+ships as `/boot/config-<release>` and what `src/verify/checks-kernel.ts` reads
 back out of the packed root — **so that is the file a claim about this kernel is
 made against.** An earlier draft of this page predicted the opposite of the
 truth here by reading the input, and the two files differ in exactly this one

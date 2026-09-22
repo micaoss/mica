@@ -38,7 +38,7 @@ systemd on every current target and binds it read-only at `/etc/machine-id`.
 It stays stable across reboot, update and rollback. A complete reflash creates a
 new identity. No identity is stored in the bootloader's attempt records.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:verify/src/checks-file-root.ts`
+> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:src/verify/checks-file-root.ts`
 
 ## 2. Finding the device
 

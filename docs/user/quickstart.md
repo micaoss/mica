@@ -13,7 +13,7 @@ docker with a working daemon, plus bash, make, git and python3 — every
 compiler, filesystem maker and signing tool runs inside the pinned build-env
 images.
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:Makefile`, `docs/user/build.md`
 
 ## 2. Take a published image
 
@@ -29,7 +29,7 @@ Which release, and how to check the decompressed image against the version
 index, is [download](download.md). The image is a whole GPT disk — ESP,
 SYSTEM and DATA — carrying two signed deployment records.
 
-> status: shipped — evidence: `docs/user/download.md`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:src/image/file-layout.ts`
 
 ## 3. Boot it under QEMU
 
@@ -47,7 +47,7 @@ make lifecycle-uefi PRODUCT=uefi-x64-dev
 It boots the product and exercises runtime, updates, faults, reset and
 shutdown.
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`
 
 ## 4. Or build the image first
 

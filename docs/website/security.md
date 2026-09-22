@@ -33,7 +33,7 @@ selection, and retain a known authenticated fallback. Boot, content and metadata
 keys are independent. Root/kernel updates leave loader firmware untouched; its
 signed maintenance flow has separate recovery and readback.
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-deploy:src/acquisition.rs`, `mica-build:build/src/firmware-maintenance.ts`
+> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-deploy:src/acquisition.rs`, `mica-build:src/image/firmware-maintenance.ts`
 
 HTTPS management authenticates administrator sessions and bearer tokens, protects
 browser writes with CSRF checks, and keeps login backoff/audit state. SSH is off

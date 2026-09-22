@@ -32,7 +32,7 @@ automatic, and a `cx3576` or `s905x5m` image has never been started by
 anything automatic: no suite boots a FIT image — the FIT suite runs on the
 host and carries no QEMU ([download](download.md) section 1).
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. Before you write
 
@@ -67,7 +67,7 @@ Then know three things about the write:
 - **DATA is small on purpose.** It ships at 256 MiB and grows to the medium on
   first boot; SYSTEM is exactly 1 GiB and holds both deployments.
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:src/image/file-layout.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
 
 ## 2. What the image carries, per board
 
@@ -109,7 +109,7 @@ The ESP is FAT, labelled `MICAESP`, and carries `EFI/BOOT/BOOTX64.EFI` and
 `loader/loader.conf`. The image boots wherever UEFI firmware starts
 `BOOTX64.EFI`, so the whole image goes to the target medium.
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:build/src/file-layout.ts`
+> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
 
 ### Which media the kernel can drive
 
@@ -233,13 +233,13 @@ is one target in `mica-build`:
 make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 A stock release image boots to its login prompt and its services. The
 `FILE_AB_*` markers the acceptance console prints come from the suite's own
 in-image script, not from a shipped image; do not expect them on a device.
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/boot.sh`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`
 
 ## 5. cx3576
 
@@ -364,7 +364,7 @@ recovered are all unwritten and untested — bench work owned jointly by
   report the running deployment id; map it back with the index:
   `jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json`.
 
-> status: shipped — evidence: `mica-build:build/src/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:src/image/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
 
 No full device cycle — write, first boot, update, confirmation, rollback — has
 been run on hardware. The device-side half of this section is read out of

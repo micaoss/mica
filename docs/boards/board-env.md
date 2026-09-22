@@ -2,10 +2,10 @@
 
 `boards/<name>/board.env` declares the board's target architecture, current disk
 geometry and hardware capabilities. The active system-image targets are uefi-x64,
-uefi-arm64, cx3576 and the s905x5m development port. `build/src/file-layout.ts` parses the current layout;
+uefi-arm64, cx3576 and the s905x5m development port. `src/image/file-layout.ts` parses the current layout;
 `make os-layout-lint` exercises it.
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `mica-build:make os-layout-lint`
+> status: shipped — evidence: `mica-build:src/image/file-layout.ts`, `mica-build:make os-layout-lint`
 
 ## Format and consumers
 
@@ -16,11 +16,11 @@ from persistent device storage.
 
 | Consumer | Contract |
 |---|---|
-| `build/src/file-layout.ts` | Current partition order, sizes, identities and protected firmware ranges |
-| `build/src/file-image.ts` | Signed deployment assembly and factory filesystem creation |
+| `src/image/file-layout.ts` | Current partition order, sizes, identities and protected firmware ranges |
+| `src/image/file-image.ts` | Signed deployment assembly and factory filesystem creation |
 | `rootfs/build.sh` | Architecture, root pack settings, hardware capabilities and current bind/repart configuration |
 | `mica-boards:producers/board/render.sh`, `stage.sh` | Board service and hardware initialization files |
-| `verify/src/file-image.ts` | Exact assembled GPT, firmware, component and filesystem checks |
+| `src/verify/file-image.ts` | Exact assembled GPT, firmware, component and filesystem checks |
 
 ## Identity
 
@@ -78,7 +78,7 @@ The native C boot policy validates these fixed ranges, persists and reads back a
 trial decrement, and only then loads a required signed FIT. DATA growth compares
 protected firmware/SYSTEM bytes and preserves their identities.
 
-> status: shipped — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-build:build/src/firmware-maintenance.ts`, `mica-build:tests/repart-loader-test.sh`
+> status: shipped — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-build:src/image/firmware-maintenance.ts`, `mica-build:tests/repart-loader-test.sh`
 
 ## s905x5m protected firmware ranges
 
@@ -110,7 +110,7 @@ how many units the board package enables, which the package gate holds.
 ## The authenticated boot
 
 The assembly's kernel component and firmware package dispatch on these
-facts and never on the board's name (`mica-build:build/src/board-facts.ts`,
+facts and never on the board's name (`mica-build:src/image/board-facts.ts`,
 held by `mica-build:tests/board-name-lint.sh`). `BOARD_CMDLINE_ARGS` is the
 exact authenticated kernel command line on every board (a FIT board's
 kernel forces it, `CONFIG_CMDLINE_FORCE`). `FIRMWARE_FORMAT` is `efi` on a

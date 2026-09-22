@@ -148,7 +148,7 @@ auto 模式，其中 nft 前端的优先级高于旧版，并且这里没有任�
 `/usr/local/lib/systemd/system`（[applications.md](applications.md)）。这是对
 产品当下行为的陈述，不是关于该如何运行防火墙的建议。
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:verify/src/checks-firewall.ts`
+> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. 安全生命周期
 

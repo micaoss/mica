@@ -164,7 +164,7 @@ At most two deployments are retained, so a device always keeps one fallback.
 Installation needs the new bytes plus a 128 MiB reserve on SYSTEM and 64 MiB
 on the ESP, counting what garbage collection reclaims first.
 
-> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-build:build/src/file-image.ts`, `docs/design/updates.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-build:src/image/file-image.ts`, `docs/design/updates.md`
 
 ## 6. Reboot, confirmation and rollback
 

@@ -32,7 +32,7 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 再只读绑定到 `/etc/machine-id`。它跨重启和组件更新保持稳定；格式错误或不可用的
 身份会被拒绝，不会静默生成临时替代身份。
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:verify/src/checks-file-root.ts`
+> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:src/verify/checks-file-root.ts`
 
 ## 2. 找到设备
 

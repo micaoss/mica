@@ -9,7 +9,7 @@ already running Mica OS moves forward with an update archive instead
 This page is the order of operations. The per-board write procedure — and
 which boards have one — is [flashing](flashing.md).
 
-> status: shipped — evidence: `mica-build:build/src/file-layout.ts`, `docs/user/flashing.md`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:src/image/file-layout.ts`, `docs/user/flashing.md`, `docs/design/storage.md`
 
 ## 1. Choose and verify the image
 

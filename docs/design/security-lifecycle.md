@@ -79,7 +79,7 @@ Do not claim a wall-clock signer-expiry window as installed-boot revocation.
 `boot/dev-keys.sh` creates separate boot/content/metadata development
 domains only when explicitly invoked with a new output directory. Its marker is
 baked with the public defaults. The native observer reports that provenance;
-`build/run.sh --release gate` refuses marked material on candidate/stable channels.
+`bin/bun.sh src/cli.ts --release gate` refuses marked material on candidate/stable channels.
 Releases signed with the development material therefore target the development
 channel only; candidate and stable releases wait for production keys (user,
 2026-09-14; `docs/task/20260912-2058-production-key-custody.md`).
@@ -179,7 +179,7 @@ per `docs/design/release-signing.md` §3 — and a publication gate must refuse
 a release whose claims exceed its board evidence, including any boot-assurance
 claim above the board's evidenced ladder level. The unsupported-claim
 publication gate is **[implemented]** by `checkBoardEvidence` in
-`build/src/release-manifest.ts`. Channel promotion remains **[proposed]**;
+`src/image/release-manifest.ts`. Channel promotion remains **[proposed]**;
 until it exists, promotion is this procedure executed by hand by the release
 owner, recorded in the release notes.
 

@@ -252,7 +252,7 @@ editing may conceal a failure. Record the actual watchdog reset and cause.
 **Exit criteria.** Applicable automated gates pass, and every claimed physical
 path has dated board/image-bound evidence. Unrun physical cases remain pending.
 
-> status: shipped — evidence: `mica-build:tests/lifecycle-uefi/updates.sh`, `mica-build:make os-fit-records-test`, `mica-build:make os-file-transaction-faults`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/updates.sh`, `mica-build:make os-fit-records-test`, `mica-build:make os-file-transaction-faults`
 
 ## Stage 10 — release registration
 

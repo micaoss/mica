@@ -62,7 +62,7 @@ API 验收套件在 QEMU 里启动 uefi-x64 镜像，通过真实套接字驱动
 它也是这个面端到端行为（包括 TLS、重定向与认证门控）的参考：
 
 ```sh
-bash micad:tests/apid-api/run.sh
+bash micad:tests/suites/apid-api/run.sh
 ```
 
 > status: shipped — evidence: `mica-core:tests/apid-api/run.sh`

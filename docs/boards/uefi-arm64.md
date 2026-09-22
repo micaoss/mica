@@ -72,7 +72,7 @@ The kernel enforces `dm_verity.require_signatures=1`. Module/support mounts are
 ready before udev. Three trial attempts are persisted before launch; only the
 health gate confirms. Exhaustion stops without refilling counters.
 
-> status: shipped — evidence: `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-deploy:src/bin/mica-init.rs`, `mica-build:tests/lifecycle-uefi/updates.sh`
+> status: shipped — evidence: `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-deploy:src/bin/mica-init.rs`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
 
 ## Storage media and layout
 

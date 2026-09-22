@@ -39,7 +39,7 @@ classes:
   never a loose build. A development-keyring image
   (`meta/GENERATED`-derived) must never be flashed at a factory station. Three
   mechanisms now stand behind that sentence: the image verifier's gate
-  (`verify/src/checks-root.ts`), the **publication gate**, which refuses a
+  (`src/verify/checks-root.ts`), the **publication gate**, which refuses a
   `candidate` or `stable` release whose image carries
   `/usr/share/mica/meta/GENERATED` and names the file
   (`docs/design/release-artifacts.md` §4.1), and the **device itself**, which
