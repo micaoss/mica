@@ -737,7 +737,12 @@ written to hold.
 question.** The `world` job reads another repository's `main`: the
 `io-throttling.*` and `memcg.*` rows say what the **next** board release will
 carry, the `board-pin.*` rows what the products being built carry **today**,
-and no row of it can reach a build output.
+and no row of it can reach a build output. *(Since the merge of `mica-boards`
+into `mica-build` on 2026-09-21 the rows read `mica-build:boards/` and
+`mica-build:common/`, and the `board-pin.*` rows are gone with the re-pin
+step they watched: a board is no input, so what the next release carries and
+what the products are built from are the same committed tree, and the
+`board-release.*` rows name `mica-build`'s newest release per board.)*
 `mica-build:tests/session-probe/probe.sh` reads the
 machine, which is the right **shape** for the second question — and until
 2026-09-20 it was not answering it. **The product side of this section is
@@ -909,6 +914,11 @@ what lets a red be read without an investigation:
 | the four board releases are cut | green | **red** | green | says nothing |
 | `mica-build` re-pins the boards | green | green | **red** | says nothing |
 | a product built from those pins is booted | green | green | green | answers, once it asks in a delegated cgroup |
+
+*(Table as written on 2026-09-20. The third row's event no longer exists:
+since 2026-09-21 the boards live in `mica-build` and nothing re-pins them, so
+the `board-pin.*` column is gone and a board release is the same `mica-build`
+release that builds the products.)*
 
 The middle row is there because it was missing: the release is a step of the
 chain that **no instrument saw**, so a page could have said *the repair has

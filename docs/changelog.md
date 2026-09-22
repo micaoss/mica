@@ -9512,3 +9512,14 @@ builds every board's components, since no `mica-build` release has published
 any yet. Open in the plan: P3 (`layout.tsv`, the dispatch rule, the fact
 lint) and P4 (`mica-core`).
 
+
+## 2026-09-22 07:34 [progress]
+
+The `world` gate went red on the merged `mica-build` (run `35699972514`):
+its `board-pin.*` rows read `locks/pins/mica-boards.*.pin`, which the merge
+removed. `docs/world-claims.tsv` now reads the boards in `mica-build`
+(`boards/`, `common/`), the `board-release.*` rows name `mica-build`'s newest
+release per board (`20260920-0622`), and the four `board-pin.*` rows are gone
+with the re-pin step; `containers.md`, `support-tiers.md` and `access.md`
+say so where they stated those rows or cited the moved paths. 22/22 claims
+hold.

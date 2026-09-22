@@ -1110,7 +1110,7 @@ An operator who loses the webAdmin password **and** every authorized key has
   `serial-getty@ttyFIQ0` from the kernel `console=` parameter on both profiles.
   No package ships a getty unit; `mica-board-cx3576` ships only a drop-in that
   amends the generated one
-  (`mica-boards:boards/cx3576/package/overlay/etc/systemd/system/serial-getty@ttyFIQ0.service.d/local-line.conf`).
+  (`mica-build:boards/cx3576/package/overlay/etc/systemd/system/serial-getty@ttyFIQ0.service.d/local-line.conf`).
   A login prompt appears. It has no account that will accept a
   credential — root is locked and every other account is locked by
   `mica-shadow-reconcile`.

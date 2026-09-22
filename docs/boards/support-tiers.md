@@ -107,9 +107,10 @@ still says four physical rows untested with `RFCT-922` open.
 **A hardware boot of `cx3576` was reported by the user on 2026-09-20**, the
 first physical boot report here. It changes no row in this table: a pass row
 carries a date and an evidence reference, and this arrived as a sentence with
-no artefact, so `cx3576` keeps "physical rows not tested" until `mica-boards`
-records one. What it would satisfy, and what the person who booted it would
-have to keep, is `mica-boards`'s to state.
+no artefact, so `cx3576` keeps "physical rows not tested" until the board's
+dossier records one. What it would satisfy, and what the person who booted it
+would have to keep, is the board's to state (in `mica-build:boards/cx3576/`
+since the merge of 2026-09-21).
 
 `s905x5m` was opened as a release target by user decision on 2026-09-19 and
 published its first release, `s905x5m.20260920-0033`, on 2026-09-20; its tier
@@ -119,14 +120,15 @@ never meant being qualified on hardware here — `cx3576` has published images
 at the bring-up tier, with the same "physical rows not tested", since before
 the rename. `s905x5m` was the outlier and this table gave no reason for it, so
 the decision removes an inconsistency rather than lowering a bar. The flag in
-`board.env` and the first release follow from `mica-boards`, and `mica-build`
-re-pins and publishes its products after that.
+`board.env` and the first release followed from `mica-boards`, and `mica-build`
+re-pinned and published its products after that; since the merge of
+2026-09-21 one `mica-build` release scoped to the board does both.
 
 The flag took a while to flip, and the reason is worth reading: **the board
 had no `evidence.json`**, and `mica-build`'s release manifest requires one — `schemaVersion` 2, the board name, a known `bootAssurance`, a non-empty
 qualification, at least one `evidenceRef` and `physicalBoundaries`. Flipping
 today would produce a product whose release manifest cannot be built, so
-`mica-boards` writes the document first, on the `cx3576` model that states its
+`mica-boards` wrote the document first, on the `cx3576` model that states its
 own pending physical rows. That document is where the distinction this table
 draws — a release target is not a hardware claim — gets stated for this
 board.
@@ -162,4 +164,4 @@ class that starts them rather than for a machine; `cx3576` and `s905x5m` are
 They were called `x64` and `virt-arm64` until 2026-09-16, and releases
 published before that date carry the old names.
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
