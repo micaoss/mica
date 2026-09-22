@@ -428,6 +428,21 @@ with P4.
   the next thing to read. Open: P3 (`layout.tsv`, the dispatch rule, the
   fact lint) and P4; the worktree `tmp/wt-merge2` of `mica-build` keeps the
   built kernels under `_out/` until the first releases publish them.
+- 2026-09-22 (CI of the merged main, run `35699869336` on `90b72919`): every
+  gate, the four kernels and both U-Boots, the pools, the components job,
+  `boards` and the eight `products` jobs green; two reds, both in what the
+  local gates never run: the eight `release-products` jobs (the product job
+  of `release-product.yml` expected every board's built tar while it
+  downloads only its own; `f8ad6bd1` filters `built` to the board) and the
+  `suites` job (`tools/deploy-pool.sh --check` compared the fixture's board
+  vocabulary against the `board` rows of `locks/`, empty since the board is
+  no input; `2e8ebaef` reads `boards/boards.tsv`). The suites steps after
+  that refusal never ran in CI and were run here instead: the boot tooling
+  suites, the aa64 boot tools, the apid spec pins (43) and typecheck, the
+  runtime-closure test; all green. The `world` gate of this repository went
+  red on the removed `locks/pins/mica-boards.*.pin` and reads the boards in
+  `mica-build` now (`53b174a`). Run `35702312526` on `2e8ebaef` is the one to
+  read next.
 
 ## Annotations
 

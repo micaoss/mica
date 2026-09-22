@@ -9523,3 +9523,15 @@ release per board (`20260920-0622`), and the four `board-pin.*` rows are gone
 with the re-pin step; `containers.md`, `support-tiers.md` and `access.md`
 say so where they stated those rows or cited the moved paths. 22/22 claims
 hold.
+
+## 2026-09-22 07:59 [progress]
+
+Two readers the merge missed, found by the first CI run of the merged
+`mica-build` main (`35699869336`) and fixed as `f8ad6bd1` and `2e8ebaef`:
+the product job of `release-product.yml` expected every board's built tar
+when `ci.yml` builds all boards in one run, and `tools/deploy-pool.sh
+--check` read the fixture's board vocabulary against the `board` rows of
+`locks/`, which the merge emptied; it reads `boards/boards.tsv` now. The
+suites steps CI never reached were run by hand on the merged tree, all
+green; the plan's *Progress* has the list.
+
