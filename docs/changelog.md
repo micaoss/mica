@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-22 12:20 [progress]
+
+The runtime composition of `mica-build` runs on bun (`9bb86d01`, plan
+`20260922-0817` P2, second slice): `rootfs/runtime/{select,compose,
+source-lineage}.py` are `src/rootfs/runtime/{select,compose,lineage}.ts`
+plus `fsx.ts`, `pyjson.ts` and `elf.ts`, the pack stage runs `bun` copied
+out of the pinned build-env base image and `python3` leaves `pack-tools`,
+and the 2.2k lines of Python tests are the 149 cases of
+`tests/suites/rootfs-runtime/`. Parity measured on a release-shaped
+`uefi-x64-prod` build: every signed component byte-identical to the
+reference, the drops table identical, the runtime report the same size
+with only the installation timestamps, source commits and input hashes
+differing; the lineage record byte-identical over the real pool. The same
+commit repairs the three reds of CI run `35722671849` on `2a9a9180`, one
+defect: `tools/podman-pool.sh` handed `bin/bun.sh` a `/tmp` path, which
+the container route writes inside the container and loses. Still Python
+in `mica-build`: the lifecycle suite's QEMU helpers, `boot/elf-closure.py`,
+the two kernel helpers, `common/scripts/git-pack-manifest.py`, two gates,
+two suite helpers and the four under `boards/cx3576`.
+
 ## 2026-09-21 12:17 [finding]
 
 **A gate has a domain, and `make docs-verify`'s is the working tree rather

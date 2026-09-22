@@ -447,6 +447,60 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
   `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
   the four under `boards/cx3576`.
+- 2026-09-22 12:20: **P2, second slice: the runtime composition** (`9bb86d01`;
+  30 files, +4,437/-3,834). `rootfs/runtime/{select,compose,source-lineage}.py`
+  are `src/rootfs/runtime/{select,compose,lineage}.ts`, rule for rule and
+  message for message, over `fsx.ts` (extended attributes, `lchown` and
+  nanosecond `utimensat` through `bun:ffi`, the three facts Node's `fs`
+  does not expose; Node errno errors rendered as Python's `OSError` text,
+  which the refusals and their tests read), `pyjson.ts` (the bytes
+  Python's `json` module writes -- sorted keys, `\uXXXX`, integers exact as
+  bigint -- verified byte-identical) and `elf.ts`. The lineage record's
+  reader stays in the runtime directory, which is all the pack stage
+  mounts (nothing there imports outside it, so no `node_modules` enters
+  the container); its writer, which reads the pool archives through
+  `src/pool/deb.ts` and the checkout through git, is `src/rootfs/lineage.ts`
+  (`bun src/cli.ts lineage`, called by `rootfs/build.sh`). The pack stage
+  runs `bun` copied out of the pinned build-env base image (a fourth
+  stage, `bun-source`; `MICA_IMAGE_BUILD_BASE` resolved by
+  `tools/from.sh` beside the trixie image; bun links only glibc) and
+  `python3` leaves `pack-tools`. Parity, measured: a release-shaped
+  `uefi-x64-prod` build against the reference `_out/ref-prod-b76b23fe`
+  (built by the Python at `b76b23fe`) -- root, kernel, firmware,
+  deployments, updates and lifecycle components byte-identical, the drops
+  table identical, the runtime report the same 6,697,986 bytes with 34
+  differing lines, all of them the installation timestamps of the
+  `configured` capture, the source commits and the hashes of the inputs
+  that legitimately changed (`pack-tools.tsv` without python3, the moved
+  stage scripts); `image/data.img` and the `kinds` image keep the known
+  40-byte timestamp gap. The source lineage record over the real amd64
+  pool: byte-identical to the Python's (12,006 bytes). The 2.2k lines of
+  Python tests are `tests/suites/rootfs-runtime/` (89 + 46 + 14 = 149
+  cases, one per Python case, the same fixture: real ELF files, device
+  nodes over `mknod`, foreign owners, `security.capability`), run by
+  `make os-rootfs-runtime-test` through `bin/bun.sh` -- as root, which the
+  container route is, so CI drops its `sudo`; verified through that route
+  (`MICA_BUN_CONTAINER=1`, 149 pass: `mknod` and `setxattr` work under
+  docker's default capabilities). `release-manifest.test.ts` builds its
+  runtime fixture through the same `Composition` class instead of an
+  embedded Python program (74 pass). One fidelity gap the port surfaced:
+  the Python tests read `No such file or directory` out of an `OSError`,
+  which is why `fsx.ts` renders errno errors Python's way rather than the
+  tests being loosened. Also in the commit: the three reds of CI run
+  `35722671849` on `2a9a9180` (products, suites, boards) were one defect,
+  `tools/podman-pool.sh` handing `bin/bun.sh` an output path under
+  `/tmp`, which the container route writes inside the container and
+  loses; its work directory is under `_out/` now (the rule: a path handed
+  to the bootstrap is inside the tree). Green on the slice: the runtime
+  suites, `src/image` and `src/verify` (958), the stages test (the
+  target list gains `bun-source`), the board-name, host-toolchain and
+  pipefail lints with their negative tests, `os-netavark-kernel-test`,
+  `bun run lint`/`typecheck`. Still Python: the QEMU helpers of the
+  lifecycle suite, `boot/elf-closure.py`, `common/kernel/{mklogo,
+  export-regdb-certs}.py`, `common/scripts/git-pack-manifest.py`,
+  `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
+  `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
+  the four under `boards/cx3576`.
 
 ## Annotations
 
