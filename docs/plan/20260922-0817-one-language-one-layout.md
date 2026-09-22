@@ -254,6 +254,42 @@ the product recipes, any behaviour of the built images.
   deployable apps or shared packages with several consumers; this is one
   tool with one CLI. Rejected.
 
+**The board directory under one management (user, 2026-09-22: "我们更倾向统一
+管理所有的构建，在boards里面不需要有刷机这些").** Measured at `2e8ebaef`:
+every `.sh`, Makefile and Dockerfile under `boards/` is ours (the kernel and
+loader builds that run inside the bsp image, the kconfig hooks, the tests);
+the vendor content is `s905x5m/kernel/third` (the Seekwave SDIO driver, 88
+files), `s905x5m/userland/{skwbt,skw_bridge}` (its Bluetooth library and
+bridge), `loader/blobs` and `cx3576/loader/MiniLoaderAll.bin` (DDR, BL31
+and loader blobs), the radio firmware under `firmware/`, and the patch
+series over the pinned upstream kernel and U-Boot trees. `cx3576/flash/`
+(37 files: an rkdeveloptool macOS build with two patches, `verify-flash`,
+an Alpine recovery root) and the `flash-mica`, `flash-maskrom`,
+`rkdeveloptool-macos` targets of the board Makefile are flashing support
+nothing in the engine reads; `tests/bench/` is a bench qualification
+collector. The four `boards/<board>/meta` entries are absolute symlinks to
+one checkout's `meta/` committed by the layout move of 2026-09-21; nothing
+reads them and they are removed (`e26ee3cf`). So, added to P1:
+
+- a board directory is data and vendor inputs -- `board.env`, `layout.tsv`
+  (P3 of `20260921-1142`), `images.tsv`, `outputs.tsv`, `bsp.env`,
+  `evidence.json`, `manifests/`, `package/`, `firmware/`, `kernel/`
+  (config, dts, patches, hooks, the vendor driver trees), `loader/`
+  (config, dts, patches, blobs, `mica-file-boot.c`), the package producers
+  (`extras/`, `components/`) and `tests/`; the engine drives every build
+  from that data (`bun src/cli.ts board kernel|loader|firmware <board>`),
+  and the per-board Makefiles go with the root Makefile's `board_delegation`;
+- the in-image build scripts a board needs (`kernel/build.sh`,
+  `configure.sh`, `loader/build*.sh`, the hooks) stay shell because they
+  run inside the bsp image, and they are the only shell a board carries;
+- flashing leaves the tree: `cx3576/flash/` and its three Makefile targets
+  are deleted, the rkdeveloptool patches and the recovery procedure are
+  recorded in `docs/boards/cx3576.md` (*Recovery method*) with the two
+  patch files kept under `docs/boards/cx3576/` as reference; the
+  `cx3576-flash-verify-test` goes with `verify-flash`; `tests/bench/` stays
+  as a test;
+- `tools/inputs.sh` stops hashing `flash/assets` (a path no board has).
+
 ## Open questions for the user
 
 1. **Boards' host-side tests.** `boards/<board>/tests/*-test.sh` and the
@@ -272,4 +308,8 @@ the product recipes, any behaviour of the built images.
 
 ## Annotations
 
-(none)
+- 2026-09-22 08:48 (user): "当前混合了python ts shell，目录结构散乱组织比较差" -- the
+  diagnosis confirmed; and "为什么每个板卡目录还有meta这些？... 我们更倾向统一
+  管理所有的构建，在boards里面不需要有刷机这些，这些属于文档部分，可以写文档不用
+  刷机支持，除非是测试脚本" -- folded into the proposal as *The board
+  directory under one management*.
