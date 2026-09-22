@@ -443,6 +443,25 @@ with P4.
   red on the removed `locks/pins/mica-boards.*.pin` and reads the boards in
   `mica-build` now (`53b174a`). Run `35702312526` on `2e8ebaef` is the one to
   read next.
+- 2026-09-22 (run `35702312526` on `2e8ebaef`): the two earlier reds fixed;
+  two more, both readers of the pool rows the merge changed, and both
+  reproduced locally before the fix: the release manifest's tree lock read
+  only the imported rows of `locks/` while the composer's lineage records
+  the tree's own board and radio packages beside them (`pool.sh rows`), so
+  every release-shaped product build refused itself; `tools/pool.sh own`
+  prints the own rows and `treeLockRows` appends them from the pool
+  directory the release names, a HEAD that cannot be read refuses instead
+  of stamping zeros, and the bun container route passes `safe.directory`
+  because the CLI runs as root over the runner's tree (`6b596709`,
+  `8c32e849`). The selection test's consumer-policy check compared the
+  policy with the pool rows alone, which carry the own packages only once
+  `make board-pool` has run; it reads the producers' declarations too
+  (`8c32e849`). Producer discovery walked `.tmp/` and `repos/` and saw a
+  test fixture's copy as a second producer (`b76b23fe`). Before the push:
+  the release-shaped `uefi-x64-prod` build with `--release 20000101-0000`
+  passed locally, `os-build-test` (586), `os-release-test` (65),
+  `os-pool-test` (23), `publish-test` (21), the board contract (44), the
+  selection tests (89) and both shell lints green. Run `35706535146`.
 
 ## Annotations
 

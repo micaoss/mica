@@ -9535,3 +9535,15 @@ when `ci.yml` builds all boards in one run, and `tools/deploy-pool.sh
 suites steps CI never reached were run by hand on the merged tree, all
 green; the plan's *Progress* has the list.
 
+## 2026-09-22 08:47 [progress]
+
+Four more readers of the merged pool rows, found by `mica-build` CI run
+`35702312526` and fixed as `6b596709`, `8c32e849` and `b76b23fe`: the
+release manifest's tree lock now carries the tree's own packages as the
+composer's lineage does (`tools/pool.sh own`), git trusts the mounted tree
+inside the bun container, the consumer-policy test reads the producers'
+declarations beside the pool rows, and producer discovery prunes `.tmp/`
+and `repos/`. Each was reproduced locally first; the release-shaped
+product build and the gates are green on `b76b23fe`. Details in the merge
+plan's *Progress*.
+
