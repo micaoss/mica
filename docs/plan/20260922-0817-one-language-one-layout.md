@@ -574,6 +574,30 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   in P4. Two scripts nothing runs, noted rather than deleted:
   `tests/gates/boot-startup-pack-fixture.sh` and `tests/suites/repart/inner.sh`
   (the `measure.ts` caller) have no caller in the tree.
+- 2026-09-22 14:30: **P2, third slice: what CI measured** (`3fa4e389`). Run
+  `35728952530` on `5c770a23` went red in two places the host could not
+  show. (1) Every arm64 `release-products` job: the packager image is
+  x86-64 by design and runs under emulation on an arm64 runner
+  (`src/image/kernel-package.ts` names the platform), and bun 1.4.2 aborted
+  there the moment `initramfs.sh` ran `elf-closure.ts` (`panic(main
+  thread): abort() called`, qemu's uncaught signal 6), while the same file
+  had packed every amd64 product. A JIT runtime does not survive that
+  emulation; the Python ran there because the interpreter has none. The
+  closure is `stages/boot/elf-closure.sh` now, bash by the rule's own
+  exception for a container where bun is not the toolchain (decision
+  `2026-09-22-mica-build-one-language.md`), ported rule for rule from the
+  Python: the closure of `/usr/bin/ls` on this host is the same six files at
+  the same modes as the Python's, and the two refusals name what the Python
+  named. bun leaves the boot tools image, whose `mica.boot.inputs` label goes
+  back to its four rows; both images rebuilt, `os-boot-test` green. The
+  13:40 entry's `elf-closure.ts` is superseded by this one. (2) `suites`,
+  `os-release-test` 61/65: `bin/bun.sh` announced its route on stderr on
+  every invocation, and `tests/gates/release-test.sh` compares a plan's
+  combined output against the expected rows -- it saw the announcement. The
+  bootstrap's header promises a caller cannot tell which route it got; the
+  announcement goes to a terminal only now, and the release test is 65/65
+  through the container route. Both are the same lesson as the two seam
+  defects before them: the container route is measured only where it runs.
 
 ## Annotations
 

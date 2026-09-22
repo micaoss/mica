@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-22 14:30 [finding]
+
+**A JIT runtime does not survive user-mode emulation, and the boot
+packager runs under it on arm64 runners.** `mica-build`'s boot tools image
+is x86-64 by design and is emulated on an arm64 host; the third P2 slice put
+bun into it for the ELF closure helper, every amd64 product packed, and every
+arm64 release job died with bun's `panic(main thread): abort() called` under
+qemu (run `35728952530`). The Python before it ran there because the
+interpreter has no JIT. The helper is bash now (`3fa4e389`), the rule's own
+exception for a container where bun is not the toolchain, and bun leaves that
+image. The same run measured a second seam defect: `bin/bun.sh` announced
+its route on stderr, and a gate comparing a command's combined output saw
+the announcement; it is silent unless stderr is a terminal. With the `/tmp`
+path (`9bb86d01`) and the unforwarded environment (`5c770a23`), that is four
+container-route defects in one day, none visible with bun on the host:
+the route is measured only where it runs, and `MICA_BUN_CONTAINER=1` is how
+to run it here.
+
 ## 2026-09-22 13:40 [progress]
 
 The host-side Python of `mica-build` is gone (`5c770a23`, plan
