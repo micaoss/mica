@@ -1,6 +1,21 @@
 # Changelog
 
-## 2026-09-22 18:30 [progress]
+## 2026-09-22 15:47 [progress]
+
+P3, third slice (`mica-build` `2b0285d2`, `08e26e1d`): the package pool is
+`src/pool/pool.ts` (`bun src/cli.ts pool rows|own|fetch|index`), row for
+row and byte for byte with the shell over the tree's locks and the real
+amd64 pool; the index still runs `dpkg-scanpackages` in the base image,
+through `stages/pool/index.sh`. The OCI reader fetches instead of spawning
+curl, so the pool gate is a bun test whose registry is the test process
+(23/23 on both routes), and a `Refused` carries its whole message. CI on
+the previous slice measured the bootstrap's container creating a cache
+directory as root and the host refused beside it; the container now runs
+as the calling user, reproduced and measured as uid 1001 before the push.
+The seven entries of this day from 12:13 on were stamped ahead of the
+clock and now carry the UTC time of the commit that added each.
+
+## 2026-09-22 15:17 [progress]
 
 P3, second slice (`mica-build` `1c2387b9`): the OCI reader and the offline
 pins are `src/pool/oci.ts` and `src/pool/local-pins.ts` (`bun src/cli.ts
@@ -13,7 +28,7 @@ route inside (`MICA_BUN_ROUTE`) and mounts every offline pin's checkout
 read-only, so an offline pool reads on that route while `local-pins`,
 which writes outside the tree, refuses it by name.
 
-## 2026-09-22 17:40 [progress]
+## 2026-09-22 15:03 [progress]
 
 P3 of the one-language plan has started in `mica-build` (`9f94575d`): the
 image resolver, the upstream-lock reader and the source checkout are
@@ -30,7 +45,7 @@ deletions twenty minutes before their callers moved -- a staged `git rm`
 rides along with a path-limited commit -- so main's pool jobs were red for
 that window; `9f94575d` completes it.
 
-## 2026-09-22 16:10 [decision]
+## 2026-09-22 14:39 [decision]
 
 **The bsp image's helpers become resources the base image's bun computes**
 (user, 2026-09-22; `mica-build` `89fd5403`, plan `20260922-0817` P2, fourth
@@ -47,7 +62,7 @@ until P3 moves the fetch to the host, and the inline heredocs of the shell
 gates, which go with P4; the bsp image keeps python3 for the kernel's own
 scripts, which are not this tree's.
 
-## 2026-09-22 15:05 [finding]
+## 2026-09-22 14:01 [finding]
 
 **A gate that runs under sudo can write outside its fixture for months and
 pass.** `mica-build`'s reproducibility gate substituted `/rootfs` once per
@@ -59,7 +74,7 @@ the substitution at path boundaries and removes the litter here. The
 privilege was the mask: a fixture gate should be run at least once as a user
 who cannot write anywhere but the fixture.
 
-## 2026-09-22 14:30 [finding]
+## 2026-09-22 13:23 [finding]
 
 **A JIT runtime does not survive user-mode emulation, and the boot
 packager runs under it on arm64 runners.** `mica-build`'s boot tools image
@@ -77,7 +92,7 @@ container-route defects in one day, none visible with bun on the host:
 the route is measured only where it runs, and `MICA_BUN_CONTAINER=1` is how
 to run it here.
 
-## 2026-09-22 13:40 [progress]
+## 2026-09-22 12:44 [progress]
 
 The host-side Python of `mica-build` is gone (`5c770a23`, plan
 `20260922-0817` P2, third slice): the boot stage's ELF closure, the
@@ -97,7 +112,7 @@ runs inside the bsp image, where there is no bun (`mklogo.py`,
 `export-regdb-certs.py`, `git-pack-manifest.py`) -- an open question in the
 plan -- plus the inline heredocs of the shell gates, which go with P4.
 
-## 2026-09-22 12:20 [progress]
+## 2026-09-22 12:13 [progress]
 
 The runtime composition of `mica-build` runs on bun (`9bb86d01`, plan
 `20260922-0817` P2, second slice): `rootfs/runtime/{select,compose,

@@ -467,7 +467,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
   `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
   the four under `boards/cx3576`.
-- 2026-09-22 12:20: **P2, second slice: the runtime composition** (`9bb86d01`;
+- 2026-09-22 12:13: **P2, second slice: the runtime composition** (`9bb86d01`;
   30 files, +4,437/-3,834). `rootfs/runtime/{select,compose,source-lineage}.py`
   are `src/rootfs/runtime/{select,compose,lineage}.ts`, rule for rule and
   message for message, over `fsx.ts` (extended attributes, `lchown` and
@@ -521,7 +521,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
   `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
   the four under `boards/cx3576`.
-- 2026-09-22 13:40: **P2, third slice: the host-side Python** (`5c770a23`; 44
+- 2026-09-22 12:44: **P2, third slice: the host-side Python** (`5c770a23`; 44
   files, +1,013/-906). Ported, each with its measurement: `stages/boot/elf-closure.py`
   to `elf-closure.ts` (readelf-based as before; the boot tools image copies
   `bun` out of the build-env base image, `MICA_IMAGE_BUILD_BASE` through
@@ -574,7 +574,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   in P4. Two scripts nothing runs, noted rather than deleted:
   `tests/gates/boot-startup-pack-fixture.sh` and `tests/suites/repart/inner.sh`
   (the `measure.ts` caller) have no caller in the tree.
-- 2026-09-22 14:30: **P2, third slice: what CI measured** (`3fa4e389`). Run
+- 2026-09-22 13:23: **P2, third slice: what CI measured** (`3fa4e389`). Run
   `35728952530` on `5c770a23` went red in two places the host could not
   show. (1) Every arm64 `release-products` job: the packager image is
   x86-64 by design and runs under emulation on an arm64 runner
@@ -598,7 +598,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   announcement goes to a terminal only now, and the release test is 65/65
   through the container route. Both are the same lesson as the two seam
   defects before them: the container route is measured only where it runs.
-- 2026-09-22 15:05: **P2, third slice: the last red** (`8d565d39`). Run
+- 2026-09-22 14:01: **P2, third slice: the last red** (`8d565d39`). Run
   `35733135324` on `3fa4e389`: every product and release job green, the
   149 runtime cases green in CI, and one red left, `tests/gates/rootfs-reproducibility-test.sh`'s
   two pack-surgery cases. The gate rewrites `/rootfs`, `/runtime` and `/out`
@@ -614,7 +614,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   host's `/rootfs` and `/out` from earlier runs are removed. The privilege
   the old runner granted had hidden a gate that wrote outside its fixture
   since it was written.
-- 2026-09-22 16:10: **P2, fourth slice: the bsp-image helpers** (`89fd5403`).
+- 2026-09-22 14:39: **P2, fourth slice: the bsp-image helpers** (`89fd5403`).
   The user's answer to the open question (15:30): the base image's bun
   computes the resources and the BSP build consumes them; the bsp image
   stays as it is, no build-env release. `common/kernel/mklogo.py` is
@@ -639,7 +639,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   chose) and the inline heredocs of the shell gates (P4). python3 stays in
   the bsp image for the kernel's own scripts, which is not this tree's
   Python. The open question is closed by this answer.
-- 2026-09-22 17:40: **P3, first slice: `from`, `upstream`, `source`** (`9f94575d`;
+- 2026-09-22 15:03: **P3, first slice: `from`, `upstream`, `source`** (`9f94575d`;
   87 files, +373/-295), after three CI-measured repairs on the way:
   `64509ba1` (the host-toolchain lint takes `// mica-build-side: container
   -- <why>` in a TypeScript file's leading comment, since P2 made `.ts`
@@ -670,7 +670,7 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   board-contract-test, os-pool-test, os-boot-test, the images, paths,
   verity-signing, verify tools, release-manifest and stages suites. Next in
   the order: `oci`, `local-pins`, then `pool` and `deb/*`.
-- 2026-09-22 18:30: **P3, second slice: `oci`, `local-pins`** (`1c2387b9`; 15
+- 2026-09-22 15:17: **P3, second slice: `oci`, `local-pins`** (`1c2387b9`; 15
   files, +317/-243). `tools/oci.sh` is `src/pool/oci.ts`, message for
   message: over the real mica-core amd64 pool the manifest lands at the
   same cache path with the same bytes, the first layer's blob is
@@ -694,6 +694,44 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `local-pins`, which writes outside the tree, refuses that route by name.
   Next in the order: `pool` and `deb/*`, whose gate (`pool-test.sh`,
   `package-gate`, `version-guard`) goes with them.
+- 2026-09-22 15:47: **P3, third slice: `pool`; the bootstrap runs as the
+  user** (`2b0285d2`, 31 files, +738/-674; `08e26e1d`). `tools/pool.sh` is
+  `src/pool/pool.ts` (`bun src/cli.ts pool rows|own|fetch|index`): over the
+  tree's locks `rows` and `own` print the same bytes as the shell; over the
+  real amd64 pool `fetch` verifies the same twelve archives and `index` the
+  same `Packages` and `SHA256SUMS`, and `manifest.txt` differs in the
+  comment line naming its writer. The index still runs `dpkg-scanpackages`
+  in the base image, as `stages/pool/index.sh`, the shell's inline block
+  in a file with its container marker. `src/pool/oci.ts` fetches instead
+  of spawning curl, from `https://ghcr.io` or the registry
+  `MICA_OCI_REGISTRY` names, the real pool's manifests and blobs
+  byte-identical either way; `tests/gates/pool-test.sh` is
+  `tests/gates/pool.test.ts`, case for case, and the registry is the test
+  process, so the `MICA_CURL` hand-over of the second slice is gone after
+  one day; 23/23 on both routes. `src/pool/local-pins.ts` and
+  `src/image/release-manifest.ts` read the rows in-process; every other
+  caller reaches the pool through the bootstrap. A `Refused` now carries
+  its whole message (`locks: refused <rule>: <detail>`), which every
+  TypeScript entry had printed as the bare rule since the first slice.
+  Green: lint, typecheck, the three lints, the pool gate on both routes,
+  os-rootfs-manifest-test 48/48, the runtime suites 149, os-build-test
+  578, os-offline-chain-test 18/18. What CI measured on `1c2387b9` (run
+  35746126641, 27 green, `boards` and `suites` red, the rest cancelled):
+  the container created `_out/cache/oci` as root, and the host's `mkdir
+  _out/cache/pool` and the pool gate's `mv` beside it were refused --
+  pre-creating the top-level scratch directories (`3fa4e389`) had covered
+  one level, and the class is not a list of directories. `bin/bun.sh` runs
+  the container as the calling uid and gid, with the docker socket's group
+  and `HOME` under the tree (`.tmp/home`); reproduced and measured as uid
+  1001 on a fresh checkout outside any `node_modules/` parent: the pool,
+  the cache, `node_modules` and `HOME` are the user's, the host's `mkdir`
+  beside them succeeds, the pool gate passes on that route as that user.
+  Record correction in this entry's commit: the seven entries of this day
+  from 12:13 on had been stamped ahead of the clock (up to three hours,
+  the last at 18:30 while the clock read 15:17); each now carries the UTC
+  time of the `mica` commit that added it. Next in the order: `deb/*`
+  (`build`, `pack`, `package-gate`, `preflight`, `producers`, `publish`,
+  `registry`, `version-guard`, `package-inputs`), then the boards group.
 
 ## Annotations
 
