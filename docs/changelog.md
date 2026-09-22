@@ -9580,3 +9580,13 @@ The living records name the moved paths. Two container-route reds of
 P1a's CI are fixed in the bootstrap. Next: P1c, the board directory under
 one management.
 
+## 2026-09-22 10:20 [progress]
+
+cx3576 flashing is an operator procedure, not tree content
+(`20260922-0815-one-language-one-layout`, P1c; `mica-build` `0ade0a58`):
+the `rkdeveloptool` steps for Loader and Maskrom mode are in the hardware
+and user pages, the tool's macOS build with its two patches beside the
+board page, and `boards/cx3576/flash/`, its three targets and its test are
+deleted. The rebuilt cx3576 kernel is byte-identical but for two comment
+lines of the shipped floor fragment that P1a renamed.
+

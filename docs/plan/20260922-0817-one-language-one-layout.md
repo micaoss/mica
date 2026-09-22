@@ -395,6 +395,25 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `.tmp/` absent inside the container, `tmp/` created root-owned by a
   container and refused to the runner -- fixed by the bootstrap creating
   the scratch directories as the host user first. CI run `35714638101`.
+- 2026-09-22 10:20: **P1c, flashing out of the tree** (`0ade0a58`, held locally until
+  P1b's CI run `35714638101` is read): `boards/cx3576/flash/` (37 files),
+  the targets `flash-mica`, `flash-maskrom` and `rkdeveloptool-macos`, the
+  `cx3576-flash-verify-test` and the `flash/assets` entry of the kernel
+  inputs are gone; the procedure is `docs/hardware/cx3576.md`,
+  `docs/user/flashing.md` (both languages) and
+  `docs/boards/cx3576/rkdeveloptool/` (the two patches and the pinned
+  upstream commit, `3e381a1`). The kernel inputs hash of `cx3576` moves
+  with its Makefile (a declared input); the rebuilt kernel component is
+  byte-identical to the merged tree's reference build in 14 of 16 files,
+  and the two that differ are the shipped `mica-required.fragment` copies,
+  in two comment lines only (the paths P1a renamed) -- which also means
+  P1a already moved every board's kernel inputs hash through that
+  fragment, so the next release builds every component again; the
+  non-comment lines are identical. **Sequencing decision**: the per-board
+  Makefiles and the root Makefile's `board_delegation` are replaced when
+  the engine's board driver is written in TypeScript (P3, `src/boards/`),
+  not now -- doing it in shell first would be a port done twice. The
+  boards' host-side tests move to TypeScript in P4 as planned.
 
 ## Annotations
 
