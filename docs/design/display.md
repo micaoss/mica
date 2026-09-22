@@ -94,7 +94,7 @@ keyboard, EDID negotiation and visual output require testing the flashed image.
 
 **Giving another board a logo is four things in this order**, and the order is
 the point *(2026-09-20)*: `CONFIG_LOGO` (with `LOGO_LINUX_CLUT224`) in the
-board's kernel configure hook; the `mklogo.py` hook rendering the master into
+board's kernel configure hook; the `mklogo.ts` stage rendering the master into
 the kernel tree at build time; `fbcon=logo-pos:` in the board's forced command
 line; and **only then** the `logind` drop-in that keeps `tty1` idle. Out of
 order, the last step alone gives the board an idle VT protecting nothing — a

@@ -174,7 +174,7 @@ with* is what decides whether it was meant:
   — and the logo that comment protects is **the kernel's**: the board's
   `kernel/hooks/configure.sh` enables `LOGO` and `LOGO_LINUX_CLUT224`, its
   `kernel/hooks/prepare.sh` renders `flash/assets/splash.png` into the kernel
-  tree at build time with `common/kernel/mklogo.py`, and the forced command
+  tree at build time with `common/kernel/mklogo.ts`, and the forced command
   line places it with `fbcon=logo-pos:center,logo-count:1`
   ([display](display.md) section 4). No other board does any of that: the
   committed configs of `uefi-x64` and `s905x5m` say `# CONFIG_LOGO is not

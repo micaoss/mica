@@ -79,7 +79,7 @@ mica-build/producers/
   board/                ONE producer for every board's package (FOR_EACH=boards/*/board.env)
   radio-wifi/, radio-bluetooth/   the radio packages every board with the feature installs
 mica-build/common/
-  kernel/               mica-required.fragment (the shared floor), floor-check.sh, kernel-config-test.sh, export-regdb-certs.py
+  kernel/               mica-required.fragment (the shared floor), floor-check.sh, kernel-config-test.sh, export-regdb-certs.ts
   uboot/                mica-records.h, embed-fit-trust.sh
   trust/                stage.sh with stage-inner.sh: validate and stage the public VERITY_TRUST_CERT / FIT_TRUST_CERT
   package/, scripts/    fstab.in and copyright; the builders' shared steps

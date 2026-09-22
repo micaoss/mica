@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-22 16:10 [decision]
+
+**The bsp image's helpers become resources the base image's bun computes**
+(user, 2026-09-22; `mica-build` `89fd5403`, plan `20260922-0817` P2, fourth
+slice). Rather than adding bun to `mica-build-env:bsp`, each kernel
+Dockerfile renders the boot logo in a `logo` stage on the base image
+(`common/kernel/mklogo.ts`, byte-identical to the Python's PPM, 0.2 s
+against 1.6 s) and exports the regulatory certificates in a `regdb` stage
+over what the first profile's build staged (`export-regdb-certs.ts`,
+byte-identical over a synthetic tree); the BSP stages copy the results in.
+The uefi-x64 kernel rebuilt through the new stage is byte-identical in every
+output. Every board's kernel inputs hash moves once. What remains Python in
+`mica-build` is `common/scripts/git-pack-manifest.py`, in the bsp fetch step
+until P3 moves the fetch to the host, and the inline heredocs of the shell
+gates, which go with P4; the bsp image keeps python3 for the kernel's own
+scripts, which are not this tree's.
+
 ## 2026-09-22 15:05 [finding]
 
 **A gate that runs under sudo can write outside its fixture for months and

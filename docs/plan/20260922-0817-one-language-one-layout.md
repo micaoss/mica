@@ -614,6 +614,31 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   host's `/rootfs` and `/out` from earlier runs are removed. The privilege
   the old runner granted had hidden a gate that wrote outside its fixture
   since it was written.
+- 2026-09-22 16:10: **P2, fourth slice: the bsp-image helpers** (`89fd5403`).
+  The user's answer to the open question (15:30): the base image's bun
+  computes the resources and the BSP build consumes them; the bsp image
+  stays as it is, no build-env release. `common/kernel/mklogo.py` is
+  `mklogo.ts`, run in a `logo` stage on `MICA_IMAGE_BUILD_BASE` in each of
+  the four kernel Dockerfiles, and the BSP stage copies the PPM into the
+  source tree (the uefi boards directly, the two BSP boards through their
+  prepare hook's new fourth argument). Measured: the render byte-identical
+  to the Python's over the committed master (2,115,709 bytes, only the
+  generator's name in the PPM comment differs, which pnmtologo ignores),
+  0.2 s against 1.6 s; the uefi-x64 kernel rebuilt through the new stage
+  byte-identical in every output file to the build before it.
+  `common/kernel/export-regdb-certs.py` is `export-regdb-certs.ts`, run in
+  a `regdb` stage on the base image over what the first profile's build
+  stages at `/regdb-inputs` (`.config`, `net/wireless/certs`, the Image),
+  an `out` stage copying the PEM beside every profile; byte-identical to
+  the Python over a synthetic kernel tree, the same refusal when a
+  certificate is absent from the Image; its end-to-end run is CI's cx3576
+  and s905x5m kernel builds. Every board's kernel inputs hash moves once
+  for the Dockerfile change; CI rebuilds every board, reuse by hash resumes
+  after. Still Python in `mica-build`: `common/scripts/git-pack-manifest.py`
+  (in the bsp fetch step, until P3 moves the fetch to the host, as the user
+  chose) and the inline heredocs of the shell gates (P4). python3 stays in
+  the bsp image for the kernel's own scripts, which is not this tree's
+  Python. The open question is closed by this answer.
 
 ## Annotations
 
