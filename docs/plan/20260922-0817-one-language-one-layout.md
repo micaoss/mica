@@ -1,7 +1,8 @@
 # 20260922-0817-one-language-one-layout One language and one layout for the mica-build engine
 
-- **status**: proposed
+- **status**: implementing
 - **createdAt**: 2026-09-22 08:17
+- **approvedAt**: 2026-09-22 08:55 (user: "开始处理", with "容器内的构建脚本如果是外部的就保留外部的shell即可"; the three open questions take their recommended answers)
 - **relatedTask**: 20260922-0815-one-language-one-layout
 
 ## Context
@@ -304,7 +305,19 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
 
 ## Progress
 
-(none)
+- 2026-09-22 08:55: approved. Answers taken: (1) the boards' host-side tests move to
+  TypeScript, the BSP builds keep their languages; (2) all five phases;
+  (3) `src/`, `stages/`, `tests/{gates,suites,fixtures}/`. The user's
+  addition: shell that runs inside a container and comes from outside
+  (vendor build scripts, upstream trees) stays the external shell it is;
+  nothing is rewritten for the sake of the rule. P1 lands in three slices,
+  each pushed and gated: P1a one Bun package (`src/`, `tests/suites/`,
+  `bin/bun.sh` as the one bootstrap that finds Bun on the host or in the
+  pinned container, the Makefile and CI on it); P1b the `tests/` split and
+  `stages/`; P1c the board directory under one management (no per-board
+  Makefile, `flash/` out). The kernel rebuild that P1b's `common/` move
+  forces is compared against the merged tree's builds under
+  `tmp/wt-merge2/_out/built/`.
 
 ## Annotations
 

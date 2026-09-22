@@ -9547,3 +9547,14 @@ and `repos/`. Each was reproduced locally first; the release-shaped
 product build and the gates are green on `b76b23fe`. Details in the merge
 plan's *Progress*.
 
+## 2026-09-22 08:56 [decision]
+
+One language and one layout for the `mica-build` engine
+(`20260922-0815-one-language-one-layout`, plan `20260922-0817`, decision
+`2026-09-22-mica-build-one-language.md`): approved by the user ("开始处理"),
+with the boards' host-side tests in TypeScript, all five phases, the names
+`src/`, `stages/`, `tests/{gates,suites,fixtures}/`, and external shell
+that runs inside a container left as it is. The board directory comes
+under one management: data and vendor inputs, no per-board Makefile,
+flashing as documentation. P1 begins with one Bun package.
+

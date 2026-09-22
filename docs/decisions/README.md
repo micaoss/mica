@@ -44,3 +44,5 @@ Kinds:
 | [A hardware capture carrying a SoC serial is not committed to a public repository](2026-09-20-device-captures-are-not-committed.md) | working practice | 2027-03-20 |
 | [A coordinator's working state is a record nobody else can read](2026-09-20-coordination-state-is-a-record.md) | working practice | 2027-03-20 |
 | [Development-phase release deletion](2026-09-20-development-phase-release-deletion.md) | user decision | the development phase |
+| [mica-boards is merged into mica-build: a board owns its build and its image](2026-09-21-mica-boards-merged-into-mica-build.md) | engineering decision | 2027-03-21 |
+| [mica-build: one language on the build host, shell only where Bun is not the toolchain](2026-09-22-mica-build-one-language.md) | engineering decision | 2027-03-22 |
