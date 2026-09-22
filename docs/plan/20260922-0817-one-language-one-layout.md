@@ -302,6 +302,26 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
    unification, the recommendation) or stop after P3 with the fallback
    above.
 3. **The names** `src/`, `stages/`, `tests/{gates,suites,fixtures}/`.
+- **The three helpers that run inside the bsp image** (`common/kernel/mklogo.py`,
+  `common/kernel/export-regdb-certs.py`, `common/scripts/git-pack-manifest.py`;
+  262 lines). They run in the kernel and loader builds, in the
+  `mica-build-env:bsp` image, which carries python3 (the kernel's own
+  scripts need it) and no bun. Three ways to make them TypeScript, none free:
+  (a) `mica-build-env` adds bun to `bsp` (one `COPY --from=base` line and a
+  release), after which the three become `.ts` and every kernel and U-Boot
+  inputs hash moves once (the bsp pin is an input), so every board rebuilds
+  in CI once and reuse by hash resumes after; (b) each kernel and loader
+  Dockerfile copies bun out of the base image itself, as the pack, boot and
+  lab images do now -- no build-env release, but the same one-time rebuild
+  and six Dockerfiles carrying the same three lines; (c) the logo and the
+  regdb certificates are generated on the host before the container build
+  and handed in as inputs, and the mirror manifest is read on the host, which
+  is where P3 moves the fetch anyway -- no bun in any kernel container, but
+  a change to what the kernel build takes as input. Recommendation: (a),
+  because the rule is "TypeScript on bun everywhere the engine runs" and the
+  bsp image is ours; (c) is the shape P3 arrives at for the fetch and can
+  follow for the logo without waiting. Until decided, the three stay Python,
+  which is the one place `python3` remains a build input of this tree.
 
 ## Progress
 
@@ -501,6 +521,59 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
   `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
   the four under `boards/cx3576`.
+- 2026-09-22 13:40: **P2, third slice: the host-side Python** (`5c770a23`; 44
+  files, +1,013/-906). Ported, each with its measurement: `stages/boot/elf-closure.py`
+  to `elf-closure.ts` (readelf-based as before; the boot tools image copies
+  `bun` out of the build-env base image, `MICA_IMAGE_BUILD_BASE` through
+  `tools/from.sh`, a `bun` row in the `mica.boot.inputs` label; a
+  release-shaped `uefi-x64-prod` build: the two initramfs trees identical
+  member for member but for `etc/mica/boot.json`, the closure's `/init`
+  byte-identical, root, firmware and lifecycle components identical; the
+  kernel `buildId` moves with its packager's inputs by design and takes the
+  deployments and update archives with it; `product-verify` 106 checks,
+  `os-boot-test` green on both boot-tools images); `tests/gates/evidence-schema.py`
+  to `src/boards/evidence-schema.ts` (`bun src/cli.ts evidence-schema`; the
+  same output as the Python over the four boards' `evidence.json` and eight
+  mutations of one; `board-contract-test.sh` calls it); the mirror-hook gate
+  and its Python server to `tests/gates/mirror-hook.test.ts` (the mirror is
+  the test process, `Bun.serve` with the `/r/` redirect; the fetches run
+  asynchronously, since a blocking spawn never lets the in-process mirror
+  answer -- the first run showed every fetch timing out; 19 cases, green on
+  both routes of `bin/bun.sh`); the lifecycle suite's `qmp-boot.py`,
+  `timed-boot.py`, `metrics.py` to `.ts` (the lab image
+  `tests/suites/signed-boot-lab/Dockerfile.lab` copies `bun` out of the base
+  image, which retires `Dockerfile.maintenance` and the firmware lab image;
+  the recorder runs the boot command under `setsid` so a timeout kills the
+  QEMU group; exercised in the lab image against a fake QEMU: events
+  recorded, exit status through, refusal without a server, group killed;
+  `metrics.ts` byte-identical to the Python over a fixture log;
+  `storage-metrics.py`, which nothing ran, deleted); `tests/suites/repart/measure.py`
+  to `measure.ts` (byte-identical record over the product image, the same
+  refusal when DATA did not grow); `lifecycle-uboot-fit/image.py` to
+  `image.ts` (ported check for check, run against nothing: no cx3576
+  medium on this host); the three `boards/cx3576/kernel/tests/*.py` to
+  `.ts`, now under the package's lint and typecheck (`eslint.config.js`
+  un-ignores `boards/*/kernel/tests/`; `resource-dt-test.ts` prints the
+  same four lines as the Python over the dev DTB in the lab image; the
+  other two need a kernel source tree that is not here). Two seam defects
+  the slice measured and repaired in `bin/bun.sh`: (1) in P2's second
+  slice, an output path under `/tmp` (`tools/podman-pool.sh`, `9bb86d01`);
+  (2) here, the environment: `CI`, `GITHUB_ACTIONS` and `MICA_*` did not
+  cross into the container, so the locks reader's CI mode was invisible
+  there and the offline-pin refusal never fired (CI run `35725871542`,
+  `os-pool-test` 2/23); the bootstrap forwards them now, 23/23 on both
+  routes. Also this slice: `mica`'s world gate went red when `verify/src`
+  became `src/verify` (the claim of absence for the deleted kernel-config
+  check could not be made from a directory that no longer answered;
+  `0f85934`), and a research page another session keeps untracked had been
+  swept into `ac4c02d` and is untracked again (`83b652c`). Still Python in
+  `mica-build`: `common/kernel/{mklogo,export-regdb-certs}.py` and
+  `common/scripts/git-pack-manifest.py`, which run inside the bsp image,
+  where there is no bun -- see *Open questions*; and the inline `python3 -`
+  heredocs of the shell gates and suite scripts, which go with those files
+  in P4. Two scripts nothing runs, noted rather than deleted:
+  `tests/gates/boot-startup-pack-fixture.sh` and `tests/suites/repart/inner.sh`
+  (the `measure.ts` caller) have no caller in the tree.
 
 ## Annotations
 

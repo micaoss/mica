@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-22 13:40 [progress]
+
+The host-side Python of `mica-build` is gone (`5c770a23`, plan
+`20260922-0817` P2, third slice): the boot stage's ELF closure, the
+evidence schema (`bun src/cli.ts evidence-schema`), the mirror-hook gate
+(a bun test whose mirror is the test process), the lifecycle suite's three
+QEMU helpers, the repart measurer, the cx3576 medium inspector and the three
+cx3576 kernel tests are TypeScript; the boot tools image and the lifecycle
+lab image copy `bun` out of the build-env base image. Measured: the closure's
+`/init` and every initramfs member but `boot.json` byte-identical in a
+release-shaped product build, the evidence schema and the DT test the same
+output as the Python, the measurer's record byte-identical, 106 verify
+checks. `bin/bun.sh` now forwards `CI`, `GITHUB_ACTIONS` and `MICA_*` into
+its container route: without them the locks reader never saw CI and the
+offline-pin refusal never fired there (`os-pool-test` 2/23 in run
+`35725871542`; 23/23 now on both routes). What remains Python in `mica-build`
+runs inside the bsp image, where there is no bun (`mklogo.py`,
+`export-regdb-certs.py`, `git-pack-manifest.py`) -- an open question in the
+plan -- plus the inline heredocs of the shell gates, which go with P4.
+
 ## 2026-09-22 12:20 [progress]
 
 The runtime composition of `mica-build` runs on bun (`9bb86d01`, plan

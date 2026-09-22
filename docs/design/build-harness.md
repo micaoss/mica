@@ -818,7 +818,7 @@ because no suite boots one.** Not "no automation runs it": there is nothing to
 run. `tests/suites/lifecycle-uboot-fit/` carries no QEMU at all — measured file by
 file at `e92dc5d` and verified independently — and tests firmware IO,
 records, signatures, trust and dirty-filesystem behaviour on the host, while
-the boot machinery (`boot.sh`, `timed-boot.py`, `runtime-build.sh`,
+the boot machinery (`boot.sh`, `timed-boot.ts`, `runtime-build.sh`,
 `kernel-faults.sh`) is in `tests/suites/lifecycle-uefi/`.
 
 **The number, since it is half the catalogue.** Of eight published products,
