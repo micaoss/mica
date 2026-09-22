@@ -149,7 +149,7 @@ board-release.s905x5m	newest-tag	micaoss/mica-build:s905x5m	^s905x5m[.]20260920-
 # after it watches the one place the request was DENIED.
 #
 # AND ONE ROW FOR A DELETED CHECK. mica-boards' kernel config test names
-# mica-build:verify/src/checks-kernel.ts as the half that reads the
+# mica-build:src/verify/checks-kernel.ts as the half that reads the
 # /boot/config-* an image ships -- the top rung of the ladder in containers.md
 # 8. THAT FILE EXISTED AND WAS DELETED on 2026-09-09, so the citation was
 # accurate when written and the rung is a REGRESSION rather than a gap nobody
@@ -169,7 +169,7 @@ board-release.s905x5m	newest-tag	micaoss/mica-build:s905x5m	^s905x5m[.]20260920-
 # is asserted against the fragment" is not expressible as a line in a file, so
 # that half is the third form of docs/decisions/2026-09-20-coordination-state-
 # is-a-record.md: the record alone.
-shipped-config-check	no-path	micaoss/mica-build:verify/src/checks-kernel.ts	absent	docs/design/containers.md
+shipped-config-check	no-path	micaoss/mica-build:src/verify/checks-kernel.ts	absent	docs/design/containers.md
 psi-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/design/containers.md
 iocost-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/design/containers.md
 taskstats-floor-off	line	micaoss/mica-build:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/design/containers.md
