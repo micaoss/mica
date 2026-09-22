@@ -9590,3 +9590,13 @@ board page, and `boards/cx3576/flash/`, its three targets and its test are
 deleted. The rebuilt cx3576 kernel is byte-identical but for two comment
 lines of the shipped floor fragment that P1a renamed.
 
+## 2026-09-22 10:54 [progress]
+
+The first Python of `mica-build`'s engine is TypeScript
+(`20260922-0815-one-language-one-layout`, P2): the lock reader
+(`src/locks/locks.ts`, held by the 82 canonical vectors), the Debian
+archive reader (`src/pool/deb.ts`, on a pure JavaScript xz decoder) and
+the version index (`src/release/index.ts`), each compared byte for byte
+with its original before the Python was deleted. Details and what is
+still Python in the plan's *Progress*.
+

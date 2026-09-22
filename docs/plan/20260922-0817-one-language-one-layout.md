@@ -414,6 +414,39 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   the engine's board driver is written in TypeScript (P3, `src/boards/`),
   not now -- doing it in shell first would be a port done twice. The
   boards' host-side tests move to TypeScript in P4 as planned.
+- 2026-09-22 10:54: **P2, first slice** (held with P1c until P1b's CI was read; run
+  `35714638101` was green but for the spec-pins step, whose fetch of the
+  OpenAPI document the P1a target had lost -- restored). Ported, byte for
+  byte on their outputs: the lock reader `tools/locks.py` to
+  `src/locks/locks.ts` (`bun src/cli.ts locks ...`, the same commands and
+  messages; the 82 canonical vectors and the 19 commands over the real
+  `locks/` identical to the Python's output; `src/image` and `src/verify`
+  import its `rows()` instead of spawning python), the Debian archive
+  readers `tools/deb/control-fields.py` and `tools/deb-member.py` to
+  `src/pool/deb.ts` (`deb control`, `deb member`; the control text of all
+  38 pool archives and the payload members compared identical; a pure
+  JavaScript xz decoder, `xz-decompress` 0.2.3, is the tree's one runtime
+  dependency, because every archive is xz and Bun has no decoder; the
+  refusal for a directory names the tar type as `"5"` where Python said
+  `b'5'`), and the version index `tools/release-index.py` to
+  `src/release/index.ts` (`release-index lock|json`; the release test's
+  65 checks including the index dry-runs and the mirror rule pass through
+  it). Shell callers invoke the commands through `bin/bun.sh`; the
+  bootstrap installs the dependencies when no `node_modules` is found in
+  the tree or above it and keeps the installer off stdout, because a
+  caller captures stdout as the answer (that pollution and a `process.exit`
+  after an unawaited `stdout.write` -- 131072 of 2.6 million bytes -- were
+  the two defects the parity checks caught). `BUILD_FILES` names
+  `src/locks/locks.ts` in place of the Python. Every Makefile gate and
+  lint green on the slice; the bun suites and the release-shaped product
+  build are the last checks before the push. Still Python: the runtime
+  selection (`rootfs/runtime/*.py`, 1.5k, and its 2.2k of tests), the
+  QEMU helpers of the lifecycle suite, `boot/elf-closure.py` (a boot-tools
+  stage), `common/kernel/{mklogo,export-regdb-certs}.py` and
+  `common/scripts/git-pack-manifest.py` (run inside the bsp image),
+  `tests/gates/evidence-schema.py`, `tests/gates/mirror-hook-server.py`,
+  `tests/suites/{lifecycle-uboot-fit/image.py,repart/measure.py}`, and
+  the four under `boards/cx3576`.
 
 ## Annotations
 
