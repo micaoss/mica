@@ -59,7 +59,7 @@ The current CX3576 image shows the **Mica OS** icon above its wordmark
 (`mica-res:mica/brand/logo/mica-os-icon-dark.svg` and
 `mica-os-wordmark-dark.svg`), centered over a soft blue/teal gradient that
 fades to black around it. The authoritative bitmap
-is `mica-boards:boards/cx3576/flash/assets/splash.png`. The kernel build converts it to
+is `mica-build:common/kernel/splash.png`, shared by every board. The kernel build converts it to
 a deterministic 720×405 CLUT224 logo, fitting modes from 800×600 upward. Its
 black edges blend into the framebuffer around the centered image.
 

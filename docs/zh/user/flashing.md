@@ -221,53 +221,30 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 17 MiB。因此写镜像同时也写了引导器：没有单独的 idblock 步骤，这块板也不产出厂商
 `update.img`。
 
-写入路径在 `mica-boards`（读自 `9ce875d`），走 USB 上的 `rkdeveloptool`：
+写入路径是操作者在 USB 上运行的 `rkdeveloptool`；构建树不再带刷机工具（用户决定，
+2026-09-22）。**必须是解压后的 `.img`**，恰好 1 299 MiB = 1 362 100 224 字节。
 
-```sh
-make -C boards/cx3576 flash-mica      # 设备已经在 Loader/RockUSB 模式
-make -C boards/cx3576 flash-maskrom   # 设备在 Maskrom 模式
-```
-
-`MICA_IMAGE=<path>` 指定镜像；不指定时 Makefile 取 `_out/image/mica-cx3576-*.img`
-里最新的一个。**必须是解压后的 `.img`**：预检断言文件恰好是
-1 299 MiB = 1 362 100 224 字节，所以 `.img.gz` 会立刻以 `wrong factory image size`
-失败。
-
-两个 target 各自的步骤顺序：
-
-| 步骤 | `flash-mica` | `flash-maskrom` |
+| 步骤 | Loader/RockUSB 模式 | Maskrom 模式 |
 |---|---|---|
-| 1 | 预检 `--check` | 预检 `--check` |
-| 2 | `rkdeveloptool wl 0 <image>` | `sha256sum -c loader/MiniLoaderAll.bin.sha256` |
-| 3 | 回读：再跑一次 `--check`，然后 `rl 0 36864` 和 `rl 36864 2623488`，各自与镜像比较 | `rkdeveloptool db loader/MiniLoaderAll.bin` |
-| 4 | `rkdeveloptool rd`——复位，只有两次比较都通过才执行 | 接着执行整套 `flash-mica` |
+| 1 | -- | `sha256sum -c boards/cx3576/loader/MiniLoaderAll.bin.sha256` |
+| 2 | -- | `rkdeveloptool db boards/cx3576/loader/MiniLoaderAll.bin` |
+| 3 | `rkdeveloptool wl 0 <image>` | 同左 |
+| 4 | `rkdeveloptool rl 0 36864 boot.bin`，与镜像前 36 864 扇区比较；再 `rkdeveloptool rl 36864 2623488 rest.bin`，与其余部分比较 | 同左 |
+| 5 | `rkdeveloptool rd`——复位，只有两次比较都通过才执行 | 同左 |
 
-预检不碰设备：它检查大小、两份 GPT（头部 CRC、版本、128×128 字节的表及其 CRC、
-最后一个 LBA 上逐字节相同的备份）、三个分区的范围和标签，以及 `RKNS` 魔数。成功时
-打印 `Factory geometry verified: 1362100224 bytes`；回读之后打印
-`Verified all 1362100224 written bytes; firmware and counter region first.`
+先单独回读引导器区间：这一段的部分写入或损坏是唯一会让板卡跳过恢复键变砖的失败。
+仓库里提交的厂商 loader `boards/cx3576/loader/MiniLoaderAll.bin`（786 937 字节）由
+`rkdeveloptool db` 下载进内存；它从不嵌入镜像，也不是 U-Boot 的构建输入。**在 `db` 和
+`rd` 之间不要断电、拔线或复位板卡。**
 
-仓库里提交的厂商 loader `boards/cx3576/loader/MiniLoaderAll.bin`
-（786 937 字节）由 `rkdeveloptool db` 下载进内存；它从不嵌入镜像，也不是 U-Boot 的
-构建输入。**在 `db` 和 `rd` 之间不要断电、拔线或复位板卡。**
+回读不一致时不执行 `rd`——设备停在 Loader 模式，可以立刻重刷。已经起不来的板卡，恢复
+路径就是 Maskrom（SoC 的 USB 恢复模式）加上表中的 Maskrom 列。
 
-某一步失败时：预检失败意味着什么都没写。回读不一致会打印
-`device readback differs at image byte N` 和 `Readback retained at <path>`，并且
-*不*执行 `rd`——设备停在 Loader 模式，可以立刻重刷。已经起不来的板卡，恢复路径就是
-Maskrom（SoC 的 USB 恢复模式）加 `flash-maskrom`。
+操作者的前置条件：`PATH` 上有 `rkdeveloptool`，以及对设备的 USB 访问权限。macOS 上按
+[`docs/boards/cx3576/rkdeveloptool/`](../../boards/cx3576/rkdeveloptool/README.md) 在固定的
+上游提交上用两个补丁原生构建。
 
-操作者的前置条件：`PATH` 上有 `python3` 和 `rkdeveloptool`，以及对设备的 USB 访问
-权限。macOS 上先 `brew install autoconf automake libusb pkg-config`，再
-`make -C boards/cx3576 rkdeveloptool-macos`，它用两个仓库内的补丁在固定提交上构建
-上游 `rkdeveloptool`，并安装到 Makefile 会去找的位置。
-
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/cx3576/flash/scripts/verify-flash.py`, `mica-boards:boards/cx3576/loader`, `docs/boards/cx3576.md`
-
-被证明的是控制流程，不是某块板：仓库里的 `cx3576-flash-verify-test.sh` 用一个打桩的
-`rkdeveloptool` 和一个伪造的镜像驱动整个 target，断言调用顺序、两个回读区间，以及
-loader 处、20 MiB 处和接近末尾处各损坏一个字节都能被发现并使 `rd` 不被执行。
-未验证的部分：面对真实硬件的每一步、进入 Maskrom 的按键或触点序列、非 root 操作者
-需要的 udev 规则或权限（仓库没有提供），以及任何 SD 卡启动回退方案。
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/boards/cx3576/rkdeveloptool/README.md`, `docs/boards/cx3576.md`
 
 > status: unsupported
 

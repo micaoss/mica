@@ -318,7 +318,7 @@ unchanged package is reused from the previous release of that board
 depends on: `locks-test`, `ci-outputs-test`, `board-contract-test`,
 `uboot-env-test`, `kernel-config-test`, `kernel-cmdline-test`,
 `bench-collector-test`, `mac-stable-test`, `can-network-test`,
-`gadget-configfs-test`, `flash-verify-test` and `wireless-test`. A new board
+`gadget-configfs-test` and `wireless-test`. A new board
 is not done until they pass with its directory in the tree;
 `board-contract-test` is the one that reads the layout above, and
 `kernel-config-test` the one that reads `config/<board>.required`.

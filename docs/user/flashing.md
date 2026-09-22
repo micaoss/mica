@@ -251,62 +251,34 @@ sector 64, inside the protected range — the four bytes `RKNS` at byte offset
 16 MiB and 17 MiB. Writing the image writes the bootloader too: there is no
 separate idblock step, and no vendor `update.img` is produced for this board.
 
-The write path lives in `mica-boards` (read at `9ce875d`), over
-`rkdeveloptool` on USB:
+The write path is `rkdeveloptool` over USB, run by the operator; the build
+tree carries no flashing tooling (user decision, 2026-09-22). **It must be the
+decompressed `.img`**, exactly 1 299 MiB = 1 362 100 224 bytes.
 
-```sh
-make -C boards/cx3576 flash-mica      # the device is already in Loader/RockUSB mode
-make -C boards/cx3576 flash-maskrom   # the device is in Maskrom
-```
-
-`MICA_IMAGE=<path>` selects the image; without it the Makefile takes the
-newest `_out/image/mica-cx3576-*.img`. **It must be the decompressed `.img`**:
-the preflight asserts the file is exactly 1 299 MiB = 1 362 100 224 bytes, so
-a `.img.gz` fails immediately with `wrong factory image size`.
-
-What each target does, in order:
-
-| Step | `flash-mica` | `flash-maskrom` |
+| Step | Loader/RockUSB mode | Maskrom mode |
 |---|---|---|
-| 1 | preflight `--check` | preflight `--check` |
-| 2 | `rkdeveloptool wl 0 <image>` | `sha256sum -c loader/MiniLoaderAll.bin.sha256` |
-| 3 | readback: `--check` again, then `rl 0 36864` and `rl 36864 2623488`, each compared with the image | `rkdeveloptool db loader/MiniLoaderAll.bin` |
-| 4 | `rkdeveloptool rd` — the reset, only after both comparisons passed | the whole `flash-mica` sequence |
+| 1 | -- | `sha256sum -c boards/cx3576/loader/MiniLoaderAll.bin.sha256` |
+| 2 | -- | `rkdeveloptool db boards/cx3576/loader/MiniLoaderAll.bin` |
+| 3 | `rkdeveloptool wl 0 <image>` | the same |
+| 4 | `rkdeveloptool rl 0 36864 boot.bin`, compared with the image's first 36 864 sectors; then `rkdeveloptool rl 36864 2623488 rest.bin`, compared with the rest | the same |
+| 5 | `rkdeveloptool rd` -- the reset, only after both comparisons passed | the same |
 
-The preflight touches no device: it checks the size, both GPTs (header CRC,
-version, the 128×128-byte table and its CRC, the byte-identical backup at the
-last LBA), the three partition ranges and labels, and the `RKNS` magic. On
-success it prints `Factory geometry verified: 1362100224 bytes`; after the
-readback, `Verified all 1362100224 written bytes; firmware and counter region
-first.`
-
-The committed vendor loader `boards/cx3576/loader/MiniLoaderAll.bin`
+The loader region is read back first and on its own, because a partial or
+corrupt write there is the one failure that bricks the board past the
+recovery key. The committed vendor loader `boards/cx3576/loader/MiniLoaderAll.bin`
 (786 937 bytes) is downloaded into RAM by `rkdeveloptool db`; it is never
 embedded in the image and is not a U-Boot build input. **Do not cut power,
 unplug or reset the board between `db` and `rd`.**
 
-If a step fails: a failed preflight means nothing was written. A readback
-mismatch prints `device readback differs at image byte N` and
-`Readback retained at <path>`, and `rd` is *not* run — the device stays in
-Loader mode and can be re-flashed straight away. Recovery for a board that no
-longer boots is Maskrom, the SoC's USB recovery mode, plus `flash-maskrom`.
+If a readback differs, `rd` is not run: the device stays in Loader mode and
+can be re-flashed straight away. Recovery for a board that no longer boots is
+Maskrom, the SoC's USB recovery mode, and the Maskrom column above.
 
-Operator prerequisites: `python3` and `rkdeveloptool` on `PATH` and USB access
-to the device. On macOS, `brew install autoconf automake libusb pkg-config`
-then `make -C boards/cx3576 rkdeveloptool-macos`, which builds upstream
-`rkdeveloptool` at a pinned commit with two committed patches and installs it
-where the Makefile looks for it.
+Operator prerequisites: `rkdeveloptool` on `PATH` and USB access to the
+device. On macOS build it natively at the pinned upstream commit with the two
+patches kept in [`docs/boards/cx3576/rkdeveloptool/`](../boards/cx3576/rkdeveloptool/README.md).
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/cx3576/flash/scripts/verify-flash.py`, `mica-boards:boards/cx3576/loader`, `docs/boards/cx3576.md`
-
-What is proven is the control flow, not a board: the repository's
-`cx3576-flash-verify-test.sh` drives the whole target against a stub
-`rkdeveloptool` and a fabricated image, asserting the call order, the two
-readback ranges and that a single corrupted byte in the loader, at 20 MiB and
-near the end is detected and leaves `rd` unrun. Not verified: every step
-against real hardware, the button or pad sequence that enters Maskrom, the
-udev rules or permissions a non-root operator needs (the repository ships
-none), and any SD-card boot fallback.
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/boards/cx3576/rkdeveloptool/README.md`, `docs/boards/cx3576.md`
 
 > status: unsupported
 
