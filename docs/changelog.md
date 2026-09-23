@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-23 12:59 [progress]
+
+P3, eighth slice (`mica-build` `5df4abba`): the product reader, the version
+stamp, the mica-podman reader and the composer are `src/product/product.ts`,
+`src/release/version.ts`, `src/pool/podman-pool.ts` and `src/rootfs/build.ts`
+(`bun src/cli.ts product|version|podman-pool|compose`). The product reader is
+byte-identical to the shell over the eight products; the composer's
+`uefi-x64-dev` root is byte-identical to the shell's from a clean worktree of
+the parent commit -- `rootfs-verity.img` and `factory-root.oci` the same
+sha256, the compose inputs and records the same apart from the source-commit
+column the pool index stamps per tree -- with smoke 12/12 on both. The three
+tests that parsed the shell's text read the composer now, and
+`tests/gates/product-test.sh` is `tests/gates/product.test.ts`. Every caller,
+including the eight suites and gates that `eval`'d `tools/product.sh`, goes
+through `bin/bun.sh src/cli.ts`.
+
+## 2026-09-23 11:57 [progress]
+
+P3, seventh slice (`mica-build` `ab8832e7`, `402dcaf5`, `f471ec9a`): the
+package-set resolver, the Base packages helper (Python included) and the
+public-meta validator are `src/rootfs/{resolve,base-packages,
+validate-public-meta}.ts` (`bun src/cli.ts resolve|base-packages|
+validate-public-meta`), byte-identical to the shell over every board and
+both architectures; the manifest gate drives the one resolver over its
+perturbed copies through `--packages-dir`. Two seam findings: the workflows
+fed `ci-outputs` and `board-pool` from `RUNNER_TEMP`, which the bootstrap's
+container does not see, and keep those under `_out/ci/` now; and the CLI
+ran every module with the repository as its working directory, so a
+relative path a caller handed a command meant something else than to the
+shell -- it keeps the caller's directory now, regression green.
+
 ## 2026-09-23 11:33 [progress]
 
 P3, sixth slice (`mica-build` `554c8dce`, `f831a96a`): the boards group is

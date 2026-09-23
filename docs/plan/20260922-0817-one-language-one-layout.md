@@ -865,6 +865,105 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   bootstrap writes `.tmp/gitconfig` and hands it in as `GIT_CONFIG_GLOBAL`
   (`310cdd98`); as uid 1001 on the container route the test passes 6/6.
   Next: `rootfs/build.sh` and `packages/resolve.sh`, then `boot/`.
+- 2026-09-23 11:57: **P3, seventh slice: the resolver, the Base packages
+  helper, the public-meta validator; the CLI keeps the caller's directory;
+  the workflows feed the container from the tree** (`ab8832e7`, `402dcaf5`,
+  `f471ec9a`). What CI measured on `310cdd98` first (run 35855584689,
+  `boards-build / pools` red): `ci-outputs unpack` refused
+  `_temp/pools/pool-amd64.tar` as missing -- the tars were downloaded to
+  `RUNNER_TEMP`, which the bootstrap's container does not see, where
+  `tools/ci-outputs.sh` had run on the host. The same seam waited in every
+  downloaded output, the staged components and the verity certificate the
+  boards jobs write for `board-pool`; all of them live under `_out/ci/` in
+  the workspace now, the privileged workflow's signing directory with them,
+  and the buildx cache and `daemon.json` stay where the host's buildx and
+  dockerd read them (`ab8832e7`). `rootfs/packages/resolve.sh` is
+  `src/rootfs/resolve.ts` (`bun src/cli.ts resolve`), message for message:
+  over the four fetched boards, with each board's dev product features, with
+  no feature and with one radio, the resolutions are byte-identical, and
+  the six refusals tried read the same; the engine's manifest directory is
+  an argument (`--packages-dir`) where the shell walked up from its own copy
+  to the Makefile, so `tests/gates/rootfs-manifest-test.sh` drives the one
+  resolver over its perturbed copies, 48/48 on both routes (`402dcaf5`).
+  `tools/base-packages.sh` is `src/rootfs/base-packages.ts`
+  (`base-packages check|fetch|select`), embedded Python included: `check`,
+  `fetch` for both architectures and `select` over the uefi-x64 and cx3576
+  dev selections print the same bytes as the shell, the archives' control
+  fields read by `src/pool/deb.ts` on the host where the shell ran
+  `dpkg-deb` in the base image. `rootfs/scripts/validate-public-meta.sh` is
+  `src/rootfs/validate-public-meta.ts`, the directory checks and the
+  manifest checks the shell ran as a bun script inside the base image one
+  in-process module; `src/image/public-meta.test.ts` drives it, 61/61, both
+  routes. That test's relative-input cases measured a CLI property no port
+  had met before: `src/cli.ts` ran every command's module with the
+  repository as its working directory, so `validate-public-meta meta` from a
+  product directory read the tree's own `meta/`; the CLI keeps the caller's
+  directory now, every tree path a module reads being `REPO_ROOT`'s, and the
+  regression after the change was os-build-test 578, os-verify-test 958, the
+  runtime suites 149, the pool, package-gate, ci-outputs, board-bundle,
+  version-guard and publish tests and os-release-test 65/65 (`f471ec9a`).
+  Next: `rootfs/build.sh` itself, whose text three tests still parse
+  (`stages.test.ts`, `public-meta.test.ts`, `rootfs-reproducibility-test.sh`),
+  so its port hands those tests a data structure or the TypeScript text.
+- 2026-09-23 12:59: **P3, eighth slice: the product reader, the version
+  stamp, the mica-podman reader and the composer** (`5df4abba`).
+  `tools/product.sh` is `src/product/product.ts` (`bun src/cli.ts product
+  <name> | --list`), refusal for refusal: the KEY=value printed for each of the
+  eight products and the product list are byte-identical to the shell on both
+  routes, and the TOML documents the shell handed to Python are read by Bun's
+  parser (a malformed file is refused with that parser's words; the fragments
+  the gate checks are unchanged). `tools/product.sh --list` had twelve shell
+  callers and eight `eval` consumers; every one goes through
+  `bin/bun.sh src/cli.ts product` now, and `tests/gates/product-test.sh` is
+  `tests/gates/product.test.ts`, case for case plus the refusals the shell
+  gate never drove (a budget that is not a number, a substitution, a key
+  declared twice, an unfetched board). `tools/version.sh` is
+  `src/release/version.ts` (`version`), same stamp on the same tree, and the
+  lineage writer reads it in-process where it spawned the shell (the lineage
+  fixture test stops copying the shell into its tree). `tools/podman-pool.sh`
+  is `src/pool/podman-pool.ts` (`podman-pool --check`): over the real pools
+  the two files it writes are the shell's bytes and modes; five fixture cases
+  cover the refusals. `rootfs/build.sh` (782 lines) is `src/rootfs/build.ts`
+  (`MICA_PRODUCT=<name> MICA_VERSION=<stamp> bun src/cli.ts compose`): the
+  product, the resolver, the public-meta validator, the pool rows, the
+  lineage writer, the Base packages helper, the pool index, the image
+  resolver, the source checkout and the mica-podman reader run in-process;
+  the stages driver and the smoke run stay the two commands they were. The
+  parity measurement: `uefi-x64-dev` composed by the shell in a clean
+  worktree of `f471ec9a` and by the composer in a clean checkout of
+  `5df4abba`, same pool, same `MICA_VERSION`, same signing workspace --
+  `rootfs-verity.img` and `factory-root.oci` byte-identical (sha256
+  `b6f4fe4f…d65c3` and `6683643f…9449`), `compose/` identical apart from
+  `source-lineage.json`, `rootfs-verity.env`, `rootfs-report.txt` and
+  `rootfs-stages.txt` identical, `rootfs-packages.txt` identical apart from
+  the source-commit column, smoke 12/12 both. The two differences are the
+  two inputs that could not be held equal: the own-package rows of the pool
+  index carry the indexing tree's HEAD, and a first comparison without the
+  same signing workspace differed by exactly `usr/share/mica/meta/GENERATED`
+  (the runtime report named the one inode). One deliberate change: the shell
+  left a `meta-public.XXXXXX` directory under the build directory per run;
+  the composer stages the public set straight into `compose/meta-public`.
+  The three tests that parsed the shell's text read the composer:
+  `src/image/stages.test.ts` takes the `--arg` names from `driverArgNames()`,
+  `src/image/public-meta.test.ts` orders `validatePublicMeta()` before the
+  staging in the TypeScript, and the cache contract
+  `tests/gates/rootfs-reproducibility-test.sh` proved with Python over the
+  shell is `src/rootfs/build.test.ts` (the cache switch, the retired switches,
+  the driver argument list, the Base root rows, the presets); the gate itself
+  still passes (`ROOTFS_REPRODUCIBILITY_PASS`) with its initramfs half, which
+  is P4's. Regression on this tree: lint, typecheck, the tree's own 3638 bun
+  tests (`git ls-files` over the four test roots) green apart from the 13
+  `tests/suites/lifecycle-uefi` cases (`api-launcher`, `native-input`,
+  `bun-identity`) that fail identically on the parent commit; board-name
+  lint, host-toolchain lint, pipefail lint, `rootfs-manifest-test` 48/48;
+  the new tests and commands on the container route. Two findings for later:
+  `bun src/cli.ts test`'s filters are substrings, so on a host it also runs
+  the imported checkouts under `_out/src` (118 reds there, none in the tree);
+  and `tools/image-kinds.sh` stays shell for now, spawned by the product
+  reader for the kinds and update rows -- it goes with the product/release
+  group. Next: `boot/build-tools.sh`, `boot/dev-keys.sh`,
+  `common/trust/stage.sh`, then `tools/product-build.sh`, `image-kinds.sh`,
+  `release.sh` and the rest of `tools/`.
 
 ## Annotations
 
