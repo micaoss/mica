@@ -819,6 +819,52 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   the committed tree (its clone keeps a deleted file until the deletion is
   committed). Next: the boards group (`board-pool`, `inputs`, `reuse`,
   `boards`), which takes `registry.sh` and `oci.sh` with it.
+- 2026-09-23 11:33: **P3, sixth slice: the boards group** (`554c8dce`, 54
+  files, +1137/-1332; `f831a96a`). `tools/boards.sh`, `component.sh`,
+  `inputs.sh`, `reuse.sh`, `board-pool.sh`, `publish-components.sh` and
+  `ci-outputs.sh` are `src/boards/{boards,component,inputs,reuse,board-pool}.ts`
+  and `src/release/{publish-components,ci-outputs}.ts` (`bun src/cli.ts
+  boards|component|board-inputs|reuse|board-pool|publish-components|ci-outputs`),
+  and `tools/deb/registry.sh` and `oci.sh`, whose last readers those were,
+  went with them: `src/pool/registry.ts` is the one registry client, and
+  `tools/deb/registry.env` its declaration. Measured against the shell over
+  the tree: every `boards` listing, `check`, `producers` and `pool-has`
+  answer byte-identical for all four boards; every component listing the
+  same; every staged component tree the same files, modes and times (the
+  shell's `cp -a` kept the directories' modes and times, so the port does
+  -- the one difference the first run measured); every board component's
+  inputs manifest identical, all twelve pairs, and the hash with it; a
+  `--fetch-all` of every board the same bundles, modes, output lines,
+  `--check` and `--kernel-dir` answers; a packed CI output tar the same
+  bytes and every unpack refusal the same words. The publishers of
+  `src/pool/` and the registry's scope reader read the boards in-process.
+  `tests/gates/ci-outputs-test.sh` is `tests/gates/ci-outputs.test.ts`; the
+  board bundle test drives the TypeScript assembler, the publish test the
+  TypeScript component publisher: 6/6, 2/2, 5/5, version-guard 8/8, all on
+  both routes; board-contract-test 44/44, os-rootfs-manifest-test 48/48,
+  os-release-test 65/65, os-product-test 33/33, `make board-fetch-all` on
+  the container route, the four lints. Left as they are: the comment lines
+  of `boards/*/Makefile`, `Dockerfile`, `outputs.tsv` and `boards.tsv` that
+  name the deleted scripts, since those files are inputs of the board
+  components and a comment edit would move every kernel and U-Boot digest
+  -- they go when a board input moves for a reason of its own. Found on
+  the way (`f831a96a`): the api-launcher fixture
+  (`tests/suites/lifecycle-uefi/api-launcher.test.ts`, not run in CI) had
+  fallen behind the launcher since before this plan (`tools/image-kinds.sh`,
+  the board's `images.tsv`) and further under it (`bin/bun.sh` colliding
+  with its own `bin/`, `package.json`); the list is repaired up to the boot
+  engine, where `from --ref upstream:docker:28-cli` still does not resolve
+  inside the fixture -- left for P4, which ports the suite drivers. What CI
+  measured on `7490bf76` (run 35853107043, `suites` red): the board bundle
+  test's scratch `git clone` of the tree refused inside the container,
+  "detected dubious ownership", although the bootstrap told git
+  `safe.directory=*` through `GIT_CONFIG_COUNT/KEY/VALUE`; the remote side of
+  a local clone reads only protected configuration and takes the variables
+  for none (git 2.47 in the tools image, measured over a tree owned by uid
+  1001: every clone form refused, a global configuration file accepted). The
+  bootstrap writes `.tmp/gitconfig` and hands it in as `GIT_CONFIG_GLOBAL`
+  (`310cdd98`); as uid 1001 on the container route the test passes 6/6.
+  Next: `rootfs/build.sh` and `packages/resolve.sh`, then `boot/`.
 
 ## Annotations
 

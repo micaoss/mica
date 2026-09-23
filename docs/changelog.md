@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-23 11:33 [progress]
+
+P3, sixth slice (`mica-build` `554c8dce`, `f831a96a`): the boards group is
+TypeScript -- `src/boards/{boards,component,inputs,reuse,board-pool}.ts` and
+`src/release/{publish-components,ci-outputs}.ts` (`bun src/cli.ts
+boards|component|board-inputs|reuse|board-pool|publish-components|ci-outputs`)
+-- and the shell registry client went with its last readers, so
+`src/pool/registry.ts` is the one. Every listing, inputs manifest, staged
+component and assembled bundle is byte-identical to the shell's over the
+tree; the board bundle, publish, version-guard and CI outputs tests pass on
+both routes. The comment lines under `boards/` that still name the deleted
+scripts are left, since those files are inputs of the board components. The
+bootstrap hands git a global `safe.directory` file (`310cdd98`): the remote
+side of a local clone inside the container took the variables for none.
+
 ## 2026-09-23 11:12 [progress]
 
 P3, fifth slice (`mica-build` `5e3beb80`, `69d4a07d`, `1b43a904`, `7490bf76`):
