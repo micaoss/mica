@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-23 11:12 [progress]
+
+P3, fifth slice (`mica-build` `5e3beb80`, `69d4a07d`, `1b43a904`, `7490bf76`):
+the package gate, the pool publisher and the version guard are
+`src/pool/{gate,publish,version-guard}.ts` over `src/pool/registry.ts` (`bun
+src/cli.ts pool-gate|pool-publish|version-guard`), the gate check for check
+with the shell (111/111 static, 32/32 with its byte-identical rebuild), the
+publisher writing the manifest bytes jq wrote, the version order agreeing
+with the shell's Python. Three shell gates are bun tests
+(`tests/gates/{package-gate,version-guard,publish,board-bundle}.test.ts`);
+`board-bundle` was a reader of the curl the OCI reader no longer runs, which
+CI measured red. The bootstrap hands `~/.docker` back to the host user too,
+after CI measured the product jobs' buildx refused by a root-owned activity
+file; the gate test's `dpkg-deb` is a registered exemption, after a lint
+that scans tracked files passed locally over an untracked file.
+
 ## 2026-09-22 16:15 [progress]
 
 P3, fourth slice (`mica-build` `afb1f095`, `b4bfcd4a`): the producer

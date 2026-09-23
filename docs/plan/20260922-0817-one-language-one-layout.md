@@ -777,6 +777,48 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   the host by `src/pool/deb.ts` where the shell ran `dpkg-deb` in the base
   image), then `registry`/`oci`/`publish`/`version-guard` with their two
   gates as bun tests.
+- 2026-09-23 11:12: **P3, fifth slice: the package gate, the publishers, the
+  version guard; three gates as bun tests** (`5e3beb80`, `69d4a07d`,
+  `1b43a904`, `7490bf76`). `tools/deb/package-gate.sh` is `src/pool/gate.ts`
+  (`bun src/cli.ts pool-gate`), check for check: over both pools the static
+  gate passes the same 111/111 with the same RESULT line as the shell, and
+  with its rebuild for amd64 the same 32/32, byte-identical rebuild included,
+  on both routes; the archives are read on the host by `src/pool/deb.ts`,
+  which now lists a payload where the shell ran `dpkg-deb --contents` in the
+  base image, and the maintainer scripts are parsed by this host's `sh`. The
+  shell staged an always-empty lock for a pool this tree imports nothing
+  into; those branches are not carried. `tests/gates/package-gate.test.ts`
+  drives the static half over synthetic producers and dpkg-deb fixture
+  archives, seventeen cases, every refusal by name; its `dpkg-deb` launch
+  site is a registered host-toolchain exemption (`1b43a904`, after CI run
+  35755559026 refused it: the lint scans tracked files, and the file was
+  untracked when the lint ran locally -- a gate over the index runs after
+  the add). `tools/deb/publish.sh` and `tools/deb/version-guard.sh` are
+  `src/pool/publish.ts` (`pool-publish`) and `src/pool/version-guard.ts`
+  (`version-guard`) over `src/pool/registry.ts`: the registry declaration,
+  the token, the release a checkout is, the latest published lock carrying a
+  row, and an OCI client that reads and pushes with fetch -- the manifest it
+  writes is byte-identical to the one jq wrote, so an unchanged pool keeps
+  its digest across the port; the Debian version order agrees with the
+  shell's embedded Python over seventeen pairs. `tools/deb/registry.sh` and
+  `oci.sh` stay for `tools/reuse.sh` and `tools/publish-components.sh` until
+  those are ported. `tests/gates/{version-guard,publish}-test.sh` are bun
+  tests over a sibling `registry:3.1.1` and a scratch clone
+  (`tests/gates/release-fixture.ts`), 8/8 and 5/5 on both routes.
+  `tests/gates/board-bundle-test.sh`, a reader of the curl the OCI reader
+  no longer runs -- missed in the second slice and measured red by CI run
+  35756001658 (7 of 23) -- is `tests/gates/board-bundle.test.ts`, the
+  registry the test process, handed to `src/pool/oci.ts` as
+  `MICA_OCI_REGISTRY` and to the shell client `tools/reuse.sh` sources
+  through a `registry.env` over plain HTTP; 6 cases, both routes. The
+  bootstrap: CI run 35752739496 measured the product jobs' own `docker
+  buildx` refused by a root-owned `~/.docker/buildx/activity` after a build
+  inside the container (the directory is mounted since the fourth slice);
+  the epilogue hands that directory back too (`69d4a07d`), measured as uid
+  1001. Green: lint, typecheck, the four lints, os-release-test 65/65 over
+  the committed tree (its clone keeps a deleted file until the deletion is
+  committed). Next: the boards group (`board-pool`, `inputs`, `reuse`,
+  `boards`), which takes `registry.sh` and `oci.sh` with it.
 
 ## Annotations
 
