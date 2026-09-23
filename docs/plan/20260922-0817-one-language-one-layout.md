@@ -1005,6 +1005,52 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `TOOLS_PLATFORM` from the port instead of the shell's text), `tools`,
   the three lints, and a full `tools/product-build.sh uefi-x64-dev` from the clean tree (compose, the root component signed in-process, the packager image, the image) with `--verify` 106 checks green. Next: `tools/product-build.sh`,
   `image-kinds.sh`, `component.sh`, `release.sh` and the rest of `tools/`.
+- 2026-09-23 14:08: **P3, tenth slice: the image kinds, the product build,
+  the deploy pool and the micad pool** (`19f63a33`, `553be666`). `tools/image-kinds.sh`
+  is `src/product/image-kinds.ts` (`bun src/cli.ts image-kinds
+  kinds|updates|pack`): the kinds and update rows of the four fetched boards
+  are byte-identical to the shell's (8/8, the one refusal tried the same
+  words under the new prefix), the pack of the built `uefi-x64-dev` product
+  writes the same `kinds.tsv` and the same files, and the GPT the shell read
+  with Python -- the partition table into `<name>.img`, `layout.json`,
+  `product.json` -- is read in TypeScript; the product reader takes the rows
+  in-process, so the eight products still print the shell's bytes.
+  `tests/gates/image-kinds-test.sh` is `tests/gates/image-kinds.test.ts`,
+  case for case, its fixture GPT image built in TypeScript.
+  `tools/product-build.sh` is `src/product/build.ts` (`product-build <name>
+  [--verify | --version <v> | --release <stamp>] [--generation <g>]`), step
+  for step: the product reader, the version stamp, the pool, the source
+  checkout, the board bundle, the composer, the lifecycle reader, the boot
+  tools and the image kinds run in-process, the component, verify and
+  release commands stay the `src/cli.ts` commands they were, and the receipt
+  the port computes for the built product equals the shell's on disk apart
+  from the tree line. One repair on the way: the FIT tools label hashed
+  `Dockerfile.fit fit.sh regdb.sh` under `boot/`, where they had not been
+  since the `stages/` move, and the shell's `(cd boot && sha256sum …)` failed
+  inside a command substitution that `set -e` does not reach, so every FIT
+  packager image since then carried a label over fewer inputs than it
+  declared; the port hashes them under `stages/boot`, which moves the FIT
+  boards' packager label once. `tools/deploy-pool.sh` is
+  `src/pool/deploy-pool.ts` (`deploy-pool --lifecycle|--check`, the board
+  vocabulary check the shell ran in Python included) and
+  `tools/micad-pool.sh` is `src/pool/micad-pool.ts` (`micad-pool
+  --openapi|--source`): the runkit and the OpenAPI document are the shell's
+  bytes and modes, `--check` prints the shell's lines, and
+  `tests/gates/deploy-pool.test.ts` drives the three over fixtures.
+  Verification: a full `product-build uefi-x64-dev` from the clean tree (fetch, compose, the components, the image, the update packages, the pack) with `--verify` 106 checks green, and a second run reusing the receipt; lint, typecheck, the three lints
+  (host-toolchain 432/432), `boot-tools-test`, the tests around the ports
+  91/91. CI on the ninth slice (`41e90a6f`, run 35867951143) went red in
+  `suites`: `tests/gates/boot-startup-package-test.sh` drove the launcher
+  by the path `boot/build-tools.sh` joined in Python, a reader the grep for
+  the path did not see; its ten launcher cases (docker an argument
+  recorder, nothing built) are `src/boot/build-tools.test.ts`'s now, and
+  for that recorder to be reachable on the container route the ports take
+  the docker client from `MICA_BUILD_DOCKER` (`src/shared/docker.ts`, the
+  answer the stages driver and the toolbox already give) and check its
+  presence without running it (`553be666`; `make os-boot-test` green
+  locally). Next: `tools/release.sh` with `tools/registry.sh` and its three
+  gates, then `offline`, `offline-chain`, `cache-prune`, `measure-rootfs`,
+  `pool-payload-diff`, `new-board`, `kernel-config-test`.
 
 ## Annotations
 

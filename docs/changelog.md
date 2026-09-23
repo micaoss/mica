@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-23 14:08 [progress]
+
+P3, tenth slice (`mica-build` `19f63a33`, `553be666`): the image kinds, the product build,
+the deploy pool and the micad pool are `src/product/image-kinds.ts`,
+`src/product/build.ts`, `src/pool/deploy-pool.ts` and `src/pool/micad-pool.ts`
+(`bun src/cli.ts image-kinds|product-build|deploy-pool|micad-pool`): the kinds
+and update rows of every board, the pack of the built product, the runkit, the
+OpenAPI document and the deploy check are the shell's bytes and lines, and the
+receipt the product build computes equals the shell's apart from the tree
+line. One repair: the FIT packager label had hashed three stage files under a
+path they left with the `stages/` move; it hashes them where they are. The
+image-kinds gate is a bun test; the deploy pool and the product build have
+their own. The boot tools launcher cases moved from the boot startup gate,
+which reached the deleted shell by a path joined in Python and went red in
+CI, into the module's test; the ports name docker through `MICA_BUILD_DOCKER`.
+
 ## 2026-09-23 13:34 [progress]
 
 P3, ninth slice (`mica-build` `41e90a6f`): the boot tools image build, the
