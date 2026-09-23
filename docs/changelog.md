@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-23 13:34 [progress]
+
+P3, ninth slice (`mica-build` `41e90a6f`): the boot tools image build, the
+development keys, the verity signer and the trust stage are
+`src/boot/{build-tools,dev-keys,init-keys,verity-tool,trust-stage}.ts`
+(`bun src/cli.ts boot-tools|dev-keys|init-keys|verity-tool|trust-stage`),
+label for label (the packager image's `mica.boot.inputs`), byte for byte (the
+CMS signature) and directory for directory (the trust context); the shell the
+key tools ran inside the base image is `stages/boot/{dev-keys,init-keys}-inner.sh`.
+The boards' Makefiles take the trust stage through `bin/bun.sh`, which moves
+every board's inputs hash once, as the plan foresaw. `bin/bun.sh` keeps the
+caller's directory on both routes: a relative argument from `boards/<board>/`
+meant the root before, on either route.
+
 ## 2026-09-23 12:59 [progress]
 
 P3, eighth slice (`mica-build` `5df4abba`): the product reader, the version

@@ -964,6 +964,47 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   group. Next: `boot/build-tools.sh`, `boot/dev-keys.sh`,
   `common/trust/stage.sh`, then `tools/product-build.sh`, `image-kinds.sh`,
   `release.sh` and the rest of `tools/`.
+- 2026-09-23 13:34: **P3, ninth slice: the boot tools, the development keys,
+  the verity signer and the trust stage; the bootstrap keeps the caller's
+  directory** (`41e90a6f`). `boot/build-tools.sh` is `src/boot/build-tools.ts`
+  (`bun src/cli.ts boot-tools [--target x64|aa64]`), label for label: the
+  `mica.boot.inputs` the port computes for the amd64 image equals the label
+  the shell wrote when it rebuilt the image on the same inputs minutes before
+  (`fc3736d4…3157`; the image the host carried until then had an older label,
+  which is the measurement that made the rebuild necessary), and the port's
+  own build of the image is five cache hits and the same label.
+  `boot/verity-tool.sh` is `src/boot/verity-tool.ts` (`verity-tool sign …`):
+  the CMS signature over one hash with the development content key is the
+  same bytes from both; the root component builders and the trust-rotation
+  suite call `sign()` in-process where they spawned the shell.
+  `common/trust/stage.sh` is `src/boot/trust-stage.ts` (`trust-stage BUNDLE
+  PARENT`): the same context directory under the same digest, restaging onto
+  the shell's context reuses it, and `tests/gates/trust-stage-test.sh` is
+  `tests/gates/trust-stage.test.ts`, case for case. `boot/dev-keys.sh` and
+  `boot/init-keys.sh` are `src/boot/dev-keys.ts` and `src/boot/init-keys.ts`
+  (`dev-keys --out DIR`, `init-keys [--out DIR]`); the shell each ran inside
+  the base image is `stages/boot/dev-keys-inner.sh` and
+  `stages/boot/init-keys-inner.sh`, the initializer holds its lock by
+  running its module again under `flock`, and
+  `tests/gates/trust-domain-hygiene-test.sh` drives both through the CLI
+  and passes (the concurrent initializers included). The boards' Makefiles
+  take the trust stage through `bin/bun.sh` now, which moves every board's
+  kernel and U-Boot inputs hash: `common/trust/` is a declared input, the
+  plan's risk register foresaw the one move in P3, and the release that
+  follows rebuilds every component and compares. That call is also what
+  measured the bootstrap: from `boards/<board>/` a relative argument meant
+  the root on the host route (`bin/bun.sh` cd'd there) and the root on the
+  container route (`-w` the root), so the CLI keeping the caller's directory
+  (seventh slice) reached nothing that came through the bootstrap -- and the
+  first try wrote a trust context into the main checkout's `_out/`. The
+  bootstrap resolves its first argument, a tree-relative module path,
+  against the root and leaves every other argument and the working directory
+  the caller's, on both routes; from `boards/uefi-x64/` both routes now
+  stage the same context under this tree. Regression: lint, typecheck, the
+  boot tests on both routes, `verity-signing`, `kernel-profile` (which reads
+  `TOOLS_PLATFORM` from the port instead of the shell's text), `tools`,
+  the three lints, and a full `tools/product-build.sh uefi-x64-dev` from the clean tree (compose, the root component signed in-process, the packager image, the image) with `--verify` 106 checks green. Next: `tools/product-build.sh`,
+  `image-kinds.sh`, `component.sh`, `release.sh` and the rest of `tools/`.
 
 ## Annotations
 
