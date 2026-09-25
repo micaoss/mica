@@ -1086,6 +1086,35 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   `<sha256>.deb.control` and read as `<sha256>.control`; CI's cache still held the shell's files.
   Still Python in `mica-build`: `common/scripts/git-pack-manifest.py`, until the fetch moves to the
   host. Next: P4, the host-side gates and suite drivers.
+- 2026-09-25 15:20: **P4, the host-side gates** (`mica-build` `5f9a53c9`..`ae6c6874`). Every
+  script under `tests/gates/` is TypeScript: the release-lock vectors and their pin, the U-Boot
+  record test, the board-name lint (its scope widened to all of `src/`), the soname scan
+  (`src/rootfs/soname-scan.ts`), the trust-domain gate, the board contract with its planted defects,
+  the logo equivalence, the floor fixtures, the netavark kernel gate (reading the one `REQUIRED`
+  list of `common/kernel/kernel-config-test.sh` instead of a second copy), the pipefail lint, the
+  boot recipe, tools and signing gates, the repart growth gate, the rootfs reproducibility fixtures,
+  the Quadlet documentation gate, the rootfs manifest gate (the resolver in-process, the hardware
+  feature list `src/product/product.ts`'s), the release gate (envelopes signed in-process, 65 shell
+  checks in 46 tests), the host-toolchain lint and its 28-case self-test, and the install-closure
+  gate around its in-root scripts, now `tests/suites/install-closure/guest/`. Each was compared with
+  its original on the same inputs before the shell was deleted: identical RESULT lines for the
+  host-toolchain lint (both scanners) and the install-closure gate, identical counts for the
+  manifest gate, the same checks passing for the rest. The guest halves of the boot gates moved to
+  `tests/suites/boot-tools/guest/`; five boot-startup scripts nothing has called since the import
+  moved unchanged to `tests/suites/boot-startup/guest/`, pending a decision whether to keep them.
+  Defects found on the way, each fixed where it lives: the repart harness's `measure.ts` could never
+  pass since its own port (a bigint compared with a parsed number); the install-closure gate's pins
+  were a stale copy of `src/verify/smoke-pins.ts`'s rule and failed three binaries before the port
+  (now the smoke register's pins); the vectors pin check's port called `gh`, which the bootstrap's
+  container route does not carry, and turned CI's lint job red (run 36149122894; now the REST API
+  in-process, `093bcae6`); `test.each` hands a shorter row's missing parameter a `done` callback,
+  which the Quadlet port tripped over before it passed. The bare-host ladder's rung 1 is now bash
+  running a gate through `bin/bun.sh`: no gate is bash-only any more. Found and not fixed here: the
+  ladder's rung 3 (`os-verify-test` in a fresh clone) has needed the pool's
+  `mica-podman/upstream.lock` since `6b7b991e`, so the ladder has been red past rung 2 since
+  2026-09-22; no workflow runs it. Next: the suite drivers (`run.sh` of `lifecycle-uefi`,
+  `apid-api`, `session-probe`, `factory-root-gate`, `signed-boot-lab`, `bare-host-gate`), the
+  placement of `common/*.sh`, and the closing lint.
 
 ## Annotations
 

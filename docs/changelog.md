@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-25 15:20 [progress]
+
+One-language P4, the host-side gates (`mica-build` `5f9a53c9`..`ae6c6874`): every script under
+`tests/gates/` is TypeScript -- lints, fixture gates, the release and install-closure gates -- each
+compared with its original on the same inputs before the shell was deleted, and the in-root halves
+moved beside their suites as guest scripts. Four defects surfaced and were fixed where they live:
+the repart harness could never pass since its own port, the install-closure gate's version pins
+were a stale copy of the smoke register's rule, the vectors pin check's port needed a `gh` the
+container route does not carry (CI's lint job, run 36149122894), and a `test.each` trap. Details
+and what is left of P4 in the plan's *Progress*.
+
 ## 2026-09-25 11:40 [progress]
 
 Merge P3 (plan `20260921-1142`), the board-owned disk (`mica-build` `2ff265c3`, `34bc3932`):
