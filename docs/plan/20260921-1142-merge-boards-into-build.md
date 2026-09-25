@@ -499,12 +499,25 @@ with P4.
   bytes, minimum first, as the FIT boards did (`pool-payload-diff` over `mica-board-uefi-x64`
   0.1.0-2 and 0.1.0-3: exactly those two files). The amd64 package gate 32/32; the arm64 half and
   every FIT product are CI's, this host has no arm64 emulation.
-- **What P3 has not done yet**: the backend axis. `BOOT_BACKEND` and `FIRMWARE_FORMAT` are still
-  branched on where they were (`kernel-package.ts`, `firmware.ts`, `firmware-maintenance.ts`,
-  `components.ts`, the image assembly's staging of the boot objects, `src/boards/component.ts`'s
-  U-Boot directory, `board-pool`'s kernel directories); the `BACKENDS[backend]` registry, the fact
-  lint over the six literals and the board tests discovered as `boards/*/tests/*-test.sh` are the
-  remaining P3 work.
+- 2026-09-25: **P3c, the backend axis** (`mica-build` `d63ad16a`). `src/image/backends/`
+  (`systemd-boot`, `uboot-fit`) behind `BACKENDS[BOOT_BACKEND]` and `src/image/firmware-formats.ts`
+  (`efi`, `rockchip-loader`, `amlogic-boot0`) behind `FIRMWARE_FORMATS[FIRMWARE_FORMAT]` are the one
+  dispatch point on each: the boot object and its format, the packager, the kernel directories, the
+  U-Boot component, the kernel symbols and refusals; the facts, signed target, bounds, loader file,
+  U-Boot outputs, place in the image and maintenance of each firmware format. Every consumer the
+  audit named reads them, and where the boot objects live is the layout's (an `esp`, or `system`).
+  Firmware maintenance had cx3576's RockUSB range and loader bound as literals; they are the layout's
+  loader region now. One deviation from the proposal: the kernel directories stay a backend fact
+  (`kernel/`, or `kernel/dev` and `kernel/prod`) instead of every board shipping `kernel/<profile>/`,
+  which would have rebuilt every kernel and changed every bundle for no difference in what is packed.
+  The fact lint (`tests/gates/board-fact-lint.test.ts`, `make os-board-fact-lint`, in CI) refuses a
+  quoted backend or format value in the engine outside the registries and the table readers, and
+  `LAYOUT_PARTITIONS` anywhere, with planted cases; the board tests were already discovered as
+  `boards/*/tests/*-test.sh`. Proof, the engine at `34bc3932` against this one over identical inputs:
+  the uefi-x64 kernel component, the firmware components of uefi-x64, cx3576 and s905x5m, and the
+  `uefi-x64-dev` disk byte-identical; the verifier 106 checks green; the image, verify and board suites
+  1630/1630 (the commit message says 1632, a miscount). P3 is complete; P4 (the device reads the
+  FIT geometry from signed data, `mica-core`) is the remaining phase.
 
 ## Annotations
 
