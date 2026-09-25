@@ -44,7 +44,7 @@ The plan is `docs/plan/20260922-0817-one-language-one-layout.md`.
 
 ## ActiveForm
 
-Proposing one language and one layout for the mica-build engine.
+Implementing one language and one layout for the mica-build engine: P3 done but for `tools/deb/` and the bsp-image fetch helper; P4 next.
 
 ## Dependencies
 
@@ -56,3 +56,5 @@ Proposing one language and one layout for the mica-build engine.
 
 - 2026-09-22 08:15: investigation done at `mica-build` `2e8ebaef`; the
   measurements and the proposal are in the plan.
+- 2026-09-25: P3 slices eleven to thirteen landed (`mica-build` `bc542d3b`, `0675f0e2`, `fa6bed8a`), with
+  the repairs CI measured (`b4ea175b`, `8d4a67b3`); `tools/` holds only `tools/deb/`. Details in the plan.

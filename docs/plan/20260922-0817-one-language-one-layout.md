@@ -1051,6 +1051,41 @@ reads them and they are removed (`e26ee3cf`). So, added to P1:
   locally). Next: `tools/release.sh` with `tools/registry.sh` and its three
   gates, then `offline`, `offline-chain`, `cache-prune`, `measure-rootfs`,
   `pool-payload-diff`, `new-board`, `kernel-config-test`.
+- 2026-09-23 14:17: **P3, eleventh slice: the scoped release driver** (`bc542d3b`).
+  `tools/release.sh` and `tools/registry.sh` are `src/release/scoped.ts` (`bun src/cli.ts
+  scoped-release plan|collect|publish|attach|index|verify-index`), step for step; the GitHub
+  release operations are REST calls with `GH_TOKEN`, which `bin/bun.sh` forwards into the
+  container route; the bundle manifests are the compact, key-sorted bytes the shell's jq wrote.
+  `tests/gates/release-test.sh` stays shell (P4), rewired. CI on it (run 35876186843) went red in
+  three jobs, each a seam the local run did not cross, repaired in `b4ea175b` (run 36117012700
+  green): `release-index` checks out the newest index's own commit, which predates the port, and
+  runs `tools/release.sh` there when the checkout has no `src/release/scoped.ts`; the release gate
+  handed the publisher the registry's loopback port, which the bootstrap's container route does not
+  reach, and hands it the registry's name on the traefik network there; the release products bound
+  a relative `_out/release/assets`, which docker takes for a volume name, and `hostPath` resolves a
+  path before translating it.
+- 2026-09-25 09:25: **P3, twelfth slice: the payload diff, the cache prune, the kernel-config
+  driver and the board clone** (`0675f0e2`). `tools/pool-payload-diff.sh` (bash around inline
+  Python) is `src/pool/payload-diff.ts`, the tar reader of `src/pool/deb.ts` carrying owner and link
+  target for it; `tools/cache-prune.sh` is `src/pool/cache-prune.ts`, called by the three CI steps;
+  `tools/kernel-config-test.sh` is `src/boards/kernel-config.ts` (the floor per board is still
+  `common/kernel/kernel-config-test.sh`, P4's); `tools/new-board.sh` is `src/boards/new-board.ts`,
+  byte-preserving without cpio, sed or uuidgen. None of the four had a test;
+  `tests/gates/tool-ports.test.ts` drives each over fixtures, refusals included.
+- 2026-09-25 09:50: **P3, thirteenth slice: the offline build, the offline chain and the root
+  measurement** (`fa6bed8a`). `tools/offline.sh` is `src/offline/offline.ts` (`board-offline`);
+  `tools/offline-chain.sh` is `src/offline/chain.ts` (`offline-chain`), every assembly step through
+  the mica-build clone's own `bin/bun.sh`, and its gate `tests/gates/offline-chain.test.ts`, check
+  for check; `tools/measure-rootfs.sh` is `src/rootfs/measure.ts` (`measure-rootfs`), the ELF
+  sections and dynamic entries read by `src/verify/elf.ts` and `src/rootfs/runtime/elf.ts` instead of
+  readelf, with a fixture test that packs a root as the one-layer OCI archive 90-pack exports. What
+  remains under `tools/` is `tools/deb/README.md` and `registry.env`: the producers' Dockerfiles and
+  version.env files cite that README and are package inputs, so the move waits for a round that
+  bumps those packages anyway. One defect of the seventh slice found on the way, by the first
+  composition on a fresh cache (`8d4a67b3`): the Base packages' control fields were written as
+  `<sha256>.deb.control` and read as `<sha256>.control`; CI's cache still held the shell's files.
+  Still Python in `mica-build`: `common/scripts/git-pack-manifest.py`, until the fetch moves to the
+  host. Next: P4, the host-side gates and suite drivers.
 
 ## Annotations
 

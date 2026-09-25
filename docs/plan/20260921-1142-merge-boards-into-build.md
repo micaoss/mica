@@ -462,6 +462,49 @@ with P4.
   passed locally, `os-build-test` (586), `os-release-test` (65),
   `os-pool-test` (23), `publish-test` (21), the board contract (44), the
   selection tests (89) and both shell lints green. Run `35706535146`.
+- 2026-09-25: **P3a, the board-owned disk** (`mica-build` `2ff265c3`, with `d33873be`). Every
+  board carries `boards/<board>/layout.tsv` (`# mica layout v1`: `disk`, `part`, `region` rows as
+  proposed; region offsets relative to their partition, the device's convention), in the board
+  bundle, which the board component now stages from `outputs.tsv` rather than a fixed list.
+  `src/image/file-layout.ts` reads it and holds the rules only; the fixed partition set, the 1 GiB
+  `system` and the per-format offsets are gone from the engine, and the capacity check reads the
+  declared sizes. The partition role is the one dispatch point: `src/image/roles/` (`esp`, `system`,
+  `data`, `raw`, `vfat`, `ext4`) behind `ROLES[role]`, `src/image/regions.ts` one writer per source
+  (`loader`, `records-a`, `records-b`, `file:<path>`), and the verifier's own registry
+  `src/verify/roles.ts` keyed by the same roles; a board's `vfat` or `ext4` partition is seeded from
+  `partitions/<name>/`. A loader region must sit where the firmware facts place the loader, or there
+  is none. The P4 guard is `src/image/device-fit-geometry.ts`, the record geometry `mica-deploy`
+  compiles in: a FIT layout that differs, or a FIT board the device does not know, is refused naming
+  P4, and the board-name lint allows that file alone. Proof, the engine at `fa6bed8a` against the new
+  over the same inputs: the sgdisk argv and disk size of all four boards identical; both FIT firmware
+  partitions byte-identical; a `uefi-x64-dev` product built locally, its image assembled from the
+  same components by both engines, the whole disk one sha256 (`b4045c3b...`, see below); the new
+  verifier 106 checks green over it; the layout tests over each board's table and a fifth board with
+  five partitions, a vendor raw partition and a 2 GiB `system`, every refusal by name.
+- 2026-09-25: **The DATA partition was not reproducible**, found by that proof and independent of
+  it (`0c888c38`): two assemblies of the same components differed in 28 bytes of DATA (the
+  superblock's write and check times, its checksum, a quota block), with either engine. The quota
+  pass `e2fsck -fy` ran with `E2FSPROGS_FAKE_TIME`, which e2fsck ignores; it reads `E2FSCK_TIME`.
+  With both, two assemblies are one disk, and the old engine with the same one-line change assembles
+  that same disk, which is what makes the P3a comparison whole.
+- 2026-09-25: **P3b, the geometry leaves `board.env`** (`34bc3932`). `producers/board/render.sh`
+  renders fstab, the ESP mount, one `repart.d` entry per partition and the growth drop-in from
+  `layout.tsv`; its `case "$LAYOUT_PARTITIONS"` is gone, and 35 geometry keys leave each
+  `board.env` (it keeps the name, architecture, backend, loader facts and `LAYOUT_VERSION`, the
+  packers' interface). The rockchip loader's disk offset is the layout's loader region, the ESP
+  volume id the `esp` partition's; `new-board` mints identities in `layout.tsv`. The board packages
+  are bumped (uefi-x64 and uefi-arm64 0.1.0-3, cx3576 0.1.0-4, s905x5m 0.1.0-5) with the s905x5m
+  wireless and bluetooth extras that pin them. What the device receives: the FIT boards' rendered
+  files byte-identical; on the UEFI boards the two fixed-size repart entries spell their size in
+  bytes, minimum first, as the FIT boards did (`pool-payload-diff` over `mica-board-uefi-x64`
+  0.1.0-2 and 0.1.0-3: exactly those two files). The amd64 package gate 32/32; the arm64 half and
+  every FIT product are CI's, this host has no arm64 emulation.
+- **What P3 has not done yet**: the backend axis. `BOOT_BACKEND` and `FIRMWARE_FORMAT` are still
+  branched on where they were (`kernel-package.ts`, `firmware.ts`, `firmware-maintenance.ts`,
+  `components.ts`, the image assembly's staging of the boot objects, `src/boards/component.ts`'s
+  U-Boot directory, `board-pool`'s kernel directories); the `BACKENDS[backend]` registry, the fact
+  lint over the six literals and the board tests discovered as `boards/*/tests/*-test.sh` are the
+  remaining P3 work.
 
 ## Annotations
 

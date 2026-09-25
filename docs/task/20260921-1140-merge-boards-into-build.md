@@ -31,7 +31,7 @@ The plan is `docs/plan/20260921-1142-merge-boards-into-build.md`.
 
 ## ActiveForm
 
-Planning the merge of mica-boards into mica-build and the board-owned image contract.
+Implementing P3 of the merge: the board-owned disk is in (layout.tsv, P3a and P3b); the backend axis is next.
 
 ## Dependencies
 
@@ -45,3 +45,6 @@ Planning the merge of mica-boards into mica-build and the board-owned image cont
 - 2026-09-22 07:30: P1 and P2 landed on `mica-build` `main` (`0e34a1b4`, 98 commits
   replayed onto `de476350`); proof and gates in the plan's *Progress*. P3 and
   P4 open; the task stays in progress for P3.
+- 2026-09-25: P3a and P3b landed (`mica-build` `2ff265c3`, `34bc3932`): every board declares its disk
+  in `layout.tsv` and the engine builds and verifies it by role; the geometry left `board.env`. Proof
+  and what remains of P3 (the backend axis, the fact lint) in the plan's *Progress*.

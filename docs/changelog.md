@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-25 11:40 [progress]
+
+Merge P3 (plan `20260921-1142`), the board-owned disk (`mica-build` `2ff265c3`, `34bc3932`):
+every board declares its disk in `boards/<board>/layout.tsv` -- partitions with their role,
+geometry and identities, and the raw regions -- and the engine builds and verifies it through one
+role registry and one region writer per source, with rules instead of the two partition sets it
+used to compile in. `board.env` loses its 35 geometry keys; the board package renders its repart
+set, fstab and ESP mount from the table, and the four board packages are bumped. Byte identity over
+the same components: the whole `uefi-x64-dev` disk, both FIT firmware partitions and every GPT;
+the device-visible change is the UEFI boards' repart size spelling. The backend axis of P3 is still
+open. On the way: the DATA partition carried the build's wall clock (e2fsck reads `E2FSCK_TIME`,
+`0c888c38`), and the Base packages' control fields had been written under another name than they
+were read (`8d4a67b3`).
+
+## 2026-09-25 09:50 [progress]
+
+One-language P3, twelfth and thirteenth slices (`mica-build` `0675f0e2`, `fa6bed8a`): the payload
+diff, the cache prune, the kernel-config driver, the board clone, the offline build, the offline
+chain and the root measurement are TypeScript, each with a test the shell did not have (the
+offline chain's gate ported check for check). `tools/` holds only `tools/deb/`'s README and
+registry file. The eleventh slice (`bc542d3b`, the scoped release driver) went red in CI in three
+seams the local run did not cross -- the index verifier at an index older than the port, the
+release gate's registry address on the container route, a relative bind path -- repaired in
+`b4ea175b`, CI green.
+
 ## 2026-09-23 14:08 [progress]
 
 P3, tenth slice (`mica-build` `19f63a33`, `553be666`): the image kinds, the product build,
