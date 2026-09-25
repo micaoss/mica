@@ -135,12 +135,13 @@ source of truth every consumer reads and none duplicates.
 **Inputs.** The partition layout decided with the bootloader (stage 2) and
 the storage medium; the board facts accumulated so far.
 
-**Procedure.** Start from the nearest board: `bash tools/new-board.sh <name>
---from <board>` in `mica-boards` copies it, rewrites every name, mints fresh
-GPT and filesystem identities and sets `BOARD_RELEASE_TARGET=0`. Then write
-`<name>/board.env` against the key reference in [board-env.md](board-env.md):
-the ordered partition set in `LAYOUT_PARTITIONS` with a `<NAME>_ROLE` per entry
-(the schema lint enforces each role's keys in both directions), the
+**Procedure.** Start from the nearest board: `bun src/cli.ts new-board <name>
+--from <board>` in `mica-build` copies it, rewrites every name, mints fresh
+GPT and filesystem identities in its `layout.tsv` and sets
+`BOARD_RELEASE_TARGET=0`. Then write the disk in `<name>/layout.tsv` --
+the partitions with their roles, sizes and identities, and the raw regions --
+and `<name>/board.env` against the reference in [board-env.md](board-env.md)
+(`make os-layout-lint` holds the table to the layout rules), the
 hardware as `BOARD_FEATURES` and lists (`BOARD_FIRMWARE_FILES`,
 `BOARD_HWINIT_CONFS`) where empty is a statement, the authenticated boot
 (`FIRMWARE_FORMAT`, the `FIT_*` facts, the exact `BOARD_CMDLINE_ARGS`), and
@@ -163,7 +164,7 @@ publish`) that the assembly pins.
 ## Stage 6 — image layout
 
 **Goal.** A complete current factory image with two authenticated deployments.
-Use the exact three-partition layout from `board.env`; there is no old-layout
+Use the layout the board declares in `layout.tsv`; there is no old-layout
 reader, frozen historical geometry or in-place migration requirement.
 
 In the assembly, the board enters as an input, `locks/mica-boards.<name>.lock`
