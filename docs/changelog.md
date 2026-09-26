@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 08:50 [decision]
+
+Development builds leave the release, and what a board releases becomes two variants: **full**
+(the default, every feature) and **basic** (without the heavy optional features, podman first)
+(`docs/decisions/2026-09-26-release-variants-full-and-basic.md`). Recorded as the direction; the
+user asked that nothing change yet, and the record lists what is open for when it does.
+
 ## 2026-09-25 15:20 [progress]
 
 One-language P4, the host-side gates (`mica-build` `5f9a53c9`..`ae6c6874`): every script under

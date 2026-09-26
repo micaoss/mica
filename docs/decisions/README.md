@@ -46,3 +46,4 @@ Kinds:
 | [Development-phase release deletion](2026-09-20-development-phase-release-deletion.md) | user decision | the development phase |
 | [mica-boards is merged into mica-build: a board owns its build and its image](2026-09-21-mica-boards-merged-into-mica-build.md) | engineering decision | 2027-03-21 |
 | [mica-build: one language on the build host, shell only where Bun is not the toolchain](2026-09-22-mica-build-one-language.md) | engineering decision | 2027-03-22 |
+| [Development builds leave the release; the released variants are full and basic](2026-09-26-release-variants-full-and-basic.md) | engineering decision (not implemented) | 2027-03-26 |
