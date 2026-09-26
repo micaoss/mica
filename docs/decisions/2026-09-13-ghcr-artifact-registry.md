@@ -77,7 +77,7 @@ to `micaoss` (root commit `5b7fd98`): a release publishes
 board; the first release was `20260914-1603` (`c6ecd7bce901`, `SHA256SUMS`
 trust hash `fe61758865cd49ca461757a880cf9c2ac718c029aeba2b880bea7818555a785b`),
 deleted on 2026-09-15 when `mica-boards` moved to per-board releases
-(`<board>/20260915-0824`, `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`). The `mica-debian` row records the
+(`<board>/20260915-0824`, `2026-09-15-mica-boards-per-board-releases` (a record deleted 2026-09-26)). The `mica-debian` row records the
 proposal the Base rows replaced.
 
 A Base release carries a lock, the same model as the build-env

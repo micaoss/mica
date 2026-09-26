@@ -56,7 +56,7 @@ The workspace driver that chains the offline builds is
 release row carries that tag, and a consumer keeps each scope as
 `locks/<repository>.<scope>.lock` with `locks/pins/<repository>.<scope>.pin`
 (`SCOPE=<scope>`). No other repository has scoped releases
-(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`,
+(`2026-09-15-mica-boards-per-board-releases` (a record deleted 2026-09-26),
 `docs/decisions/2026-09-15-mica-build-scoped-releases.md`).
 
 **Image rows** (user, 2026-09-15, replacing the ghcr mirrors of

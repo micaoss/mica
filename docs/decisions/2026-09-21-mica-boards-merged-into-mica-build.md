@@ -48,7 +48,7 @@ repository holds the boards and the assembly:
 
 ## What this supersedes
 
-- `docs/decisions/2026-09-15-mica-boards-per-board-releases.md` in its
+- `2026-09-15-mica-boards-per-board-releases` (a record deleted 2026-09-26) in its
   premise, "`mica-boards` stays its own repository; it is not merged into
   `mica-build`", whose removal condition was this merge; its per-board scoped
   tags and component artifacts stand, published by `mica-build` now.

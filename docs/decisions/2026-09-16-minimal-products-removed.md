@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the `mica-build` owner (the product set, the rules and tests that named a minimal product); `mica` records it
 - **review sunset**: 2027-03-16
-- **status**: accepted (user, 2026-09-16: "不需要minimal这个，所有的都不发布这个"); supersedes `docs/decisions/2026-09-15-minimal-products-not-released.md`; implemented by `mica-build` in the rename round of `docs/task/20260916-0040-uefi-board-names.md`
+- **status**: accepted (user, 2026-09-16: "不需要minimal这个，所有的都不发布这个"); supersedes `2026-09-15-minimal-products-not-released` (a record deleted 2026-09-26); implemented by `mica-build` in the rename round of `docs/task/20260916-0040-uefi-board-names.md`
 
 ## Decision
 
@@ -37,9 +37,9 @@ unpublished — that was the 2026-09-15 position — they do not exist.
 
 ## What this supersedes
 
-`docs/decisions/2026-09-15-minimal-products-not-released.md`, which kept the
+`2026-09-15-minimal-products-not-released` (a record deleted 2026-09-26), which kept the
 minimal products as unpublished build targets. That record in turn had
-superseded `docs/decisions/2026-09-15-no-minimal-products.md`, which removed
+superseded `2026-09-15-no-minimal-products` (a record deleted 2026-09-26), which removed
 them; this decision returns to removal, now with the composition test in place
 of the product.
 

@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: every repository that publishes Debian packages (`mica-boards`, `mica-system-base`, `mica-podman`, `mica-core`); `mica-build` as the consumer that stops depending on commit-carrying versions
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15); rules R1-R8 resolved (user: "全部按建议处理"); adopted by all four package-publishing repositories, each with its first release under the rules: `mica-system-base` `20260915-1102`, `mica-podman` `20260915-1057`, `mica-boards` `<board>/20260915-1128` and `mica-core` `20260915-1135`; `mica-build` pins them before its first scoped release; supersedes `docs/decisions/2026-09-15-package-reuse-by-inputs.md`
+- **status**: accepted (user, 2026-09-15); rules R1-R8 resolved (user: "全部按建议处理"); adopted by all four package-publishing repositories, each with its first release under the rules: `mica-system-base` `20260915-1102`, `mica-podman` `20260915-1057`, `mica-boards` `<board>/20260915-1128` and `mica-core` `20260915-1135`; `mica-build` pins them before its first scoped release; supersedes `2026-09-15-package-reuse-by-inputs` (a record deleted 2026-09-26)
 
 ## Decision
 
@@ -120,7 +120,7 @@ reuse.
 
 ## What this supersedes
 
-- `docs/decisions/2026-09-15-package-reuse-by-inputs.md`: versions carrying
+- `2026-09-15-package-reuse-by-inputs` (a record deleted 2026-09-26): versions carrying
   the release commit, with unchanged packages copied by their inputs hash.
   Its producer hashing (`mica-boards:tools/deb/package-inputs.sh`) remains
   the inputs guard.

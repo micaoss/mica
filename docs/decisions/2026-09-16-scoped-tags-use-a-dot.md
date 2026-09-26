@@ -43,7 +43,7 @@ than a git tag and keeps its slash (`docs/design/mica-index.md` 3.1).
 
 ## What this supersedes
 
-The slash form of `docs/decisions/2026-09-15-mica-boards-per-board-releases.md`
+The slash form of `2026-09-15-mica-boards-per-board-releases` (a record deleted 2026-09-26)
 and `docs/decisions/2026-09-15-mica-build-scoped-releases.md`, and the index tag
 of `docs/decisions/2026-09-15-mica-version-index.md`. Releases published before
 this change carry the old form in their own tags; they are history and are not

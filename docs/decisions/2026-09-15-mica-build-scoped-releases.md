@@ -14,7 +14,7 @@ explicit exception to the uniform release rules (the workspace release rules
 and `docs/design/release-lock.md` section 1) that applies to `mica-build`
 only (user, 2026-09-15). The scoped tag and scoped release row are shared with
 `mica-boards`, which releases per board
-(`docs/decisions/2026-09-15-mica-boards-per-board-releases.md`); the image
+(`2026-09-15-mica-boards-per-board-releases` (a record deleted 2026-09-26)); the image
 assets and product scopes are `mica-build`'s alone.
 
 **Scoped releases.** A release is scoped to a board, meaning all of that

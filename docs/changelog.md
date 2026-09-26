@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-26 09:05 [decision]
+
+The released variants' default is **basic**, not full (user correction: "默认是basic不是full";
+`docs/decisions/2026-09-26-release-variants-full-and-basic.md`). And the decision records keep only
+what is in force (user: "删除旧的决策，只保留现有的"). Six are deleted, each superseded or ended:
+- `2026-09-15-no-minimal-products` and `2026-09-15-minimal-products-not-released`, both by
+  `2026-09-16-minimal-products-removed`;
+- `2026-09-15-package-reuse-by-inputs`, by `2026-09-15-package-versions`;
+- `2026-09-15-board-image-kinds`, by `2026-09-15-board-image-packers`;
+- `2026-09-15-mica-boards-per-board-releases`, by `2026-09-21-mica-boards-merged-into-mica-build`,
+  which carries the per-board tags that stand;
+- `2026-09-16-consolidated-round-pause`, which had ended.
+
+The records that cited them name them as deleted. Plans, tasks and this changelog keep their
+mentions as history, and git keeps the files.
+
 ## 2026-09-26 08:50 [decision]
 
 Development builds leave the release, and what a board releases becomes two variants: **full**

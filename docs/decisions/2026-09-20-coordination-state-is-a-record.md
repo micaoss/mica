@@ -25,7 +25,7 @@ applied.
    (`docs/task/20260920-0610-producer-data-assets.md`).
 2. **The 2026-09-16 consolidated-round pause.** Never formally lifted: it
    ended because work resumed and nobody said the word
-   (`2026-09-16-consolidated-round-pause.md`).
+   (`2026-09-16-consolidated-round-pause`, a record deleted 2026-09-26).
 3. **The device-capture practice.** Enforced all evening, correctly followed
    by `mica-boards` *because it was told to*
    (`2026-09-20-device-captures-are-not-committed.md`).
