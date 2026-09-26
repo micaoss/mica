@@ -55,3 +55,6 @@ upstream/refused/image-without-digest.lock	set	field-value reference-digest	vali
 upstream/refused/source-without-sha256.lock	set	column-count	unmeasured
 upstream/refused/git-short-commit.lock	set	field-value	unmeasured
 upstream/refused/unsorted.lock	set	sort-order	unmeasured
+lock/refused/apt-duplicate.lock	set	duplicate-key	valid
+lock/refused/apt-snapshot.lock	set	apt-snapshot	valid
+lock/refused/apt-suite.lock	set	apt-suite	valid

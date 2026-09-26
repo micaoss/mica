@@ -85,3 +85,6 @@ repos/cache-hit	valid	-	offline
 repos/cache-corrupt	refused	cache-corrupt	offline
 repos/offline-miss	refused	offline-miss	offline
 repos/fetch-miss	refused	fetch-required	local
+lock/refused/apt-duplicate.lock	refused	duplicate-key	-
+lock/refused/apt-snapshot.lock	refused	apt-snapshot	-
+lock/refused/apt-suite.lock	refused	apt-suite	-

@@ -60,3 +60,6 @@ upstream/refused/release-row.lock	edit-of	upstream/valid/upstream.lock
 upstream/refused/repository-source.lock	edit-of	upstream/valid/upstream.lock
 upstream/refused/source-without-sha256.lock	edit-of	upstream/valid/upstream.lock
 upstream/refused/unsorted.lock	reorder-of	upstream/valid/upstream.lock
+lock/refused/apt-duplicate.lock	edit-of	lock/valid/mica-system-base.lock
+lock/refused/apt-snapshot.lock	edit-of	lock/valid/mica-system-base.lock
+lock/refused/apt-suite.lock	edit-of	lock/valid/mica-system-base.lock

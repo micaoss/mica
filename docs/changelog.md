@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-26 12:00 [design]
+
+A release lock carries one `apt` row per Debian source (`docs/design/release-lock.md` 1.2.5;
+plan `docs/plan/20260926-1125-apt-row-per-source.md`): the key is `<uri> <suite>`, so Base can
+name `trixie`, `trixie-updates` and `trixie-security` at one snapshot, and two new rules hold
+them together, `apt-snapshot` (one snapshot timestamp) and `apt-suite` (one release and its
+pockets, the release among them). mica-system-base found OpenSSL, libexpat1 and util-linux
+fixes in those pockets that its root, resolved from `trixie` alone, did not carry. The checker
+implements both; the valid `mica-system-base.lock` vector carries the three sources, and
+`apt-duplicate`, `apt-snapshot` and `apt-suite` are the refusals. Readers move before Base
+publishes more than one row: mica-build, mica-build-env, mica-podman and mica-system-base
+(mica-boards is retired into mica-build).
+
 ## 2026-09-26 09:05 [decision]
 
 The released variants' default is **basic**, not full (user correction: "默认是basic不是full";

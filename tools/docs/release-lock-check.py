@@ -75,6 +75,7 @@ NAME = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
 UPSTREAM_NAME = re.compile(r"^[a-z0-9][a-z0-9._/-]*(?::[A-Za-z0-9._-]+)?$")
 UPSTREAM_REFERENCE = re.compile(r"^[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::[0-9]+)?/[a-z0-9._/-]+(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$")
 VERSION = re.compile(r"^[A-Za-z0-9.+~:-]+$")
+APT_SNAPSHOT = re.compile(r"/([0-9]{8}T[0-9]{6}Z)/?$")
 REFERENCE = re.compile(r"^(?P<registry>ghcr\.io/micaoss|local)/(?P<repository>[a-z0-9][a-z0-9-]*)(?::(?P<tag>[A-Za-z0-9._-]+))?@sha256:(?P<digest>[0-9a-f]{64})$")
 
 
@@ -189,8 +190,9 @@ def check_lock(path):
                   and row[5].startswith("https://") and all(NAME.match(r) for r in roots) and roots == sorted(set(roots)))
             key = (row[1], row[2])
         elif kind == "apt":
+            # 1.2.5: one row per Debian source, keyed by the source.
             field(row[1].startswith("https://") and row[2] and row[3] and row[4].startswith("/"))
-            key = ()
+            key = (row[1], row[2])
         elif kind == "input":
             name, _, input_scope = row[1].partition(".")
             field(REPOSITORY.match(name) and (input_scope == "" or SCOPE.match(input_scope))
@@ -250,6 +252,15 @@ def check_lock(path):
         sort_keys.append((KIND_ORDER.index(kind),) + tuple(k.encode() for k in key))
     if repository != "mica-system-base" and any(r[0] in BASE_ONLY for r in rows):
         refuse("base-only-kind")
+    # 1.2.5: the sources are one snapshot of one release and its pockets.
+    apt = [r for r in rows if r[0] == "apt"]
+    if apt:
+        stamps = {m.group(1) if m else None for m in (APT_SNAPSHOT.search(r[1]) for r in apt)}
+        if len(stamps) != 1 or None in stamps:
+            refuse("apt-snapshot")
+        suites = {r[2] for r in apt}
+        if len({suite.partition("-")[0] for suite in suites}) != 1 or not any("-" not in suite for suite in suites):
+            refuse("apt-suite")
     if repository != "mica-build" and any(r[0] in BUILD_ONLY for r in rows):
         refuse("build-only-kind")
     if not index_lock and any(r[0] in INDEX_KINDS for r in rows):

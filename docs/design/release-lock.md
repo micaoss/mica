@@ -88,7 +88,7 @@ input.
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
 | `board` | `board <board> <component> <arch> <reference>` | board, component | one built component artifact of a board (`mica-build`, 1.2.2); `<component>` is `kernel`, `uboot` or `firmware` (section 2); every board with a row has a `kernel` row (`board-components`) |
 | `upstream` | `upstream <name> <arch> <version> <sha256> <url> <roots>` | name, arch | a third-party archive pinned for later stages; `<url>` is https; `<roots>` is the comma-separated, sorted, duplicate-free list of `upstream.pkgs` roots it is pinned for (*fixed here*, as Base publishes today); `mica-system-base` only |
-| `apt` | `apt <uri> <suite> <components> <signed-by>` | at most one | the one apt source; `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
+| `apt` | `apt <uri> <suite> <components> <signed-by>` | uri, suite | one Debian source, one row per source (1.2.5); `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
 | `input` | `input <repository>[.<scope>] <release> <sha256>` | input | one release `mica-build` composed from (1.2.2); `mica-build` only |
 | `product` | `product <product> <board> <profile> <generation> <deployment id> <kernel id> <rootfs id>` | product | one product of the release and its signed deployment (1.2.2); `mica-build` only |
 | `bundle` | `bundle <product> image\|update <reference>` | product, type | the product's OCI image or update bundle (1.2.2); `mica-build` only |
@@ -318,6 +318,48 @@ producer, not to the format. `kind-unknown` is unchanged, so a reader that
 does not know the kind still refuses the lock: readers and writers move
 together, as they did for the format itself.
 
+#### 1.2.5 The Debian sources: one `apt` row per source
+
+The `apt` rows are the Debian sources a Base root was resolved from, and the
+ones a consumer resolves an unpinned package from *(user, 2026-09-26)*:
+
+```text
+apt https://snapshot.debian.org/archive/debian-security/<ts> trixie-security main /usr/share/keyrings/debian-archive-keyring.gpg
+apt https://snapshot.debian.org/archive/debian/<ts> trixie main /usr/share/keyrings/debian-archive-keyring.gpg
+apt https://snapshot.debian.org/archive/debian/<ts> trixie-updates main /usr/share/keyrings/debian-archive-keyring.gpg
+```
+
+**One row per source, and the key is the source: `<uri> <suite>`.** A release
+and its pockets live at different URIs -- security fixes are in
+`debian-security`, the rest in `debian` -- and one deb822 stanza with several
+URIs and several suites pairs every URI with every suite, so the sources cannot
+share a row. Between point releases a fix exists only in `trixie-security` or
+`trixie-updates`; a root resolved from `trixie` alone does not carry it until
+the next point release reaches `trixie`, which is what the single row of this
+format's first version meant *(mica-system-base, 2026-09-26: OpenSSL 3.5.7,
+libexpat1 2.8.3 and util-linux 2.41.5 were in those pockets at its snapshot
+and not in its root)*.
+
+Two rules hold the rows together, each refused by name:
+
+- **`apt-snapshot`**: every `apt` row's URI ends in a snapshot timestamp
+  (`<YYYYMMDD>T<HHMMSS>Z`), and it is the same one. The sources are one moment
+  of the archive, or a consumer resolves against a mixture no build ever saw.
+- **`apt-suite`**: the suites are one release and its pockets -- every suite is
+  that release or `<release>-<pocket>` -- and the release itself is among them.
+  Pockets are additions to a release, not a source on their own.
+
+The rows sort by key as bytes, like every kind, so `debian-security` comes
+before `debian`. A consumer renders **one deb822 stanza per row** (`Types: deb`,
+the row's URI, suite and components, `Signed-By` its keyring path,
+`Check-Valid-Until: no`), and resolves from all of them together. One row alone
+is still a valid lock: the release with no pocket.
+
+**Readers move before the writer.** A reader of this format's first version
+refuses a second `apt` row as `duplicate-key`, so Base publishes more than one
+only after every reader of its lock implements this section and reads the
+vectors that exercise it.
+
 ### 1.3 References
 
 A reference of a `pool`, a `board` or a repository's image is
@@ -404,8 +446,10 @@ the ones the vectors use:
 | `reference-registry` | a `pool`, `board` or repository image reference outside `ghcr.io/micaoss/` and `local/`, `local/` in a published lock, or `ghcr.io/micaoss/` in an offline lock |
 | `reference-repository` | a `pool` or `board` reference to another repository than the release row's, or a repository image reference to another repository than its source |
 | `reference-upstream` | an `upstream` image reference in `ghcr.io/micaoss/` or `local/` |
-| `duplicate-key` | two rows of one kind with the same key (a second `apt` row included) |
+| `duplicate-key` | two rows of one kind with the same key (two `apt` rows for one source included) |
 | `base-only-kind` | an `upstream` or `apt` row in a lock of any repository but `mica-system-base` |
+| `apt-snapshot` | an `apt` row whose URI does not end in a snapshot timestamp, or two `apt` rows naming different ones (1.2.5) |
+| `apt-suite` | `apt` rows whose suites are not one release and its `<release>-<pocket>` pockets, or without the release itself (1.2.5) |
 | `package-without-pool` | a `package` row whose arch has no `pool` row |
 | `build-only-kind` | an `input`, `origin`, `built`, `index`, `product`, `bundle` or `asset` row in a lock of any repository but `mica-build` |
 | `index-scope` | an `origin`, `built` or `index` row outside a `mica-build` `mica.<release>` lock, a `mica` lock without an `index` row, or `mica` as another repository's scope, an input's scope, a product or a board |
@@ -638,8 +682,8 @@ One lock replaces `system-base.lock`, `system-base-packages.lock` and
 - `pool amd64|arm64`;
 - `package` rows for the Base's own packages, per architecture;
 - `upstream` rows for the pinned later-stage packages, with their roots;
-- one `apt` row, the Debian snapshot source; a consumer that runs apt renders
-  the deb822 source from it.
+- the `apt` rows, the Debian sources at one snapshot (1.2.5); a consumer that
+  runs apt renders one deb822 stanza per row.
 
 The policy stays `docs/decisions/2026-09-14-base-pins-upstream-packages.md`.
 
@@ -953,8 +997,8 @@ The vectors are files every repository copies into its own tests:
   `upstream` rows with the original names and index-digest references and a
   `386` row), `mica-core.lock`
   (`pool`, `package`),
-  `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, `apt`, a
-  comment), `offline-mica-core.lock` (an offline lock with `local/`
+  `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, three
+  `apt` rows for a release and its two pockets, a comment), `offline-mica-core.lock` (an offline lock with `local/`
   references), `mica-build.uefi-x64.lock` (a scoped `mica-build` lock: the board's
   `pool`, `package` and `board` rows, `input`, `product`, `bundle`, `asset`
   rows, a `root` update beside `full`),
@@ -978,7 +1022,9 @@ The vectors are files every repository copies into its own tests:
   `index-without-index-rows.lock` (`index-scope`), `index-only-inputs.lock`,
   `index-input.lock`, `index-product-source.lock` and
   `index-asset-release.lock` (`index-product-source`), and
-  `index-built-form.lock`.
+  `index-built-form.lock`; the source refusals are `apt-duplicate.lock`
+  (`duplicate-key`, one source twice), `apt-snapshot.lock` (a pocket at another
+  snapshot) and `apt-suite.lock` (pockets without their release).
 - `pins/valid/` and `pins/refused/`: directories holding a `locks/` content
   (the `.lock` files and `pins/<repository>[.<scope>].pin`); `release`
   (checked in `ci` mode) and `offline-checkout` (in `local` mode) are valid;
