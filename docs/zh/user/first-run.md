@@ -51,7 +51,7 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 地址依据 eMMC CID 和物理拓扑计算，不依赖接口探测顺序。当前开发验收全部使用
 完整最新版系统；请记录实际读到的板卡接口及地址。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/package/hwinit/hwinit-mac`, `mica-boards:boards/cx3576/package/init/mac.conf`, `mica-build:make os-mac-test`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/package/hwinit/hwinit-mac`, `mica-build:boards/cx3576/package/init/mac.conf`, `mica-build:make os-mac-test`
 
 ## 3. 离线路径：配置文档
 
@@ -81,7 +81,7 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 `journalctl -u mica-provisioning-import` 才是"插了 U 盘却没反应"时第一个要
 看的地方——而不是状态路由。
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`
+> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
 
 ### 它能带什么，以及它点名拒绝什么
 

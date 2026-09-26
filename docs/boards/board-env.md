@@ -106,7 +106,7 @@ The native C boot policy validates these fixed ranges, persists and reads back a
 trial decrement, and only then loads a required signed FIT. DATA growth compares
 protected firmware/SYSTEM bytes and preserves their identities.
 
-> status: shipped — evidence: `mica-build:boards/cx3576/loader/mica-file-boot.c`, `mica-build:src/image/firmware-maintenance.ts`, `mica-build:tests/gates/repart-loader-test.sh`
+> status: shipped — evidence: `mica-build:boards/cx3576/loader/mica-file-boot.c`, `mica-build:src/image/firmware-maintenance.ts`, `mica-build:tests/gates/repart-loader.ts`
 
 ## s905x5m protected firmware ranges
 
@@ -139,7 +139,7 @@ how many units the board package enables, which the package gate holds.
 
 The assembly's kernel component and firmware package dispatch on these
 facts and never on the board's name (`mica-build:src/image/board-facts.ts`,
-held by `mica-build:tests/gates/board-name-lint.sh`). `BOARD_CMDLINE_ARGS` is the
+held by `mica-build:tests/gates/board-name-lint.test.ts`). `BOARD_CMDLINE_ARGS` is the
 exact authenticated kernel command line on every board (a FIT board's
 kernel forces it, `CONFIG_CMDLINE_FORCE`). `FIRMWARE_FORMAT` is `efi` on a
 `systemd-boot` board, `rockchip-loader` or `amlogic-boot0` on a `uboot-fit`

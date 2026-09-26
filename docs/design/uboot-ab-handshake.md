@@ -1,7 +1,7 @@
 # cx3576 signed FIT boot and trial records
 
 The normal cx3576 boot path is compiled C policy in
-`mica-boards:boards/cx3576/loader/mica-file-boot.c`.
+`mica-build:boards/cx3576/loader/mica-file-boot.c`.
 It reads current three-partition geometry and bounded deployment records, arms
 the watchdog before storage discovery, persists a trial decrement, and loads a
 required-signature FIT. It does not import commands, boot scripts, environment
@@ -38,7 +38,7 @@ Physical reset and Linux handoff remain bench acceptance requirements.
 
 ## Disk contract
 
-`mica-boards:boards/cx3576/board.env` is authoritative.
+`mica-build:boards/cx3576/board.env` is authoritative.
 
 | Partition | Range | Contents |
 |---|---|---|

@@ -7,7 +7,7 @@ other and what survives an update are yours to describe — in systemd's terms,
 not in a mica-specific format.
 
 This document is the integrator's guide to doing that. Every example below is
-extracted by `tests/gates/quadlet-doc-test.sh` and fed to the Quadlet generator this
+extracted by `tests/gates/quadlet-doc.test.ts` and fed to the Quadlet generator this
 image actually ships, so an example that stopped working fails the test suite
 rather than sitting here looking correct.
 
@@ -581,7 +581,7 @@ than one that is uniformly confident.
 **To firewall — the one category anybody had decided about, because it had
 already broken.** `cx3576` once shipped without `NFT_FIB_*` and every bridged
 container failed;
-`mica-build:tests/gates/netavark-kernel-config-test.sh` now asserts the symbols
+`mica-build:tests/gates/netavark-kernel.test.ts` now asserts the symbols
 netavark programs rules against, on every board config, and requires each
 board's post-`olddefconfig` loop to name the same symbols so that a silently
 dropped symbol fails the kernel build. The other categories have no gate and

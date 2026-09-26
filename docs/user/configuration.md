@@ -96,7 +96,7 @@ The authoritative list is the API contract, not this prose: what
 WiFi presence is board-dependent: the cx3576 carries WiFi and Bluetooth; the
 uefi-x64 QEMU baseline has no radio.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
 ## 4. An unmodelled setting is an unsupported setting
 
@@ -146,7 +146,7 @@ been demonstrated.
 
 > status: shipped — evidence: `docs/design/time.md`, `mica-core:micad/src/time_status.rs`
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
 
 ### 5.2 Offline provisioning channels and factory injection
 

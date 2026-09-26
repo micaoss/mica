@@ -133,7 +133,7 @@ DATA/state 镜像到另一台上以"保住"它的身份；序列号的连续性�
 没有任何东西会烧熔丝，在确切序列于同一板卡版本的牺牲件上被证明、并被写进
 每一台施加它的单元的记录之前，也不允许有。
 
-> status: board-dependent — evidence: `docs/design/manufacturing.md`, `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `docs/design/manufacturing.md`, `mica-build:boards/cx3576/board.env`
 
 ## 6. 一条产线今天真正能做的事
 

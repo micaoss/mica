@@ -92,7 +92,7 @@ sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
 这是唯一不需要其它输入的校验。其余的——lock、索引、OCI 层——是从不同方向重复
 陈述同一批摘要，见第 4 节。
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
 ## 4. 哪一步该核对哪个摘要
 
@@ -126,7 +126,7 @@ sha256sum -c SHA256SUMS                       # 列出 lock 和每个资产
 对照 `sha256sum mica-build.lock`、用 `jq -r .previous.trust` 对照上一个索引的信任
 哈希。
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
 ## 5. 用源头证明一个发布
 
@@ -135,15 +135,15 @@ lock 是 `mica-lock v1` 文件，记录发布的提交以及进入它的每一�
 `mica-build` 检出中，可以从已发布的 release 重建索引并逐字节比较：
 
 ```sh
-bash tools/release.sh verify-index mica.<index release>
-bash tools/release.sh verify-index mica.<index release> --full
+bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release>
+bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release> --full
 ```
 
 文件旁边的校验和只能证明文件完整到达。让镜像值得信任的是它内部的签名链
 （[发布签名](../../design/release-signing.md)）以及平台信任那个签名者；上面的
 哈希是完整性的一半，不是真实性的一半。
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
 
 ## 6. 下一步
 

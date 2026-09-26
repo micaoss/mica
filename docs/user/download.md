@@ -110,7 +110,7 @@ That is the one check that needs no other input. Everything else — the lock,
 the index and the OCI layer — states the same digests again from a different
 direction, which is section 4.
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
 ## 4. Which digest at which step
 
@@ -149,7 +149,7 @@ Inside an index release the same idea applies to the index itself:
 `sha256sum mica-build.lock`, and `jq -r .previous.trust` against the previous
 index's trust hash.
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
 
 ## 5. Prove the release against its sources
 
@@ -160,8 +160,8 @@ scoped release, the images and archives themselves. From a clean checkout of
 published releases and compared byte for byte:
 
 ```sh
-bash tools/release.sh verify-index mica.<index release>
-bash tools/release.sh verify-index mica.<index release> --full
+bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release>
+bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release> --full
 ```
 
 A checksum next to a file proves only that the file arrived intact. What makes
@@ -170,7 +170,7 @@ an image trustworthy is the signature chain inside it
 that signer; the hashes above are the integrity half, not the authenticity
 half.
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
 
 ## 6. Next
 

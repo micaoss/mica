@@ -46,13 +46,13 @@ transaction onto a pinned base. Adding a native application means adding a
 A producer is one directory holding `producer.env` and a `Dockerfile`, found
 anywhere in the tree; first-party ones live in the repository that produces
 the package (`mica-core:pkgs/`, `mica-system-base:debs/`,
-`mica-boards:producers/`), and board-specific ones under
-`mica-boards:boards/<board>/`. `producer.env` declares what the producer emits,
+`mica-build:producers/`), and board-specific ones under
+`mica-build:boards/<board>/`. `producer.env` declares what the producer emits,
 which architectures it emits for, and — per package — how many
 `multi-user.target.wants` symlinks the archive is supposed to ship. The full
 contract, including the control template, the version stamp, the `PREPARE`
 hook and the pre-flight, is each producing repository's own packaging
-(`mica-core:scripts/deb/`, `mica-boards:tools/deb/README.md`), and it is not
+(`mica-core:scripts/deb/`, `mica-build:tools/deb/README.md`), and it is not
 restated here.
 
 What is worth knowing before writing one:
@@ -203,7 +203,7 @@ Device access is systemd's, with nothing mica-specific over it:
 
 Device names are board facts. Take them from the board's dossier under
 [../boards/](../boards/cx3576.md) rather than from another board's unit;
-`mica-boards:boards/cx3576/package/hwinit/` (`mica-boards:boards/cx3576/package/hwinit`) is where the shipped
+`mica-build:boards/cx3576/package/hwinit/` (`mica-build:boards/cx3576/package/hwinit`) is where the shipped
 board-specific units live.
 
 ## 8. Ceilings

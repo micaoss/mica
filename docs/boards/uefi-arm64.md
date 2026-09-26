@@ -28,13 +28,12 @@ describes emulated boot and services and qualifies no physical arm64 machine.
 
 ## Provenance
 
-- Kernel: mainline stable `linux`, tag pinned in
-  `mica-boards:boards/uefi-arm64/kernel/versions.env` and verified by the sha256 of
-  `git archive` over that tag. Currently `v6.12.107`, the same tag uefi-x64 pins —
+- Kernel: mainline stable `linux`, pinned by tag and commit in the `uefi-arm64-kernel` git row
+  of `mica-build:locks/upstream.lock`. Currently `v6.12.107`, the same tag uefi-x64 pins —
   deliberately, so that a first boot failure is not ambiguous between the port
   and the kernel version.
-- Configuration: arm64 `defconfig`, plus `mica-boards:common/kernel/mica-required.fragment`
-  and `mica-boards:boards/uefi-arm64/kernel/config/uefi-arm64.fragment`, resolved by
+- Configuration: arm64 `defconfig`, plus `mica-build:common/kernel/mica-required.fragment`
+  and `mica-build:boards/uefi-arm64/kernel/config/uefi-arm64.fragment`, resolved by
   `olddefconfig` and recorded as `config/uefi-arm64.config`.
 - Boot manager and UKI stub: systemd 257.13, today built by the `mica-boot`
   source pin with the required attempt-persistence policy. In the split of
@@ -145,7 +144,7 @@ read-only. Identity is created on DATA before services and retained across updat
 
 ## Artifact digests
 
-Kernel source and configuration are pinned under `mica-boards:boards/uefi-arm64/kernel/`.
+Kernel source and configuration are pinned under `mica-build:boards/uefi-arm64/kernel/`.
 Exact signed artifact identities and verification logs belong to the complete
 image under test. Current API evidence is `_out/uefi-arm64/apid-api/result.json`;
 full runtime, component update and trust-rotation results are summarized in

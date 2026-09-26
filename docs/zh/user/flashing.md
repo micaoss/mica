@@ -23,7 +23,7 @@
 `cx3576` 与 `s905x5m` 的镜像则没有任何自动流程会启动：没有任何套件会启动 FIT 镜像——
 FIT 那套跑在宿主机上，里面没有 QEMU（[获取发布版](download.md) 第 1 节）。
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. 写入之前
 
@@ -72,7 +72,7 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 是“有什么可下载”，不是“能写入什么”：它的镜像仍然不会装上任何引导器，理由见第 6 节。
 没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/cx3576/images.tsv`
 
 ## 3. uefi-x64
 
@@ -92,7 +92,7 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loader.conf`。
 只要 UEFI 固件启动 `BOOTX64.EFI` 它就能起来，所以整个镜像写到目标介质上。
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
 
 ### 内核能驱动哪些介质
 
@@ -105,7 +105,7 @@ ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loade
 所以从驱动角度的答案是：U 盘和 USB 硬盘、SATA、NVMe。这些介质中哪些被组装侧判为
 合格仍然是开放问题——没有做过任何实机测试。
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-boards:make kernel-config-test`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-build:make kernel-config-test`
 
 ### 写入（未验证）
 
@@ -205,7 +205,7 @@ mica-deploy import /run/mica/import/update.micaupd
 make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 普通的发布镜像启动到登录提示符并拉起它的服务。验收控制台上打印的 `FILE_AB_*`
 标记来自套件自己塞进镜像的脚本，不是出厂镜像的行为；在设备上不要指望看到它们。
@@ -308,4 +308,4 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 - **不能靠重刷来升级。** 写镜像会抹掉 DATA。要把运行中的设备带到新发布，用更新归档
   （[更新包](../../user/update-packages.md)）。
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`

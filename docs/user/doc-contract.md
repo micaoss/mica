@@ -81,7 +81,7 @@ backticks, multiple references separated by `, `:
 
 ```
 > status: shipped — evidence: `mica-core:apid/openapi.json`
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 > status: proposed — evidence: `docs/task/20260912-2058-fleet-runtime.md`
 > status: unsupported
 ```

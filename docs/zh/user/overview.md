@@ -22,7 +22,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 | `mica-build` | 组装：组合每个产品的根、给组件签名，并发布镜像、更新归档和版本索引 |
 | `mica` | 本仓库：设计契约、决策、指南和工作区记录 |
 
-> status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-boards:boards`
+> status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-build:boards`
 
 ## 2. 发布链
 

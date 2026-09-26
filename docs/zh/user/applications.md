@@ -52,7 +52,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 组件是添加一个 producer，不是编辑构建阶段。结果封在 verity 密封的根里，
 只能通过发布新的签名镜像来更新。
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-core:scripts/deb/`, `mica-boards:tools/deb/`, `mica-build:rootfs/packages/`
+> status: shipped — evidence: `docs/design/build.md`, `mica-core:scripts/deb/`, `mica-build:tools/deb/`, `mica-build:rootfs/packages/`
 
 集成商指南——[../../design/native-applications.md](../../design/native-applications.md)——
 覆盖 producer 约定、专用服务账户、可写状态归属、健康与日志、按名字的设备

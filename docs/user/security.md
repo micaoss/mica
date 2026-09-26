@@ -179,7 +179,7 @@ directory `/usr/local/lib/systemd/system` like any other native application
 ([applications.md](applications.md)). That is a statement of what the product
 does now, not a recommendation of how to run a firewall.
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
+> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. Security lifecycle
 
@@ -191,7 +191,7 @@ section states its own maturity rather than implying it is enforced. Boards
 carry a boot-assurance claim in a committed evidence file, and the release
 gate reads that file rather than letting a release name its own level.
 
-> status: shipped — evidence: `docs/design/security-lifecycle.md`, `mica-boards:boards/cx3576/evidence.json`
+> status: shipped — evidence: `docs/design/security-lifecycle.md`, `mica-build:boards/cx3576/evidence.json`
 
 **None of the response channels exists yet, and an auditor should be told
 so.** There is no published security contact and no disclosure policy at the

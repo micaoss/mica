@@ -34,7 +34,7 @@ A release is not a physical-board qualification. Generate any download list
 from the index and the delivered artifact records; do not hand-write release
 identities or claim absent evidence.
 
-> status: shipped — evidence: `mica-build:tools/release.sh`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/mica-index.md`
 
 Public hosting, release support windows and a public downloadable release history
 remain unprovided. Link [build instructions](../design/build.md),

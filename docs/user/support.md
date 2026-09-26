@@ -46,7 +46,7 @@ Integrators bringing their own hardware start at
 boundary, kernel assertion set, layout schema) is shipped and enforced by the
 build.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `docs/boards/contract.md`
 
 ## 3. Lifecycle ownership
 

@@ -9,7 +9,7 @@ A board directory produces **artifacts**; the OS build consumes **artifacts**.
 Neither side reaches into the other's build. Since 2026-09-21 both live in one
 repository, `mica-build` (`docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`;
 `mica-boards` is retired): the boundary is the board directory, held by
-`mica-build:tests/gates/board-contract-test.sh` on the board's side and by the
+`mica-build:tests/gates/board-contract.ts` on the board's side and by the
 board-name lint on the engine's, not a repository. Yocto is permitted only
 inside a board directory (when a vendor ships BSP solely as Yocto layers, run
 `bitbake virtual/kernel virtual/bootloader` and export the deploy dir) — never
@@ -118,7 +118,7 @@ no persistent boot command script.
 ## 3. The board bundle
 
 Everything the assembly reads of a board is assembled into one board tree,
-`mica-build:_out/boards/<board>/`, by `mica-build:tools/board-pool.sh --fetch`
+`mica-build:_out/boards/<board>/`, by `mica-build:src/boards/board-pool.ts --fetch`
 (since 2026-09-21, `docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`):
 the board's definition, manifests, flashing formats, outputs, evidence and
 trust certificate are staged from `boards/<board>/` of the checkout, its
@@ -126,8 +126,8 @@ firmware files likewise, and its **built** components -- the kernel, and the
 U-Boot where the board has one -- come from a local build under
 `_out/<board>/` (`make <board>-kernel`, `make <board>-firmware`) or, when
 there is none, from the latest release of this repository that published
-them with the same inputs hash (`tools/inputs.sh`, the `mica.inputs`
-annotation; `tools/reuse.sh`), read by digest. Neither present is a refusal
+them with the same inputs hash (`src/boards/inputs.ts`, the `mica.inputs`
+annotation; `src/boards/reuse.ts`), read by digest. Neither present is a refusal
 naming the make target, never a silent build.
 
 A scoped release publishes the built components as the OCI artifacts
@@ -148,7 +148,7 @@ component's input key), `mica.source-commit` and `mica.source-repo`
 (`mica-build`; the fetch refuses any other value). `mica.verity-cert-sha256`
 is required on the `kernel` component, which embeds the verity trust; a
 `uboot` or `firmware` component may carry it, and then it must match
-(`mica-build:tools/board-pool.sh`). A release reuses an unchanged component
+(`mica-build:src/boards/board-pool.ts`). A release reuses an unchanged component
 by digest: the same manifest bytes under the new release's tag, never a
 re-pointed tag, and the release lock names each as a `board` row
 (`docs/design/release-lock.md` 1.2.2). The `mica-kernel-<board>` packages
@@ -180,7 +180,7 @@ a board line that already names `mica.profile` or `mica.recovery` is refused
 (option A, 2026-09-14).
 
 The board list and each board's expected outputs are machine-readable
-(`mica-boards` `ce44907`, read by `mica-build:tools/boards.sh`; the file
+(`mica-boards` `ce44907`, read by `mica-build:src/boards/boards.ts`; the file
 formats keep the `mica-boards` name they were specified under):
 
 - `mica-build:boards/boards.tsv`: line 1 `# mica-boards boards v1`, then one
@@ -194,7 +194,7 @@ formats keep the `mica-boards` name they were specified under):
   the assembled board tree, at its path in the table above, for example
   `file firmware firmware/<file>`; `outputs.tsv` itself included), sorted by
   kind, then value; the assembled tree must be exactly its file rows
-  (`tools/boards.sh bundle-is`).
+  (`src/boards/boards.ts bundle-is`).
 
 ### 3.1 Flashing formats: `images.tsv` and the packer interface
 
@@ -308,7 +308,7 @@ not free on cx3576: it `depends on !DEBUG_INFO_SPLIT && !DEBUG_INFO_REDUCED`
 (v6.1 `lib/Kconfig.debug`) and the board config sets
 `CONFIG_DEBUG_INFO_REDUCED=y`, so adopting it means compiling the whole tree
 with full DWARF and adding `dwarves` (pahole) to
-`mica-boards:boards/cx3576/kernel/Dockerfile`. Both kernels were built and compared:
+`mica-build:boards/cx3576/kernel/Dockerfile`. Both kernels were built and compared:
 
 | | floor as shipped | with BTF | delta |
 |---|---|---|---|
@@ -357,7 +357,7 @@ back-end** — §4.2.1 measures it unreachable through anything the image select
 And `NF_NAT_MASQUERADE`, which `NFT_MASQ` selects, so a line for it would state
 a consequence rather than a requirement.
 
-The two floors overlap: `tests/gates/netavark-kernel-config-test.sh` asserts that
+The two floors overlap: `tests/gates/netavark-kernel.test.ts` asserts that
 every symbol it cites which the fragment also states is stated there as `=y`,
 so a weaker statement in the shared file cannot hide behind cx3576's own
 Dockerfile loop.
@@ -437,7 +437,7 @@ so the fragment merges values that are already there. Both kernels were built
 from this tree with only the fragment differing, to show that rather than
 assert it. **The comparison was by size, not by hash, and the reason is worth
 keeping now that it has been repaired:** at the time
-the cx3576 kernel Dockerfile (now `mica-boards:boards/cx3576/kernel/Dockerfile`) pinned none of `KBUILD_BUILD_TIMESTAMP`,
+the cx3576 kernel Dockerfile (now `mica-build:boards/cx3576/kernel/Dockerfile`) pinned none of `KBUILD_BUILD_TIMESTAMP`,
 `_USER` or `_HOST`, which uefi-x64's did, so two builds of one unchanged tree already
 differed — the two `Image` files here have equal size and different sha256, and
 that difference was the build clock rather than this change.
@@ -641,7 +641,7 @@ is not set` line in `cx3576`'s committed config, read at the pinned release.
 Taken on its author's authority: the CI run and the cx3576 `Image` dates.*
 
 `mica-boards` asserts its shared kernel floor
-(`mica-boards:common/kernel/mica-required.fragment`) in two places: over each
+(`mica-build:common/kernel/mica-required.fragment`) in two places: over each
 board's committed config, and over the RESOLVED config after `olddefconfig`,
 in the board's own kernel build. Both run when a kernel is BUILT.
 
@@ -672,7 +672,7 @@ so its staleness is the PIN's. Same path, different question.
 
 **What reads a shipped kernel configuration, and what does not.** In its
 author's words, where *this file* is
-`mica-boards:common/kernel/kernel-config-test.sh`:
+`mica-build:common/kernel/kernel-config-test.sh`:
 
 > NOTHING CATCHES THAT FOR THESE SYMBOLS. Measured against `mica-build` at
 > `77a124b`: two places read a shipped kernel configuration, and neither reads
@@ -728,7 +728,7 @@ nothing that was ever protecting a heading, and buys reachability outright —
 
 **The general rule this came from**: a constraint in a header warns whoever is
 already reading that file, which is nobody who needs it. This one was written
-in `mica-boards:common/kernel/kernel-config-test.sh`'s header, with its
+in `mica-build:common/kernel/kernel-config-test.sh`'s header, with its
 measurement, weeks before another repository met the same hazard and built a
 staleness guard for it — and the repository that had written it down could not
 warn the one that hit it.
@@ -752,7 +752,7 @@ separate board evidence.
 
 The boot path sets the floor. The root is a squashfs carrying its own dm-verity
 hash tree, described by one `dm-mod.create=` table on the kernel command line —
-"one boot contract, written once by rootfs/build.sh, read by the kernel's
+"one boot contract, written once by src/rootfs/build.ts, read by the kernel's
 dm-init on a board whose kernel has it and by this script on a board whose kernel
 does not" — above a userland that
 is "Debian trixie + systemd" — the digest-pinned base
@@ -770,14 +770,14 @@ merge the same shared fragment before `olddefconfig`. Board intake tiers:
 
 ## 7. Adding a current board
 
-1. In `mica-build`: `bash tools/new-board.sh <name> --from <nearest>` copies
+1. In `mica-build`: `bash bin/bun.sh src/cli.ts new-board <name> --from <nearest>` copies
    a board under `boards/`, its build included -- `board.env`,
    `sources.env`, `manifests/board.pkgs`, the kernel build, configuration,
    device tree, patches and hooks under `kernel/`, the loader build and
    inputs under `loader/` with
    `bsp.env` naming them, the package inputs under `package/` -- with
    fresh identities; the Makefile discovers it. `make check` proves the contract
-   (`tests/gates/board-contract-test.sh`) and the kernel floor. The board package
+   (`tests/gates/board-contract.ts`) and the kernel floor. The board package
    provides and conflicts with the virtual `mica-board`, so it excludes its
    siblings without naming them, and it may depend on the Debian packages
    the `mica-board-*` consumer family of `mica-debian:consumers.pkgs`

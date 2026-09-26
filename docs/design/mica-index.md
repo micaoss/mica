@@ -334,7 +334,7 @@ measured 1.9 KB per product. Both the member and the threshold are proposals.
 The checker of `docs/design/release-lock.md` proves the index lock's file
 rules; the checks across releases are done at the cut and by the verifier:
 
-- `mica-build:tools/release.sh verify-index <tag>` re-derives an index
+- `mica-build:src/release/scoped.ts verify-index <tag>` re-derives an index
   incrementally and requires byte-identical files.
 - `verify-index <tag> --full` rebuilds every entry from its sources and
   publishes nothing.

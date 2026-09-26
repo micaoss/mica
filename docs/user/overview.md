@@ -26,7 +26,7 @@ from source with [build](build.md), an image reaches a board through
 | `mica-build` | the assembly: it composes each product's root, signs the components, and publishes the images, the update archives and the version index |
 | `mica` | this repository: the design contracts, the decisions, the guides and the workspace records |
 
-> status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-boards:boards`
+> status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-build:boards`
 
 ## 2. The release chain
 

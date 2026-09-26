@@ -56,8 +56,8 @@ provenance, mainline U-Boot, Wi-Fi and Bluetooth — and is the board the
 U-Boot A/B boot-order handshake is built for. The uefi-x64 board is the QEMU and
 CI baseline: firmware boots it, so it has no BSP build.
 
-> status: shipped — evidence: `mica-boards:boards/cx3576/board.env`, `docs/boards/cx3576-bsp-sync.md`
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`
+> status: shipped — evidence: `mica-build:boards/cx3576/board.env`, `docs/boards/cx3576-bsp-sync.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`
 
 Neither board carries a completed field-reliability qualification matrix — the
 cx3576 dossier holds the matrix with every row at `not tested`, and the
@@ -72,7 +72,7 @@ contract. A new board declares its partition geometry and layout constants in
 one `board.env`, produces kernel, device tree and bootloader artifacts through
 the BSP boundary, and must satisfy the shared kernel assertion set.
 
-> status: shipped — evidence: `docs/boards/contract.md`, `mica-boards:common/kernel/mica-required.fragment`
+> status: shipped — evidence: `docs/boards/contract.md`, `mica-build:common/kernel/mica-required.fragment`
 
 The staged porting manual, intake rubric, board template and qualification
 procedure are published, and together they are the integrator's path from a

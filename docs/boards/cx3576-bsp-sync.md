@@ -1,7 +1,7 @@
 # Design: cx3576 Upstream BSP Sync Record
 
 > Not a design in the usual sense: a **sync record** for a vendored tree.
-> `mica-boards:boards/cx3576/` is derived from an upstream BSP repository, not authored
+> `mica-build:boards/cx3576/` is derived from an upstream BSP repository, not authored
 > here, so it needs a place that names where it came from, which upstream
 > commit it is level with, and where we deliberately differ.
 
@@ -31,9 +31,9 @@ this record exists to prevent.
 |---|---|
 | Repository | <https://github.com/micaoss/board-cx3576-alpine> (`git@github.com:micaoss/board-cx3576-alpine.git`) |
 | Location | The user announced this move of the upstream (2026-09-14); it is not done yet, and the commit ids below were recorded against the tree before the move |
-| Relationship | `mica-boards:boards/cx3576/` is **derived from** that tree, not authored in this repository |
+| Relationship | `mica-build:boards/cx3576/` is **derived from** that tree, not authored in this repository |
 
-`mica-boards:boards/cx3576/` is a drifted derivative, not a mirror. Measured at `b4b7c72`
+`mica-build:boards/cx3576/` is a drifted derivative, not a mirror. Measured at `b4b7c72`
 against upstream `b210e2b^`, `kernel/config/kernel-cx3576z.config` and
 `kernel/dts/rk3576-cx3576z.dts` were byte-identical, while `Makefile`,
 `kernel/Dockerfile`, `rootfs/alpine/Dockerfile` and `uboot/Dockerfile` had
@@ -84,11 +84,11 @@ One entry today.
 
 | | |
 |---|---|
-| **Where** | `mica-boards:boards/cx3576/loader/patches/0006-rk3576-generic-cx3576z-usb-host-led-boot-order.patch`, the `bootstd` node in the `arch/arm/dts/rk3576-generic.dts` hunk |
+| **Where** | `mica-build:boards/cx3576/loader/patches/0006-rk3576-generic-cx3576z-usb-host-led-boot-order.patch`, the `bootstd` node in the `arch/arm/dts/rk3576-generic.dts` hunk |
 | **Upstream has** | `bootdev-order = "mmc1", "mmc0", "usb";` — SD first, so an inserted SD card overrides eMMC |
 | **We have** | `bootdev-order = "mmc0", "mmc1", "usb";` — eMMC first, SD second, USB last |
 | **Reason** | The user decided it, 2026-08-20. |
-| **Guard** | `mica-boards:boards/cx3576/loader/build.sh` asserts `[ "$(fdtget u-boot.dtb /bootstd bootdev-order)" = "mmc0 mmc1 usb" ]` on the compiled device tree, and `build-mica.sh` repeats it because that stage rebuilds `u-boot.dtb` |
+| **Guard** | `mica-build:boards/cx3576/loader/build.sh` asserts `[ "$(fdtget u-boot.dtb /bootstd bootdev-order)" = "mmc0 mmc1 usb" ]` on the compiled device tree, and `build-mica.sh` repeats it because that stage rebuilds `u-boot.dtb` |
 
 SD is retained as a fallback, not removed: a rescue SD still boots when eMMC is
 unbootable, but it cannot override an eMMC that boots.
@@ -117,8 +117,8 @@ above still passes.
 clearing the variable before anything reads the order. The clear is per-boot and
 non-destructive: it takes no value and issues no `saveenv`, so it does not
 rewrite the stored environment. Each stage's exact `BOOTCOMMAND` string is
-asserted separately in `mica-boards:boards/cx3576/loader/build.sh` and
-`mica-boards:boards/cx3576/loader/build-mica.sh`, so dropping the clear cannot pass
+asserted separately in `mica-build:boards/cx3576/loader/build.sh` and
+`mica-build:boards/cx3576/loader/build-mica.sh`, so dropping the clear cannot pass
 silently.
 
 This is a mechanism note, not a second deviation: upstream carries the same

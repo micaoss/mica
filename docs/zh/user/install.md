@@ -29,7 +29,7 @@ profile（`dev` 或 `prod`）固化在该产品签名后的内核命令行里。
 这种安装视作可信——FIT 板卡的 U-Boot 只接受用编译进它的证书签名的内核。开发版本用
 开发证书签名，不构成生产信任。
 
-> status: shipped — evidence: `docs/design/release-signing.md`, `mica-boards:common/trust/stage.sh`, `docs/boards/assurance.md`
+> status: shipped — evidence: `docs/design/release-signing.md`, `mica-build:src/boot/trust-stage.ts`, `docs/boards/assurance.md`
 
 ## 3. 写入镜像
 
@@ -43,7 +43,7 @@ profile（`dev` 或 `prod`）固化在该产品签名后的内核命令行里。
 每种情况的命令、拒绝条件以及哪些还没有验证，都在
 [刷写](../../user/flashing.md)。
 
-> status: board-dependent — evidence: `docs/user/flashing.md`, `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/user/flashing.md`, `mica-build:boards/cx3576/Makefile`, `mica-build:boards/s905x5m/board.env`
 
 ## 4. 首次启动
 

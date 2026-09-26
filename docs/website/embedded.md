@@ -34,7 +34,7 @@ and the OS build consumes those artifacts without reaching into their build.
 Kernel configurations must satisfy a shared assertion set, so every board
 carries the features the OS depends on.
 
-> status: shipped — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:common/kernel/mica-required.fragment`, `docs/boards/contract.md`
+> status: shipped — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:common/kernel/mica-required.fragment`, `docs/boards/contract.md`
 
 ### Factory and offline setup
 
@@ -65,7 +65,7 @@ component objects; DATA holds state, configuration, applications and a bounded
 variable-data tier. Only DATA grows to fill the medium, and the OS never
 assumes it can grow SYSTEM or firmware.
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `docs/design/storage.md`
 
 ### Field recovery
 

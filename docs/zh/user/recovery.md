@@ -25,7 +25,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 保存完整串口记录、可获得的原生状态和确切镜像/组件 ID。共享存储或全部部署不可用
 时刷完整最新版镜像，不编辑计数器或导入启动命令。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/suites/lifecycle-uefi/faults.sh`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/suites/lifecycle-uefi/faults.sh`
 
 ## 3. 决策树
 
@@ -202,7 +202,7 @@ Rockchip loader 路径（上电时按 recovery 键、启动失败时自动落入
 - **不能恢复：**软件层面没有。但请注意它**不**做什么：它不擦除。见上面那段
   和第 8 步。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `docs/design/access.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/Makefile`, `docs/design/access.md`
 
 ### 第 8 步——安全擦除——终结，且未实现
 

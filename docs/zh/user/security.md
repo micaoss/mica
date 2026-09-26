@@ -148,7 +148,7 @@ auto 模式，其中 nft 前端的优先级高于旧版，并且这里没有任�
 `/usr/local/lib/systemd/system`（[applications.md](applications.md)）。这是对
 产品当下行为的陈述，不是关于该如何运行防火墙的建议。
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-boards:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
+> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. 安全生命周期
 
@@ -158,7 +158,7 @@ auto 模式，其中 nft 前端的优先级高于旧版，并且这里没有任�
 板卡在一份提交进仓库的证据文件里携带启动保障声明，发布门禁读的是那份文件，
 不允许一个发布版自称等级。
 
-> status: shipped — evidence: `docs/design/security-lifecycle.md`, `mica-boards:boards/cx3576/evidence.json`
+> status: shipped — evidence: `docs/design/security-lifecycle.md`, `mica-build:boards/cx3576/evidence.json`
 
 **其中没有任何一条响应渠道已经存在，这一点应当直接告诉审计者。**仓库根目录
 没有公开的安全联系方式与披露政策，没有公告源，没有事件通知路径，也没有任何

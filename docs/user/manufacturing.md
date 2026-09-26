@@ -167,7 +167,7 @@ whole batch. Nothing in this tree fuses anything, and nothing may, until the
 exact sequence has been proven on sacrificial hardware of the same board
 revision and named in the record of every unit it is applied to.
 
-> status: board-dependent — evidence: `docs/design/manufacturing.md`, `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `docs/design/manufacturing.md`, `mica-build:boards/cx3576/board.env`
 
 ## 6. What a line can actually do today
 

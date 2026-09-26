@@ -38,7 +38,7 @@ U-Boot accepts only a kernel signed by the certificate built into it.
 Development releases are signed with development certificates and establish no
 production trust.
 
-> status: shipped — evidence: `docs/design/release-signing.md`, `mica-boards:common/trust/stage.sh`, `docs/boards/assurance.md`
+> status: shipped — evidence: `docs/design/release-signing.md`, `mica-build:src/boot/trust-stage.ts`, `docs/boards/assurance.md`
 
 ## 3. Write the image
 
@@ -52,7 +52,7 @@ production trust.
 Each case, with its commands, its refusals and what is not verified, is in
 [flashing](flashing.md).
 
-> status: board-dependent — evidence: `docs/user/flashing.md`, `mica-boards:boards/cx3576/Makefile`, `mica-boards:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/user/flashing.md`, `mica-build:boards/cx3576/Makefile`, `mica-build:boards/s905x5m/board.env`
 
 ## 4. First boot
 

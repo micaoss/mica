@@ -25,7 +25,7 @@ mismatched inputs. `MICA_SIGNING_OUTPUT` overrides the directory. Key generation
 and verification run in the pinned OpenSSL container, not the host toolchain.
 
 ```sh
-bash boot/dev-keys.sh --out /path/to/new-development-inputs
+bash bin/bun.sh src/cli.ts dev-keys --out /path/to/new-development-inputs
 ```
 
 The directory must not exist. The generator creates separate RSA boot/content

@@ -62,7 +62,7 @@ make product-verify PRODUCT=uefi-x64-dev
 - Writing the image the build produced to a board is
   [flashing](flashing.md).
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/product/build.ts`
 
 ## 4. Building one package or one board component
 
@@ -80,7 +80,7 @@ make product-verify PRODUCT=uefi-x64-dev
   latest release's component with the same inputs -- and checks it against
   the board's `outputs.tsv`.
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/boards.sh`, `mica-build:tools/board-pool.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/boards/boards.ts`, `mica-build:src/boards/board-pool.ts`
 
 ## 5. Offline: the side-by-side checkouts
 
@@ -108,7 +108,7 @@ different builds and the local one is a valid archive that is not the
 published one; `mica-core` is that case today. An offline build is a
 **working** system either way.
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/offline/chain.ts`, `docs/design/release-lock.md`
 
 `mica-build:src/cli.ts local-pins` lets a sibling checkout's own pools stand in
 for its release while developing, instead of the pinned release.

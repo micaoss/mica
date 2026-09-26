@@ -10,7 +10,7 @@ Snapshot written 2026-09-20; status is owned by the
 
 **It has no board dossier.** `docs/boards/` holds dossiers for `cx3576`,
 `s905x5m` and `uefi-arm64`, not for this one. What follows is read from
-`mica-boards:boards/uefi-x64/board.env`, its `evidence.json`, its kernel
+`mica-build:boards/uefi-x64/board.env`, its `evidence.json`, its kernel
 configuration, and the [flashing](../user/flashing.md) page.
 
 ## At a glance
@@ -42,7 +42,7 @@ configuration, and the [flashing](../user/flashing.md) page.
 Those storage drivers have to be built in: a dm-verity root has no initramfs,
 so nothing can load before the root is mounted.
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-x64/kernel/config`, `mica-boards:boards/uefi-x64/evidence.json`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-x64/kernel/config`, `mica-build:boards/uefi-x64/evidence.json`
 
 ## Partition layout
 
@@ -54,7 +54,7 @@ so nothing can load before the root is mounted.
 
 SYSTEM is exactly 1 GiB and holds both deployments at once. The ESP carries
 `EFI/BOOT/BOOTX64.EFI` and `loader/loader.conf`. The authoritative geometry is
-`mica-boards:boards/uefi-x64/board.env`.
+`mica-build:boards/uefi-x64/board.env`.
 
 ## Console
 

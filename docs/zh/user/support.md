@@ -37,7 +37,7 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 自带硬件的集成商从 [../../boards/porting.md](../../boards/porting.md) 开始；
 板卡契约本身（产物边界、内核断言集、布局 schema）已发布并由构建强制。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `docs/boards/contract.md`
 
 ## 3. 生命周期归属
 

@@ -472,7 +472,7 @@ query; that one can only be answered **from outside the artefact**, because
 the artefact is behaving correctly within a scope it states.
 
 **A drift gate diffs where a release gate digests.** The repair
-(`mica-build:tests/gates/vectors-pin-check.sh`) pins the copy to a `mica` commit and
+(`mica-build:tests/gates/vectors-pin-check.ts`) pins the copy to a `mica` commit and
 compares the trees with `diff -r` and not a digest, *"because a digest says
 that they differ and the whole reason this drifted is that nobody could see
 what"*. Both are equality checks and they are not interchangeable: a digest is
@@ -589,7 +589,7 @@ question that gets this wrong.
 `mica-boards` answered it on paper for three artifacts and got three different
 answers in one repository (2026-09-16):
 
-- **pools** run on the target platform — `tools/deb/build.sh` sets the platform
+- **pools** run on the target platform — `src/pool/build.ts` sets the platform
   to the package architecture — so CI is native per architecture and a foreign
   local host is emulated. Measured: a locally emulated arm64 pool rebuild
   matched the CI-published `cx3576` packages byte for byte, the fourth

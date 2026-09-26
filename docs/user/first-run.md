@@ -58,7 +58,7 @@ derives one for each of them from the eMMC chip identifier and from where the
 port is attached to the board. The addresses are therefore stable across
 reboots, reflashes and image updates.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/package/hwinit/hwinit-mac`, `mica-boards:boards/cx3576/package/init/mac.conf`, `mica-build:make os-mac-test`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/package/hwinit/hwinit-mac`, `mica-build:boards/cx3576/package/init/mac.conf`, `mica-build:make os-mac-test`
 
 ## 3. The offline route: a provisioning document
 
@@ -93,7 +93,7 @@ candidate for the `media` source. A medium that will not mount never becomes a
 document at all, so `journalctl -u mica-provisioning-import` is where an
 operator whose stick did nothing looks first — not the status route.
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/uefi-x64/board.env`
+> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
 
 ### What it may carry, and what it refuses by name
 

@@ -28,7 +28,7 @@ The full access model, including what each channel can and cannot do, is
 
 > status: shipped — evidence: `docs/design/access.md`, `mica-core:apid/openapi.json`
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
 ## 2. Identifying the device and release
 

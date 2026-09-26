@@ -31,7 +31,7 @@ is a squashfs sealed by a dm-verity hash tree; every block read at runtime is
 checked against a root hash fixed at build time. There is no configuration
 drift, because there is nothing on the root to drift.
 
-> status: shipped — evidence: `mica-build:rootfs/build.sh`, `docs/design/ro-root.md`
+> status: shipped — evidence: `mica-build:src/rootfs/build.ts`, `docs/design/ro-root.md`
 
 **Updates publish authenticated deployments.** Kernel/support and root components
 are installed independently. Objects are verified and synced before the native

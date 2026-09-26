@@ -63,7 +63,7 @@ keys or inputs: signing material is explicit (`make os-devkeys` writes a
 development set) and every input comes from `locks/`. The full path, online
 and offline, is the [build guide](build.md).
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`, `docs/user/build.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/product/build.ts`, `docs/user/build.md`
 
 ## 5. First contact
 

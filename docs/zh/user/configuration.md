@@ -76,7 +76,7 @@ UI 的自动更新面板就是驱动它的。
 
 WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；uefi-x64 QEMU 基线没有无线电。
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
 ## 4. 未建模的设置就是不受支持的设置
 
@@ -117,7 +117,7 @@ WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；uefi-x64 QEMU 基线
 
 > status: shipped — evidence: `docs/design/time.md`, `mica-core:micad/src/time_status.rs`
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
 
 ### 5.2 离线配置通道与工厂注入
 

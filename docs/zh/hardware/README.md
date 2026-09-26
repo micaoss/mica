@@ -21,7 +21,7 @@
 （Mica OS 自己跑完并拥有合格矩阵）、`integrator-qualified / bring-up`（合约满足，
 现场证据由集成商持有或仍在积累）、`unsupported`（没有档案，不做任何声明）。
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
 
 ## 现在到底是什么状态（2026-09-20）
 
@@ -87,4 +87,4 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 `mica-boards` 仓库里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
 `uefi-x64` 没有板卡档案，它那页会逐条注明来源。
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-boards:boards`
+> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`

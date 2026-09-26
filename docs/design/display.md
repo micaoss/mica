@@ -102,7 +102,7 @@ order, the last step alone gives the board an idle VT protecting nothing — a
 the four boards have today ([access](access.md) section 2). `cx3576` is the
 worked example of all four.
 
-`mica-boards:boards/<board>/board.env` names `display` in `BOARD_FEATURES` or not; cx3576 does and the QEMU boards do not. It gates the boot
+`mica-build:boards/<board>/board.env` names `display` in `BOARD_FEATURES` or not; cx3576 does and the QEMU boards do not. It gates the boot
 experience above, not the kiosk. A board whose product has an HDMI output must
 provide:
 

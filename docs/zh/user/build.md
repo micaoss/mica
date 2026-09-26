@@ -55,7 +55,7 @@ make product-verify PRODUCT=uefi-x64-dev
   `_out/boards/<board>/`）。receipt 未变的产品不会重建。
 - 把构建出的镜像写进板卡见[刷写](flashing.md)。
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/product/build.ts`
 
 ## 4. 只构建一个软件包或一个板卡组件
 
@@ -70,7 +70,7 @@ make product-verify PRODUCT=uefi-x64-dev
   内核与加载器构建，或最近一次发布中输入相同的组件——并对照该板的 `outputs.tsv`
   检查。
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/boards.sh`, `mica-build:tools/board-pool.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/boards/boards.ts`, `mica-build:src/boards/board-pool.ts`
 
 ## 5. 离线：并排的检出
 
@@ -93,7 +93,7 @@ make offline-chain PRODUCTS=uefi-x64-dev
 构建，本地那个是有效的归档、但不是已发布的那一个；今天属于这种情况的是 `mica-core`。
 无论哪种情况，离线构建得到的都是一个**可用的**系统。
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/offline-chain.sh`, `docs/design/release-lock.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/offline/chain.ts`, `docs/design/release-lock.md`
 
 `mica-build:src/cli.ts local-pins` 让开发期间用并排检出自己的池顶替它的 release。
 

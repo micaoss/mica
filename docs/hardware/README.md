@@ -23,7 +23,7 @@ qualification row. The tiers themselves are defined by evidence and ownership �
 bring-up` (the contract is met; the field evidence belongs to the integrator or
 is still being accumulated), `unsupported` (no dossier, no claim).
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
 
 ## Where the project actually stands (2026-09-20)
 
@@ -97,4 +97,4 @@ board's own `board.env` and `evidence.json` in `mica-boards`, and the user
 documentation. `uefi-x64` has no dossier, and its page names the source of each
 fact instead.
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-boards:boards`
+> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`

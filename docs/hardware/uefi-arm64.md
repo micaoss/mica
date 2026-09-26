@@ -8,7 +8,7 @@ a machine boots.**
 
 Snapshot written 2026-09-20, from the dossier
 [`docs/boards/uefi-arm64.md`](../boards/uefi-arm64.md) and
-`mica-boards:boards/uefi-arm64/`; status is owned by the
+`mica-build:boards/uefi-arm64/`; status is owned by the
 [tiers table](../boards/support-tiers.md#current-boards).
 
 ## At a glance
@@ -49,7 +49,7 @@ the resolved configuration drops one. The measured cost is recorded too — 232
 kernel modules instead of 71, a 24.5 MB `Image`, and a CI kernel job that goes
 from 330 s to 718 s.
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-boards:boards/uefi-arm64/board.env`, `mica-boards:boards/uefi-arm64/kernel/config`
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
 
 ## Partition layout
 
@@ -157,4 +157,4 @@ firmware, and a freshly assembled three-partition image.
 | Radios and fieldbus | N/A | this board declares none |
 | Physical recovery action | N/A | no physical presence assertion |
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-boards:boards/uefi-arm64/evidence.json`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `docs/design/build-harness.md`

@@ -33,7 +33,7 @@ Capture the complete serial trace, native status if available, and the exact
 image/component IDs. Use a full latest-image reflash when shared storage or every
 bootable deployment is unusable. Do not edit counters or import boot commands.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/suites/lifecycle-uefi/faults.sh`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/mica-file-boot.c`, `mica-system-base:debs/mica-systemd-boot/persistence.patch`, `mica-build:tests/suites/lifecycle-uefi/faults.sh`
 
 ## 3. The decision tree
 
@@ -249,7 +249,7 @@ and rewrite the disk. [install.md](install.md) is the procedure.
 - **Does not recover:** nothing software-wise. But note what it does **not**
   do: it does not erase. See the paragraph above and step 8.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`, `docs/design/access.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/Makefile`, `docs/design/access.md`
 
 ### Step 8 — Secure wipe — TERMINAL, and not implemented
 

@@ -8,7 +8,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 [支持层级表](../../boards/support-tiers.md#current-boards)为准。
 
 **它没有板卡档案。**`docs/boards/` 下有 `cx3576`、`s905x5m` 和 `uefi-arm64` 的
-档案，没有这一块。本页的事实来自 `mica-boards:boards/uefi-x64/board.env`、
+档案，没有这一块。本页的事实来自 `mica-build:boards/uefi-x64/board.env`、
 `evidence.json`、内核配置，以及中文[刷写](../user/flashing.md)页。
 
 ## 概况
@@ -39,7 +39,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 
 为什么这些存储驱动必须内建：verity root 没有 initramfs，root 挂上之前什么都加载不了。
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/uefi-x64/kernel/config`, `mica-boards:boards/uefi-x64/evidence.json`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-x64/kernel/config`, `mica-build:boards/uefi-x64/evidence.json`
 
 ## 分区布局
 
@@ -50,7 +50,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 | `data` | ext4 | 1537 MiB | 256 MiB（首次启动扩展到介质大小） |
 
 SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EFI` 与
-`loader/loader.conf`。权威几何在 `mica-boards:boards/uefi-x64/board.env`。
+`loader/loader.conf`。权威几何在 `mica-build:boards/uefi-x64/board.env`。
 
 ## 控制台
 

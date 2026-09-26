@@ -5,7 +5,7 @@ This is the reusable operator procedure for the thirteen qualification rows in
 It defines the order, admission gates, human observations and evidence boundary
 for a fresh complete image using signed file deployments.
 
-The collector is `mica-boards:boards/cx3576/tests/bench/collect.sh`. It is
+The collector is `mica-build:boards/cx3576/tests/bench/collect.sh`. It is
 copied to the device and run there; it needs nothing from this repository.
 
 **This page does not fill any row.** A procedure is not a measurement. Only a
@@ -13,7 +13,7 @@ dated run bound to the exact image, source, board, storage part and radio SKU
 may update the live matrix or dossier, and off-hardware gates remain evidence
 about their own surface rather than a hardware `pass`.
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`, `mica-boards:boards/cx3576/tests/bench/collector-test.sh`
+> status: board-dependent — evidence: `docs/boards/cx3576.md`, `mica-build:boards/cx3576/tests/bench/collector-test.sh`
 
 ## 1. What the session has to produce
 
@@ -292,10 +292,10 @@ own configuration step enables the AT8563's driver and then asserts it —
 the AT8563.** A stage that finds otherwise has found a defect, and that is the
 useful sentence — not a prediction of absence.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/kernel/configure.sh`, `mica-boards:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/configure.sh`, `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
 
 **Read the resolved configuration, never the committed one.** The vendor config
-at `mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config` carries
+at `mica-build:boards/cx3576/kernel/config/kernel-cx3576z.config` carries
 `# CONFIG_RTC_DRV_HYM8563 is not set`; `configure.sh` flips it before
 `olddefconfig`, and the file's own header says the assertions are "on the
 RESOLVED config and not on the committed input". The resolved config is what
@@ -396,7 +396,7 @@ regulatory state, association, addressing, DNS and link-bound traffic. Test
 Bluetooth separately against a named peer/profile and prove a bidirectional
 operation; controller enumeration alone does not pass the radio obligation.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
 ### Stage 5 — `fieldbus` (row 7)
 
@@ -877,7 +877,7 @@ the bench run:
 - **BusyBox ships with no applet links**: the root contains `/usr/bin/busybox`
   and its copyright file, and nothing else — so `busybox` covers no absence.
 
-> status: board-dependent — evidence: `mica-build:rootfs/build.sh`, `mica-boards:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:src/rootfs/build.ts`, `mica-build:boards/cx3576/board.env`
 
 ## 8. Filling the dossier
 
@@ -938,8 +938,8 @@ unqualified until observed on the exact image. The open late-HDMI work is
 
 D5 is not mandatory acceptance. The console policy — the
 [display design](../design/display.md) section 4,
-board environment (`mica-boards:boards/cx3576/board.env`) line 55 and
-forced kernel configuration (`mica-boards:boards/cx3576/kernel/config/kernel-cx3576z.config`)
+board environment (`mica-build:boards/cx3576/board.env`) line 55 and
+forced kernel configuration (`mica-build:boards/cx3576/kernel/config/kernel-cx3576z.config`)
 line 491 route kernel and service output only to `ttyFIQ0` and omit
 `console=tty1`. Authenticated tty2 remains the recovery path.
 

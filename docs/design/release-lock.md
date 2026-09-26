@@ -927,7 +927,7 @@ release build. Its result is committed on a local branch that is never pushed,
 so a composer still binds to a clean commit. It replaces `local-pins` in
 `mica-build`.
 
-## 8. The workspace driver: `mica-build:tools/offline-chain.sh`
+## 8. The workspace driver: `mica-build:src/offline/chain.ts`
 
 The driver builds `mica-build-env`, then `mica-system-base`, then
 `mica-core` and `mica-podman` in parallel, then `mica-build`,
@@ -938,7 +938,7 @@ every clone's `repos/` reads through to its checkout's `repos/`. It outputs
 the product images, a summary of every lock and digest, and every checkout
 commit.
 
-It lives in `mica-build:tools/offline-chain.sh` (user, 2026-09-14).
+It lives in `mica-build:src/offline/chain.ts` (user, 2026-09-14).
 
 ## 9. Test vectors
 
@@ -1047,7 +1047,7 @@ and the adopted answer goes further and removes the copy:
 
 > **The vectors are not copied. A consumer reads them out of `mica` at a
 > pinned commit and refuses a difference** — the mechanism
-> `mica-build:tools/deploy-pool.sh --check` already uses to read `mica-core`'s
+> `mica-build:src/pool/deploy-pool.ts --check` already uses to read `mica-core`'s
 > contract fixtures at the commit of its release, and the one that caught the
 > board vocabulary on 2026-09-20.
 

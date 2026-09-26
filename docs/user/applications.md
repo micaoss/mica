@@ -61,7 +61,7 @@ adding a component is adding a producer, not editing a build stage. The result
 ships inside the verity-sealed root and is updated only by shipping a new
 signed image.
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-core:scripts/deb/`, `mica-boards:tools/deb/`, `mica-build:rootfs/packages/`
+> status: shipped — evidence: `docs/design/build.md`, `mica-core:scripts/deb/`, `mica-build:tools/deb/`, `mica-build:rootfs/packages/`
 
 The integrator's guide —
 [../design/native-applications.md](../design/native-applications.md) — covers

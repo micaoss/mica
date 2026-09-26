@@ -58,7 +58,7 @@ make product-verify PRODUCT=uefi-x64-dev
 材料是显式的（`make os-devkeys` 写出一套开发密钥），每一项输入都来自 `locks/`。
 在线与离线的完整路径见[构建指南](../../user/build.md)。
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:tools/product-build.sh`, `docs/user/build.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/product/build.ts`, `docs/user/build.md`
 
 ## 5. 首次访问
 

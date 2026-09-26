@@ -76,7 +76,7 @@ and removal are kernel-package changes; they do not use a mutable rootfs keyring
 Ordinary boot never waits for network validation, CRL delivery or catalog refresh.
 Do not claim a wall-clock signer-expiry window as installed-boot revocation.
 
-`boot/dev-keys.sh` creates separate boot/content/metadata development
+`src/boot/dev-keys.ts` creates separate boot/content/metadata development
 domains only when explicitly invoked with a new output directory. Its marker is
 baked with the public defaults. The native observer reports that provenance;
 `bin/bun.sh src/cli.ts --release gate` refuses marked material on candidate/stable channels.

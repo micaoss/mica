@@ -32,7 +32,7 @@ automatic, and a `cx3576` or `s905x5m` image has never been started by
 anything automatic: no suite boots a FIT image — the FIT suite runs on the
 host and carries no QEMU ([download](download.md) section 1).
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
 
 ## 1. Before you write
 
@@ -88,7 +88,7 @@ to download, not what can be written: its image still installs no bootloader,
 for the reason in section 6. There is no A/B partition pair to choose between
 and no conversion from an older layout: a write is a full write.
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-boards:boards/cx3576/board.env`, `mica-boards:boards/s905x5m/board.env`, `mica-boards:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/cx3576/images.tsv`
 
 ## 3. uefi-x64
 
@@ -109,7 +109,7 @@ The ESP is FAT, labelled `MICAESP`, and carries `EFI/BOOT/BOOTX64.EFI` and
 `loader/loader.conf`. The image boots wherever UEFI firmware starts
 `BOOTX64.EFI`, so the whole image goes to the target medium.
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:src/image/file-layout.ts`
 
 ### Which media the kernel can drive
 
@@ -123,7 +123,7 @@ card reader is ordinary USB mass storage.
 So the driver answer is USB sticks and disks, SATA and NVMe. Which of those
 media the assembly qualifies is still open — nothing physical has been tested.
 
-> status: board-dependent — evidence: `mica-boards:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-boards:make kernel-config-test`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/kernel/config/uefi-x64.config`, `mica-build:make kernel-config-test`
 
 ### Writing it (not verified)
 
@@ -233,7 +233,7 @@ is one target in `mica-build`:
 make lifecycle-uefi PRODUCT=uefi-arm64-dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-boards:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
 
 A stock release image boots to its login prompt and its services. The
 `FILE_AB_*` markers the acceptance console prints come from the suite's own
@@ -355,4 +355,4 @@ been run on hardware. The device-side half of this section is read out of
   running device to a newer release, take an update archive
   ([update packages](update-packages.md)).
 
-> status: shipped — evidence: `mica-boards:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/design/updates.md`, `docs/user/update-packages.md`

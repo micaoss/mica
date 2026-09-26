@@ -9,7 +9,7 @@ design record wins.
 Two boards run through this manual as references:
 
 - **cx3576** (CX3576-Z, RK3576) — the full-effort case: the board builds its
-  own boot chain under `mica-boards:boards/cx3576/`, so every stage below applies.
+  own boot chain under `mica-build:boards/cx3576/`, so every stage below applies.
 - **uefi-x64** and **uefi-arm64** use the platform's UEFI firmware plus the
   independently built signed systemd-boot manager and UKI. Each has a BSP kernel
   and current board definition; no boot script is used.
@@ -69,7 +69,7 @@ physical boot/watchdog/recovery observations are recorded separately. Use
 `make os-fit-records-test` for the cx3576 native C policy and the UEFI QEMU
 harness for actual boot-manager selection.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/loader/build-mica.sh`, `mica-build:boot`, `mica-build:tests/suites/lifecycle-uboot-fit`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/build-mica.sh`, `mica-build:boot`, `mica-build:tests/suites/lifecycle-uboot-fit`
 
 ## Stage 3 — kernel, config and DTS
 
@@ -77,7 +77,7 @@ harness for actual boot-manager selection.
 initramfs, which means every boot-path option built in, `=y`, never `=m`.
 
 **Inputs.** The vendor or mainline kernel tree pinned by commit; the shared
-baseline fragment `mica-boards:common/kernel/mica-required.fragment`; the board's device
+baseline fragment `mica-build:common/kernel/mica-required.fragment`; the board's device
 tree.
 
 **Procedure.** Start from the vendor config, merge the shared fragment
@@ -88,10 +88,10 @@ board DTS in-tree under `kernel/dts/` (open-source route, no overlay
 stacking) and local fixes as an ordered patch series under
 `kernel/patches/`, listed in that directory's `series` file.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/kernel/configure.sh`, `mica-boards:boards/cx3576/kernel/hooks/configure.sh`, `mica-boards:boards/cx3576/kernel/patches/series`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/configure.sh`, `mica-build:boards/cx3576/kernel/hooks/configure.sh`, `mica-build:boards/cx3576/kernel/patches/series`
 
 uefi-x64 follows the same procedure over mainline rather than a vendor tree, with
-no patch series and no DTS: `mica-boards:boards/uefi-x64/kernel/` pins the tag and the
+no patch series and no DTS: `mica-build:boards/uefi-x64/kernel/` pins the tag and the
 sha256 of `git archive` over it, merges the shared fragment and its own on top
 of `x86_64_defconfig`, and records the resolved `.config` in-tree so the build
 can refuse one that drifted.
@@ -119,7 +119,7 @@ verification suite asserts the assembled image carries the same set. Per-unit
 calibration (MAC addresses, radio calibration) is factory data, not image
 content — route it to stage 8.
 
-> status: board-dependent — evidence: `mica-boards:producers/board/render.sh`
+> status: board-dependent — evidence: `mica-build:producers/board/render.sh`
 
 **Exit criteria.** `BOARD_FIRMWARE_FILES` names only confirmed runtime files;
 the board package builds; nothing firmware-shaped hides in the overlay.
@@ -150,14 +150,14 @@ declare the flashing formats in `<name>/images.tsv`, at least
 ([contract.md](contract.md) section 3.1). `manifests/board.pkgs` names the board package; a radio's
 transport packages and optional components go beside it. `make check` in
 `mica-boards` holds the directory to the contract
-(`tests/gates/board-contract-test.sh`).
+(`tests/gates/board-contract.ts`).
 
 > status: shipped — evidence: `mica-build:make os-layout-lint`
 
 **Exit criteria.** The current layout tests and explicit image verification pass.
 `make os-layout-lint` is the existing contract gate.
 
-**Contract artifact.** `mica-boards:boards/<name>/board.env` and `manifests/` — the
+**Contract artifact.** `mica-build:boards/<name>/board.env` and `manifests/` — the
 definition itself, published in the board bundle (`make pool`, `make
 publish`) that the assembly pins.
 
@@ -186,7 +186,7 @@ board's `dev` product, then the complete image reaches actual firmware boot and
 clean shutdown. The DATA growth test validates the actual packed policy
 against a disposable disk.
 
-> status: shipped — evidence: `mica-build:tools/product-build.sh`, `mica-build:make product-verify`, `mica-build:tests/gates/repart-loader-test.sh`
+> status: shipped — evidence: `mica-build:src/product/build.ts`, `mica-build:make product-verify`, `mica-build:tests/gates/repart-loader.ts`
 
 ## Stage 7 — hwinit
 
@@ -202,7 +202,7 @@ declare the conf set in `BOARD_HWINIT_CONFS`. The facts themselves come from
 `package/init/` and are staged by the board package. A board with no such
 hardware declares the list empty — uefi-x64 does.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/package/hwinit`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/package/hwinit`
 
 **Exit criteria.** Every declared conf has a unit that reads it and vice
 versa (the rootfs build refuses a fact no script reads); units are inert on
@@ -227,7 +227,7 @@ three-layer configuration model in
 [docs/design/provisioning.md](../design/provisioning.md) defines how a device
 is configured without a network after flashing.
 
-> status: board-dependent — evidence: `mica-boards:boards/cx3576/Makefile`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/Makefile`
 
 **Exit criteria.** A written factory procedure a technician can follow; a
 blank board becomes a booting, individually identified unit using only
@@ -280,7 +280,7 @@ run done before the board is called supported.
 
 ## The board's files, in one list
 
-A board is a data directory. `bash tools/new-board.sh <name> --from <board>`
+A board is a data directory. `bash bin/bun.sh src/cli.ts new-board <name> --from <board>`
 in `mica-boards` creates it; these are the files it must end up with, and the
 contract for each is [contract.md](contract.md):
 
@@ -303,15 +303,15 @@ package pool. The `board` and `kernel` components carry the verity trust
 certificate annotation; a component whose inputs are unchanged is reused from
 the board's latest release by digest.
 
-> status: shipped — evidence: `mica-boards:tools/new-board.sh`, `mica-boards:boards/boards.tsv`, `mica-boards:boards/uefi-x64/images.tsv`, `mica-boards:boards/uefi-x64/outputs.tsv`, `docs/boards/contract.md`
+> status: shipped — evidence: `mica-build:src/boards/new-board.ts`, `mica-build:boards/boards.tsv`, `mica-build:boards/uefi-x64/images.tsv`, `mica-build:boards/uefi-x64/outputs.tsv`, `docs/boards/contract.md`
 
-The board's packages are built by the producers in `mica-boards:producers/`
+The board's packages are built by the producers in `mica-build:producers/`
 (`board`, `radio`, `radio-wifi`, `radio-bluetooth`). Each package declares its
 own version and `SOURCE_DATE_EPOCH`; a release never changes a version, and an
 unchanged package is reused from the previous release of that board
 ([package versions](../decisions/2026-09-15-package-versions.md)).
 
-> status: shipped — evidence: `mica-boards:producers`, `docs/decisions/2026-09-15-package-versions.md`
+> status: shipped — evidence: `mica-build:producers`, `docs/decisions/2026-09-15-package-versions.md`
 
 ## Gates
 
@@ -324,7 +324,7 @@ is not done until they pass with its directory in the tree;
 `board-contract-test` is the one that reads the layout above, and
 `kernel-config-test` the one that reads `config/<board>.required`.
 
-> status: shipped — evidence: `mica-boards:Makefile`, `mica-boards:tools/kernel-config-test.sh`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/boards/kernel-config.ts`
 
 ## The first release, and what the assembly needs
 

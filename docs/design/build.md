@@ -15,7 +15,7 @@ SquashFS/ext4/GPT makers, signing tools and archive assembly belong to the pinne
 build environment. Orchestration selects inputs and commands. A judge reads an
 artifact to report a result; image judges also use their declared pinned tools.
 Do not substitute host filesystem/signing tools merely because they are present.
-`tests/gates/host-toolchain-lint.sh` and its negative suite enforce these boundaries.
+`tests/gates/host-toolchain-lint.ts` and its negative suite enforce these boundaries.
 
 The Docker daemon may be a sibling-container host. Bind the narrow project or
 artifact path using its actual host path. Paths under `/srv` are identical in
@@ -48,7 +48,7 @@ the Dockerfile and copied files; the FIT tools image adds its FIT and regdb
 scripts, the board's U-Boot tool binaries and the regdb source), and
 `src/image/kernel-package.ts` refuses an image without it; `ukify` and
 `sbsign` run under `faketime` frozen at `SOURCE_DATE_EPOCH`, so two signings
-are byte-identical (`tests/gates/boot-signing-test.sh`); and `release.sh collect`
+are byte-identical (`tests/gates/boot-signing.test.ts`); and `release.sh collect`
 refuses a kernel that has the previous scoped release's `buildId` but
 another identity. A release
 that changes only a board or only the release metadata keeps both
@@ -60,7 +60,7 @@ deployment binds the chosen association.
 An image is a **product**: `mica-build:products/<name>/` declares the board,
 the profile, the opt-in features and components, the image kinds and the
 public factory manifest (`product.env`, `meta/`), and `MICA_PRODUCT=<name>`
-is the composer's one input; `tools/product.sh` reads and validates the
+is the composer's one input; `src/product/product.ts` reads and validates the
 directory against the fetched board bundle. The resolver selects the engine's
 manifests for the profile and the features and the board's own out of its
 bundle (`board.pkgs`, `radio-<r>.pkgs`, `component-<c>.pkgs`);
@@ -121,7 +121,7 @@ A board is an input like any other (`mica-build` `0094a097`): one
 `locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
 (`SCOPE=<board>`) per board, pinning the per-board releases (the current ones
 are `<board>/20260915-1926`); the former `deps/boards/` pins are removed. `make
-board-fetch BOARD=<board>` (`tools/board-pool.sh`) reads the board's component
+board-fetch BOARD=<board>` (`src/boards/board-pool.ts`) reads the board's component
 artifacts by the digests of its `board` rows into `_out/boards/<board>/`,
 checks them against the board's `outputs.tsv`, and refuses a component whose
 `mica.source-repo` is not `mica-boards` or whose verity trust certificate is
@@ -184,7 +184,7 @@ Build the pinned environments and required package pools through `make help`.
 build. Generate isolated development inputs only when needed:
 
 ```sh
-bash boot/dev-keys.sh --out /path/to/new-signing-inputs
+bash bin/bun.sh src/cli.ts dev-keys --out /path/to/new-signing-inputs
 ```
 
 The output must be new. Boot, content and metadata keys are independent. For a
@@ -199,7 +199,7 @@ inputs fail. cx3576 U-Boot must embed the matching public boot key set.
 
 ## 3. Component CLI
 
-`make product PRODUCT=<name>` (`mica-build:tools/product-build.sh`) is the
+`make product PRODUCT=<name>` (`mica-build:src/product/build.ts`) is the
 one command from a recipe to a signed image, under `_out/products/<name>/`:
 it fetches the board bundle and the pool of the board's architecture,
 composes the root, signs the root, kernel and firmware components, two
@@ -308,7 +308,7 @@ runtime/update/fault/shutdown and large-root measurements for current images.
 
 The DATA growth test uses the actual packed root policy and a disposable loop
 disk. Pass board, complete image and matching root image to
-`tests/gates/repart-loader-test.sh`; it checks identities and every protected firmware,
+`tests/gates/repart-loader.ts`; it checks identities and every protected firmware,
 counter and SYSTEM byte around growth.
 
 Record exact image and component identities with the acceptance run that used
