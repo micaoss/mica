@@ -32,3 +32,6 @@ Rewriting the release-lock sections that describe per-repository copies
   paragraph, 4.1, 5, 7, 8, 9, 9.1 (rewritten), 9.2 and 9.3; the decision record's status. The
   user guides (`docs/user/build.md` section 5 and its Chinese page, `tools/repos.sh`) describe
   what the repositories run today and change with each repository's switch, not here.
+- 2026-09-26: the user moved the pin into `locks/` ("放在locks里面的pin"), after weighing a
+  release lock for `mica-build-tools` and keeping a pin: `locks/mica-build-tools.pin`, lock
+  4.2. `mica-build-tools` follows in its design 2.1 and 2.2, its bootstrap and its tests.

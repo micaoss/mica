@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-26 19:00 [design]
+
+The `mica-build-tools` pin lives in `locks/`: `locks/mica-build-tools.pin`, beside `locks/pins/`
+and not in it (`docs/design/release-lock.md` 4.2; user, 2026-09-26: "放在locks里面的pin"). It
+is an input the repository pins, so it belongs in `locks/`; it is not a producer release with a
+lock, so it takes no part in the lock and pin pairing of section 4. Its format stays
+`mica-tools-pin v1`.
+
 ## 2026-09-26 18:40 [design]
 
 The release-lock text names `mica-build-tools` as the one implementation of its rules

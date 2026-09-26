@@ -13,7 +13,7 @@ implements the release lock and `locks/upstream.lock` (current release
 `mica-podman` (`20260915-1057`), `mica-core` (`20260915-1135`) and
 `mica-boards` (per board, `<board>.20260915-1926`); `mica-build` adopts it
 last. The rules are implemented once, in `mica-build-tools`, which every
-repository pins by commit in `mica-build-tools.pin` and runs as
+repository pins by commit in `locks/mica-build-tools.pin` (4.2) and runs as
 `bin/mica-tools` (`docs/decisions/2026-09-26-mica-build-tools.md`); it passes
 every test vector of section 9.
 
@@ -816,7 +816,8 @@ Rules:
   offline lock), and the lock itself passes section 1;
 - every `locks/<repository>[.<scope>].lock` of a producer has exactly one pin
   of the same name, and no pin exists without its lock; `locks/upstream.lock`
-  (4.1) has no pin;
+  (4.1) and `locks/mica-build-tools.pin` (4.2) are not producer inputs and
+  take no part in this pairing;
 - an offline pin is refused under CI (`CI` or `GITHUB_ACTIONS` set) and in
   every release build.
 
@@ -878,6 +879,29 @@ git` take their arguments from these rows.
 | `reference-digest` | an image reference without `@sha256:<digest>` |
 | `reference-upstream` | an image reference in `ghcr.io/micaoss/` or `local/` |
 
+### 4.2 The build tools: `locks/mica-build-tools.pin`
+
+Every repository runs the tools that implement this document at one
+`mica-build-tools` commit, recorded in `locks/mica-build-tools.pin`
+(user, 2026-09-26):
+
+```text
+# mica-tools-pin v1
+REPOSITORY=mica-build-tools
+COMMIT=<40 lowercase hex>
+```
+
+The file rules are those of 9.2: the header, exactly these two keys in this
+order, comment lines allowed after the header, `COMMIT` the full commit.
+Refusals: `header`, `encoding`, `pin-format`, `field-value`.
+
+It sits in `locks/` because it is an input the repository pins, and beside
+`locks/pins/` rather than in it, because `mica-build-tools` publishes no
+lock: a file in `locks/pins/` is a `mica-pin v1` with its lock (section 4).
+Moving it touches no other file of `locks/`. `bin/mica-tools`, the bootstrap
+every repository copies from `mica-build-tools`, reads it before anything
+else runs.
+
 ## 5. The source cache: `repos/` and `mica-tools repos`
 
 Every repository has `repos/` at its root, git-ignored:
@@ -889,7 +913,7 @@ Every repository has `repos/` at its root, git-ignored:
   `repos/git/mica-build-tools.git` and `repos/mica-build-tools/`.
 
 `mica-tools repos` is implemented once, in `mica-build-tools`, and every
-repository runs it at the commit its `mica-build-tools.pin` names:
+repository runs it at the commit its `locks/mica-build-tools.pin` names:
 
 - `repos get <sha256> <url> <out>`: take the archive from
   `repos/sha256/<sha256>`, or download it, verify its sha256, store it, then
@@ -1077,12 +1101,12 @@ carries the vectors:
   family. There is no subset: it reads every form any repository reads or
   writes.
 - **No other repository carries vectors or a `vectors.pin`.** A repository
-  conforms by pinning a `mica-build-tools` commit, in `mica-build-tools.pin`,
+  conforms by pinning a `mica-build-tools` commit, in `locks/mica-build-tools.pin`,
   and deletes its own reader, its vectors copy and its `vectors.pin` in the
   change that adds the pin.
 - **A rule changes here first**: the text and its vectors in this repository,
   then `mica-build-tools` moves its `tests/vectors.pin` and passes them, then
-  each reader moves its `mica-build-tools.pin`. A writer emits a new form only
+  each reader moves its `locks/mica-build-tools.pin`. A writer emits a new form only
   after every repository that reads its lock pins a commit that reads it (the
   order of 1.2.5).
 
@@ -1168,7 +1192,7 @@ identical to its sibling, and the `edit-of` line bound.
 ### 9.2 `vectors.pin`: the pin a gate reads
 
 `mica-build-tools` records the vectors it conforms to in `tests/vectors.pin`,
-the one file of this form (9.1); its own `mica-build-tools.pin` follows the
+the one file of this form (9.1); `locks/mica-build-tools.pin` (4.2) follows the
 same file rules:
 
 ```text

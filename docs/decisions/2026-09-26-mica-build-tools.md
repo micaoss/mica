@@ -16,7 +16,8 @@ inputs hash, the package-version guard, the Debian packer and pool index, the
 pool publisher and release attach, and the shell lint. It is TypeScript on Bun
 with no runtime dependency.
 
-- Every repository pins it by commit in `mica-build-tools.pin` at its root and
+- Every repository pins it by commit in `locks/mica-build-tools.pin`
+  (`docs/design/release-lock.md` 4.2; user, 2026-09-26: "放在locks里面的pin") and
   runs it through `bin/mica-tools`, a byte-identical copy of its bootstrap;
   TypeScript repositories import the same checkout.
 - It is the only reader of the test vectors: it pins them in its own
