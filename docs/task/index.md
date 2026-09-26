@@ -117,3 +117,4 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260920-the-floor-and-the-declared-features What the kernel floor would cost if it served the products' declared features**](20260920-the-floor-and-the-declared-features.md) `P2`
 - [x] [**20260920-user-namespaces-and-container-kernel-facts User namespaces on the four boards, and two differences found beside them**](20260920-user-namespaces-and-container-kernel-facts.md) `P2`
 - [x] [**20260921-0911-s905x5m-forced-line-and-its-declaration The board declared a command line its kernel was not built with**](20260921-0911-s905x5m-forced-line-and-its-declaration.md) `P2`
+- [x] [**20260920-0858-strip-c2pa-from-brand-svgs The brand SVGs carry the artwork and nothing else**](20260920-0858-strip-c2pa-from-brand-svgs.md) `P2`

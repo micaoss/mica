@@ -3437,6 +3437,21 @@ CI of the repository whose files it guards* are one principle — **the fix
 belongs where the thing being fixed lives** — reached in two repositories
 within an hour, neither having seen the other. It is the first time today two
 repositories arrived at the same idea rather than one correcting another.
+## 2026-09-20 08:58 [fix]
+
+**The brand SVGs carry the artwork and nothing else** (task
+`20260920-0858-strip-c2pa-from-brand-svgs`). Five files under
+`website/public/` held a c2pa provenance manifest -- 7.7 KB of base64 in a
+`<metadata>` element, against 1005 bytes of icon. A visitor downloaded eight
+times the artwork to receive a claim about who drew it, and mica-core embeds
+one of these files in the apid binary, so the blob was on its way into every
+device image.
+
+They had also stopped being copies: the tool that added the manifest rewrote
+the XML declaration and expanded every self-closing `<path/>`, so the website's
+assets differed from the originals in `micaoss/mica-res` by more than the
+metadata. All five are those originals again, byte for byte, and mica-core's
+copy was replaced from the same source in the same pass.
 ## 2026-09-20 07:09 [progress]
 
 **The hardware list is published, in both locales** (task
