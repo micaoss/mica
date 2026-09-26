@@ -53,3 +53,17 @@ mica-build: `bin/`, `locks/`, `tsconfig.json`, producers and board packages, `sr
 ## Alternatives
 
 - Move the build environment in its own change first: the packages would be bumped twice.
+
+## Progress
+
+2026-09-26, mica-build `89efb4e`: the switch in one change. mica-build-tools pinned at `f29772c`
+(`5d0a5d9` plus the `controlEntries` export gate.ts reads the control members with),
+mica-build-env at `20260926-2110`; the modules of the design's section 8 deleted with their
+vectors copy; every producer declares a `mica-inputs`, versions in the control templates, packed
+by `deb pack`, every own package bumped by one; the boot tools install from every `apt` row.
+Local: typecheck clean, image 589, verify 937, rootfs-runtime 153, gates green but the two
+publisher gates whose registry sibling this host does not reach (also red on `origin/main` here),
+every CI lint target, and uefi-x64-dev built, verified (106) and through the lifecycle suite.
+Kept for a later change: `stages/pool/index.sh` (its `manifest.txt` carries the source commit
+the lineage reads, which `pool index` does not) and the scoped publisher's own OCI client in
+`src/pool/registry.ts`.
