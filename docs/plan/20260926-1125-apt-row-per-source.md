@@ -95,3 +95,8 @@ only its rule, with their `expected.tsv`, `derived-from.tsv` and `refusal-sets.t
 reader; this task writes the specification only -- step 1, the
 section, the rules, the vectors and the checker here. Each reader follows it in its own
 repository (step 2), and Base publishes three rows after that (step 3).
+
+2026-09-26, the user: the readers do not change their own implementations; step 2 is each
+repository's switch to `mica-build-tools`, which implements 1.2.5
+(`docs/decisions/2026-09-26-mica-build-tools.md`). Step 3 waits for every reader of the Base
+lock to pin a `mica-build-tools` commit that reads three rows.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-26 18:40 [design]
+
+The release-lock text names `mica-build-tools` as the one implementation of its rules
+(`docs/decisions/2026-09-26-mica-build-tools.md`; its first release `20260926-1825`, commit
+`5619810`). Section 5 is `mica-tools repos` and section 7 `mica-tools local-lock`, no longer a
+script each repository keeps; section 9.1 says `mica-build-tools` is the one reader of the
+vectors, at its `tests/vectors.pin`, and no other repository carries a copy or a `vectors.pin`
+-- the per-copy table and the subset derivation are removed; 9.2 and 9.3 follow, and 1.2.5's
+readers move by pinning a commit that implements it. `mica-build-env:RULES.md` changes in that
+repository; the user guides change with each repository's switch.
+
 ## 2026-09-26 12:00 [design]
 
 A release lock carries one `apt` row per Debian source (`docs/design/release-lock.md` 1.2.5;

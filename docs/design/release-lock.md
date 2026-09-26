@@ -12,8 +12,10 @@ implements the release lock and `locks/upstream.lock` (current release
 `mica-system-base` (current release `20260915-1102`),
 `mica-podman` (`20260915-1057`), `mica-core` (`20260915-1135`) and
 `mica-boards` (per board, `<board>.20260915-1926`); `mica-build` adopts it
-last, with its own scripts, and every repository proves them with the test
-vectors of section 9.
+last. The rules are implemented once, in `mica-build-tools`, which every
+repository pins by commit in `mica-build-tools.pin` and runs as
+`bin/mica-tools` (`docs/decisions/2026-09-26-mica-build-tools.md`); it passes
+every test vector of section 9.
 
 Where the decision left a detail open, this specification fixes it; those
 choices are marked *(fixed here)*.
@@ -357,8 +359,8 @@ is still a valid lock: the release with no pocket.
 
 **Readers move before the writer.** A reader of this format's first version
 refuses a second `apt` row as `duplicate-key`, so Base publishes more than one
-only after every reader of its lock implements this section and reads the
-vectors that exercise it.
+only after every reader of its lock pins a `mica-build-tools` commit that
+implements this section (9.1).
 
 ### 1.3 References
 
@@ -862,10 +864,10 @@ Only `mica-build-env` keeps `image` rows here: they are the list of approved
 third-party images its lock carries unchanged (1.2.1); every other repository
 takes those images from `locks/mica-build-env.lock`.
 
-`tools/repos.sh check` verifies every `source` and `git` row of
+`mica-tools repos check` verifies every `source` and `git` row of
 `locks/upstream.lock`, and the `upstream` rows a repository takes from a
-producer lock, against `repos/`; `repos.sh get` and `repos.sh git` take their
-arguments from these rows.
+producer lock, against `repos/`; `mica-tools repos get` and `mica-tools repos
+git` take their arguments from these rows.
 
 | Rule | Refused when |
 |---|---|
@@ -876,26 +878,27 @@ arguments from these rows.
 | `reference-digest` | an image reference without `@sha256:<digest>` |
 | `reference-upstream` | an image reference in `ghcr.io/micaoss/` or `local/` |
 
-## 5. The source cache: `repos/` and `tools/repos.sh`
+## 5. The source cache: `repos/` and `mica-tools repos`
 
 Every repository has `repos/` at its root, git-ignored:
 
 - `repos/sha256/<hex>`: content-addressed archives (toolchains, Debian
   snapshot archives, podman, netavark and crun tarballs, vendor blobs);
 - `repos/git/<name>.git`: bare mirrors where a pin is a commit or tree hash
-  (kernel, U-Boot).
+  (kernel, U-Boot). `bin/mica-tools` keeps its own checkout here too, in
+  `repos/git/mica-build-tools.git` and `repos/mica-build-tools/`.
 
-`tools/repos.sh` has the same name and behaviour in every repository, each
-keeping its own copy:
+`mica-tools repos` is implemented once, in `mica-build-tools`, and every
+repository runs it at the commit its `mica-build-tools.pin` names:
 
-- `repos.sh get <sha256> <url> <out>`: take the archive from
+- `repos get <sha256> <url> <out>`: take the archive from
   `repos/sha256/<sha256>`, or download it, verify its sha256, store it, then
   copy it to `<out>`. A cached file that does not hash to its name is refused
   (`cache-corrupt`), never silently re-downloaded.
-- `repos.sh git <url> <commit|tree> <dir>`: check the pinned commit or tree out
+- `repos git <url> <commit|tree> <dir>`: check the pinned commit or tree out
   of `repos/git/<name>.git`, fetching into the mirror first when it is
   missing, and verify the checked-out commit or tree hash.
-- `repos.sh check`: every `source` and `git` row of `locks/upstream.lock`
+- `repos check`: every `source` and `git` row of `locks/upstream.lock`
   (4.1), and every `upstream` row the repository takes from a producer lock,
   is present in `repos/` and hashes right.
 - With `MICA_OFFLINE=1`, a miss is a refusal naming the pin (`offline-miss`)
@@ -961,9 +964,9 @@ References use the registry name `local`
 (`local/<repository>:pool.amd64.offline@sha256:<digest>`) and resolve only
 inside that checkout's `_out/offline/oci/`.
 
-## 7. `tools/local-lock.sh`
+## 7. `mica-tools local-lock`
 
-`tools/local-lock.sh <repository>[.<scope>] <checkout>` verifies
+`mica-tools local-lock <repository>[.<scope>] <checkout>` verifies
 `<checkout>/_out/offline/SHA256SUMS` and every digest the lock names in the
 checkout's OCI layout, writes `locks/<repository>[.<scope>].lock` unchanged
 and the offline pin `locks/pins/<repository>[.<scope>].pin`. It is refused under GitHub Actions and in every
@@ -977,7 +980,7 @@ The driver builds `mica-build-env`, then `mica-system-base`, then
 `mica-core` and `mica-podman` in parallel, then `mica-build`,
 over throw-away `git clone --shared` clones of each checkout's `HEAD` under
 `<workspace>/.mica-offline/<stamp>/<repository>`. For every input it runs
-`local-lock.sh` and commits the locks on `offline/<stamp>` in the clone;
+`mica-tools local-lock` and commits the locks on `offline/<stamp>` in the clone;
 every clone's `repos/` reads through to its checkout's `repos/`. It outputs
 the product images, a summary of every lock and digest, and every checkout
 commit.
@@ -986,8 +989,9 @@ It lives in `mica-build:src/offline/chain.ts` (user, 2026-09-14).
 
 ## 9. Test vectors
 
-The vectors are files every repository copies into its own tests:
-`docs/design/release-lock/vectors/`.
+The vectors are `docs/design/release-lock/vectors/`. One implementation reads
+them: `mica-build-tools`, at the commit its `tests/vectors.pin` names (9.2),
+every family and every row; no other repository carries a copy (9.1).
 
 - `expected.tsv`: one row per vector, tab-separated: path (relative to
   `vectors/`), `valid` or `refused`, the rule of 1.5, section 4 or 4.1 (or `-`),
@@ -1042,110 +1046,48 @@ The vectors are files every repository copies into its own tests:
   `source-without-sha256.lock` (`column-count`), `git-short-commit.lock`
   (`field-value`), `unsorted.lock` (`sort-order`). The valid pins case
   `pins/valid/release` also holds a `locks/upstream.lock` without a pin.
-- `repos/`: the offline side of `repos.sh get`: each directory holds a
+- `repos/`: the offline side of `repos get`: each directory holds a
   `repos/sha256/` cache and a `request` (sha256, url); `cache-hit` is valid,
   `cache-corrupt` and `offline-miss` are refused, all under `MICA_OFFLINE=1`.
 
-Registry checks (section 1.5, last paragraph) and `repos.sh git` have no file
+Registry checks (section 1.5, last paragraph) and `repos git` have no file
 vectors.
 
 `tools/docs/release-lock-check.py` is a reference checker of the file rules;
 `make docs-verify` runs it over every vector (`tools/docs/verify-release-lock.sh`)
 and fails when a result or rule differs from `expected.tsv` or a vector is not
 listed. It proves the vectors; it is not a tool the other repositories use.
+It and `mica-build-tools` are written independently of each other, and both
+agreeing with one set of vectors is the evidence that the vectors say what this
+text says.
 
-### 9.1 Who carries a copy, and how much of one
+### 9.1 One reader of the vectors
 
-Every repository that reads a lock carries a **private implementation of rules
-this document owns**, and the vectors are the only thing that makes those
-copies agree. They are copied, so each copy is a **snapshot** — and **a
-conformance test that ships its own fixtures tests conformance to itself**:
-*78 of 78* is a true statement about a set six vectors short, green on every
-push, with the test name and the pass line both looking complete.
+Until 2026-09-26 every repository that read a lock carried its own
+implementation of these rules and its own copy of the vectors, and a copy that
+lagged looked identical to one that did not: measured that day, six readers in
+three languages, and `mica-build-env`'s copy 51 vectors short with its tests
+green. The rules are now implemented once, in `mica-build-tools`
+(`docs/decisions/2026-09-26-mica-build-tools.md`), and that settles who
+carries the vectors:
 
-Measured 2026-09-20 by reading each tree, **with the unit stated, because two
-correct counts of one file differed by one until someone said which**: a
-`lines` count includes the header comment, a `rows` count is the vectors.
+- **`mica-build-tools` is the one reader.** It pins the vectors in
+  `tests/vectors.pin` (9.2), reads them out of this repository at that commit,
+  and asserts every row of `expected.tsv` and `refusal-sets.tsv` (9.4), every
+  family. There is no subset: it reads every form any repository reads or
+  writes.
+- **No other repository carries vectors or a `vectors.pin`.** A repository
+  conforms by pinning a `mica-build-tools` commit, in `mica-build-tools.pin`,
+  and deletes its own reader, its vectors copy and its `vectors.pin` in the
+  change that adds the pin.
+- **A rule changes here first**: the text and its vectors in this repository,
+  then `mica-build-tools` moves its `tests/vectors.pin` and passes them, then
+  each reader moves its `mica-build-tools.pin`. A writer emits a new form only
+  after every repository that reads its lock pins a commit that reads it (the
+  order of 1.2.5).
 
-| Repository | Copy | Lines | Vector rows | `data` vectors |
-|---|---|---|---|---|
-| `mica` (owner) | `docs/design/release-lock/vectors/` | 85 | 84 | 6 |
-| `mica-system-base` | `tests/vectors/` | 85 | 84 | 6 — byte-identical to the canonical file |
-| `mica-build` | `tests/fixtures/release-lock/vectors/` | 79 | 78 | 0 — exactly the six short |
-| `mica-core` | `tests/vectors/` | 52 | 51 | 0 |
-| `mica-podman` | `tests/vectors/` | 49 | 48 | 0 |
-| `mica-res` | none | — | — | — |
-
-**A reader must pass every vector for the forms it can encounter**, and what
-it can encounter is decided by what it pins: a repository that pins only
-unscoped producers never sees a `<scope>.<release>` row, and requiring it to
-conform to scoped rules is requiring conformance nobody needs. That is the
-honest reason a subset is legitimate, and it is written here rather than left
-as the reason nobody wired the rest up — `mica-system-base`'s reader was on
-the retired `<scope>/<release>` separator for four days and it cost nothing,
-because it pins no scoped producer.
-
-**But a subset and a stale copy are indistinguishable by size**, which is the
-resolution problem one level up ([harness](build-harness.md) section 4): 64
-rows may be a deliberate subset or last month's copy, and nothing in the file
-says which. Naming the `mica` commit a copy was taken from would answer that —
-and the adopted answer goes further and removes the copy:
-
-> **The vectors are not copied. A consumer reads them out of `mica` at a
-> pinned commit and refuses a difference** — the mechanism
-> `mica-build:src/pool/deploy-pool.ts --check` already uses to read `mica-core`'s
-> contract fixtures at the commit of its release, and the one that caught the
-> board vocabulary on 2026-09-20.
-
-The sentence behind it generalises past vectors: **being on a list that is
-checked beats being on a list that is surveyed.** A survey answers today; a
-pinned read answers whenever someone adds a seventh reader, and it answers
-*conforming* rather than *running*, which are not the same question — running
-a stale copy looks identical from outside.
-
-**The mechanism's best argument is what happened the hour it was specified**
-*(`mica-core`, 2026-09-20)*: it wrote a new `vectors.pin`, pinned the commit,
-read the vectors at that commit — and **the vectors told it the file was
-wrong**, within the same hour, with nobody reviewing it. **A copy taken that
-morning would have said nothing, because the family did not exist that
-morning.** The canonical set is 92 rows now rather than 84, seven of them the
-`vectors-pin` family specified after four repositories had already written the
-file.
-
-**A floor derived from filenames is a floor derived from somebody's naming**
-*(2026-09-20)*. `mica-core` read `release-slash` as constraining its own
-release values, from the vector's **name**; the file is a `mica-boards` lock
-carrying `uefi-x64/20260914-2042` — **a scoped release with a slash, a form it
-neither pins nor emits**. It rebuilt its floor from vector **content**. The
-derivation rule survives only if it reads the file — and the same sentence was
-wrong in its first half and right in its second: `release-slash` constrains
-nobody's own release value, but `scoped-release-not-allowed.lock` **is** a
-`mica-core` lock carrying `uefi-x64.20260914-2042`, an unscoped producer with
-a scope, so it belongs in a consumer's floor by the third clause — **the
-vectors that say what its own forms may not be**. Read from the name, half of
-that was invented; read from the file, half of it held. Three repositories
-made the same mistake about the same vector on the same day.
-
-**The required subset is derivable, not arguable.** What a reader can
-encounter follows from `locks/pins/`: a fact about a directory rather than a
-claim about a repository's habits. That also relocates the difficulty of ever
-gating this — the hard part is **not** deciding what each reader owes, it is
-**finding each reader's copy**, and those are very different problems.
-
-**And the derivation grew a fourth element without the rule changing**, which
-is what a derivation is for and a list never does: a repository that pins the
-vectors **produces** a `vectors.pin`, so the whole `vectors-pin` family is in
-its floor the moment it writes the file. The rule was written before that
-family existed and covered it anyway.
-
-**The derivation gives a FLOOR, not a ceiling** *(`mica-system-base`,
-2026-09-20)*. It pins one unscoped producer and could skip every scoped,
-index, product, bundle and asset vector; it runs them anyway, because **a
-producer that conforms only to what it consumes can emit a row nobody
-downstream accepts.** So the rule reads: **what you pin, plus what you
-produce, plus the vectors that say what your own forms may not be** — and that
-is the minimum. A floor stated as a ceiling is how a correct rule produces a
-worse tree.
+The per-repository copies, the subset each owed and the table that counted
+them are in this file's history before this change.
 
 ### 9.3 `derived-from.tsv`: which valid vector a refused one is written against
 
@@ -1225,8 +1167,9 @@ identical to its sibling, and the `edit-of` line bound.
 
 ### 9.2 `vectors.pin`: the pin a gate reads
 
-A consumer records the vectors it conforms to in a file named **`vectors.pin`
-in a directory of its own choosing**:
+`mica-build-tools` records the vectors it conforms to in `tests/vectors.pin`,
+the one file of this form (9.1); its own `mica-build-tools.pin` follows the
+same file rules:
 
 ```text
 # mica-vectors-pin v1
@@ -1253,7 +1196,7 @@ CR, not UTF-8), `pin-format` (any other key set or order) and `field-value`
 correcting *do not pin a commit that contains one*)*. Removing the pin does
 not remove the artefact — the copy carries those bytes either way, and
 unpinned it carries them **unverifiably** — and moving a pin is a one-line
-change, which is the same argument the uniform basename rests on. So a
+change. So a
 repository that must pin a commit carrying a known defect **names the defect
 in the pin file, above the keys**, with the mechanism a later reader needs:
 **a pin is a statement about one commit and never about the newest one, so the
@@ -1265,15 +1208,10 @@ one line only where nothing is pinned to it.** Editing the file is one line;
 what it costs is whatever downstream of it has to be re-fetched, rebuilt,
 re-recorded or re-measured — the board re-pin of 2026-09-20 was four such
 lines and required four board releases before it and a product rebuild after,
-and moving a vectors pin means re-syncing the copy it names. The one-line
+and moving the vectors pin means `mica-build-tools` passing every vector at
+the new commit. The one-line
 argument holds for the **edit**, and a reader deciding whether a move is cheap
 has to count the things the pin holds up, not the lines it occupies.)*
-
-**The basename is uniform and the directory is not**, which is the whole point
-of fixing it: finding each reader's copy was named as the hard part of ever
-gating this, and a uniform basename makes that **one command per repository**
-instead of a maintained list of paths. A naming convention that costs nothing
-today removes the obstacle that made the gate not worth building.
 
 **A vocabulary rename is a change to words this project owns, and a fixture
 contains words it does not** *(2026-09-20)*. The board sweep of 2026-09-16
@@ -1366,10 +1304,10 @@ decision rather than five local ones** *(proposed by `mica-system-base`,
 plus a second column in `expected.tsv`.** The short-circuit stays the default,
 because `expected.tsv` names **one** rule per vector and a reader returning a
 set would stop answering the question the table asks — **the first-rule
-behaviour is the table's contract, not an implementation detail.** No
-repository builds a second, non-short-circuiting reader of its own: that is a
-private copy of somebody else's truth, which is the thing this section exists
-to remove.
+behaviour is the table's contract, not an implementation detail.** The
+collect mode exists twice, like the default: here, and in `mica-build-tools`
+(`lock check --collect`), which reproduces `refusal-sets.tsv` (9.4). No other
+repository builds one.
 
 **And the constraint that keeps it from manufacturing its own findings**,
 which is why it is specified before it is written: suppressing a rule to see
@@ -1532,16 +1470,6 @@ that a gate reads it: **a hand-maintained provenance comment is a claim; a pin
 a gate reads is an input.** A repository adopting the pin deletes its comment
 in the same commit — a provenance line surviving beside a pin is a second
 source of truth, and the two will disagree within a month.
-
-**And the table above has the same defect it describes**: nothing compares
-those copies to this one, so it will go stale the way its own numbers did.
-The commit-naming rule is what keeps it alive — **if every copy names its
-source, the table can be regenerated rather than maintained, and a regenerated
-table cannot be stale in the way a maintained one is.** That is the difference
-between a record that needs an owner and one that needs a command.
-
-`mica-res` reads pins and now locks and carries no copy; that is the one row
-of the table with nothing behind it.
 
 ### 9.4 `refusal-sets.tsv`: every rule a refused vector breaks
 

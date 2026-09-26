@@ -41,3 +41,4 @@ Kinds:
 | [mica-boards is merged into mica-build: a board owns its build and its image](2026-09-21-mica-boards-merged-into-mica-build.md) | engineering decision | 2027-03-21 |
 | [mica-build: one language on the build host, shell only where Bun is not the toolchain](2026-09-22-mica-build-one-language.md) | engineering decision | 2027-03-22 |
 | [Development builds leave the release; the released variants are basic (the default) and full](2026-09-26-release-variants-full-and-basic.md) | engineering decision (not implemented) | 2027-03-26 |
+| [The build and consumption rules are implemented once, in mica-build-tools](2026-09-26-mica-build-tools.md) | engineering decision | 2027-03-26 |
