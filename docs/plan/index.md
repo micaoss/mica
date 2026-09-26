@@ -76,3 +76,4 @@ file cannot take it for an open row.
 - [ ] [**20260914-0514-workspace-rules-and-build-env Bring mica-boards to the workspace rules and the released build-env**](20260914-0514-workspace-rules-and-build-env.md) `2026-09-21`
 - [ ] [**20260920-0627-kernel-capabilities-beside-each-board The floor, made legible to another repository**](20260920-0627-kernel-capabilities-beside-each-board.md) `2026-09-21`
 - [ ] [**20260920-0730-the-boot-logo-on-every-board-that-can-draw Adding the boot logo, and what it costs per board**](20260920-0730-the-boot-logo-on-every-board-that-can-draw.md) `2026-09-21`
+- [ ] [**20260926-0800-fleet-without-a-board-table The update platform checks a release's shape, not a list of boards**](20260926-0800-fleet-without-a-board-table.md) `2026-09-26`
