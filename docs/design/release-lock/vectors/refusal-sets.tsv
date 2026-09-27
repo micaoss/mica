@@ -10,6 +10,7 @@ lock/refused/column-count.lock	set	column-count	unmeasured
 lock/refused/release-not-first.lock	set	release-row	unmeasured
 lock/refused/release-missing.lock	set	release-row	unmeasured
 lock/refused/release-value.lock	set	field-value release-scope	valid
+lock/refused/scope-two-dots.lock	set	field-value	valid
 lock/refused/scoped-release-not-allowed.lock	set	release-scope	unmeasured
 lock/refused/unscoped-release.lock	set	release-scope	unmeasured
 lock/refused/release-slash.lock	set	field-value release-scope	valid
@@ -21,13 +22,6 @@ lock/refused/bundle-without-product.lock	set	bundle-without-product	unmeasured
 lock/refused/asset-without-bundle.lock	set	asset-without-bundle	unmeasured
 lock/refused/update-full.lock	set	update-full	unmeasured
 lock/refused/update-kind.lock	stopped	field-value	valid
-lock/refused/index-row-outside-index.lock	set	index-scope	unmeasured
-lock/refused/index-without-index-rows.lock	stopped	index-product-source index-scope	valid
-lock/refused/index-only-inputs.lock	set	index-input index-only-inputs	valid
-lock/refused/index-input.lock	set	index-input	unmeasured
-lock/refused/index-product-source.lock	stopped	index-product-source	valid
-lock/refused/index-asset-release.lock	set	index-product-source	unmeasured
-lock/refused/index-built-form.lock	set	index-built-form	unmeasured
 lock/refused/image-platform.lock	set	field-value	unmeasured
 lock/refused/image-source.lock	set	image-source	unmeasured
 lock/refused/image-source-reference.lock	set	reference-repository	unmeasured

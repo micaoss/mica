@@ -34,7 +34,10 @@ to `images.tsv`. So:
   repositories enforce it, and the dot tag form depends on it
   (`docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`).
 - A product is `<board>-<variant>`, where the variant says what the image is
-  for: `dev`, `prod`, and later for example `cloud`.
+  for: `dev`, `prod`, and later for example `cloud`. *Amended by the user on
+  2026-09-27*: a product is `<board>.<variant>`, or the board's own name for a
+  board with one product (`docs/boards/contract.md` 1.1,
+  `docs/design/release-lock.md` 1.0).
 - A board package is `mica-board-<board>`.
 - A platform-specific guest board is `<platform>-<arch>`.
 
@@ -44,7 +47,6 @@ to `images.tsv`. So:
 |---|---|
 | board release | `<board>.<YYYYMMDD-HHMM>` |
 | `mica-build` scoped release | `<scope>.<YYYYMMDD-HHMM>` (a board or a product) |
-| version index | `mica.<YYYYMMDD-HHMM>` |
 | OCI pool | `pool.<board>.<arch>.<release>` |
 | OCI board component | `<component>.<board>.<release>` |
 | OCI product bundles | `image.<product>.<release>`, `update.<product>.<release>` |

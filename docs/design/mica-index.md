@@ -1,5 +1,10 @@
 # The Mica version index: `mica-index.json` (`mica/index/v1`)
 
+> **Retired 2026-09-27.** `mica-build` releases each board on its own and cuts no index
+> (`docs/plan/20260927-1422-independent-board-releases-and-scoped-ci.md`); the release lock no
+> longer has an index lock or its `origin`, `built` and `index` rows. Published index releases
+> stay as they are. This page describes them and is removed with the rest of the index text.
+
 A Mica version is one immutable `mica-build` release, `mica.<YYYYMMDD-HHMM>`,
 that names the scoped product releases forming it
 (`docs/decisions/2026-09-15-mica-version-index.md`). It carries no image or

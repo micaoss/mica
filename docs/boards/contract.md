@@ -38,8 +38,11 @@ file format belongs to `images.tsv`:
 **Name forms.** A board is `[a-z0-9][a-z0-9-]*` and never contains a dot, which
 is what lets `<board>.<YYYYMMDD-HHMM>` be parsed
 ([release lock](../design/release-lock.md) 1.0). A product is
-`<board>-<variant>`, the variant naming what the image is for (`dev`, `prod`,
-later for example `cloud`). A board package is `mica-board-<board>`. A
+`<board>.<variant>`, the variant naming what the image is for (`basic`,
+`full`, `dev`, later for example `cloud`), or the board's own name for a board
+with one product; so it holds at most one dot, and a product-scoped tag is
+parsed at its last dot (user, 2026-09-27). Products named before that,
+`<board>-<variant>`, keep their names. A board package is `mica-board-<board>`. A
 platform-specific guest board is `<platform>-<arch>`.
 
 **Today's set.** Boards `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`;

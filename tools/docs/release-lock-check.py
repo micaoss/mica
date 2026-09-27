@@ -51,13 +51,10 @@ def refuse(rule):
 
 
 KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "board": 5, "upstream": 7, "apt": 5,
-                "input": 4, "origin": 3, "built": 5, "index": 3, "product": 8, "bundle": 4, "asset": 6,
-                "data": 4}
+                "input": 4, "product": 8, "bundle": 4, "asset": 6, "data": 4}
 KIND_ORDER = list(KIND_COLUMNS)
 BASE_ONLY = {"upstream", "apt"}
-BUILD_ONLY = {"input", "origin", "built", "index", "product", "bundle", "asset"}
-INDEX_KINDS = {"origin", "built", "index"}
-INDEX_SCOPE = "mica"
+BUILD_ONLY = {"input", "product", "bundle", "asset"}
 PROFILE = {"dev", "prod"}
 GENERATION = re.compile(r"^[1-9][0-9]*$")
 BUNDLE = {"image", "update"}
@@ -68,7 +65,9 @@ COMMIT = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SCOPED = {"mica-build"}
 COMPONENT = {"kernel", "uboot", "firmware"}
-SCOPE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+BOARD = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+# A scope is a board or a product, and a product is <board> or <board>.<variant> (1.0).
+SCOPE = re.compile(r"^[a-z0-9][a-z0-9-]*(\.[a-z0-9][a-z0-9-]*)?$")
 ARCH = {"amd64", "arm64"}
 PLATFORM = {"index", "amd64", "arm64", "386"}
 NAME = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
@@ -129,9 +128,6 @@ def check_lock(path):
           and (scope == "" or SCOPE.match(scope)))
     if (scope != "") != (repository in SCOPED):
         refuse("release-scope")
-    if scope == INDEX_SCOPE and repository != "mica-build":
-        refuse("index-scope")
-    index_lock = repository == "mica-build" and scope == INDEX_SCOPE
     registry = "local" if release == "offline" else "ghcr.io/micaoss"
 
     def reference(value, expected=repository):
@@ -145,12 +141,6 @@ def check_lock(path):
         if m.group("repository") != expected:
             refuse("reference-repository")
         return m.group("tag") or ""
-
-    def index_input(name):
-        input_repository, _, input_scope = name.partition(".")
-        field(input_repository == "mica-build" and SCOPE.match(input_scope))
-        if input_scope == INDEX_SCOPE:
-            refuse("index-scope")
 
     def asset_file(row, asset_release):
         prefix = "mica-" + row[1] + "-" + asset_release + "."
@@ -199,32 +189,10 @@ def check_lock(path):
                   and (RELEASE.match(row[2]) or row[2] == "offline") and SHA256.match(row[3]))
             if (input_scope != "") != (name in SCOPED):
                 refuse("release-scope")
-            if input_scope == INDEX_SCOPE:
-                refuse("index-scope")
-            key = (row[1],)
-        elif kind == "origin":
-            index_input(row[1])
-            field(COMMIT.match(row[2]))
-            key = (row[1],)
-        elif kind == "built":
-            index_input(row[1])
-            name, _, built_scope = row[2].partition(".")
-            if not (REPOSITORY.match(name) and (built_scope == "" or SCOPE.match(built_scope))
-                    and (built_scope != "") == (name in SCOPED)
-                    and (RELEASE.match(row[3]) or row[3] == "offline") and SHA256.match(row[4])):
-                refuse("index-built-form")
-            key = (row[1], row[2])
-        elif kind == "index":
-            field(SCOPE.match(row[1]))
-            if row[1] == INDEX_SCOPE:
-                refuse("index-scope")
-            index_input(row[2])
             key = (row[1],)
         elif kind == "product":
-            field(SCOPE.match(row[1]) and SCOPE.match(row[2]) and row[3] in PROFILE and GENERATION.match(row[4])
+            field(SCOPE.match(row[1]) and BOARD.match(row[2]) and row[3] in PROFILE and GENERATION.match(row[4])
                   and all(SHA256.match(v) for v in row[5:8]))
-            if INDEX_SCOPE in (row[1], row[2]):
-                refuse("index-scope")
             key = (row[1],)
         elif kind == "bundle":
             field(SCOPE.match(row[1]) and row[2] in BUNDLE)
@@ -233,8 +201,7 @@ def check_lock(path):
         elif kind == "asset":
             field(SCOPE.match(row[1]) and row[2] in BUNDLE and SHA256.match(row[5])
                   and (NAME.match(row[3]) if row[2] == "image" else row[3] in UPDATE_SUFFIX))
-            if not index_lock:
-                field(asset_file(row, release))
+            field(asset_file(row, release))
             key = (row[1], row[2], row[3])
         elif kind == "data":
             # 1.2.4: any repository may name producer-data assets. The file is
@@ -263,29 +230,6 @@ def check_lock(path):
             refuse("apt-suite")
     if repository != "mica-build" and any(r[0] in BUILD_ONLY for r in rows):
         refuse("build-only-kind")
-    if not index_lock and any(r[0] in INDEX_KINDS for r in rows):
-        refuse("index-scope")
-    if index_lock:
-        if not any(r[0] == "index" for r in rows):
-            refuse("index-scope")
-        if any(r[0] in ("image", "pool", "package", "board", "upstream", "apt") for r in rows) \
-                or any(r[0] == "input" and r[1].partition(".")[0] != "mica-build" for r in rows):
-            refuse("index-only-inputs")
-        inputs = {r[1]: r[2] for r in rows if r[0] == "input"}
-        if any(r[0] in ("origin", "built") and r[1] not in inputs for r in rows) \
-                or any(r[0] == "index" and r[2] not in inputs for r in rows) \
-                or any(sum(r[0] == "origin" and r[1] == name for r in rows) != 1
-                       or not any(r[0] == "built" and r[1] == name for r in rows) for name in inputs):
-            refuse("index-input")
-        indexed = {r[1]: inputs[r[2]] for r in rows if r[0] == "index"}
-        if {r[1] for r in rows if r[0] == "product"} != set(indexed) \
-                or any(r[0] in ("bundle", "asset") and r[1] not in indexed for r in rows):
-            refuse("index-product-source")
-        for r in rows:
-            if r[0] == "bundle" and REFERENCE.match(r[3]).group("tag") != r[2] + "." + r[1] + "." + indexed[r[1]]:
-                refuse("index-product-source")
-            if r[0] == "asset" and not asset_file(r, indexed[r[1]]):
-                refuse("index-product-source")
     products = {r[1] for r in rows if r[0] == "product"}
     bundles = {(r[1], r[2]) for r in rows if r[0] == "bundle"}
     if any(r[0] in ("bundle", "asset") and r[1] not in products for r in rows):

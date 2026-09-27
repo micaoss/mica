@@ -122,3 +122,4 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260926-1829-rules-name-mica-build-tools The release-lock text names mica-build-tools as its one implementation**](20260926-1829-rules-name-mica-build-tools.md) `P1`
 - [-] [**20260926-2214-mica-build-switch-to-mica-build-tools mica-build switches to mica-build-tools and mica-build-env 20260926-2110**](20260926-2214-mica-build-switch-to-mica-build-tools.md) `P1`
 - [-] [**20260927-1422-independent-board-releases-and-scoped-ci Each board releases on its own, and CI checks what a change touches**](20260927-1422-independent-board-releases-and-scoped-ci.md) `P1`
+- [x] [**20260927-1552-dotted-products-and-no-index-lock A product scope may carry one dot, and the release lock has no index lock**](20260927-1552-dotted-products-and-no-index-lock.md) `P1`

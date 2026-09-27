@@ -26,13 +26,6 @@ lock/refused/image-platform.lock	minimal-of	lock/valid/mica-build-env.lock
 lock/refused/image-registry.lock	edit-of	lock/valid/mica-build-env.lock
 lock/refused/image-source-reference.lock	edit-of	lock/valid/mica-build-env.lock
 lock/refused/image-source.lock	edit-of	lock/valid/mica-build-env.lock
-lock/refused/index-asset-release.lock	edit-of	lock/valid/mica-build.mica.lock
-lock/refused/index-built-form.lock	edit-of	lock/valid/mica-build.mica.lock
-lock/refused/index-input.lock	edit-of	lock/valid/mica-build.mica.lock
-lock/refused/index-only-inputs.lock	edit-of	lock/valid/mica-build.mica.lock
-lock/refused/index-product-source.lock	edit-of	lock/valid/mica-build.mica.lock
-lock/refused/index-row-outside-index.lock	edit-of	lock/valid/mica-build.uefi-x64.lock
-lock/refused/index-without-index-rows.lock	edit-of	lock/valid/mica-build.mica.lock
 lock/refused/local-reference-in-release.lock	edit-of	lock/valid/mica-core.lock
 lock/refused/package-without-pool.lock	minimal-of	lock/valid/mica-core.lock
 lock/refused/reference-without-digest.lock	edit-of	lock/valid/mica-core.lock
@@ -42,6 +35,7 @@ lock/refused/release-not-first.lock	reorder-of	lock/valid/mica-core.lock
 lock/refused/release-slash.lock	edit-of	lock/valid/mica-build.uefi-x64.lock
 lock/refused/release-value.lock	edit-of	lock/valid/mica-core.lock
 lock/refused/repository-mismatch.lock	edit-of	lock/valid/mica-core.lock
+lock/refused/scope-two-dots.lock	edit-of	lock/valid/mica-build.uefi-x64.basic.lock
 lock/refused/scoped-release-not-allowed.lock	edit-of	lock/valid/mica-core.lock
 lock/refused/trailing-tab.lock	edit-of	lock/valid/mica-core.lock
 lock/refused/unknown-kind.lock	edit-of	lock/valid/mica-core.lock

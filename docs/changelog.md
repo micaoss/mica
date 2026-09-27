@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-27 16:10 [design]
+
+A `mica-build` scope is a board or a product, and a product is `<board>.<variant>` or the
+board's own name: the scope form is `[a-z0-9][a-z0-9-]*(\.[a-z0-9][a-z0-9-]*)?`, and a scoped
+tag is parsed at its last dot (`docs/design/release-lock.md` 1.0; `docs/boards/contract.md`
+1.1). The index lock is gone with the index (plan
+`20260927-1422-independent-board-releases-and-scoped-ci`): no `origin`, `built` or `index`
+rows, no `index-*` rules, and `mica` is no longer a reserved scope. The checker and the vectors
+follow: the index vectors are removed, a product-scoped valid lock and a two-dot refusal are
+added. `docs/design/mica-index.md` is marked retired; the user and website pages that describe
+the index are not changed yet.
+
 ## 2026-09-27 [docs]
 
 `micaoss/mica-boards` is deleted; the documents stop describing it as a repository. The README

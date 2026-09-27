@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15: "同意"; amended the same day for scale); implemented on `mica-build` `main` (index job `da1d36a1`, incremental cuts, full re-verification and the shared input table `9c2f399e`, `release-test` 43/43); released: the first index `mica/20260915-2240`, built in full, and the first incremental index `mica/20260915-2242`, both verified anonymously; specified in `docs/design/release-lock.md` 1.2.3 and `docs/design/mica-index.md`
+- **status**: accepted (user, 2026-09-15: "同意"; amended the same day for scale); implemented on `mica-build` `main` (index job `da1d36a1`, incremental cuts, full re-verification and the shared input table `9c2f399e`, `release-test` 43/43); released: the first index `mica/20260915-2240`, built in full, and the first incremental index `mica/20260915-2242`, both verified anonymously; specified in `docs/design/release-lock.md` 1.2.3 and `docs/design/mica-index.md`; **ended 2026-09-27** (user: each board releases on its own and no index lists every board, `docs/plan/20260927-1422-independent-board-releases-and-scoped-ci.md`), and the release lock dropped the index lock the same day
 
 ## Decision
 
