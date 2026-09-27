@@ -21,7 +21,7 @@ on:
 jobs:
   checks:
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     defaults:
       run:
@@ -44,7 +44,7 @@ jobs:
   # change upstream.
   index:
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     defaults:
       run:
@@ -79,7 +79,7 @@ jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch'
     needs: [checks, index]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
