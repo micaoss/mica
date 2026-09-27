@@ -80,3 +80,4 @@ file cannot take it for an open row.
 - [ ] [**20260926-0930-mini-images-on-128-mb A mini x64 and arm64 image that runs from 128 MB of flash**](20260926-0930-mini-images-on-128-mb.md) `2026-09-26`
 - [-] [**20260926-1125-apt-row-per-source One `apt` row per Debian source**](20260926-1125-apt-row-per-source.md) `2026-09-26`
 - [-] [**20260926-2214-mica-build-switch-to-mica-build-tools mica-build switches to mica-build-tools and mica-build-env 20260926-2110**](20260926-2214-mica-build-switch-to-mica-build-tools.md) `2026-09-26`
+- [-] [**20260927-1422-independent-board-releases-and-scoped-ci Each board releases on its own, and CI checks what a change touches**](20260927-1422-independent-board-releases-and-scoped-ci.md) `2026-09-27`
