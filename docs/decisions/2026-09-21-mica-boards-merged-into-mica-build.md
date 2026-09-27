@@ -44,7 +44,9 @@ repository holds the boards and the assembly:
   repository variable `MICA_VERITY_TRUST_CERT`, which `trust-certificates.sha256`
   records, in the same repository that signs with its private half.
 - **The records of `mica-boards` move to `mica`**, like `mica-build`'s, under
-  their own identifiers.
+  their own identifiers. Superseded for new records by
+  `2026-09-27-each-repository-keeps-its-records.md`: `mica-build` keeps its
+  own; the records already moved stay here.
 
 ## What this supersedes
 

@@ -84,7 +84,7 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 ## 这些页面的来源
 
 每页的事实来自三处：英文板卡档案（`docs/boards/<board>.md`）、
-`mica-boards` 仓库里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
+`mica-build:boards/<board>/` 里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
 `uefi-x64` 没有板卡档案，它那页会逐条注明来源。
 
 > status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`

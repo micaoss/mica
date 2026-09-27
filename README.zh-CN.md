@@ -8,7 +8,7 @@
 可复现、能在现场更新、更新出错时能恢复。
 
 本仓库是项目的正门。从这里开始——[`micaoss`](https://github.com/micaoss) 组织下的其他
-仓库各自持有一部分代码，设计、决策与文档都指回这里。
+仓库各自持有一部分代码和自己的开发记录，全局约定与公开文档都指回这里。
 
 ## 它是什么
 
@@ -57,11 +57,10 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：镜像会被
 
 | 仓库 | 持有什么 |
 |---|---|
-| **`mica`**（本仓库） | 产品文档：架构、用户文档、决策，以及项目的任务与计划记录 |
-| `mica-build` | 镜像组装：组合、签名、校验并测试一份产品镜像 |
+| **`mica`**（本仓库） | 全局约定与公开文档：架构、契约、跨仓库决策、用户文档 |
+| `mica-build` | 板卡（BSP、内核、板卡包）与镜像组装：组合、签名、校验并测试一份产品镜像 |
 | `mica-core` | 管理面（`micad`、`mica-apid`、控制台）与设备上的部署客户端 |
 | `mica-system-base` | 与板卡无关的基础系统：固定版本的 Debian 包与系统策略 |
-| `mica-boards` | 板卡：BSP、内核、板卡包与射频包 |
 | `mica-podman` | 容器引擎包 |
 | `mica-build-env` | 每个仓库据以构建的构建环境镜像 |
 
@@ -70,14 +69,14 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：镜像会被
 
 ## 包
 
-一份镜像由 Debian 包组合而成。`mica-build` 一个都不自己构建：它按固定版本从产出该包的
-仓库导入。
+一份镜像由 Debian 包组合而成。`mica-build` 按固定版本从产出该包的仓库导入每个包，
+只有板卡包由它自己从 `boards/` 与 `producers/` 构建。
 
 | 仓库 | 包 |
 |---|---|
-| `mica-system-base` | `mica-system`（系统策略）、`mica-busybox`（应急二进制）、`mica-ca-trust`、`mica-systemd-boot`（未签名的引导器，由 `mica-build` 签名；从不装进 root） |
+| `mica-system-base` | `mica-system`（系统策略）、`mica-busybox`（应急二进制）、`mica-ca-trust`、`mica-ssh`、`mica-tzdata`、Wi-Fi 包 `mica-wifi` 与 `mica-wifi-ap`、`mica-systemd-boot`（未签名的引导器，由 `mica-build` 签名；从不装进 root） |
 | `mica-core` | `micad`、`mica-apid`、`mica-mqttd`、`mica-mqtt-broker`、`mica-sftp-server`、`mica-deploy`、`mica-lifecycle`（早期启动与关机的可执行文件；从不装进 root） |
-| `mica-boards` | 每块板卡的 `mica-board-<board>`，射频包 `mica-wifi`、`mica-wifi-ap`、`mica-bluetooth`，以及 `mica-kernel-<board>`（板卡的内核包；从不装进 root） |
+| `mica-build` | 每块板卡的 `mica-board-<board>`、`mica-bluetooth`，以及 s905x5m 的组件包；内核、U-Boot 与固件作为独立的板卡组件制品发布，不是包 |
 | `mica-podman` | `mica-podman`（Podman 容器引擎） |
 
 Debian 包来自 `mica-system-base` 的发布，每份发布带一个 `mica-system-base.lock` 及其
@@ -91,10 +90,11 @@ mica-system-base README 中 *Consuming a release* 的规则。
 ## 项目怎么运转
 
 - **决策**记在 [`docs/decisions/`](docs/decisions/README.md)，每条带理由与复核日期。
-- **进行中的工作**以[任务](docs/task/index.md)与[计划](docs/plan/index.md)追踪；每项改动
-  先调查、先提案，再实现。
+- **进行中的工作**以任务与计划记在它所改动的仓库里；这里的[任务](docs/task/index.md)与
+  [计划](docs/plan/index.md)只管本仓库和跨仓库的工作。每项改动先调查、先提案，再实现。
 - **历史**在[变更日志](docs/changelog.md)。
-- 任何仓库的代码改动，都连同它在这里的记录一起落地。
+- 代码改动连同它的记录在同一个仓库里落地
+  （[决策](docs/decisions/2026-09-27-each-repository-keeps-its-records.md)）。
 
 文档检查用 `make docs-verify`，检查自身的测试用 `make docs-verify-test`。
 

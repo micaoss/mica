@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-27 [docs]
+
+`micaoss/mica-boards` is deleted; the documents stop describing it as a repository. The README
+(English and Chinese) and the overview (English and Chinese) drop its rows and its place in the
+release chain: `mica-build` holds the boards and builds `mica-board-<board>`, `mica-bluetooth` and
+s905x5m's component packages, and `mica-wifi` and `mica-wifi-ap` are listed under
+`mica-system-base`, which builds them. The repository counts are six. `docs/boards/porting.md`
+and `docs/design/build.md` describe a board as a directory of `mica-build` built and published by
+its scoped release, with `make board-check`, and no `locks/mica-boards.<board>.lock`. The hardware,
+flashing, install and update-package pages name `mica-build` as the owner. Measurements attributed
+to `mica-boards` at a commit or date stay as they were.
+
+## 2026-09-27 [decision]
+
+Each repository keeps its own development records -- task, plan, changelog, module design and
+local decisions -- in its own `docs/`; `mica` holds the conventions every repository follows and
+the public documentation, and its `task/` and `plan/` track only its own and cross-repository
+work (`docs/decisions/2026-09-27-each-repository-keeps-its-records.md`; user, 2026-09-27). The
+README (English and Chinese), `docs/README.md` and `docs/architecture.md` say so; the
+`mica-build` exception in `2026-09-21-mica-boards-merged-into-mica-build.md` is superseded for
+new records. Records already here stay.
+
+## 2026-09-26 23:10 [design]
+
+The documents follow `mica-build-tools` `20260926-2232` (`5467dbc`). Its history was rewritten
+after the entries below were written: the first release is `20260926-2005` (`8bb0331`), and
+`20260926-1825` and `5619810`, cited at 18:40, no longer exist. Lock 4.2 says `locks check`
+checks `locks/mica-build-tools.pin` and refuses one left at the repository root; lock 5 says
+`repos get` may download from the `MICA_MIRROR` mirror, verified by the same sha256; the build
+guide (English and Chinese) names `bin/mica-tools repos` in place of `tools/repos.sh`, which no
+repository keeps. Switched: `mica-build-env`, `mica-core`, `mica-system-base`; in progress:
+`mica-podman`, `mica-build`; not started: `mica-res`.
+
 ## 2026-09-26 19:00 [design]
 
 The `mica-build-tools` pin lives in `locks/`: `locks/mica-build-tools.pin`, beside `locks/pins/`

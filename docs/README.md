@@ -32,13 +32,15 @@ and path names use the `mica` prefix — `micad`, `mica-deploy`, `com.mica.micad
 
 ## Where documentation lives
 
-Mica OS is seven repositories **as this page counts them, and the set is not
+Mica OS is six repositories **as this page counts them, and the set is not
 closed**: `micaoss/mica-fleet` exists and is checked out
 (`f048a4ae`, 2026-09-20), carries no entry here and no issue, and **whether it
 is in this documentation's scope is the user's call** — recorded so the count
 reads as a measurement rather than as a boundary. **This one holds the product
-documentation; each module's documentation lives in the repository that
-produces it.**
+documentation and the conventions every repository follows; each module's
+documentation, including its task, plan and changelog records, lives in the
+repository that produces it** — no repository keeps its records here
+(`decisions/2026-09-27-each-repository-keeps-its-records.md`).
 
 | Here | In the module's repository |
 |---|---|
@@ -67,7 +69,7 @@ restating it.
 | `hardware/` | the per-board reader's view: feature and verification state, and the flashing, update and recovery route for one board | the board status table, the board contract and the dossiers, which are `boards/` |
 | `website/` | publication copy for micaos.dev and its claim limits | anything not yet evidenced |
 | `research/` | measurements and external references that inform, but do not define, a contract | normative requirements |
-| `plan/`, `task/` | `/pma` tracking: proposals, open work and acceptance evidence | permanent contracts |
+| `plan/`, `task/` | `/pma` tracking for this repository and for work that spans repositories: proposals, open work and acceptance evidence | permanent contracts; work inside one module, which its repository tracks |
 | `decisions/` | dated decisions and skill divergences with a sunset | design detail |
 | `changelog.md` | the history of changes to code and records | current behaviour |
 | `zh/` | Chinese user guides, the Chinese hardware list under `zh/hardware/`, and explicitly requested Chinese briefs | engineering translations |

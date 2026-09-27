@@ -304,8 +304,8 @@ unpacking it again) carrying the signed U-Boot as `bootloader.PARTITION` and
 deliberately omitting `gpt.bin` and `bootloader_a`, so a burn frames the
 hardware boot areas and cannot touch a user-area GPT. Which host tool consumes
 that image, how boot0 is written and read back, and how a bricked board is
-recovered are all unwritten and untested — bench work owned jointly by
-`mica-boards` and `mica-build`.
+recovered are all unwritten and untested — bench work owned by
+`mica-build`.
 
 > status: unsupported
 

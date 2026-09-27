@@ -8,7 +8,7 @@ removal condition. Records describe the decision as it stands; history is in
 Kinds:
 
 - **skill divergence** — a deliberate deviation from a `/pma` or stack-skill
-  rule. The workspace `AGENTS.md` links here and does not restate the rationale.
+  rule.
 - **engineering decision** — a cross-cutting technical choice that no single
   design record owns.
 
@@ -42,3 +42,4 @@ Kinds:
 | [mica-build: one language on the build host, shell only where Bun is not the toolchain](2026-09-22-mica-build-one-language.md) | engineering decision | 2027-03-22 |
 | [Development builds leave the release; the released variants are basic (the default) and full](2026-09-26-release-variants-full-and-basic.md) | engineering decision (not implemented) | 2027-03-26 |
 | [The build and consumption rules are implemented once, in mica-build-tools](2026-09-26-mica-build-tools.md) | engineering decision | 2027-03-26 |
+| [Each repository keeps its own development records; mica holds the conventions and the public documentation](2026-09-27-each-repository-keeps-its-records.md) | working practice | 2027-03-27 |

@@ -900,7 +900,9 @@ It sits in `locks/` because it is an input the repository pins, and beside
 lock: a file in `locks/pins/` is a `mica-pin v1` with its lock (section 4).
 Moving it touches no other file of `locks/`. `bin/mica-tools`, the bootstrap
 every repository copies from `mica-build-tools`, reads it before anything
-else runs.
+else runs, and `mica-tools locks check` checks it with the rest of `locks/`. A
+pin at the repository root, where the first release of `mica-build-tools` put
+it, is refused with the path to move it to.
 
 ## 5. The source cache: `repos/` and `mica-tools repos`
 
@@ -918,7 +920,10 @@ repository runs it at the commit its `locks/mica-build-tools.pin` names:
 - `repos get <sha256> <url> <out>`: take the archive from
   `repos/sha256/<sha256>`, or download it, verify its sha256, store it, then
   copy it to `<out>`. A cached file that does not hash to its name is refused
-  (`cache-corrupt`), never silently re-downloaded.
+  (`cache-corrupt`), never silently re-downloaded. A download may be served
+  by the mirror `MICA_MIRROR` names and falls back to the row's URL on any
+  mirror failure; the sha256 is checked whichever source served, so a mirror
+  adds no input (`mica-build-tools:docs/design.md` 3.2).
 - `repos git <url> <commit|tree> <dir>`: check the pinned commit or tree out
   of `repos/git/<name>.git`, fetching into the mirror first when it is
   missing, and verify the checked-out commit or tree hash.

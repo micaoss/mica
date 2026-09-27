@@ -86,7 +86,8 @@ make product-verify PRODUCT=uefi-x64-dev
 
 Every repository has `make offline`, which builds its release outputs from
 its `locks/` into `_out/offline/` with a git-ignored `repos/` source cache
-managed by `tools/repos.sh`. The workspace driver chains them:
+managed by `bin/mica-tools repos` (`mica-build-tools`, pinned in
+`locks/mica-build-tools.pin`). The workspace driver chains them:
 
 ```sh
 make offline-chain                       # in mica-build; MICA_WORKSPACE defaults to ..

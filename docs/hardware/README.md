@@ -93,7 +93,7 @@ point of view; the topic pages above own the detail.
 ## Where these pages come from
 
 Each page draws on the English board dossier (`docs/boards/<board>.md`), the
-board's own `board.env` and `evidence.json` in `mica-boards`, and the user
+board's own `board.env` and `evidence.json` in `mica-build:boards/<board>/`, and the user
 documentation. `uefi-x64` has no dossier, and its page names the source of each
 fact instead.
 

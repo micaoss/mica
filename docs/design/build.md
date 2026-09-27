@@ -117,16 +117,18 @@ directory is empty, the lineage record requires each directory at its pin,
 and `make deps-bump DEP=<repository>` is the reviewable import, like a
 package pin.
 
-A board is an input like any other (`mica-build` `0094a097`): one
-`locks/mica-boards.<board>.lock` with `locks/pins/mica-boards.<board>.pin`
-(`SCOPE=<board>`) per board, pinning the per-board releases (the current ones
-are `<board>/20260915-1926`); the former `deps/boards/` pins are removed. `make
-board-fetch BOARD=<board>` (`src/boards/board-pool.ts`) reads the board's component
-artifacts by the digests of its `board` rows into `_out/boards/<board>/`,
-checks them against the board's `outputs.tsv`, and refuses a component whose
-`mica.source-repo` is not `mica-boards` or whose verity trust certificate is
-not the assembly's (`docs/boards/contract.md` section 3); `make
-board-fetch-all` does the same for every board row, and `os-pool` runs it.
+A board is a directory of this tree, `boards/<board>/`, not a pinned input
+(since the merge of `mica-boards`, 2026-09-21,
+`docs/decisions/2026-09-21-mica-boards-merged-into-mica-build.md`). `make
+board-fetch BOARD=<board>` (`src/boards/board-pool.ts`) assembles the board's
+bundle into `_out/boards/<board>/`: the board definition and firmware from
+the tree, each built component from a local build when there is one, and
+otherwise the component a `mica-build` release published with the same
+inputs hash, reused by digest. It checks the bundle against the board's
+`outputs.tsv`, and refuses a reused component whose `mica.source-repo` is not
+`mica-build` or whose verity trust certificate is not the assembly's
+(`docs/boards/contract.md` section 3); `make board-fetch-all` does the same
+for every board, and `os-pool` runs it.
 Products are published by the scoped releases of
 `docs/decisions/2026-09-15-mica-build-scoped-releases.md`.
 
@@ -137,10 +139,10 @@ never a commit or a hash
 `mica-build` publishes only its product bundles, `image.<product>.<release>`
 and `update.<product>.<release>`, in its scoped releases
 (`docs/decisions/2026-09-15-mica-build-scoped-releases.md`; the first is
-`x64/20260915-1458`); it publishes no root on its own. `mica-boards` names its artifacts by
-per-board release: `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
-`<component>.<board>.<YYYYMMDD-HHMM>` per board component (`board`, `kernel`,
-`uboot`, `firmware`, `packer`; `docs/boards/contract.md` section 3).
+`x64/20260915-1458`); it publishes no root on its own. A board's scoped release also publishes
+the board's `pool.<board>.<arch>.<YYYYMMDD-HHMM>` and one
+`<component>.<board>.<YYYYMMDD-HHMM>` per built component (`kernel`,
+`uboot`, `firmware`; `docs/boards/contract.md` section 3).
 `mica-system-base` does the same:
 `pool.<arch>.<YYYYMMDD-HHMM>` and the multi-architecture root
 `ghcr.io/micaoss/mica-system-base:rootfs.<YYYYMMDD-HHMM>`, and a Base
@@ -209,7 +211,7 @@ names and the update archive, and records a receipt of every input it read
 the public certificates, the tree's commit); a product whose receipt is
 unchanged is not rebuilt. `make product-verify PRODUCT=<name>` verifies the
 image, and `make products` builds every product on a release-target board; a
-new board enters through its `locks/mica-boards.<board>.lock` pin and its
+new board enters through its `boards/<board>/` directory and its
 `<board>-dev` product. The signing inputs are the workspace `MICA_SIGNING_OUTPUT`
 (default `meta/`): verity and boot key pairs, the update signer and its
 public key.

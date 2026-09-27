@@ -266,7 +266,7 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 `bootloader.PARTITION` 携带签名的 U-Boot，并有意省略 `gpt.bin` 和 `bootloader_a`，
 使烧录流程只框住硬件启动区域、碰不到用户区 GPT。哪个主机工具消费这个镜像、boot0
 如何写入与回读、变砖的板卡如何恢复，全都既没写下来也没测试过——属于
-`mica-boards` 与 `mica-build` 共同拥有的台架工作。
+`mica-build` 的台架工作。
 
 > status: unsupported
 

@@ -11,8 +11,8 @@ wrong.
 
 This repository is the front door of the project. Start here; every other
 repository of the [`micaoss`](https://github.com/micaoss) organisation holds
-one part of the code and points back here for the design, the decisions and
-the documentation.
+one part of the code and its own development records, and points back here
+for the conventions every repository follows and the public documentation.
 
 ## What it is
 
@@ -72,10 +72,9 @@ up-to-date table and explains what each tier means; the Chinese
 | Repository | What it holds |
 |---|---|
 | **`mica`** (this one) | the product documentation: architecture, user documentation, decisions, and the project's task and plan records |
-| `mica-build` | the image assembly: composes, signs, verifies and tests a product image |
+| `mica-build` | the boards (BSPs, kernels, board packages) and the image assembly: composes, signs, verifies and tests a product image |
 | `mica-core` | the management plane (`micad`, `mica-apid`, the dashboard) and the on-device deployment client |
 | `mica-system-base` | the board-independent base system: the pinned Debian packages and the system policy |
-| `mica-boards` | the boards: BSPs, kernels, board and radio packages |
 | `mica-podman` | the container engine package |
 | `mica-build-env` | the build environment images every repository builds in |
 
@@ -85,14 +84,15 @@ that produces it. Documents here cite code in the other repositories as
 
 ## Packages
 
-An image is composed from Debian packages. `mica-build` builds none of them:
-it imports each one, pinned, from the repository that produces it.
+An image is composed from Debian packages. `mica-build` imports each one,
+pinned, from the repository that produces it, except the board packages, which
+it builds from its own `boards/` and `producers/`.
 
 | Repository | Packages |
 |---|---|
-| `mica-system-base` | `mica-system` (the system policy), `mica-busybox` (an emergency binary), `mica-ca-trust`, `mica-systemd-boot` (the unsigned boot loader, signed by `mica-build`; never installed into a root) |
+| `mica-system-base` | `mica-system` (the system policy), `mica-busybox` (an emergency binary), `mica-ca-trust`, `mica-ssh`, `mica-tzdata`, the Wi-Fi packages `mica-wifi` and `mica-wifi-ap`, `mica-systemd-boot` (the unsigned boot loader, signed by `mica-build`; never installed into a root) |
 | `mica-core` | `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` (the early-boot and shutdown executable; never installed into a root) |
-| `mica-boards` | `mica-board-<board>` for each board, the radio packages `mica-wifi`, `mica-wifi-ap` and `mica-bluetooth`, and s905x5m's component packages; kernels, U-Boot and firmware are published as separate board component artifacts, not packages |
+| `mica-build` | `mica-board-<board>` for each board, `mica-bluetooth`, and s905x5m's component packages; kernels, U-Boot and firmware are published as separate board component artifacts, not packages |
 | `mica-podman` | `mica-podman` (the Podman container engine) |
 
 Debian packages come from `mica-system-base` releases, which carry one
@@ -112,11 +112,13 @@ differ by the signed kernel command line parameter `mica.profile=dev|prod`
 
 - **Decisions** are recorded in [`docs/decisions/`](docs/decisions/README.md),
   each with its reasoning and a review date.
-- **Work in progress** is tracked as [tasks](docs/task/index.md) and
-  [plans](docs/plan/index.md); every change is investigated and proposed
-  before it is implemented.
+- **Work in progress** is tracked as tasks and plans in the repository it
+  changes; the [tasks](docs/task/index.md) and [plans](docs/plan/index.md)
+  here cover this repository and work that spans repositories. Every change
+  is investigated and proposed before it is implemented.
 - **History** is in the [changelog](docs/changelog.md).
-- A code change in any repository lands together with its record here.
+- A code change lands together with its record in the same repository
+  ([decision](docs/decisions/2026-09-27-each-repository-keeps-its-records.md)).
 
 Documentation checks run with `make docs-verify`, and the checks' own tests
 with `make docs-verify-test`.

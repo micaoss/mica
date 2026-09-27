@@ -62,7 +62,7 @@ archive, and cannot suppress a `root` or a `kernel` package.
 That settles the `s905x5m` worry: it ships partial updates exactly as the
 other three boards do, from its second release on, non-deterministic vendor
 signing and all. Reuse there is decided by **inputs, not by bytes** —
-`mica-boards` compares a component's `mica.inputs` against the board's latest
+`mica-build` compares a component's `mica.inputs` against the board's latest
 release — and the permanent statement is only this: a release whose loader
 inputs did move rebuilds it, and that rebuild is never byte-identical. Two
 measurements are in play and they count different things: **16.13 MiB** of

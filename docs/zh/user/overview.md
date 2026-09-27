@@ -10,7 +10,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 [更新包](update-packages.md)，维护者切发布见[发布](../../user/releasing.md)，
 新板卡的引入见[移植](../../boards/porting.md)。
 
-## 1. 七个仓库
+## 1. 六个仓库
 
 | 仓库 | 产出 |
 |---|---|
@@ -18,8 +18,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 | `mica-system-base` | 与板卡无关的基础系统：固定版本的 Debian 包、四个策略包和基础根镜像 |
 | `mica-core` | `micad`、`mica-apid`、MQTT 服务、SFTP 服务器、`mica-deploy` 和 lifecycle 二进制 |
 | `mica-podman` | 容器引擎包 `mica-podman` |
-| `mica-boards` | 按板卡：内核、U-Boot、固件、板卡元数据以及该板的软件包 |
-| `mica-build` | 组装：组合每个产品的根、给组件签名，并发布镜像、更新归档和版本索引 |
+| `mica-build` | 板卡（按板卡：内核、U-Boot、固件、板卡元数据以及该板的软件包）与组装：组合每个产品的根、给组件签名，并发布镜像、更新归档和版本索引 |
 | `mica` | 本仓库：设计契约、决策、指南和工作区记录 |
 
 > status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-build:boards`
@@ -31,16 +30,15 @@ pin 记录，而不是一个分支（[发布锁](../../design/release-lock.md)�
 
 ```text
 mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
-               └─▶ mica-core ─────────────────────┤
-               └─▶ mica-boards (per board) ───────┴─▶ mica-build ─▶ mica.<stamp>
+               └─▶ mica-core ─────────────────────┴─▶ mica-build ─▶ mica.<stamp>
 ```
 
 - `mica-build-env` 是地基：其它每个仓库都在它的镜像里构建。
 - `mica-system-base` 发布基础根以及产品要安装的软件包池。
 - `mica-core` 和 `mica-podman` 把各自的软件包发布进各自的池。
-- `mica-boards` **按板卡**发布，`<board>.<YYYYMMDD-HHMM>`，并发布该板的组件和池。
-- `mica-build` **按作用域**发布，今天是 `<board>.<YYYYMMDD-HHMM>`，并发布该作用域下
-  每个产品：一份压缩磁盘镜像和更新归档。
+- `mica-build` **按作用域**发布，今天是 `<board>.<YYYYMMDD-HHMM>`，并发布该板的组件和池，
+  以及该作用域下每个产品：一份压缩磁盘镜像和更新归档。板卡在 2026-09-21 之前是独立仓库
+  `mica-boards`（[决策](../../decisions/2026-09-21-mica-boards-merged-into-mica-build.md)）。
 - 每次作用域发布成功之后，`mica-build` 切出**版本索引** `mica.<YYYYMMDD-HHMM>`，
   它列出每个已发布产品的最新 release。索引是 GitHub 的 latest release，所以最大的
   `mica.*` 标签就是最新的 Mica 版本。

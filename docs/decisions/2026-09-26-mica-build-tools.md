@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the `mica-build-tools` owner (the implementation); the rules stay with `mica` and `mica-build-env`
 - **review sunset**: 2027-03-26
-- **status**: accepted (user, 2026-09-26: "我们是否可以把这些每个仓库都用的工具抽出来做一个mica-build-tools", "为什么我们不用ts写一份", "你创建一个仓库 写好文档 当前的不需要演进，直接切换到新版本"); designed in `mica-build-tools:docs/design.md` and implemented there, first release `20260926-1825` (`5619810`); no repository pins it yet
+- **status**: accepted (user, 2026-09-26: "我们是否可以把这些每个仓库都用的工具抽出来做一个mica-build-tools", "为什么我们不用ts写一份", "你创建一个仓库 写好文档 当前的不需要演进，直接切换到新版本"); designed in `mica-build-tools:docs/design.md` and implemented there, first release `20260926-2005` (`8bb0331`); switched by 2026-09-26: `mica-build-env`, `mica-core`, `mica-system-base`; in progress: `mica-podman`, `mica-build` (`docs/plan/20260926-2214-mica-build-switch-to-mica-build-tools.md`); not started: `mica-res`
 
 ## Decision
 

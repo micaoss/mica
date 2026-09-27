@@ -119,5 +119,5 @@ index, which is how it was read in the workspace audit of 2026-09-19.
 - [x] [**20260921-0911-s905x5m-forced-line-and-its-declaration The board declared a command line its kernel was not built with**](20260921-0911-s905x5m-forced-line-and-its-declaration.md) `P2`
 - [x] [**20260920-0858-strip-c2pa-from-brand-svgs The brand SVGs carry the artwork and nothing else**](20260920-0858-strip-c2pa-from-brand-svgs.md) `P2`
 - [-] [**20260926-1125-apt-row-per-source One `apt` row per Debian source**](20260926-1125-apt-row-per-source.md) `P1`
-- [-] [**20260926-1829-rules-name-mica-build-tools The release-lock text names mica-build-tools as its one implementation**](20260926-1829-rules-name-mica-build-tools.md) `P1`
+- [x] [**20260926-1829-rules-name-mica-build-tools The release-lock text names mica-build-tools as its one implementation**](20260926-1829-rules-name-mica-build-tools.md) `P1`
 - [-] [**20260926-2214-mica-build-switch-to-mica-build-tools mica-build switches to mica-build-tools and mica-build-env 20260926-2110**](20260926-2214-mica-build-switch-to-mica-build-tools.md) `P1`

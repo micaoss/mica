@@ -145,16 +145,16 @@ DATA/meta lockdown is designed, and marked not implemented
 
 ## 6. Repository map
 
-Mica OS is seven repositories **on this map, which is a count and not a
-boundary**: an eighth, `micaoss/mica-fleet`, is checked out in the workspace
+Mica OS is six repositories **on this map, which is a count and not a
+boundary**: a seventh, `micaoss/mica-fleet`, is checked out in the workspace
 (`f048a4ae`) and is **not placed here, because whether it belongs to this
-architecture is the user's call and not this page's**. Each of the seven
+architecture is the user's call and not this page's**. Each of the six
 produces one thing, and consumes the others only at a pinned release — never
 by reaching into another's build tree.
 
 | Repository | Produces | Consumes |
 |---|---|---|
-| `mica` | the product documentation, decisions and the project's task and plan records | nothing |
+| `mica` | the conventions every repository follows (contracts and cross-repository decisions) and the public documentation | nothing |
 | `mica-build-env` | five build-env images (`base`, `c`, `go`, `rust`, `bsp`) and `RULES.md`, the rules every repository implements | nothing |
 | `mica-system-base` | the board-independent base: the pinned Debian lock, the Base's own packages, the base root | `mica-build-env` |
 | `mica-core` | the management plane as Debian packages: `micad`, `mica-apid`, `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` | `mica-build-env`, `mica-system-base` |

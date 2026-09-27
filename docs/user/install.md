@@ -46,7 +46,7 @@ production trust.
 |---|---|---|
 | `uefi-x64` | the whole image to the medium; boots through UEFI | qualified under QEMU only |
 | `uefi-arm64` | the whole image to the medium; boots through UEFI with ACPI | release target since 2026-09-16; qualified under QEMU only |
-| `cx3576` | `rkdeveloptool` over USB from `mica-boards`, with readback | not verified on hardware |
+| `cx3576` | `rkdeveloptool` over USB from `mica-build`, with readback | not verified on hardware |
 | `s905x5m` | no supported path: the loader lives in eMMC boot0 | bring-up work |
 
 Each case, with its commands, its refusals and what is not verified, is in

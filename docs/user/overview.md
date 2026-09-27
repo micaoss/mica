@@ -14,7 +14,7 @@ from source with [build](build.md), an image reaches a board through
 [releasing](releasing.md), and a new board is brought up with
 [porting](../boards/porting.md).
 
-## 1. The seven repositories
+## 1. The six repositories
 
 | Repository | Produces |
 |---|---|
@@ -22,8 +22,7 @@ from source with [build](build.md), an image reaches a board through
 | `mica-system-base` | the board-independent base: the pinned Debian packages, the four policy packages and the base root image |
 | `mica-core` | `micad`, `mica-apid`, the MQTT services, the SFTP server, `mica-deploy` and the lifecycle binary |
 | `mica-podman` | the container engine package `mica-podman` |
-| `mica-boards` | per board: the kernel, U-Boot, firmware, board metadata and the board's packages |
-| `mica-build` | the assembly: it composes each product's root, signs the components, and publishes the images, the update archives and the version index |
+| `mica-build` | the boards (per board: the kernel, U-Boot, firmware, board metadata and the board's packages) and the assembly: it composes each product's root, signs the components, and publishes the images, the update archives and the version index |
 | `mica` | this repository: the design contracts, the decisions, the guides and the workspace records |
 
 > status: shipped — evidence: `docs/architecture.md`, `docs/design/release-lock.md`, `mica-build:products`, `mica-build:boards`
@@ -36,8 +35,7 @@ builds on as a lock plus a pin record, never a branch
 
 ```text
 mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
-               └─▶ mica-core ─────────────────────┤
-               └─▶ mica-boards (per board) ───────┴─▶ mica-build ─▶ mica.<stamp>
+               └─▶ mica-core ─────────────────────┴─▶ mica-build ─▶ mica.<stamp>
 ```
 
 - `mica-build-env` is the floor: every other repository builds inside its
@@ -45,11 +43,11 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 - `mica-system-base` publishes the base root and the package pools that
   products install.
 - `mica-core` and `mica-podman` publish their packages into their own pools.
-- `mica-boards` releases **per board**, `<board>.<YYYYMMDD-HHMM>`, and
-  publishes the board's components and pool.
 - `mica-build` releases **per scope**, `<board>.<YYYYMMDD-HHMM>` today, and
-  publishes each product of that scope: a compressed disk image and the
-  update archives.
+  publishes the board's components and pool and each product of that scope: a
+  compressed disk image and the update archives. The boards were a repository
+  of their own, `mica-boards`, until 2026-09-21
+  ([decision](../decisions/2026-09-21-mica-boards-merged-into-mica-build.md)).
 - After every successful scoped release, `mica-build` cuts the **version
   index** `mica.<YYYYMMDD-HHMM>`, which names the newest release of every
   published product. The index is the GitHub latest release, so the greatest

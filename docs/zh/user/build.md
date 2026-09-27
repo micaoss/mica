@@ -75,7 +75,7 @@ make product-verify PRODUCT=uefi-x64-dev
 ## 5. 离线：并排的检出
 
 每个仓库都有 `make offline`，它从自己的 `locks/` 出发把发布产物构建到 `_out/offline/`
-里，源码缓存是由 `tools/repos.sh` 管理、被 git 忽略的 `repos/`。工作区驱动把它们串起来：
+里，源码缓存是由 `bin/mica-tools repos`（`mica-build-tools`，版本钉在 `locks/mica-build-tools.pin`）管理、被 git 忽略的 `repos/`。工作区驱动把它们串起来：
 
 ```sh
 make offline-chain                       # 在 mica-build 里；MICA_WORKSPACE 默认为 ..
