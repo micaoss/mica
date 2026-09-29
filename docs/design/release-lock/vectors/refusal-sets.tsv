@@ -35,6 +35,12 @@ lock/refused/upstream-image-republished.lock	set	reference-upstream	unmeasured
 lock/refused/upstream-image-without-digest.lock	set	field-value reference-digest	valid
 lock/refused/upstream-outside-base.lock	set	base-only-kind	unmeasured
 lock/refused/package-without-pool.lock	set	package-without-pool	unmeasured
+lock/refused/core-without-pool.lock	set	core-without-pool	unmeasured
+lock/refused/core-only-kind.lock	set	core-only-kind	unmeasured
+lock/refused/core-sort-order.lock	set	sort-order	unmeasured
+lock/refused/core-columns.lock	set	column-count	unmeasured
+lock/refused/core-duplicate.lock	set	duplicate-key	unmeasured
+lock/refused/core-version.lock	set	field-value	unmeasured
 lock/refused/unsorted.lock	set	sort-order	unmeasured
 lock/refused/data-file.lock	set	data-file	unmeasured
 lock/refused/data-columns.lock	set	column-count	unmeasured

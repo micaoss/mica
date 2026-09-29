@@ -57,3 +57,9 @@ upstream/refused/unsorted.lock	reorder-of	upstream/valid/upstream.lock
 lock/refused/apt-duplicate.lock	edit-of	lock/valid/mica-system-base.lock
 lock/refused/apt-snapshot.lock	edit-of	lock/valid/mica-system-base.lock
 lock/refused/apt-suite.lock	edit-of	lock/valid/mica-system-base.lock
+lock/refused/core-without-pool.lock	minimal-of	lock/valid/mica-core-components.lock
+lock/refused/core-only-kind.lock	minimal-of	lock/valid/mica-core-components.lock
+lock/refused/core-sort-order.lock	reorder-of	lock/valid/mica-core-components.lock
+lock/refused/core-columns.lock	edit-of	lock/valid/mica-core-components.lock
+lock/refused/core-duplicate.lock	edit-of	lock/valid/mica-core-components.lock
+lock/refused/core-version.lock	edit-of	lock/valid/mica-core-components.lock
