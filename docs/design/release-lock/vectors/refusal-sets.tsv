@@ -41,6 +41,12 @@ lock/refused/core-sort-order.lock	set	sort-order	unmeasured
 lock/refused/core-columns.lock	set	column-count	unmeasured
 lock/refused/core-duplicate.lock	set	duplicate-key	unmeasured
 lock/refused/core-version.lock	set	field-value	unmeasured
+lock/refused/item-without-pool.lock	set	item-without-pool	unmeasured
+lock/refused/item-type.lock	set	field-value	unmeasured
+lock/refused/item-sort-order.lock	set	sort-order	unmeasured
+lock/refused/item-columns.lock	set	column-count	unmeasured
+lock/refused/item-duplicate.lock	set	duplicate-key	unmeasured
+lock/refused/item-version.lock	set	field-value	unmeasured
 lock/refused/unsorted.lock	set	sort-order	unmeasured
 lock/refused/data-file.lock	set	data-file	unmeasured
 lock/refused/data-columns.lock	set	column-count	unmeasured

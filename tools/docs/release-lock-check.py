@@ -50,12 +50,14 @@ def refuse(rule):
         raise Refused(rule)
 
 
-KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "core": 5, "board": 5, "upstream": 7, "apt": 5,
-                "input": 4, "product": 8, "bundle": 4, "asset": 6, "data": 4}
+KIND_COLUMNS = {"release": 4, "image": 5, "pool": 3, "package": 5, "core": 5, "item": 6, "board": 5, "upstream": 7,
+                "apt": 5, "input": 4, "product": 8, "bundle": 4, "asset": 6, "data": 4}
 KIND_ORDER = list(KIND_COLUMNS)
 BASE_ONLY = {"upstream", "apt"}
 BUILD_ONLY = {"input", "product", "bundle", "asset"}
 CORE_ONLY = {"core"}
+# 1.2.7: the file suffixes of an archive and of a core component are no item's type.
+ITEM_RESERVED = {"deb", "img", "json"}
 PROFILE = {"dev", "prod"}
 GENERATION = re.compile(r"^[1-9][0-9]*$")
 BUNDLE = {"image", "update"}
@@ -175,6 +177,11 @@ def check_lock(path):
             # 1.2.6: a core component's record layer, keyed like a package.
             field(NAME.match(row[1]) and row[2] in ARCH and VERSION.match(row[3]) and SHA256.match(row[4]))
             key = (row[1], row[2])
+        elif kind == "item":
+            # 1.2.7: a pool layer of a type the format does not know, keyed by type, name and architecture.
+            field(NAME.match(row[1]) and row[1] not in ITEM_RESERVED and NAME.match(row[2]) and row[3] in ARCH
+                  and VERSION.match(row[4]) and SHA256.match(row[5]))
+            key = (row[1], row[2], row[3])
         elif kind == "board":
             field(NAME.match(row[1]) and row[2] in COMPONENT and row[3] in ARCH)
             reference(row[4])
@@ -250,6 +257,8 @@ def check_lock(path):
         refuse("package-without-pool")
     if any(r[0] == "core" and r[2] not in pools for r in rows):
         refuse("core-without-pool")
+    if any(r[0] == "item" and r[3] not in pools for r in rows):
+        refuse("item-without-pool")
     # A board's components (mica-build): the kernel is required, uboot and firmware are the board's to have.
     for board in {r[1] for r in rows if r[0] == "board"}:
         if not any(r[0] == "board" and r[1] == board and r[2] == "kernel" for r in rows):

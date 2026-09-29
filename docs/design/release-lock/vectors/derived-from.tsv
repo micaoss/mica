@@ -63,3 +63,9 @@ lock/refused/core-sort-order.lock	reorder-of	lock/valid/mica-core-components.loc
 lock/refused/core-columns.lock	edit-of	lock/valid/mica-core-components.lock
 lock/refused/core-duplicate.lock	edit-of	lock/valid/mica-core-components.lock
 lock/refused/core-version.lock	edit-of	lock/valid/mica-core-components.lock
+lock/refused/item-without-pool.lock	minimal-of	lock/valid/mica-podman-items.lock
+lock/refused/item-type.lock	edit-of	lock/valid/mica-podman-items.lock
+lock/refused/item-sort-order.lock	reorder-of	lock/valid/mica-podman-items.lock
+lock/refused/item-columns.lock	edit-of	lock/valid/mica-podman-items.lock
+lock/refused/item-duplicate.lock	edit-of	lock/valid/mica-podman-items.lock
+lock/refused/item-version.lock	edit-of	lock/valid/mica-podman-items.lock

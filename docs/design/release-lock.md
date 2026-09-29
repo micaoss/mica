@@ -26,7 +26,8 @@ A release of `<repository>` (tag `<YYYYMMDD-HHMM>`) carries exactly two GitHub
 Release assets: `<repository>.lock` and `SHA256SUMS`. `SHA256SUMS` lists
 exactly one file, `<repository>.lock`, in `sha256sum` format. There are no
 `.deb` or other assets; packages live only in the OCI pools (section 2), and
-so do `mica-core`'s core components (1.2.6).
+so do `mica-core`'s core components (1.2.6) and a repository's pool items
+(1.2.7).
 This holds from a repository's first release in this format on: there is no
 transition period and no release carries old assets beside the lock (user,
 2026-09-14). The exception is `mica-build`'s scoped releases, which carry
@@ -91,6 +92,7 @@ input.
 | `pool` | `pool <arch> <reference>` | arch | the package pool of one architecture |
 | `package` | `package <name> <arch> <version> <sha256>` | name, arch | an archive this repository built: the layer of `pool <arch>` with that digest; an `Architecture: all` archive appears once per architecture with the same sha256; its arch must have a `pool` row |
 | `core` | `core <package> <arch> <version> <sha256>` | package, arch | one core component `mica-core` built (1.2.6): the record layer of `pool <arch>` with that digest, whose image is a layer of the same pool; its arch must have a `pool` row; `mica-core` only |
+| `item` | `item <type> <name> <arch> <version> <sha256>` | type, name, arch | one pool item (1.2.7): the layer of `pool <arch>` with that digest, a file of a type the format does not know; `<type>` is a name other than `deb`, `img` and `json`; its arch must have a `pool` row; published by any repository |
 | `board` | `board <board> <component> <arch> <reference>` | board, component | one built component artifact of a board (`mica-build`, 1.2.2); `<component>` is `kernel`, `uboot` or `firmware` (section 2); every board with a row has a `kernel` row (`board-components`) |
 | `upstream` | `upstream <name> <arch> <version> <sha256> <url> <roots>` | name, arch | a third-party archive pinned for later stages; `<url>` is https; `<roots>` is the comma-separated, sorted, duplicate-free list of `upstream.pkgs` roots it is pinned for (*fixed here*, as Base publishes today); `mica-system-base` only |
 | `apt` | `apt <uri> <suite> <components> <signed-by>` | uri, suite | one Debian source, one row per source (1.2.5); `<components>` space-separated, `<signed-by>` an absolute keyring path; `mica-system-base` only |
@@ -367,6 +369,51 @@ and different bytes need a new version
 `mica-deploy` and `mica-lifecycle` stay Debian packages, `package` rows of the
 same lock: they are built into the root.
 
+#### 1.2.7 Pool items: the `item` row
+
+A kind is a change in three places: this text and its vectors, the one
+implementation (9.1), and every reader, which refuses a kind it does not know
+(`kind-unknown`) and so moves before the writer. The `core` row cost all
+three for one producer and one consumer. **What a repository publishes next
+is therefore a value, not a kind** *(user, 2026-09-29)*: the format already
+extends by value where an artifact is a registry artifact (an `image` row
+under a name of the producer's) and where it is a release asset (a `data`
+row, 1.2.4); the `item` row is the same for a layer of a pool.
+
+```text
+item <type> <name> <arch> <version> <sha256>
+```
+
+keyed by type, name and architecture. An item is one layer of `pool <arch>`
+(section 2), the file `<name>_<version>_<arch>.<type>` of the pool, and
+`<sha256>` is its digest. `<type>` is a name (1.2) and is the producer's to
+choose, except `deb`, `img` and `json`, which are an archive's and a core
+component's files (`field-value`). Its arch must have a `pool` row
+(`item-without-pool`). Any repository with a pool may publish items.
+
+**What the format holds for an item** is what it holds for a package: the row
+is unique by its key, the layer is in the pool at that digest, and the version
+guard applies unchanged -- a released `<type> <name> <version>` keeps its
+digest, and different bytes need a new version
+(`docs/decisions/2026-09-15-package-versions.md` R4). The layer carries
+`mica.inputs`.
+
+**What it does not hold** is anything about one type: what the bytes are,
+which repository may publish it, which other item it needs. Those belong to
+the producer and to the consumer that reads the type, which checks what it
+reads. A reader that does not consume a type skips its rows, and that is
+always safe: the rows name layers and ask nothing of a reader. So a new type
+is a file its producer adds and a row its consumer reads, **with no change
+here, none in `mica-build-tools`, and no reader that has to move first**.
+
+`kind-unknown` is unchanged: a reader that does not know the `item` kind
+itself still refuses the lock, so the readers of a lock implement this
+section before its producer publishes the first item, once.
+
+`core` stays a kind: `mica-core` published `core` rows before this section
+existed, and a published lock is immutable. A kind remains the way to add
+what no value can say -- a row of another shape, or a rule between rows.
+
 ### 1.3 References
 
 A reference of a `pool`, a `board` or a repository's image is
@@ -430,7 +477,7 @@ instances.
 ### 1.4 Order
 
 Rows are sorted by kind in the table's order (`release`, `image`, `pool`,
-`package`, `core`, `board`, `upstream`, `apt`, `input`, `product`, `bundle`,
+`package`, `core`, `item`, `board`, `upstream`, `apt`, `input`, `product`, `bundle`,
 `asset`, `data`), then by key, compared as bytes. The
 same inputs therefore give the same bytes.
 
@@ -443,7 +490,7 @@ the ones the vectors use:
 |---|---|
 | `header` | line 1 is not `# mica-lock v1` |
 | `encoding` | not UTF-8, CR, missing final LF, empty line, leading space, trailing tab |
-| `kind-unknown` | the first column is not one of the thirteen kinds |
+| `kind-unknown` | the first column is not one of the fourteen kinds |
 | `image-source` | an `image` row whose source is neither `upstream` nor a repository name, or a repository other than the release row's |
 | `column-count` | a row has the wrong number of columns for its kind |
 | `release-row` | no release row, more than one, or not the first row |
@@ -460,6 +507,7 @@ the ones the vectors use:
 | `package-without-pool` | a `package` row whose arch has no `pool` row |
 | `core-without-pool` | a `core` row whose arch has no `pool` row |
 | `core-only-kind` | a `core` row in a lock of any repository but `mica-core` |
+| `item-without-pool` | an `item` row whose arch has no `pool` row |
 | `build-only-kind` | an `input`, `product`, `bundle` or `asset` row in a lock of any repository but `mica-build` |
 | `bundle-without-product` | a `bundle` or `asset` row whose product has no `product` row |
 | `asset-without-bundle` | an `asset` row without a `bundle` row of its product and type |
@@ -470,9 +518,9 @@ the ones the vectors use:
 
 Registry checks come on top, when a lock is published or consumed: every
 reference, `upstream` rows included, reads back anonymously at its digest,
-every `package` sha256 is a layer of that architecture's pool, and every
-`core` sha256 is a record layer of it whose image sha256 is a layer of it
-too.
+every `package` and every `item` sha256 is a layer of that architecture's
+pool, and every `core` sha256 is a record layer of it whose image sha256 is a
+layer of it too.
 
 ## 2. OCI layout
 
@@ -491,6 +539,8 @@ package of the repository that publishes them.
   components (1.2.6), two layers each: the image, `mediaType`
   `application/vnd.mica.core.image`, and the record,
   `application/vnd.mica.core.record`, titled as in 1.2.6 and carrying
+  `mica.inputs`. A pool item (1.2.7) is one layer, `mediaType`
+  `application/vnd.mica.item.<type>`, titled with its file name and carrying
   `mica.inputs`. The manifest carries only
   release-independent annotations: `mica.source-repo` and `mica.arch`. There
   is no `org.opencontainers.image.version`, `.revision`, `.created` or
@@ -1039,6 +1089,8 @@ every family and every row; no other repository carries a copy (9.1).
   `386` row), `mica-core.lock`
   (`pool`, `package`), `mica-core-components.lock` (`pool`, `package` rows
   for the two packages built into the root, `core` rows),
+  `mica-podman-items.lock` (`pool`, `package`, `item` rows of two types, one
+  name under both),
   `mica-system-base.lock` (`image`, `pool`, `package`, `upstream`, three
   `apt` rows for a release and its two pockets, a comment), `offline-mica-core.lock` (an offline lock with `local/`
   references), `mica-build.uefi-x64.lock` (a scoped `mica-build` lock: the board's
