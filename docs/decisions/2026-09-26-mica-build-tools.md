@@ -8,6 +8,13 @@
 
 ## Decision
 
+*(Amended 2026-09-29, user: "把tools和mica解耦合，后续所有的规范这边维护，mica只是让子仓库用tools即可".
+The rules of the release lock no longer stay here: the specification, its vectors and the rules
+of package versions are kept in `mica-build-tools` (`docs/spec/`), `docs/design/release-lock.md`
+is a pointer to them, and `tools/docs/release-lock-check.py` is removed with the vectors. What
+follows is the decision as taken on 2026-09-26; where it says a rule changes here first, it now
+changes there.)*
+
 `mica-build-tools` is the one implementation of the release lock
 (`docs/design/release-lock.md`), the consumer's `locks/`, the source cache, and
 the build rules of `mica-build-env:RULES.md`: the lock and pin checkers,

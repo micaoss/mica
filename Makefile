@@ -69,7 +69,7 @@
 # 2026-09-20 it found `fetch-required` untested, 40 against 39.
 .PHONY: help docs-verify docs-verify-test docs-verify-world website website-deploy
 help:
-	@echo "  docs-verify         assert the docs catalog, links, truth-status lines, board dossiers and the release-lock vectors"
+	@echo "  docs-verify         assert the docs catalog, links, truth-status lines and board dossiers"
 	@echo "  docs-verify-test    prove those assertions actually fail on fixtures where their facts are false, and lint the scripts"
 	@echo "  docs-verify-world   check the claims these records make about other repositories against those repositories (needs the network)"
 	@echo "  (a records change)  bash tools/docs/record.sh --edit <script> --message <file> -- <path>..."
@@ -82,7 +82,6 @@ docs-verify:
 	bash tools/docs/verify-status.sh
 	bash tools/docs/verify-coverage.sh
 	bash tools/docs/verify-board.sh
-	bash tools/docs/verify-release-lock.sh
 
 docs-verify-world:
 	bash tools/docs/verify-world.sh
@@ -93,7 +92,6 @@ docs-verify-test:
 	bash tools/docs/verify-status-test.sh
 	bash tools/docs/verify-coverage-test.sh
 	bash tools/docs/verify-board-test.sh
-	bash tools/docs/verify-release-lock-test.sh
 	bash tools/docs/verify-world-test.sh
 	bash tools/docs/record-test.sh
 	bash tools/docs/shell-lint.sh
