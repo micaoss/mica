@@ -4,14 +4,14 @@
 - **kind**: engineering decision
 - **owner**: the `mica-build` owner (the product set, the release plan, CI's release rehearsal); `mica` records it
 - **review sunset**: 2027-03-26
-- **status**: accepted as the direction, **not implemented** (user, 2026-09-26: "我们删除所有的dev发布，dev后续修改为本地构建，不进入发布通道，后续的发布通道修改为full 和basic，默认的full包含所有功能，basic可以不包含类似podman之类的，当前先不做更改"; recorded on the user's instruction "写进去"; the default corrected the same day: "默认是basic不是full"). Nothing changes until the user asks for it. It will supersede the product half of `docs/decisions/2026-09-15-release-images-and-products.md` then.
+- **status**: accepted, **implemented 2026-09-27** in `mica-build` (products `<board>.basic`, `<board>.full` and the local-only `<board>.dev`, `mica-build:boards/products.md`) (user, 2026-09-26: "我们删除所有的dev发布，dev后续修改为本地构建，不进入发布通道，后续的发布通道修改为full 和basic，默认的full包含所有功能，basic可以不包含类似podman之类的，当前先不做更改"; recorded on the user's instruction "写进去"; the default corrected the same day: "默认是basic不是full"). It supersedes the product half of `docs/decisions/2026-09-15-release-images-and-products.md`.
 
 ## Decision
 
 - **No development build is released.** The `dev` profile stays, and it is built locally and in CI.
   No scoped release carries a `<board>-dev` product, and no Mica version index names one. The
   published `*-dev` assets are deleted. Deleting published releases in this phase is allowed by
-  `docs/decisions/2026-09-20-development-phase-release-deletion.md`.
+  `mica-build:README.md`.
 - **What a board releases is two variants.**
   - **basic** is the default. It leaves out the heavy optional features, the container engine
     (podman) first among them.

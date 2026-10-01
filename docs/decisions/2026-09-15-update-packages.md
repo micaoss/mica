@@ -34,7 +34,7 @@ objects; every missing object must already be in the store. The deployment
 descriptor gains a signed `product` field (a schema bump): a device refuses a
 deployment for another product, and catalog heads and the update-server are
 keyed by board, product and channel. There is no minimum running release
-rule. Names, as `mica-core` implements them (`mica-core:docs/task/20260915-0657-update-packages.md`):
+rule. Names, as `mica-core` implements them (`mica-core:docs/mica-core.md`):
 `mica/deployment/v2` replaces v1 with a required `product` (such as
 `uefi-x64-dev`); the device's product is the single unquoted `PRODUCT=<name>` line
 of the five-line `/usr/lib/mica/product.conf`; `mica/catalog/v2` carries
@@ -70,7 +70,7 @@ rows of `mica-build.lock` (`docs/design/release-lock.md` 1.2.2).
 identity to stay unchanged across releases; packages whose inputs did not
 change keep their version and published bytes across releases, and a release
 never changes a package version
-(`docs/decisions/2026-09-15-package-versions.md`); the root and kernel
+(`mica-build-tools:docs/spec/package-versions.md`); the root and kernel
 components carry no release identity and are signed deterministically
 (`docs/decisions/2026-09-15-stable-component-ids.md`).
 

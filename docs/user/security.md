@@ -27,7 +27,7 @@ the health gate. Loader firmware is a separate signed maintenance artifact.
 Catalog expiry gates acquisition; it does not expire installed offline boot.
 
 Metadata anchors are embedded in authenticated kernel policy. Editable update
-source/channel settings cannot replace them. Content-anchor overlap/removal is a
+source settings cannot replace them. Content-anchor overlap/removal is a
 kernel-package change; boot-key rotation changes the boot trust/firmware domain.
 Each rotation must leave a usable retained association. There is no historical
 format reader or old-layout migration.
@@ -45,7 +45,8 @@ creation never happens implicitly during a build; supply inputs explicitly.
   into an image — an image is byte-identical fleet-wide, so a baked credential
   would be a fleet-wide secret. The build *fails* if the factory shadow file
   carries a usable password hash, on both profiles.
-- **The management API is the gate.** HTTPS only; password login with signed
+- **The management API is the gate.** Plain HTTP on 8080 by default, HTTPS on
+  8443 once an operator turns it on; password login with signed
   sessions and CSRF protection for browsers, bearer tokens for automation;
   persistent login-backoff counters and a bounded, fsynced audit trail of
   logins, setup, power actions and transient-password events.
@@ -78,7 +79,7 @@ management daemon. See [applications.md](applications.md).
 
 ## 5. Network exposure
 
-The inbound surface of a stock device is apid on 443 (and the redirect on 80)
+The inbound surface of a stock device is apid on 8080 (and on 8443 once HTTPS is on)
 — nothing else listens for management, nothing dials out, and no fleet or
 cloud channel exists. Static UI assets are public; every appliance datum and
 operation sits behind the API credential boundary.

@@ -1,22 +1,24 @@
 # Update and rollback
 
-Which archive applies to a device, and how to pick it from a release or the
-version index, is [update packages](update-packages.md).
+Which archive applies to a device, and how to pick it from a product's
+release, is [update packages](update-packages.md).
 
 An Mica OS deployment selects an independently signed kernel/support component and
 an independently signed root filesystem. A release can change the root, the
 kernel, or both. The device stages verified objects while the current system
 runs, then starts the candidate on reboot. Firmware maintenance is separate.
 
-> status: shipped — evidence: `mica-deploy:src`, `mica-core:apid/src/update_api.rs`
+> status: shipped — evidence: `mica-deploy:src`, `mica-core:crates/mica-apid/src/update_api.rs`
 
 ## Install an update
 
 The System page shows the running deployment, component identities, candidate,
 retained fallback, acquisition progress and reboot verdict. Configure the update
-source, channel and automatic/manual policy through the authenticated settings
-surface. A source distributes the signed `/v1/manifest.json` catalog. Source
-settings cannot add signing keys.
+source and automatic/manual policy through the authenticated settings
+surface. A source serves the `/v1/manifest.json` catalog, unsigned; each
+release's own signed descriptor is what the device trusts, and source settings
+cannot add signing keys. There is no update channel: a device takes the
+releases of its own product.
 
 Online acquisition downloads only missing objects and verifies their signed
 lengths and digests. Offline `.micaupd` archives carry the same signed deployment
@@ -45,7 +47,7 @@ Failed deployment IDs and the monotonic generation floor prevent automatically
 reinstalling a known failed release. A corrected release uses a newly signed
 higher generation; clearing a display record cannot bypass this constraint.
 
-> status: shipped — evidence: `mica-core:apid/src/update_api.rs`, `mica-core:micad/src/deployment.rs`
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/micad/src/deployment.rs`
 
 ## Firmware and recovery
 

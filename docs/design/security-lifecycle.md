@@ -59,7 +59,7 @@ as revocation of an already installed deployment.
 Rotation requires a separately authenticated kernel policy carrying the intended
 overlap/removal, plus matching signed deployment associations. Preserve a usable
 retained combination throughout the ceremony. Recovery from lost or compromised
-anchors follows [key delivery](key-delivery.md) and the explicit complete-image
+anchors follows [key delivery](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md) and the explicit complete-image
 reflash path when no accepted association remains. No mutable settings API imports
 an older trust root or walks a historical metadata format.
 
@@ -82,7 +82,7 @@ baked with the public defaults. The native observer reports that provenance;
 `bin/bun.sh src/cli.ts --release gate` refuses marked material on candidate/stable channels.
 Releases signed with the development material therefore target the development
 channel only; candidate and stable releases wait for production keys (user,
-2026-09-14; `docs/task/20260912-2058-production-key-custody.md`).
+2026-09-14). Production key custody is not yet established.
 Empty or malformed generated markers fail release assembly. A missing marker is
 not proof of operational key custody or physical qualification.
 
@@ -93,7 +93,7 @@ and physical platform qualification are not inferred from those tests.
 ### 1.3 Device TLS identities — owner: release owner (policy), support owner (field) — **[partial]**
 
 What exists: apid generates a **self-signed** certificate on first start into
-its DATA/state directory and reuses it (`mica-core:apid/src/tls.rs`); it
+its DATA/state directory and reuses it (`mica-core:crates/mica-apid/src/tls.rs`); it
 authenticates nothing beyond "same device as last time" to a browser that
 has accepted it. There is no device certificate hierarchy, no fleet CA and no
 enrollment — first-boot provisioning deliberately mints no PKI
@@ -120,7 +120,7 @@ restating:
   (`docs/design/access.md` §4.1).
 - **Transient root password** — self-revoking by design: cleared by
   `mica-shadow-reconcile` on the next boot via the marker mechanism
-  (`docs/design/access.md` §4.1, `mica-core:micad/src/transient.rs`).
+  (`docs/design/access.md` §4.1, `mica-core:crates/micad/src/transient.rs`).
 
 **Recovery is deliberately absent**: an operator who loses the webAdmin
 credential and every key has no software path back in, and the recovery is a
@@ -186,7 +186,7 @@ owner, recorded in the release notes.
 ### 2.2 Signing and key custody — **[procedure]**
 
 Custody follows [release signing](release-signing.md) and
-[key delivery](key-delivery.md): independent boot/content/metadata private material,
+[key delivery](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md): independent boot/content/metadata private material,
 restricted signer access, recorded public fingerprints, and retained recovery
 inputs for every accepted association. CI uses explicit disposable development
 material. It must not import production private keys or claim production custody.

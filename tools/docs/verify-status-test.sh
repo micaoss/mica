@@ -199,44 +199,20 @@ replace_line "${FIX}/docs/website/page.md" '`make fixture-check`' \
 expect_fail "evidence citing an undefined make target" 1 \
     "evidence 'make no-such-target' does not exist"
 
-# --- 7. proposed without a record ref ----------------------------------------
-# The cited path exists, but it is not a tracking record. The baseline cites
-# both an open plan and an open task, so a verifier that accepts only one of
-# them fails the positive control, not this case.
-FIX="${WORK}/proposed-no-plan"
+# --- 7. proposed without evidence ------------------------------------------
+FIX="${WORK}/proposed-no-evidence"
 new_fixture "${FIX}"
 replace_line "${FIX}/docs/boards/page.md" '`docs/plan/20260101-0000-fixture-plan.md`' \
-    '> status: proposed — evidence: `pkgs/artifact.json`'
-expect_fail "proposed citing no plan record" 1 \
-    "proposed requires an open docs/plan/ or docs/task/ record ref"
+    '> status: proposed'
+expect_fail "proposed with no evidence" 1 \
+    "proposed requires evidence"
 
-# --- 7b. proposed citing the plan index -------------------------------------
-# docs/plan/index.md always exists; it is the list, not a record.
-FIX="${WORK}/proposed-index-only"
-new_fixture "${FIX}"
-replace_line "${FIX}/docs/boards/page.md" '`docs/plan/20260101-0000-fixture-plan.md`' \
-    '> status: proposed — evidence: `docs/plan/index.md`'
-expect_fail "proposed citing only the plan index" 1 \
-    "proposed requires an open docs/plan/ or docs/task/ record ref"
-
-# --- 8. proposed citing a plan that does not exist ---------------------------
-# Two assertions fire, and both are wanted: the ref is dead, AND no existing
-# plan ref remains to satisfy the proposed clause.
+# --- 8. proposed citing a record that does not exist ------------------------
 FIX="${WORK}/proposed-dead-plan"
 new_fixture "${FIX}"
 rm "${FIX}/docs/plan/20260101-0000-fixture-plan.md"
-expect_fail "proposed citing a deleted plan record" 2 \
-    "evidence 'docs/plan/20260101-0000-fixture-plan.md' does not exist" \
-    "proposed requires an open docs/plan/ or docs/task/ record ref"
-
-# --- 8b. proposed citing a record that has completed --------------------------
-# The file still exists, but its row is `[x]`: the page must be relabelled.
-FIX="${WORK}/proposed-completed-record"
-new_fixture "${FIX}"
-sed -i 's/^- \[-\] \[\*\*20260101-0001-fixture-task /- [x] [**20260101-0001-fixture-task /' \
-    "${FIX}/docs/task/index.md"
-expect_fail "proposed citing a completed task record" 1 \
-    "proposed requires an open docs/plan/ or docs/task/ record ref"
+expect_fail "proposed citing a deleted record" 1 \
+    "evidence 'docs/plan/20260101-0000-fixture-plan.md' does not exist"
 
 # --- 9. unsupported carrying evidence ----------------------------------------
 FIX="${WORK}/unsupported-evidence"

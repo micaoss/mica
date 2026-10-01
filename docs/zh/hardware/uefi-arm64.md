@@ -64,10 +64,9 @@ aarch64 `virt` 没有 VGA 也没有 framebuffer，写 `console=tty0` 就是给�
 
 ## 获取镜像
 
-产品是 `uefi-arm64-dev` 与 `uefi-arm64-prod`。
-
-**避开 `20260916-0845`、`20260916-1653`、`20260919-2103` 三轮**：这些镜像会在 PID 1
-关机（板卡改名，被 pin 住的客户端没跟上）。取 `20260919-2356` 或更新的。
+产品是 `uefi-arm64.basic`（默认）与 `uefi-arm64.full`（带容器），各自发布为
+`uefi-arm64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名
+`mica-uefi-arm64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
 
 ## 刷机
 
@@ -85,7 +84,7 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot 
 
 guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031 或 EFI 的 RTC、
 打开的 ACPI button（否则宿主请求的优雅关机传不进去）。完整说明、9p 导入离线更新的
-做法，以及 `make lifecycle-uefi PRODUCT=uefi-arm64-dev` 这一整套验收，见
+做法，以及 `make lifecycle-uefi PRODUCT=uefi-arm64.dev` 这一整套验收，见
 [刷写](../user/flashing.md) 第 4 节。
 
 **写到实体 arm64 机器上（未验证）**：与 `uefi-x64` 同理，整盘写入，机器需信任该发布
@@ -141,4 +140,4 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 | 射频与现场总线 | 不适用 | 这块板不声明 |
 | 物理恢复动作 | 不适用 | 不存在物理在场断言 |
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`

@@ -33,17 +33,17 @@ accepts `dataPolicy: unchanged` and has no destructive migration path.
 
 ## 3. Publication status
 
-A scoped release of `mica-build` publishes the signed archives and images as
-release assets, and the Mica version index names the newest release of every
-product. Distribution to devices, the channels and their withdrawal, is the
-fleet service's and is not asserted by this page. An installed authenticated
+A product release of `mica-build` (`<board>.<variant>.<YYYYMMDD-HHMM>`)
+publishes the signed archives and images as release assets, and a product's
+newest release is the one to take. Distribution to devices, the channels and
+their withdrawal, is an update server's and is not asserted by this page. An installed authenticated
 deployment boots offline whatever the catalogue's expiry. A published release
 is not a substitute for board qualification or a product support commitment.
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/mica-index.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/user/download.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
 
 No public release history, support window or end-of-life commitment is asserted
 by this page. See [obtaining an image](download.md) for the current source-build
-route and [release artifacts](../design/release-artifacts.md) for delivery records.
+route and [release artifacts](https://github.com/micaoss/mica-build/blob/main/README.md) for delivery records.
 
 > status: unsupported

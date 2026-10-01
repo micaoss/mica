@@ -804,7 +804,7 @@ key、serial 或客户数据。
 - Applications 的信任、manifest、存储和生命周期边界由 `docs/design/applications.md` 定义；
 - 当前实现与开发裁剪规则由 `docs/design/dashboard.md` 维护；
 - 安装、release、time、update、recovery、storage、diagnostics、安全、fleet 等能力的当前契约见 `docs/design/`，
-  未完成工作见 `docs/task/index.md`。
+  未完成工作由各个仓库自己跟踪。
 
 当功能从 P 进入 R/L 时，先更新本指南的成熟度和相关原型状态，再交付生产入口。若产品结构、危险语义或
 关键旅程改变，设计指南与开发指南必须在同一批次同步；不要只改高保真画面。

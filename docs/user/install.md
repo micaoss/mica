@@ -13,20 +13,21 @@ which boards have one — is [flashing](flashing.md).
 
 ## 1. Choose and verify the image
 
-An image is published per product as `mica-<product>-<release>.img.gz` and is
+An image is published per product as `mica-<board>.<variant>-<stamp>.img.gz` and is
 bound to one board and architecture; the profile (`dev` or `prod`) is fixed in
 the signed kernel command line of that product. Take the file from a release,
-check it against `SHA256SUMS`, and check the decompressed image against
-`uncompressedSha256` in the version index: [download](download.md). For an
+check it against the lock its `SHA256SUMS` lists, and check the decompressed
+image against the `mica.uncompressed-sha256` of its OCI layer:
+[download](download.md). For an
 image you built yourself, `make product-verify PRODUCT=<name>` is the
 equivalent gate.
 
 A checksum proves the file arrived intact. It says nothing about who signed
 it: obtain the release's public boot certificate through the handover it
-belongs to ([key delivery](../design/key-delivery.md)), not from beside the
+belongs to ([key delivery](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md)), not from beside the
 download.
 
-> status: shipped — evidence: `docs/user/download.md`, `mica-build:make product-verify`, `docs/design/key-delivery.md`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:make product-verify`
 
 ## 2. Make the board trust the signer
 

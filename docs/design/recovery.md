@@ -21,12 +21,12 @@ See [updates](updates.md), [storage](storage.md) and the
 ### 2.1 Scope and survivors
 
 The API and `micad_settings::ResetTier` expose exactly three tiers. The executor
-is `mica-core:micad/src/reset.rs`.
+is `mica-core:crates/micad/src/reset.rs`.
 
 | Tier | Removed or reseeded | Preserved |
 |---|---|---|
 | `configuration` | `/mica/config`; modeled settings return through first-boot provisioning | Device identity and secrets, management credential/claim/API tokens, applications and operator data |
-| `application-data` | `/mica/apps`, the independent DATA/containers backing directory, `/srv`, DATA/state Quadlet and local-unit enrollments | Settings, identity, credentials, custom UI, update workspace and other system namespaces |
+| `application-data` | `/mica/apps`, the independent DATA/containers backing directory, `/srv`, DATA/state local-unit enrollments | Settings, identity, credentials, custom UI, update workspace and other system namespaces |
 | `full-factory` | Managed `/mica` contents, `/srv`, application enrollments and management settings/credentials | Device identity and per-device secrets; persistent service files outside the removal allowlist |
 
 Every tier preserves SYSTEM, boot records and DATA/meta lifecycle/deployment
@@ -135,6 +135,6 @@ scope preservation and a further idempotent boot for each tier.
 
 cx3576 has offline image/FIT verification and firmware-policy tests. Its
 physical startup, watchdog handoff, recovery and power-cut behavior require the
-[bench runbook](../boards/cx3576-bench.md). Boot assurance and recovery capability
+[bench runbook](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/cx3576-bench.md). Boot assurance and recovery capability
 are separate claims. Pending per-board checks are in
 [support tiers](../boards/support-tiers.md#current-boards).

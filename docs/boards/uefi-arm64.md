@@ -37,7 +37,7 @@ describes emulated boot and services and qualifies no physical arm64 machine.
   `olddefconfig` and recorded as `config/uefi-arm64.config`.
 - Boot manager and UKI stub: systemd 257.13, today built by the `mica-boot`
   source pin with the required attempt-persistence policy. In the split of
-  `docs/decisions/2026-09-14-mica-boot-split.md` the boot manager is compiled
+  `mica-build:README.md` the boot manager is compiled
   by `mica-system-base` (`mica-systemd-boot`) and signed by `mica-build`.
   Their versions match the root's systemd; boot firmware is packaged
   independently.

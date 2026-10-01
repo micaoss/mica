@@ -207,7 +207,7 @@ steps 1–3 (the automatic trigger and exit) did not.
 
 ## 6. The networkd naming constraint — read this before writing another reconciler
 
-`mica-core:micad/src/reconciler/network.rs` **deletes every `*-mica-*.network` file it
+`mica-core:crates/micad/src/reconciler/network.rs` **deletes every `*-mica-*.network` file it
 did not itself render.** A WiFi unit named `50-mica-wlan0.network` is therefore
 swept away on the network reconciler's next pass: the component is present,
 every unit test is green, and WiFi has no address on device. A future reconciler author must not rediscover it.

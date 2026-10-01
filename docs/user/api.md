@@ -1,17 +1,18 @@
 # API reference
 
 The Mica OS management API is specified by one machine-readable contract:
-**`mica-core:apid/openapi.json`**. It is generated from the same code that
+**`mica-core:crates/mica-apid/openapi.json`**. It is generated from the same code that
 serves the routes, and CI holds it equal to what the shipped binary reports —
 so it cannot drift from the device the way a hand-written endpoint list
 would. This page deliberately does not duplicate the endpoint inventory; it
 tells you where the contract is and states the facts the schema itself cannot.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 
 ## 1. The surface in one paragraph
 
-apid serves HTTPS on port 443 (port 80 redirects) and `/api` is the complete
+apid serves plain HTTP on port 8080 by default, and HTTPS on 8443 once it is
+turned on (`PUT /api/v1/web`; HTTP then only redirects), and `/api` is the complete
 management protocol: versioned settings and state reads, typed writes, queued
 task records, setup and session lifecycle, UI selection, live network
 observation, update state and system actions. Errors are JSON envelopes.
@@ -20,7 +21,7 @@ only that the apid process is listening — not that micad or anything else is
 healthy. The built-in browser UI at `/_ui/` is an ordinary client of the same
 API, with no privileged side channel.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/remote-management.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/remote-management.md`
 
 ## 2. Authentication
 
@@ -37,7 +38,7 @@ unauthenticated operations; everything that reads or changes appliance state
 requires one of the credentials above. Login attempts are rate-limited with
 persistent backoff and audited ([security.md](security.md)).
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/access.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/access.md`
 
 ## 3. Versioning
 
@@ -48,7 +49,7 @@ committed document matches the binary. Breaking changes do not require a
 second version router or an adapter under this development policy
 ([doc-contract.md](doc-contract.md)).
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/api.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/api.md`
 
 ## 4. What is not a public API
 
@@ -62,7 +63,7 @@ second version router or an adapter under this development policy
 - **`/_ui` and custom UI assets** are static content, not contract; a custom
   bundle cannot shadow `/api` routes.
 
-> status: shipped — evidence: `docs/design/bus.md`, `mica-core:dist/`
+> status: shipped — evidence: `docs/design/bus.md`, `mica-core:crates/micad/dist/`
 
 ## 5. Trying it
 
@@ -74,4 +75,4 @@ surface behaves end to end, including TLS, redirects and auth gating:
 bash micad:tests/suites/apid-api/run.sh
 ```
 
-> status: shipped — evidence: `mica-core:tests/apid-api/run.sh`
+> status: shipped — evidence: `mica-build:tests/suites/apid-api/run.sh`

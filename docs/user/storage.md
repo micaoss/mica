@@ -41,7 +41,7 @@ identity and retained lifecycle/deployment records. OS rollback does not undo
 writable application data. Full reflash replaces the current image contents;
 it is not a secure erase of every physical sector beyond the image.
 
-> status: shipped — evidence: `mica-core:micad/src/storage_status.rs`, `mica-core:micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
+> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
 
 ## Failure
 

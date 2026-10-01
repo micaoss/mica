@@ -59,7 +59,7 @@ supported until superseded plus an overlap stated in its own release notes,
 per-board support bounded by the board's qualification, EOL announced with a
 notice period — and lives in the security lifecycle record.
 
-> status: shipped — evidence: `docs/design/release-artifacts.md`, `docs/design/security-lifecycle.md`
+> status: shipped — evidence: `mica-build:README.md`, `docs/design/security-lifecycle.md`
 
 **The site may not print a window, a date or an advisory-coverage promise.**
 No tooling binds a window to a release, no release is published for one to
@@ -78,4 +78,4 @@ set and the booted deployment. A bounded, redacted diagnostic snapshot can be
 collected and downloaded to attach to the case; the device never uploads it
 anywhere.
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`

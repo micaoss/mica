@@ -84,7 +84,7 @@ authenticated kernel package and boot anchors from its firmware trust domain.
 There is no `system.gitStamp` and no `system.commitDate` (decided 2026-09-15,
 `docs/decisions/2026-09-15-stable-component-ids.md`; implemented in
 `mica-core` since `20260915-1135`): package versions carry no commit
-(`docs/decisions/2026-09-15-package-versions.md`), and the root carries no
+(`mica-build-tools:docs/spec/package-versions.md`), and the root carries no
 `/usr/share/mica/release-identity.env`, so a release that changes nothing in
 the root keeps its rootfs identity. The release identity of the running
 image is the `deployment` member (`version`, `generation`), read from the
@@ -93,7 +93,7 @@ authenticated boot receipt.
 `daemon` has no `commit` either (decided 2026-09-15; implemented in
 `mica-core` since `20260915-1135`, where `micad --version` prints
 `micad 0.1.0-1`): `mica-core` removes `MICA_BUILD_COMMIT`
-(`docs/decisions/2026-09-15-package-versions.md` R3), so `daemon.version` and
+(`mica-build-tools:docs/spec/package-versions.md` R3), so `daemon.version` and
 `micad --version` show the declared package version, such as `0.1.0-1`, and
 no commit is compiled into the binary.
 
@@ -234,7 +234,7 @@ validation belongs to section 10.
 ## 5. The snapshot schema
 
 A snapshot is one JSON document. `schemaVersion` names its shape (the
-current value is `SCHEMA_VERSION` in `mica-core:apid/src/diagnostics.rs`) and
+current value is `SCHEMA_VERSION` in `mica-core:crates/mica-apid/src/diagnostics.rs`) and
 is bumped when a member changes; a reader that does not know the version it sees
 should treat the members it does know as advisory.
 
@@ -359,7 +359,7 @@ its failure is a `failed`/`timeout` result, not a failed collection.
 
 ## 8. API routes
 
-The HTTP contract is `mica-core:apid/openapi.json`, which CI holds equal to
+The HTTP contract is `mica-core:crates/mica-apid/openapi.json`, which CI holds equal to
 what the shipped binary prints; the table below is the summary.
 
 | Route | Auth | Answers |

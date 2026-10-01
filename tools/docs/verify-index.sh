@@ -9,7 +9,6 @@
 #   docs/hardware/*.md  <->  docs/README.md
 #   docs/website/*.md   <->  docs/README.md
 #   docs/boards/*.md    <->  docs/README.md
-#   docs/research/*.md  <->  docs/README.md
 #
 # SCOPE. Each catalogued directory gets one `check_readme_dir` call; a further
 # catalogued directory is one more call. `docs/plan/` and `docs/task/` are
@@ -96,13 +95,12 @@ check_readme_dir() {
     done
 }
 
-echo "tools/docs/verify-index.sh: design/ user/ website/ boards/ research/ <-> $README"
+echo "tools/docs/verify-index.sh: design/ user/ hardware/ website/ boards/ <-> $README"
 check_readme_dir design
 check_readme_dir user
 check_readme_dir hardware
 check_readme_dir website
 check_readme_dir boards
-check_readme_dir research
 # --- verdict ---------------------------------------------------------------
 if [ "$FAIL" -ne 0 ]; then
     echo "tools/docs/verify-index.sh: $FAIL FAILED, $CHECKS passed" >&2

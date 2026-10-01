@@ -1,10 +1,10 @@
 # uefi-x64：通用 amd64 UEFI 机器
 
 `uefi-x64` 不是一块板，而是一个**通用系统**：一份镜像服务于固件是 UEFI 的
-amd64 机器，按启动它的固件类命名，而不是按某台机器命名。它也是这个项目的基线——
-唯一有自动启动证据的目标。
+amd64 机器，按启动它的固件类命名，而不是按某台机器命名。它也是这个项目的基线，
+它的产品在每次发布时都会被自动启动。
 
-现状快照记于 2026-09-20。状态以英文的
+现状快照记于 2026-09-29。状态以英文的
 [支持层级表](../../boards/support-tiers.md#current-boards)为准。
 
 **它没有板卡档案。**`docs/boards/` 下有 `cx3576`、`s905x5m` 和 `uefi-arm64` 的
@@ -27,7 +27,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 
 | 功能 | 状态 | 说明 |
 |---|---|---|
-| 容器（Podman） | 随镜像发布 | `BOARD_FEATURES="containers"` |
+| 容器（Podman） | 随 `uefi-x64.full` 发布 | `BOARD_FEATURES="containers"`；`uefi-x64.basic` 不带引擎 |
 | USB 存储 | 内核内建驱动，未在实机验证 | XHCI 与 EHCI 加 `USB_STORAGE`；`USB_UAS` 未开，只支持 UAS 的硬盘盒会退回 bulk-only 或不被驱动 |
 | SATA | 内核内建驱动，未在实机验证 | AHCI 与 `ATA_PIIX` |
 | NVMe | 内核内建驱动，未在实机验证 | — |
@@ -58,10 +58,9 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 获取镜像
 
-产品是 `uefi-x64-dev` 与 `uefi-x64-prod`，文件名 `mica-uefi-x64-<profile>-<release>.img.gz`。
-
-**避开 `20260916-0845`、`20260916-1653`、`20260919-2103` 三轮**：这些镜像会在 PID 1
-关机。取 `20260919-2356` 或更新的。校验与索引用法见[获取发布版](../user/download.md)。
+产品是 `uefi-x64.basic`（默认）与 `uefi-x64.full`（带容器），各自发布为
+`uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
+校验方法见[获取发布版](../user/download.md)。
 
 ## 刷机
 
@@ -114,7 +113,7 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 | 项 | 结果 | 说明 |
 |---|---|---|
 | QEMU 生命周期（API、电源动作、重启、运行时、更新、重置） | 通过 | 支持层级表记录的验收列 |
-| 每次推送与每次发布自动启动 | 通过（自 2026-09-19） | amd64 产品启动到 guest 自己的通过标记 |
+| 每次发布时自动启动 | 是 | amd64 产品跑一轮 UEFI lifecycle 的运行阶段 |
 | 实体机器冷启动 / 写入 / 恢复 | 未测试 | 没有实机 |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

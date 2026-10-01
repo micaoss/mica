@@ -157,8 +157,8 @@ and a device secure-erase primitive are not implemented. See
 The container capability's own document says it plainly and this one must not
 be softer: **containers on this device run as root**
 (`docs/design/containers.md`). Rootless mode is not built; anything that can
-write a `.container` file into the DATA-backed Quadlet directory runs code
-with root's authority. Likewise `/usr/local/lib/systemd/system` is a
+declare a container to micad, or write the DATA-backed `container` document,
+runs code with root's authority. Likewise `/usr/local/lib/systemd/system` is a
 root-writable unit directory on DATA (`docs/design/ro-root.md` §4), so the
 set of things that start at boot is not determined by the image hash.
 

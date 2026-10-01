@@ -4,13 +4,14 @@
 kernel，或同时改变二者。设备运行时暂存已验证对象，重启后尝试候选部署；固件维护
 是独立操作。
 
-> status: shipped — evidence: `mica-deploy:src`, `mica-core:apid/src/update_api.rs`
+> status: shipped — evidence: `mica-deploy:src`, `mica-core:crates/mica-apid/src/update_api.rs`
 
 ## 安装更新
 
 System 页面展示运行部署、组件身份、候选、保留的回退部署、获取进度及重启判定。
-通过认证设置配置更新源、渠道和自动/手动策略。更新源提供签名 `/v1/manifest.json`
-目录；修改源设置不能增加签名密钥。
+通过认证设置配置更新源和自动/手动策略。更新源提供不签名的 `/v1/manifest.json` 目录；
+设备信任的是每个发布自己的签名描述符，修改源设置不能增加签名密钥。没有更新渠道：设备取的
+是它自己产品的发布。
 
 在线获取只下载缺失对象，按签名长度和摘要验证。离线 `.micaupd` 携带相同的签名
 部署及组件对象。安装接收已验证部署 ID；空间不足、无效元数据或不完整对象均阻止
@@ -30,7 +31,7 @@ System 页面展示运行部署、组件身份、候选、保留的回退部署�
 当前数据策略，不做旧布局迁移。失败部署 ID 和单调代次下限阻止自动重装已失败发布；
 修正发布必须重新签名且具有更高代次，清除显示记录不能绕过这一约束。
 
-> status: shipped — evidence: `mica-core:apid/src/update_api.rs`, `mica-core:micad/src/deployment.rs`
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/micad/src/deployment.rs`
 
 ## 固件与恢复
 

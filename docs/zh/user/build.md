@@ -3,7 +3,7 @@
 两种构建方式：**在线**，每个仓库对着自己固定的 release 构建；**离线**，并排放置的
 检出互相构建。两者产出同一个产品镜像；发布走的是在线那条路。
 
-构建背后的契约是[构建设计](../../design/build.md)，固定规则是
+构建背后的契约是[构建设计](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md)，固定规则是
 [发布锁](../../design/release-lock.md)；本页是操作者穿过它们的路径。
 
 ## 1. 前置条件
@@ -11,11 +11,11 @@
 带 buildx 的 Docker、bash、make 和 git。每一个编译器、文件系统工具和签名工具都在固定
 版本的 build-env 镜像里运行，并且有一条 lint 拒绝在宿主机上调用工具链。构建也不会从任何
 软件包归档安装东西：工具链烤进镜像，按摘要拉取
-（[决策](../../decisions/2026-09-16-toolchains-live-in-build-env.md)）。
+（[决策](https://github.com/micaoss/mica-build-env/blob/main/README.md)）。
 
 有些 target 需要特权（repart 测试）或网络（拉取池和 lock）；`make help` 会逐条说明。
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `mica-build:docs/design/image.md`
 
 ## 2. 每个仓库构建什么
 
@@ -40,11 +40,11 @@
 ```sh
 make locks-verify                 # 每个 lock 和 pin，以及它们指向的东西
 make kernels firmware             # 每块板的内核与加载器（数小时）；单块板：make <board>-kernel
-make board-pool                   # 板卡包和无线电包，两种架构
+make board-pool                   # 板卡包（以及 s905x5m 的无线电包），两种架构
 make board-fetch-all              # 每块板的 bundle：源码树、本地构建（否则取最近一次 release 的组件）
 make os-pool                      # 拉取并校验每个固定的归档，索引两个池
-make product PRODUCT=uefi-x64-dev      # 该产品的全部闭包：组合、签名、镜像、更新归档
-make product-verify PRODUCT=uefi-x64-dev
+make product PRODUCT=uefi-x64.dev      # 该产品的全部闭包：组合、签名、镜像、更新归档
+make product-verify PRODUCT=uefi-x64.dev
 ```
 
 - `make products` 构建每个板卡是发布目标的产品。
@@ -63,7 +63,7 @@ make product-verify PRODUCT=uefi-x64-dev
   里是 `make check`，`mica-system-base` 里是 `bun src/container.ts debs`，
   板卡包和无线电包在 `mica-build` 里是 `make board-pool` 加
   `make board-package-gate`）。只有声明版本被提升时软件包才会重建
-  （[软件包版本](../../decisions/2026-09-15-package-versions.md)）。
+  （[软件包版本](https://github.com/micaoss/mica-build-tools/blob/main/docs/spec/package-versions.md)）。
 - 单块板的组件：`mica-build` 里的 `make <board>-<target>` 委托给该板自己的
   `Makefile`；`make board-check` 按契约约束该板。
 - 装配用 `make board-fetch BOARD=<board>` 组装板卡的 bundle——源码树、本地的
@@ -79,7 +79,7 @@ make product-verify PRODUCT=uefi-x64-dev
 
 ```sh
 make offline-chain                       # 在 mica-build 里；MICA_WORKSPACE 默认为 ..
-make offline-chain PRODUCTS=uefi-x64-dev
+make offline-chain PRODUCTS=uefi-x64.dev
 ```
 
 它按依赖顺序在每个检出的一次性克隆里构建各个仓库，并从这些构建结果组合出产品。
@@ -110,7 +110,7 @@ make offline-chain PRODUCTS=uefi-x64-dev
   运行时阶段（不跑故障阶段）会对每个 amd64 产品自动运行——`ci.yml` 在每次推送 `main`
   和每个 pull request 上跑，`release.yml` 在发布时再跑一次。`arm64` 与 `cx3576` 没有
   任何自动启动，所以对它们而言，“某个产品能启动”带的仍是**上一次有人手工跑它的日期**
-  （[构建门](../../design/build-harness.md)）。
+  （[构建门](https://github.com/micaoss/mica-build/blob/main/README.md)）。
 - `make os-repart-test` 证明首次启动的扩容，`make os-layout-lint` 证明分区契约。
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:make product-verify`, `mica-build:make lifecycle-uefi`

@@ -67,6 +67,6 @@ because the corresponding user page exists.
 The design record under [../design/](../README.md) is the authoritative
 engineering source the user documentation is derived from; start at the
 [architecture map](../architecture.md). Integrators porting a new board start
-at [../boards/porting.md](../boards/porting.md) instead.
+at [../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md) instead.
 
 > status: shipped — evidence: `docs/architecture.md`, `docs/README.md`

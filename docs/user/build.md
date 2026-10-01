@@ -5,7 +5,7 @@ releases it pins, and **offline**, where the side-by-side checkouts build
 each other. Both produce the same product image; the online path is the one a
 release uses.
 
-The contract behind the build is [build.md](../design/build.md) and the
+The contract behind the build is [build.md](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md) and the
 pinning rules are [release-lock.md](../design/release-lock.md); this page is
 the operator's path through them.
 
@@ -15,12 +15,12 @@ Docker with buildx, bash, make and git. Every compiler, filesystem maker and
 signing tool runs inside the pinned build-env images, and a lint refuses a
 toolchain invocation on the host. A build installs nothing from a package
 archive either: the toolchains are baked into the images and pulled by digest
-([decision](../decisions/2026-09-16-toolchains-live-in-build-env.md)).
+([decision](https://github.com/micaoss/mica-build-env/blob/main/README.md)).
 
 Some targets need privileges (the repart test) or the network (fetching pools
 and locks); each says so in `make help`.
 
-> status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:Makefile`, `mica-build:make os-host-toolchain-lint`, `mica-build:docs/design/image.md`
 
 ## 2. What each repository builds
 
@@ -45,11 +45,11 @@ In `mica-build`:
 ```sh
 make locks-verify                 # every lock and pin, and what they name
 make kernels firmware             # every board's kernel and loader (hours); or one: make <board>-kernel
-make board-pool                   # the board and radio packages, both architectures
+make board-pool                   # the board packages (and s905x5m's radio packages), both architectures
 make board-fetch-all              # each board's bundle: the tree, the local build (else the latest release's component)
 make os-pool                      # fetch and verify every pinned archive, index both pools
-make product PRODUCT=uefi-x64-dev      # the product's closure: compose, sign, image, update archive
-make product-verify PRODUCT=uefi-x64-dev
+make product PRODUCT=uefi-x64.dev      # the product's closure: compose, sign, image, update archive
+make product-verify PRODUCT=uefi-x64.dev
 ```
 
 - `make products` builds every product whose board is a release target.
@@ -71,7 +71,7 @@ make product-verify PRODUCT=uefi-x64-dev
   debs` in `mica-system-base`, `make board-pool` with `make
   board-package-gate` in `mica-build` for the board and radio packages). A
   package is rebuilt only when its declared version is bumped
-  ([package versions](../decisions/2026-09-15-package-versions.md)).
+  ([package versions](https://github.com/micaoss/mica-build-tools/blob/main/docs/spec/package-versions.md)).
 - One board's components: `make <board>-<target>` in `mica-build` delegates
   to that board's `Makefile`; `make board-check` holds the board to the
   contract.
@@ -91,7 +91,7 @@ managed by `bin/mica-tools repos` (`mica-build-tools`, pinned in
 
 ```sh
 make offline-chain                       # in mica-build; MICA_WORKSPACE defaults to ..
-make offline-chain PRODUCTS=uefi-x64-dev
+make offline-chain PRODUCTS=uefi-x64.dev
 ```
 
 It builds the repositories in dependency order in throw-away clones of each
@@ -130,7 +130,7 @@ for its release while developing, instead of the pinned release.
   `main` and pull request from `ci.yml`, and again from `release.yml` when a
   release is published. No automated boot covers `arm64` or `cx3576`, so for
   those a claim that a product boots carries the date of the last hand run
-  ([harness](../design/build-harness.md)).
+  ([harness](https://github.com/micaoss/mica-build/blob/main/README.md)).
 - `make os-repart-test` proves first-boot growth, and `make os-layout-lint`
   the partition contracts.
 

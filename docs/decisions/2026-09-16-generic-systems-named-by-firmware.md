@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: `mica-boards` (the board directories, packages and releases) and `mica-build` (the products and their scopes)
 - **review sunset**: 2027-03-16
-- **status**: accepted (user, 2026-09-16); the records are renamed here; `mica-boards` and `mica-build` implement it in the same cycle as `docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`, tracked by `docs/task/20260916-0040-uefi-board-names.md`
+- **status**: accepted (user, 2026-09-16); the records are renamed here; `mica-boards` and `mica-build` implement it in the same cycle as `mica-build-tools:docs/spec/release-lock.md`, tracked by `docs/task/20260916-0040-uefi-board-names.md`
 
 ## Decision
 

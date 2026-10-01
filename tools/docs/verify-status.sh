@@ -18,10 +18,10 @@
 #   - every cited ref must exist: a repository path (file or directory), or
 #     `make <target>` where <target> is defined in the top-level Makefile --
 #     a dead evidence reference is a broken claim, not a cosmetic defect;
-#   - shipped and board-dependent REQUIRE evidence;
-#   - proposed REQUIRES at least one OPEN tracking record: a detail file
-#     `docs/plan/<id>.md` or `docs/task/<id>.md` whose index row is `[ ]` or
-#     `[-]`, so a page must be relabelled when its record completes or closes;
+#   - shipped, board-dependent and proposed REQUIRE evidence; for proposed it
+#     is the design that labels the work not implemented, or the record of the
+#     repository that will implement it (`<repository>:docs/...`). This
+#     repository keeps no task or plan records since 2026-10-01;
 #   - unsupported carries NO evidence -- the absence is the claim.
 #
 # And one meta-assertion: a scanned tree with ZERO status lines fails. The
@@ -64,15 +64,6 @@ ref_exists() {
 # to name a record that stays open forever, and a gate that fails on an example
 # teaching the format is reporting prose as a defect. Fences are
 # tracked, not stripped, so a real status line is still read anywhere else.
-# record_is_open <ref>: true when ref is docs/{plan,task}/<id>.md, the file
-# exists, and its row in that directory's index.md is pending or in progress.
-record_is_open() {
-    [[ $1 =~ ^docs/(plan|task)/([^/]+)\.md$ ]] || return 1
-    local dir=docs/${BASH_REMATCH[1]} id=${BASH_REMATCH[2]}
-    [ "$id" != index ] && [ -e "$1" ] || return 1
-    grep -qE "^- \[[ -]\] \[\*\*${id} " "$dir/index.md" 2>/dev/null
-}
-
 status_lines() {
     awk '
         /^[[:space:]]*```/ { fence = !fence; next }
@@ -81,7 +72,7 @@ status_lines() {
 }
 
 check_status_line() {
-    local file=$1 line=$2 status evidence refs_ok plan_ok ref
+    local file=$1 line=$2 status evidence refs_ok ref
     local rest=${line#> status: }
 
     if [[ $rest == *" — evidence: "* ]]; then
@@ -114,19 +105,18 @@ check_status_line() {
 
     if [ -z "$evidence" ]; then
         case "$status" in
-            shipped|board-dependent)
+            shipped|board-dependent|proposed)
                 fail "$file: $status requires evidence -- '$line'"; return ;;
         esac
     fi
 
     refs_ok=1
-    plan_ok=0
     while IFS= read -r ref; do
         ref=${ref#\`}; ref=${ref%\`}
         # A citation into another Mica OS repository (`<repository>:<path>` or
         # `<repository>:make <target>`): the code lives there, not here, so the
         # reference is accepted by shape; that repository's own gates prove it.
-        if [[ $ref =~ ^(mica-build|mica-build-env|mica-debian|mica-boot|mica-boards|mica-core|mica-deploy|mica-podman|mica-system|mica-system-base):.+$ ]]; then
+        if [[ $ref =~ ^(mica-build|mica-build-env|mica-build-tools|mica-debian|mica-boot|mica-boards|mica-core|mica-deploy|mica-podman|mica-res|mica-system|mica-system-base):.+$ ]]; then
             ok; continue
         fi
         if ref_exists "$ref"; then
@@ -135,12 +125,9 @@ check_status_line() {
             refs_ok=0
             fail "$file: evidence '$ref' does not exist -- '$line'"
         fi
-        record_is_open "$ref" && plan_ok=1
     done < <(grep -oE '`[^`]+`' <<<"$evidence" || true)
 
-    if [ "$status" = proposed ] && [ "$plan_ok" -eq 0 ]; then
-        fail "$file: proposed requires an open docs/plan/ or docs/task/ record ref -- '$line'"
-    elif [ "$refs_ok" -eq 1 ]; then
+    if [ "$refs_ok" -eq 1 ]; then
         ok
     fi
 }

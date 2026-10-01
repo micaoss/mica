@@ -25,13 +25,13 @@ The tier definitions, the qualification matrix and the intake rubric are
 published with the BSP documentation: the tiers in
 [../boards/support-tiers.md](../boards/support-tiers.md), the matrix and its row
 grammar in [../boards/qualification.md](../boards/qualification.md), the vendor
-rubric in [../boards/intake.md](../boards/intake.md). The vocabulary existing is not
+rubric in [../boards/intake.md](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md). The vocabulary existing is not
 a board having earned a tier: no board is mica-qualified today, because the one
 dossier on file carries every qualification row as `not tested`, so today's
 boards hold their standing by the evidence in this repository rather than by a
 completed dossier.
 
-> status: shipped — evidence: `docs/boards/support-tiers.md`, `docs/boards/qualification.md`, `docs/boards/intake.md`
+> status: shipped — evidence: `docs/boards/support-tiers.md`, `docs/boards/qualification.md`
 > status: board-dependent — evidence: `docs/boards/cx3576.md`
 
 ## 2. Current hardware standing
@@ -42,11 +42,11 @@ completed dossier.
 | uefi-x64 (generic UEFI x86_64) | the QEMU and CI baseline | supported as a development and verification target, not a product board |
 
 Integrators bringing their own hardware start at
-[../boards/porting.md](../boards/porting.md); the board contract itself (artifact
+[../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md); the board contract itself (artifact
 boundary, kernel assertion set, layout schema) is shipped and enforced by the
 build.
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/README.md`
 
 ## 3. Lifecycle ownership
 

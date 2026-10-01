@@ -48,10 +48,10 @@ being a statement rather than an omission.
 
 - For each input tree: upstream repository, relationship (mirror / subtree /
   drifted derivative), pinned commit, and a link to the sync record where
-  one exists (practice: [intake.md](intake.md) section 6).
+  one exists (practice: [intake.md](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md) section 6).
 - Vendor blobs in the boot chain: source repository and version per blob.
 - Input class per deliverable (source / source + blobs / binary-only /
-  Yocto-only, per [intake.md](intake.md)).
+  Yocto-only, per [intake.md](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md)).
 
 ### Supported revisions
 
@@ -117,7 +117,7 @@ being a statement rather than an omission.
 ### Artifact digests
 
 - For every binary-only or blob input accepted at intake: sha256 of the
-  exact accepted bytes, plus the vendor version ([intake.md](intake.md)
+  exact accepted bytes, plus the vendor version ([intake.md](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md)
   section 5).
 - For pinned source trees: the pinned commit hashes (these are the
   provenance digests; per-release image/bundle digests live in the release's

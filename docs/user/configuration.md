@@ -17,7 +17,7 @@ configuration as three layers:
 1. **Layer 1 — first-boot self-provisioning.** From empty DATA/state the device
    seeds identity, hostname, secrets and defaults, offline, exactly once.
    Shipped; described in [first-run.md](first-run.md).
-2. **Layer 2 — local configuration channels.** The authenticated HTTPS API
+2. **Layer 2 — local configuration channels.** The authenticated API
    and built-in UI support live changes. A validated provisioning document on
    the boot medium or removable media configures an unclaimed device offline.
    An integrator can also prepare the documented `/mica/config/` files while
@@ -27,13 +27,13 @@ configuration as three layers:
    the supported configuration keys; they cannot replace the signing keys.
    This is not a general factory credential-injection toolchain.
 
-> status: shipped — evidence: `docs/design/provisioning.md`, `mica-core:micad/`
+> status: shipped — evidence: `docs/design/provisioning.md`, `mica-core:crates/micad`
 
 ## 2. Online configuration: the API and the built-in UI
 
-Online configuration reads and writes go over HTTPS to apid — through the
+Online configuration reads and writes go to apid — over HTTP on 8080, or HTTPS on 8443 once enabled — through the
 built-in UI at `/_ui/` or the JSON API under `/api/v1` (contract:
-`mica-core:apid/openapi.json`, see [api.md](api.md)). apid owns browser sessions and API support state; it forwards settings
+`mica-core:crates/mica-apid/openapi.json`, see [api.md](api.md)). apid owns browser sessions and API support state; it forwards settings
 changes to micad over the local system bus, where the write is
 validated against the typed schema. A rejected write leaves the tree
 untouched, and a settings write returns a task you can observe until the
@@ -55,7 +55,7 @@ that tier is a settings action and not a lockout. Read
 address goes back too, and where the image names no server that leaves the
 device with none.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/micad.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/micad.md`
 
 ## 3. What is configurable today
 
@@ -80,7 +80,7 @@ The settings tree currently models, per subtree:
 - **power actions and update actions** — not settings, but reachable over the
   same authenticated surface.
 
-**Update settings are not in this tree.** The update mode, channel, server
+**Update settings are not in this tree.** The update mode, server
 address, maintenance windows and network mode live in their own document,
 `/mica/config/updates.json`, beside the ones above rather than inside the
 settings schema. They have their own route —
@@ -89,9 +89,9 @@ and the built-in UI's automatic-updates panel drives it.
 [update-rollback.md](update-rollback.md) is what each one does.
 
 The authoritative list is the API contract, not this prose: what
-`mica-core:apid/openapi.json` accepts is what the device supports.
+`mica-core:crates/mica-apid/openapi.json` accepts is what the device supports.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `mica-core:micad-settings/`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `mica-core:crates/micad-settings`
 
 WiFi presence is board-dependent: the cx3576 carries WiFi and Bluetooth; the
 uefi-x64 QEMU baseline has no radio.
@@ -105,8 +105,7 @@ The root filesystem is a verity-protected read-only squashfs. There is no
 outright or lands in memory and vanishes on reboot. Anything that must persist
 must be modelled in the settings tree and exposed by the API — if the API
 cannot set it, the appliance does not support persisting it. The deliberate
-exceptions (paths bound onto DATA, such as `/etc/ssh` or the Quadlet
-directory) are enumerated in the design record, and integrator files, scripts
+exceptions (paths bound onto DATA, such as `/etc/ssh`) are enumerated in the design record, and integrator files, scripts
 and data belong on DATA ([storage.md](storage.md)).
 
 > status: shipped — evidence: `docs/design/access.md`, `docs/design/ro-root.md`
@@ -144,7 +143,7 @@ Nothing on this page depends on the RTC being there — that is what the saved
 floor is for — but a device that keeps time across a long power-off has not
 been demonstrated.
 
-> status: shipped — evidence: `docs/design/time.md`, `mica-core:micad/src/time_status.rs`
+> status: shipped — evidence: `docs/design/time.md`, `mica-core:crates/micad/src/time_status.rs`
 
 > status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
 
@@ -156,7 +155,7 @@ name, whole-document validation, applied once and recorded, over two offline
 transports ([first-run.md](first-run.md)). It is the repeatable path for
 configuring a device that has never had a network.
 
-> status: shipped — evidence: `docs/design/provisioning.md`, `mica-core:micad/src/provisioning_doc.rs`
+> status: shipped — evidence: `docs/design/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`
 
 **Three of the five channels the design lists do not exist**, and each is an
 absence to plan around rather than work in progress: the AP captive portal has

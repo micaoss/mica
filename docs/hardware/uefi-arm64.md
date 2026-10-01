@@ -71,11 +71,9 @@ framebuffer, so `console=tty0` would name a console with no device behind it.
 
 ## Obtaining an image
 
-The products are `uefi-arm64-dev` and `uefi-arm64-prod`.
-
-**Avoid `20260916-0845`, `20260916-1653` and `20260919-2103`**: those images
-power down at PID 1 after the board rename, because the pinned client did not
-follow. Take `20260919-2356` or newer.
+The products are `uefi-arm64.basic` (the default) and `uefi-arm64.full`
+(with containers), each released as `uefi-arm64.<variant>.<YYYYMMDD-HHMM>` with
+the image `mica-uefi-arm64.<variant>-<YYYYMMDD-HHMM>.img.gz`.
 
 ## Flashing
 
@@ -94,7 +92,7 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot 
 The guest has to provide a PL011 console and only one, the i6300esb watchdog,
 an RTC through PL031 or EFI, and an enabled ACPI button so that a host's
 graceful shutdown request reaches the guest. The whole acceptance run is one
-target, `make lifecycle-uefi PRODUCT=uefi-arm64-dev`; importing an offline
+target, `make lifecycle-uefi PRODUCT=uefi-arm64.dev`; importing an offline
 update over 9p is in [flashing](../user/flashing.md) section 4.
 
 **Onto a physical arm64 machine (unverified)**: as for `uefi-x64` — a
@@ -157,4 +155,4 @@ firmware, and a freshly assembled three-partition image.
 | Radios and fieldbus | N/A | this board declares none |
 | Physical recovery action | N/A | no physical presence assertion |
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`

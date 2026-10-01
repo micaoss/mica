@@ -26,7 +26,7 @@ The application inventory contains four source classes:
 | System | Native code in the immutable OS image | Observe only; Native signed deployments own update and rollback |
 | Catalog | A release from the vendor-curated signed catalog | Full managed lifecycle |
 | Local trusted | A release signed by a device-enrolled integrator key | Full managed lifecycle when this opt-in capability exists |
-| External/unmanaged | A discovered service, handwritten Quadlet or unit | Observe only; never adopt, update or remove |
+| External/unmanaged | A discovered service, a hand-declared container or unit | Observe only; never adopt, update or remove |
 
 The source class is independent of runtime kind. A managed artifact has kind
 `oci` or `native`; neither kind alone proves its source or safety.
@@ -42,7 +42,7 @@ The managed contract therefore has these non-negotiable rules:
 
 1. Catalog releases are signed and artifacts are pinned by digest. Unqualified
    image names and mutable tags are not admission inputs.
-2. The service, UI and public API never accept a raw systemd unit, Quadlet
+2. The service, UI and public API never accept a raw systemd unit, container declaration
    file, shell command or arbitrary absolute host path.
 3. A native catalog bundle carries a declarative runtime manifest. The manager
    generates a namespaced, hardened `mica-app-<id>.service` from that manifest.
@@ -148,7 +148,7 @@ The manager owns:
 - signature, digest, manifest, path and size verification at each privilege
   boundary;
 - the installed registry and active revision pointer;
-- generated, namespaced Quadlet/systemd definitions;
+- generated, namespaced container declarations and systemd definitions;
 - systemd operation and normalized runtime/health observations;
 - update health gates, last-known-good rollback and garbage collection;
 - resource-conflict admission, maintenance interlock and an audit projection.
@@ -178,7 +178,7 @@ configured/missing status.
 ## 7. Planned HTTP contract
 
 This section is the design input for a future OpenAPI change. None of these
-routes is current until it appears in `mica-core:apid/openapi.json` and the
+routes is current until it appears in `mica-core:crates/mica-apid/openapi.json` and the
 binary contract gate passes.
 
 ### 7.1 Read surfaces

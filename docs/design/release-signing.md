@@ -11,11 +11,13 @@ mappings. No earlier update format or mutable command-line trust input is read.
 |---|---|---|
 | UKI/FIT | Kernel, initramfs, fixed policy, and DTB where applicable | UEFI or the required-signature U-Boot control FDT |
 | Root/support image | PKCS#7 signature over the root hash; signed metadata binds full geometry, hash, length and signature bytes | Kernel dm-verity and native metadata verifier |
-| Deployment | `mica/deployment/v2` (replaces v1), product/board/arch/generation/version and complete kernel/root identities; the signed `product` field (such as `uefi-x64-dev`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
-| Catalog | `mica/catalog/v2` (replaces v1), revision, validity interval, deployment associations and channel heads `{board, product, channel, releaseId, generation}` keyed by board, product and channel | Acquisition client |
+| Deployment | `mica/deployment/v3` (v2 still read), product/board/arch/generation/version, complete kernel/root identities and the core components; the signed `product` field (such as `uefi-x64.basic`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
+| Core component | `mica/core/v1`, one per package (`micad`, `mica-apid-ui`): a verity image signed with the content key, its root's interface level and its needs | Early init, which composes it over the root |
+| Catalog | `mica/catalog/v3`, **unsigned**: releases and one head per board and product; trust is each release's signed descriptor | Acquisition client |
 | Firmware | `mica/firmware/v1`, board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
 
-The components themselves are `mica/kernel/v1` and `mica/rootfs/v2`, and a
+The components themselves are `mica/kernel/v1`, `mica/rootfs/v3` (`v2` still
+read) and `mica/core/v1`, and a
 published update travels in a `mica/update-envelope/v1` envelope.
 
 **These payloads are addition-closed for readers already deployed, and the
@@ -49,7 +51,7 @@ implemented in `mica-core` since its release `20260915-1135`, which refuses v1
 or a `version` field, and written by `mica-build` since `fe3ad07`). `mica/deployment/v2` and `mica/catalog/v2` were decided on
 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and implemented
 in `mica-core` since its release `20260915-0728` (`2a4c98d`,
-`mica-core:docs/task/20260915-0657-update-packages.md`); `mica-build` writes
+`mica-core:docs/mica-core.md`); `mica-build` writes
 them since `0094a097` (not released yet).
 
 The Ed25519 envelope format is shared by Rust and Bun: its keys are ordered
@@ -68,7 +70,7 @@ from the descriptor's. One signed deployment therefore ships as `full`,
 `root` and `kernel` archives with the same descriptor.
 
 Metadata trust resides in authenticated kernel policy. Public factory update
-settings select a source/channel and policy; they cannot replace anchors.
+settings select a source and policy; they cannot replace anchors.
 Installed boot does not depend on downloading an unexpired catalog. Catalog
 freshness and monotonic revision checks apply when acquiring a new release.
 

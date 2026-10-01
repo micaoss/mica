@@ -73,8 +73,8 @@ release-target.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/board.env	BOARD_
 release-target.uefi-arm64	line	micaoss/mica-build:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.cx3576	line	micaoss/mica-build:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 release-target.s905x5m	line	micaoss/mica-build:boards/s905x5m/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
-index-tag-form	newest-tag	micaoss/mica-build:mica	^mica[.][0-9]{8}-[0-9]{4}$	docs/design/release-artifacts.md
-logo-policy-is-cx3576s	line	micaoss/mica-build:boards/cx3576/package/overlay/etc/systemd/logind.conf.d/50-mica-console.conf	NAutoVTs=0	docs/design/access.md
+release-target.mini-x64	line	micaoss/mica-build:boards/mini-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
+logo-policy-in-mica-systemd	line	micaoss/mica-system-base:debs/mica-systemd/payload/etc/systemd/logind.conf.d/50-mica-console.conf	NAutoVTs=0	docs/design/access.md
 #
 # The container-ceiling rows below are the claims docs/design/containers.md 8
 # makes about another repository's kernel configuration. The absence rows are
@@ -123,18 +123,10 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uef
 # already exactly what locks/ named, so "mica-build cannot re-pin, there is
 # nothing to re-pin to" was true and invisible.
 #
-# THEY FIRED TWENTY MINUTES LATER, WHICH IS THE ONLY TEST OF A ROW THAT
-# MATTERS. All four boards were released at 20260920-1536 from one commit,
-# 2bfa259e; these rows went red and the pin rows below stayed green, which is
-# exactly what the prediction table in containers.md 8 said would happen at
-# this step and not at the next one. The expectations are moved to the new
-# tags; they go red again at the next release, and a red here with the pin
-# rows still green means the same thing it meant today: mica-build now CAN
-# re-pin, and until it does the products carry the older kernels.
-board-release.uefi-x64	newest-tag	micaoss/mica-build:uefi-x64	^uefi-x64[.]20260920-0622$	docs/design/containers.md
-board-release.uefi-arm64	newest-tag	micaoss/mica-build:uefi-arm64	^uefi-arm64[.]20260920-0622$	docs/design/containers.md
-board-release.cx3576	newest-tag	micaoss/mica-build:cx3576	^cx3576[.]20260920-0622$	docs/design/containers.md
-board-release.s905x5m	newest-tag	micaoss/mica-build:s905x5m	^s905x5m[.]20260920-0622$	docs/design/containers.md
+# REMOVED 2026-09-29: the board-release rows named each board's newest tag
+# (`<board>.<stamp>`). A release is one product now, `<board>.<variant>.<stamp>`,
+# and the board tags they named were deleted on 2026-09-28, so there is no
+# per-board tag left to watch (docs/design/containers.md 8).
 #
 # The floor itself is now more than one symbol, and these rows are the shape of
 # the decision rather than of a scatter: PSI and IOCOST are ON for every board

@@ -6,14 +6,18 @@
 
 ## 1. What reaches the device today — **[implemented]**
 
-**apid, on the LAN, over HTTPS.** `mica-core:dist/apid.service` starts
-`/usr/bin/apid` after `micad.service`. It binds an HTTPS listener (default
-`0.0.0.0:443`) and a redirect-only HTTP listener (default `0.0.0.0:80`), both
-configured in `mica-core:apid/src/config.rs`. There is no other protocol or
-port.
+**apid, on the LAN.** apid is micad's executable under the name `mica-apid`,
+in micad's core component, enabled on both inits. It listens where the
+`access.web` setting says (`GET`/`PUT /api/v1/web`, the console's access page):
+by default plain HTTP on `0.0.0.0:8080` and no HTTPS, so it takes neither 80
+nor 443 from another service. With `httpsEnabled` it serves HTTPS on
+`httpsPort` (default 8443) with a per-device self-signed identity, which an
+operator may replace with an uploaded chain, and the HTTP port then only
+redirects; the session cookie is `Secure` exactly then. There is no other
+management protocol or port (`mica-core:docs/mica-core.md` section 4).
 
 **The API is the gate.** apid reserves `/api`, `/_ui`, `/healthz` and `/`
-before the custom-bundle fallback (`mica-core:apid/src/routes.rs`). The static
+before the custom-bundle fallback (`mica-core:crates/mica-apid/src/routes`). The static
 SPA is always readable; appliance data is not. Each management API handler
 requires a stored bearer token or a signed browser session, and a
 session-authenticated mutation also requires its random `X-CSRF-Token`. Setup
@@ -23,10 +27,10 @@ proves listener liveness only.
 **The JSON API under `/api` is the complete management protocol**: versioned
 settings and state reads, typed writes and collections, queued task records,
 setup and session lifecycle, UI selection, live network observation and system
-actions. Its generated contract is `mica-core:apid/openapi.json`.
+actions. Its generated contract is `mica-core:crates/mica-apid/openapi.json`.
 
 **apid owns no state; it is a client of micad** over D-Bus
-(`mica-core:apid/src/bus_client.rs`). micad holds the tree as `com.mica.micad`;
+(`mica-core:crates/mica-apid/src/bus_client.rs`). micad holds the tree as `com.mica.micad`;
 apid never spawns a process and never talks to systemd itself.
 
 **SSH and the console are access channels, not management channels**, and
@@ -45,51 +49,53 @@ leaves an appliance without a support story or with an attack surface its
 owner did not choose. That forces a device-initiated channel — the device dials
 out and management rides back over the connection it opened.
 
-## 3. Fleet protocol — designed, **[not implemented]**
+## 3. Fleet management — **[not part of the published product]**
 
-The device-to-plane v1 protocol is designed in
-[`docs/plan/20260910-1910-fleet-device-plane-protocol.md`](../plan/20260910-1910-fleet-device-plane-protocol.md):
-off by default, outbound-only, trust-on-first-use registration, allowlisted
-registration and report payloads, and separate consent for reporting. micad's
-first-boot device identity (`mica-core:micad/src/identity.rs`) is what
-enrollment binds to. The runtime — registration, renewal, revocation, a durable
-report queue and the plane service — is tracked by
-[`docs/task/20260912-2058-fleet-runtime.md`](../task/20260912-2058-fleet-runtime.md),
-which also moves the protocol into `docs/design/`.
+No fleet plane ships with Mica OS and no released image enrolls with one. The
+baked defaults carry a `fleet` block that is off (`enabled: false`, no `url`),
+and nothing in a released root reads it. Any future channel must hold the
+invariants of section 5.
 
 ## 4. Update control flow
 
-The implemented local path is signed catalog check, missing-object acquisition,
-verified deployment staging, native installation, reboot and health confirmation.
-`mica-deploy` authenticates current contracts and serializes installation with
-collection/reset. micad exposes the lifecycle over D-Bus; apid and the built-in
-System page show candidate/current/fallback identities and distinct acquisition,
-installation, reboot and confirmation states. There is no old backend or bundle
-path accepted by the native installer.
+The implemented path is catalog check, missing-object acquisition, verified
+deployment staging, native installation, reboot and health confirmation.
+`mica-deploy` authenticates every deployment descriptor against the keys in the
+signed kernel and serializes installation with collection and reset. micad
+exposes the lifecycle over D-Bus; apid and the console show the candidate,
+current and fallback identities and the acquisition, installation, reboot and
+confirmation states.
 
-The source is an operator setting, seeded from public factory defaults and
-changed through the authenticated API. It names `/v1/manifest.json`; changing a
-source or channel cannot change the metadata anchors embedded in authenticated
-boot policy. Offline `.micaupd` import converges on the same verified workspace.
-The catalog's freshness/replay checks apply to acquisition, not installed offline
-boot. Firmware artifacts have a separate publication and offline maintenance
-flow, outside ordinary OS updates.
+The server catalog, `mica/catalog/v3` at `<source>/v1/manifest.json`, is
+**unsigned** canonical JSON listing releases and one head per board and
+product. Trust comes from each release's own signed descriptor: a device takes
+only its own board, architecture and product, only a generation above the one
+it runs, and only the objects that descriptor names, fetched from
+`<source>/v1/objects/<sha256>`. There is no channel and no expiry; a withheld
+catalog reads as "nothing newer". The source is an operator setting
+(`/mica/config/updates.json`, `mica/update-config/v2`), seeded from the baked
+`mica/meta/v2` defaults (`source`, `policy`, `checkIntervalMinutes`); changing
+it cannot change the anchors embedded in the signed boot policy. Offline
+`.micaupd` import converges on the same verified workspace
+(`mica-core:docs/mica-core.md` section 6.2).
+
+The update plane devices are meant to read is `mica-res`'s `res.micaos.dev/v1`
+(`mica-res:docs/modules/resource.md`): the producer posts each release there and
+res serves the current release of each product. Releases are not posted there
+yet, so a device's source has to be set to a server the operator runs.
 
 Automatic policy uses the device's configured schedule, maintenance window and
 reboot policy. Reboot gating prevents an unrelated reboot from discarding an
-unsettled update; override is explicit and audited. Native contract, policy and
-API tests exist, with uefi-x64 and uefi-arm64 guest evidence; physical board
-evidence is tracked in [support tiers](../boards/support-tiers.md#current-boards).
-See [updates](updates.md) for exact routes and failure semantics.
+unsettled update; override is explicit and audited. See [updates](updates.md)
+for exact routes and failure semantics.
 
-There is still no outbound fleet-management connection or remote fleet trigger.
-The API is an authenticated inbound management surface. A future fleet channel
-must invoke the same verified deployment policy and cannot bypass signature,
-board, capacity, retained-fallback or reboot checks.
+There is no outbound fleet-management connection or remote fleet trigger. A
+future one must invoke the same verified deployment policy and cannot bypass
+signature, board, capacity, retained-fallback or reboot checks.
 
 ## 5. Security posture
 
-**Exposed today — [implemented].** apid on the LAN is the entire inbound
+**Exposed today — [implemented].** apid on the LAN, on 8080 (and 8443 once HTTPS is on), is the entire inbound
 management surface. `/_ui` and custom UI assets are public static code on that
 origin; every appliance operation and datum is protected by the `/api`
 credential boundary described in section 1.
@@ -107,4 +113,4 @@ an independent credential domain; compromise of one grants nothing in another.
 An apid session is not an enrollment credential, an enrollment credential is
 not a root shell, and an endpoint holding a fleet's channel credentials must
 not thereby hold the keys that authorise an image — the update trust anchor is
-already a separate key hierarchy (`mica-deploy:README.md`) and stays one.
+already a separate key hierarchy (`mica-core:crates/mica-deploy`) and stays one.

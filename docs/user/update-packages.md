@@ -17,44 +17,44 @@ output is not quoted where nobody has seen it.
 
 > status: unsupported
 
-## 1. One deployment, three archives
+## 1. One deployment, up to four archives
 
-Each product release has one signed deployment, published as up to three
+Each product release has one signed deployment, published as up to four
 `MICAUPD1` archives that carry the same descriptor:
 
 | Kind | File | Published when |
 |---|---|---|
-| `full` | `mica-<product>-<stamp>.micaupd` | always |
-| `root` | `mica-<product>-<stamp>.root.micaupd` | the kernel identity is unchanged from the product's previous release |
-| `kernel` | `mica-<product>-<stamp>.kernel.micaupd` | the rootfs identity is unchanged |
+| `full` | `mica-<board>.<variant>-<stamp>.micaupd` | always |
+| `root` | `mica-<board>.<variant>-<stamp>.root.micaupd` | the kernel identity is unchanged from the product's previous release |
+| `kernel` | `mica-<board>.<variant>-<stamp>.kernel.micaupd` | the rootfs identity is unchanged |
+| `core` | `mica-<board>.<variant>-<stamp>.core.micaupd` | a core release: the previous release's kernel and root with new core components (`release.yml -f core=true`) |
 
 When both changed, only `full` is published. A round that publishes only
 `full` archives can mean either of two opposite things, and both are the
-format working: **everything compared moved** — `20260919-2356` is full-only
-for all six products because `mica-deploy` is in every root and
-`mica-lifecycle` ships the `mica-runkit` packed into the initramfs as `/init`,
-part of the authenticated kernel identity, so both ids moved everywhere — or
-**there is nothing to compare against**, which is what a board's first release
-looks like, as `s905x5m.20260920-0033` did on 2026-09-20. Both pairings are
-visible in one file: the index `mica.20260920-0046` carries eight products and
-every archive in it is `full`, six for the first reason and two for the
-second. A full-only round is not evidence of a defect in either case; what
-distinguishes them is whether a previous release exists. The `root` case first ran on
+format working: **everything compared moved** — a new `mica-core` release
+moves both, because `mica-deploy` is in every root and `mica-lifecycle` ships
+the `mica-runkit` packed into the initramfs as `/init`, part of the
+authenticated kernel identity — or **there is nothing to compare against**,
+which is what a product's first release looks like, as every product's first
+release under the `<board>.<variant>` names does. A full-only release is not
+evidence of a defect in either case; what distinguishes them is whether a
+previous release of the product exists. The `root` case first ran on
 real releases on 2026-09-16, on all six products at once and against the
-devices that exist
-([record](../task/20260916-1653-root-only-archive.md)). A `root` archive carries the
+devices that exist. A `root` archive carries the
 rootfs objects, a `kernel` archive the boot artifact and the support image
 with its modules and firmware; the objects they leave out must already be on
 the device, which is why each states what it requires. Update archives are not
 compressed. The suffixes are a naming convention of the producing side — the
 client reads the `MICAUPD1` header, not the file name.
 
-**Answered: the kinds are computed over the root and kernel identities only,
-and the bootloader is in no archive kind at all.** An archive packs a signed
-descriptor and exactly two object families — the kernel (`boot.efi` or
-`boot.itb`, `support.img`, `support.roothash.p7s`) and the root (`rootfs.img`,
-`rootfs.roothash.p7s`). `full` is both, `root` omits the kernel objects,
-`kernel` omits the root objects, and there is no third family. The firmware is
+**Answered: the bootloader is in no archive kind at all.** An archive packs
+a signed descriptor (`mica/deployment/v3`) and up to three object families —
+the kernel (`boot.efi` or `boot.itb`, `support.img`, `support.roothash.p7s`),
+the root (`rootfs.img`, `rootfs.roothash.p7s`) and the core components (each
+`core.img` with its signed root hash: `micad` and the console). `full` is all
+of them, `root` the root's, `kernel` the kernel's and `core` the core
+components' alone; a core-only update runs over the root the device already
+has, provided the root's interface level is one the components run on. The firmware is
 not a member of the deployment descriptor and enters the **factory image**
 only, so a moved U-Boot changes no archive byte, can never force a `full`
 archive, and cannot suppress a `root` or a `kernel` package.
@@ -122,8 +122,8 @@ disagree with them; there is no user-space trust override.
 ```sh
 mica-deploy probe                                   # workspace readiness and free space
 mica-deploy import /path/to/mica-<product>-<stamp>.micaupd
-mica-deploy check  --source <origin> --channel stable|beta|dev
-mica-deploy fetch  --source <origin> --channel stable|beta|dev
+mica-deploy check  --source <origin>
+mica-deploy fetch  --source <origin>
 mica-deploy install /mica/updates/verified/<id>.json --objects /mica/updates/verified/objects
 mica-deploy status | mica-deploy booted             # what is running
 mica-deploy confirm | mica-deploy rollback | mica-deploy reject <id>
@@ -240,35 +240,33 @@ No commit hash and no build date is a device-visible fact any more:
 and package versions carry neither
 ([stable component ids](../decisions/2026-09-15-stable-component-ids.md)).
 
-Map a deployment id back to a release with the index:
+Map a deployment id back to a release with the `product` row of that
+release's lock:
 
 ```sh
-jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json
+awk -F'\t' '$1 == "product" {print $2, $5, $6}' mica-build.lock   # product, generation, deployment id
 ```
 
-> status: shipped — evidence: `mica-core:crates/micad/src/system_info.rs`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-stable-component-ids.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/system_info.rs`, `docs/design/release-lock.md`, `docs/decisions/2026-09-15-stable-component-ids.md`
 
-## 9. Picking a file from the index
+## 9. Picking a file from a product's release
 
-The version index `mica.<YYYYMMDD-HHMM>` of `micaoss/mica-build` is the one
-place that names every published product's newest artifacts. In
-`mica-index.json`, each product carries:
+Each product releases on its own, as `<board>.<variant>.<YYYYMMDD-HHMM>` of
+`micaoss/mica-build`; the newest is the one to take ([download](download.md)).
+Its `mica-build.lock` names what the device compares against:
 
-- `generation`, `deployment`, `kernel` and `rootfs`: the identities to compare
-  with the device;
-- `updates[]`: one entry per archive with `kind`, `file`, `url`, `sha256`,
-  `size` and `requires`, where `requires.generationBelow` is the archive's
-  generation, and `requires.kernel` or `requires.rootfs` names the component
-  the archive does not carry;
-- `images[]`: the same for the disk images, with the compression and the
-  uncompressed identity.
+- the `product` row: the generation, and the deployment, kernel and rootfs
+  identities;
+- one `asset` row per update archive: its kind (`full`, `root`, `kernel`), file
+  and sha256.
 
-So: find the product, compare `requires` with what the device runs, download
-`url`, check `sha256`, and import it. The shape is
-[mica-index](../design/mica-index.md); the checks are
-[download](download.md#4-which-digest-at-which-step).
+So: find the product's newest release, compare its kernel and rootfs
+identities with what the device runs — a `root` archive needs the device's
+kernel identity to be the release's, a `kernel` archive its rootfs identity —
+download the file, check its sha256 against the `asset` row, and import it.
+The checks are [download](download.md#4-which-digest-at-which-step).
 
-> status: shipped — evidence: `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`
 
 ## 10. Online updates: what the device demands of a server
 
@@ -277,35 +275,39 @@ the whole contract:
 
 - the source resolves to exactly `http(s)://<host>/v1/manifest.json`, with no
   query, fragment or credentials;
-- that document is a signed envelope over a `mica/catalog/v2` payload, in
-  canonical JSON, at most 1 MiB, with a monotonic `revision` (a repeated
-  revision must be byte-identical), `issuedAt`/`expiresAt` at most 30 days
-  apart, at most 128 releases and 12 channels;
-- `channels` are heads keyed by **board + product + channel**, each naming the
-  highest generation and its release; a head that is not the highest release
-  of its key is refused;
-- each object's `url` must equal `<origin>/v1/objects/<sha256>`; transfers are
-  resumable by range and are abandoned below 1 KiB/s.
+- that document is a `mica/catalog/v3` catalog: **unsigned** canonical JSON
+  (sorted keys, no whitespace — the device re-serializes it and refuses a
+  document that does not come back byte for byte), at most 128 releases and
+  heads, with one head per **board and product** and a monotonic `revision`;
+  there is no channel and no expiry, so a withheld catalog reads as "nothing
+  newer";
+- its objects name a digest and a length, and the device fetches
+  `<origin>/v1/objects/<sha256>`; transfers are resumable by range and are
+  abandoned below 1 KiB/s;
+- trust comes from each release's own signed descriptor: the device takes
+  only its own board, architecture and product, only a generation above the
+  one it runs, and only the objects that descriptor names.
 
 What the device dials is the operator's to set; what it will accept is not.
-The baked `mica/meta/v1` manifest in the image carries `update.source`,
-`channel`, `policy` (`off`, `check`, `auto`) and `checkIntervalMinutes`, and
-`/mica/config/updates.json` on DATA may override **those four keys only**. A
-document that names a trust anchor is refused: the anchors are inside the
+The baked `mica/meta/v2` manifest in the image carries `update.source`,
+`policy` (`off`, `check`, `auto`) and `checkIntervalMinutes`, and
+`/mica/config/updates.json` on DATA (`mica/update-config/v2`) may override
+**those keys only**. The v1 documents that carried a channel are refused, and
+a document that names a trust anchor is refused: the anchors are inside the
 signed image.
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy/src/catalog.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `docs/design/remote-management.md`
 
-## 11. Running an update server
+## 11. The update server
 
-No update server ships in this repository. Distribution is the fleet
-service's (`micaoss/mica-fleet`): it publishes the catalogue at
-`/v1/manifest.json` and the objects under `/v1/objects/`, and it is
-documented there. What this repository provides is the fleet's input, the
-signed archives of section 1 and the index of section 9, and the contract of
-section 10, which the device enforces against whatever serves it. The
-`mica-build:update-server/` service that once stood in for the fleet was
-removed on 2026-09-21.
+`mica-res` is the update plane devices are meant to read: `res.micaos.dev/v1`
+serves the catalog of section 10, offering the current release of each
+product, and redirects `/v1/objects/<sha256>` to its download host
+(`mica-res:docs/modules/resource.md`). It holds no key; a device trusts the
+release's own signed descriptor. **Releases are not posted to it yet**, so
+today a device's source has to point at a server the operator runs that
+implements section 10 over the archives of section 1. The `update-server/` of
+`mica-build` that once stood in for one was removed on 2026-09-21.
 
 > status: unsupported
 

@@ -46,26 +46,26 @@ transaction onto a pinned base. Adding a native application means adding a
 A producer is one directory holding `producer.env` and a `Dockerfile`, found
 anywhere in the tree; first-party ones live in the repository that produces
 the package (`mica-core:pkgs/`, `mica-system-base:debs/`,
-`mica-build:producers/`), and board-specific ones under
+`mica-build:docs/design/packages.md`), and board-specific ones under
 `mica-build:boards/<board>/`. `producer.env` declares what the producer emits,
 which architectures it emits for, and — per package — how many
 `multi-user.target.wants` symlinks the archive is supposed to ship. The full
 contract, including the control template, the version stamp, the `PREPARE`
 hook and the pre-flight, is each producing repository's own packaging
-(`mica-core:scripts/deb/`, `mica-build:tools/deb/README.md`), and it is not
+(`mica-core:scripts/deb/`, `mica-build:docs/design/packages.md`), and it is not
 restated here.
 
 What is worth knowing before writing one:
 
 - **`make os-deb-<producer>` needs no registration.** The target is a pattern
-  rule resolved through `mica-build-env:deb/producers.sh`; creating the directory
+  rule resolved through `mica-core:scripts/deb/producers.sh`; creating the directory
   is the whole of "adding a component".
 - **Compilation is not packaging.** The packer image carries `dpkg-dev` and no
   compiler. Building the binary happens in the `PREPARE` hook, on the host,
   before the build — which is also why a cross-compiled `arm64` payload has to
   be packed inside an `arm64` container, so that `dpkg-shlibdeps` resolves
   against the right libraries.
-- **The gate reads the archive, not a list.** `mica-build-env:deb/package-gate.sh`
+- **The gate reads the archive, not a list.** `mica-core:scripts/deb/package-gate.sh`
   asserts unique file ownership across the pool, one version stamp across it,
   a `copyright` file per package, and the declared enablement symlink count
   per package. A dependency on another local package must be pinned to the
@@ -89,13 +89,13 @@ Two ordering facts are mica-specific and both are load-bearing:
   during boot, and a daemon that starts ahead of them writes to the read-only
   root or to a tmpfs standing in for storage — which works, and then loses
   everything at the next power cycle.
-  `mica-core:dist/apid.service` carries
+  `mica-core:crates/mica-apid/dist/apid.service` carries
   the worked case and says in place why.
 - **The unit cannot be edited on the device.** The root is an immutable
   dm-verity squashfs, and `systemctl edit` has nowhere to write. Anything that
   differs per device — a broker address, a site identifier — is read at
   runtime from a file on DATA/state, with the unit carrying only the fallback.
-  `mica-core:mqttd/dist/mica-mqttd.service`
+  `mica-core:crates/mica-mqttd/dist/mica-mqttd.service`
   is the pattern: `EnvironmentFile=-` for the optional DATA/state file, defaults in
   `Environment=` lines, and the same defaults restated in the binary's own
   argument parsing so that a wiped environment cannot silently change the
@@ -106,7 +106,7 @@ Two ordering facts are mica-specific and both are load-bearing:
 Run the application as its own static system account, created by the
 package's `postinst` with `useradd`/`groupadd` and a `passwd` dependency
 written out in the control template. The worked example is the
-mqtt producer (`mica-core:deb/mqtt`).
+mqtt producer (`mica-core:crates/mica-mqttd`).
 
 **Static, not `DynamicUser=yes`**, and the reason generalises beyond the case
 that forced it. A D-Bus policy file resolves `<policy user="...">` when
@@ -170,7 +170,7 @@ things follow:
   rolled into a deployment that may not run either. Detect it with the health report
   and the diagnostics, and fix it with an update.
 - **What an application CAN still fail is a required member.** A unit that
-  takes the network down, wedges micad, or takes port 443 away from apid fails
+  takes the network down, wedges micad, or takes apid's port (8080, or 8443 with HTTPS) away from it fails
   the gate — not because it is an application, but because it removed the way
   in. `Type=notify` with a real readiness signal, and `WatchdogSec=` with a
   keepalive, are still how a unit tells systemd the truth about itself; they
@@ -271,9 +271,9 @@ convention rather than a mechanism that refuses:
 
 - **Nothing signs a separately installed unit.** Image content is covered by
   authenticated deployment metadata and required signed dm-verity; a file written into
-  `/usr/local/lib/systemd/system` or the Quadlet directory on a running
+  `/usr/local/lib/systemd/system` or a container declaration on a running
   device is covered by neither.
-- **No ceiling is mandatory.** Sections 8 and containers.md section 8 describe
+- **No ceiling is mandatory.** Sections 8 and containers.md section 2 describe
   what to set; nothing checks that anything was set.
 - **There is no secret store.** A native application's credentials are files
   the package or the operator puts on DATA/state, owned by root or by the

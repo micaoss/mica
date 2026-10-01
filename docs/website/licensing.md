@@ -34,7 +34,7 @@ by this repository, which are Apache-2.0. The image ships a machine-readable
 inventory of every installed package and its version, so "what is in this
 image" is a recorded fact, not an estimate.
 
-> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `mica-build:docs/design/image.md`
 
 ### Notices on the device
 
@@ -57,7 +57,7 @@ the image's package manifest and from nothing else, so two builds of one image
 emit identical bytes, and the publication gate refuses a release whose SBOM
 has no components.
 
-> status: shipped — evidence: `docs/design/release-artifacts.md`, `mica-build:make os-release-gate`
+> status: shipped — evidence: `mica-build:README.md`, `mica-build:make os-release-gate`
 
 The site may say a release carries an SBOM and a source offer. It may not yet
 say where either is published, or who answers a source request: no release is

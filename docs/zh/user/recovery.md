@@ -72,7 +72,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 该操作保留 DATA 上的配置、凭据和应用数据，不能恢复丢失凭据或撤销持久写入。
 重启为独立操作。QEMU 已覆盖真实请求及随后回退，cx3576 实机执行单独验收。
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:apid/openapi.json`, `mica-core:tests/apid-api/src/phases/07-update-rollback.ts`
+> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
 
 ## 5. 破坏性的步骤：重置与凭据恢复
 
@@ -92,12 +92,12 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 - **怎么做：**`POST /api/v1/reset`，body 为 `{"tier": "configuration"}`，
   需认证，不需要物理在场。
 
-**动手之前先读这一段：更新设置也会一起还原。**一次配置重置会把**更新渠道**
-和**更新服务器地址**还原成这台设备镜像构建时的取值，操作员做过的改动一律丢
+**动手之前先读这一段：更新设置也会一起还原。**一次配置重置会把**更新服务器地址**
+和更新策略还原成这台设备镜像构建时的取值，操作员做过的改动一律丢
 弃。这究竟是一条恢复路线还是一个意外，取决于那些内置取值是什么，而只有两种
 情况：
 
-- **镜像里指定了服务器。**设备回到那台服务器和那个渠道。如果有人把设备重新
+- **镜像里指定了服务器。**设备回到那台服务器。如果有人把设备重新
   指向了一台后来发现是错的服务器，这就是不用重刷、也不用物理接触就能撤销它
   的办法。
 - **镜像里没有指定服务器**——集成商把地址留待后设的构建就是这种情况。此时重
@@ -150,7 +150,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
   数据，一起没。
 - **按设计被保留的：**设备身份、标定数据、DATA/meta 上的更新元数据，以及两个
   系统部署。重置重置的是*状态*，不是已安装的软件版本。
-- **同样会还原的：**更新渠道与更新服务器地址，回到镜像构建时的取值——第 3 步
+- **同样会还原的：**更新服务器地址与更新策略，回到镜像构建时的取值——第 3 步
   的警告在这里原样适用，包括内置地址为*无*、于是设备被留在没有任何更新服务器
   的状态这一种情况。
 - **不能恢复：**起不来的设备，因为没有带内程序在跑；损坏的系统部署。
@@ -183,7 +183,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 如果设备要交给另一方而它的数据不能跟着走，就销毁介质。今天没有比这更软的
 说法是诚实的，第 6 节说明了为什么。
 
-> status: shipped — evidence: `mica-core:micad/src/reset.rs`, `mica-core:apid/src/routes.rs`, `docs/design/manufacturing.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/reset.rs`, `mica-core:crates/mica-apid/src/routes`, `docs/design/manufacturing.md`
 
 ## 6. 操作系统之下：重刷与处置
 

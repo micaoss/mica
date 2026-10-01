@@ -1,7 +1,7 @@
 # Writing a Mica OS image to a board
 
 A release publishes one compressed image per product,
-`mica-<product>-<release>.img.gz`. That file is a whole GPT disk image: the
+`mica-<board>.<variant>-<stamp>.img.gz`. That file is a whole GPT disk image: the
 partition table, the boot pieces, the signed root and an empty DATA. This page
 is how it reaches a board, board by board, and what is not a verified
 procedure yet.
@@ -20,16 +20,10 @@ reported on 2026-09-20 that a `cx3576` booted on hardware; it is a report with
 no artefact attached, so it is not a row and this page does not treat it as
 one ([support tiers](../boards/support-tiers.md)). The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
-where they are not verified. The dates matter: the three `uefi` rounds
-published between the board rename and 2026-09-19 (`20260916-0845`,
-`20260916-1653`, `20260919-2103`) power the machine down at PID 1 instead of
-booting. Take an image from `20260920-0622` or later — the round before it
-still had no console login ([download](download.md) section 1) — and since
-`20260919-2356` every
-amd64 product is booted automatically — on each push and again in its release
-run — while a `uefi-arm64` image is built and verified but started by nothing
-automatic, and a `cx3576` or `s905x5m` image has never been started by
-anything automatic: no suite boots a FIT image — the FIT suite runs on the
+where they are not verified. Every amd64 product is booted automatically in
+its release run, while a `uefi-arm64` image is built and verified but started
+by nothing automatic, and a `cx3576` or `s905x5m` image has never been started
+by anything automatic: no suite boots a FIT image — the FIT suite runs on the
 host and carries no QEMU ([download](download.md) section 1).
 
 > status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/boards/support-tiers.md`
@@ -39,19 +33,14 @@ host and carries no QEMU ([download](download.md) section 1).
 Verify the file, then decompress it:
 
 ```sh
-sha256sum -c SHA256SUMS                              # the release's own list, covers the .gz
-gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
-sha256sum disk.img                                   # compare with uncompressedSha256
+sha256sum -c SHA256SUMS                              # the release's own list: the lock
+gzip -dc mica-uefi-x64.basic-<stamp>.img.gz > disk.img
+sha256sum disk.img                                   # compare with the layer's mica.uncompressed-sha256
 ```
 
-The full chain — release list, the lock's `asset` row, the index's
-`uncompressedSha256`, the OCI layer annotations — is
-[download](download.md#4-which-digest-at-which-step). For
-`mica-x64-dev-20260915-2230.img.gz` — published before the boards were renamed
-on 2026-09-16, so it carries the old product name — the decompressed image is
-1 881 145 344 bytes with sha256
-`e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`, which the
-index and the OCI layer both state.
+The full chain — `SHA256SUMS`, the lock's `asset` row, the OCI layer and its
+`mica.uncompressed-*` annotations — is
+[download](download.md#4-which-digest-at-which-step).
 
 Then know three things about the write:
 
@@ -80,15 +69,14 @@ packer is implemented. What differs is where the bootloader lives.
 | `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, where UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` | a release target since 2026-09-16; qualified under QEMU only |
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
 | `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
+| `mini-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI`; no USB driver, so not from USB media | qualified under QEMU only |
 
-`uefi-x64`, `uefi-arm64` and `cx3576` have published images since
-`20260916-1653`; `s905x5m` was opened as a release target on
-2026-09-19 and publishes from its first release on — which changes what exists
-to download, not what can be written: its image still installs no bootloader,
+Every board publishes images; for `s905x5m` that changes what exists to
+download, not what can be written: its image still installs no bootloader,
 for the reason in section 6. There is no A/B partition pair to choose between
 and no conversion from an older layout: a write is a full write.
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`, `mica-build:boards/cx3576/images.tsv`
 
 ## 3. uefi-x64
 
@@ -135,7 +123,7 @@ qualified, and expect the target identification to be the risky part:
 > # NOT VERIFIED: never run against physical hardware by this project
 > lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS      # before and after plugging it in
 > udevadm info --query=property --name=/dev/sdX | grep -E 'ID_BUS|ID_MODEL|ID_SERIAL'
-> gzip -dc mica-uefi-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+> gzip -dc mica-uefi-x64.basic-<stamp>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
 > sync
 > sudo cmp -n 1881145344 /dev/sdX disk.img            # or re-read and compare sha256
 > sudo sfdisk -d /dev/sdX                             # expect 2048, 1050624, 3147776
@@ -230,7 +218,7 @@ The whole acceptance suite — boot, runtime, updates, faults, reset, shutdown �
 is one target in `mica-build`:
 
 ```sh
-make lifecycle-uefi PRODUCT=uefi-arm64-dev
+make lifecycle-uefi PRODUCT=uefi-arm64.dev
 ```
 
 > status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
@@ -311,9 +299,10 @@ recovered are all unwritten and untested — bench work owned by
 
 ## 7. First boot
 
-- **DATA grows.** `systemd-repart` grows the DATA partition to the device and
-  `systemd-growfs@mnt-data` grows its filesystem; both units must be active,
-  and the acceptance suite fails a boot where they are not.
+- **DATA grows.** On a systemd product `systemd-repart` grows the DATA
+  partition to the device and `systemd-growfs@mnt-data` grows its filesystem;
+  both units must be active, and the acceptance suite fails a boot where they
+  are not. An OpenRC product grows it with `mica-data-layout`.
   `make os-repart-test` (privileged docker) proves the growth cannot wipe the
   loader; it exists and CI does not run it.
 - **Two deployments from the start.** The factory image carries two signed
@@ -333,8 +322,9 @@ recovered are all unwritten and untested — bench work owned by
   one, so shipped images have none. What a device does with one is
   [first run](first-run.md).
 - **Which version is running.** `mica-deploy status` and `mica-deploy booted`
-  report the running deployment id; map it back with the index:
-  `jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json`.
+  report the running deployment id; the `product` row of a release's
+  `mica-build.lock` names the deployment id it published:
+  `awk -F'\t' '$1 == "product"' mica-build.lock`.
 
 > status: shipped — evidence: `mica-build:src/image/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
 

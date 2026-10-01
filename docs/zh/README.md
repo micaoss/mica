@@ -14,6 +14,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`uefi-arm64.md`](hardware/uefi-arm64.md) — 通用 arm64 UEFI 机器
   - [`cx3576.md`](hardware/cx3576.md) — CX3576-Z / Rockchip RK3576
   - [`s905x5m.md`](hardware/s905x5m.md) — BM201 / Amlogic S905X5M
+  - [`mini-x64.md`](hardware/mini-x64.md) — 带 128 MB 闪存的小型 amd64 UEFI 机器
 - `user/` — 用户文档（覆盖全部 21 篇，含文档契约本身）
   - [`overview.md`](user/overview.md) — 一页读懂：六个仓库、发布链、产品与文件位置
   - [`quickstart.md`](user/quickstart.md) — 快速上手：QEMU 里的 uefi-x64 基线
@@ -82,6 +83,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../hardware/uefi-arm64.md` | c04f0e4 | current |
 | `../hardware/cx3576.md` | c04f0e4 | current |
 | `../hardware/s905x5m.md` | c04f0e4 | current |
+| `../hardware/mini-x64.md` | 5cc1a64 | current |
 | `../website/contract.md` | db66fc02 | not-translated |
 | `../website/documentation.md` | db66fc02 | not-translated |
 | `../website/downloads.md` | db66fc02 | not-translated |
@@ -92,14 +94,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../website/security.md` | db66fc02 | not-translated |
 | `../website/support.md` | db66fc02 | not-translated |
 | `../boards/assurance.md` | db66fc02 | not-translated |
-| `../boards/board-env.md` | db66fc02 | not-translated |
 | `../boards/board-template.md` | db66fc02 | not-translated |
-| `../boards/contract.md` | e630c76f | not-translated |
-| `../boards/cx3576-bench.md` | 452289a3 | not-translated |
-| `../boards/cx3576-bsp-sync.md` | e630c76f | not-translated |
 | `../boards/cx3576.md` | db66fc02 | not-translated |
-| `../boards/intake.md` | db66fc02 | not-translated |
-| `../boards/porting.md` | db66fc02 | not-translated |
 | `../boards/qualification.md` | db66fc02 | not-translated |
 | `../boards/s905x5m.md` | 1d2a5e49 | not-translated |
 | `../boards/support-tiers.md` | db66fc02 | not-translated |
@@ -109,4 +105,4 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 
 这些文档描述**设计与行为**，不引用代码行号，也不逐句注解实现——被行号绑住的文档，
 会被那些并未改变设计的编辑证伪。需要精确契约时，直接指向承载它的产物：HTTP 接口面
-由 `mica-core:apid/openapi.json` 规定，CI 保证它与实际运行的二进制一致。
+由 `mica-core:crates/mica-apid/openapi.json` 规定，CI 保证它与实际运行的二进制一致。

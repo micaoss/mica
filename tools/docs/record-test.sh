@@ -76,7 +76,7 @@ reset_tree() { git reset -q --hard "$BASE"; git clean -qfd; }
 
 # 1. a failing edit script
 printf 'exit 3\n' > "$WORK/edit.sh"
-if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/changelog.md; then
+if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/user/release-notes.md; then
     fail "a failing edit script was accepted"
 elif committed; then
     fail "a failing edit script still produced a commit"
@@ -87,7 +87,7 @@ reset_tree
 
 # 2. a named path that did not change
 printf 'true\n' > "$WORK/edit.sh"
-if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/changelog.md; then
+if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/user/release-notes.md; then
     fail "an unchanged path was accepted"
 elif committed; then
     fail "an unchanged path still produced a commit"
@@ -99,8 +99,8 @@ fi
 reset_tree
 
 # 3. a change that breaks the gates: a link with no target
-printf 'printf "\\nSee [the ghost](ghost.md).\\n" >> docs/changelog.md\n' > "$WORK/edit.sh"
-if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/changelog.md; then
+printf 'printf "\\nSee [the ghost](ghost.md).\\n" >> docs/user/release-notes.md\n' > "$WORK/edit.sh"
+if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/user/release-notes.md; then
     fail "a change that breaks docs-verify was accepted"
 elif committed; then
     fail "a change that breaks docs-verify still produced a commit"
@@ -110,10 +110,10 @@ fi
 reset_tree
 
 # 4. something already staged
-printf 'x\n' >> docs/changelog.md
-git add docs/changelog.md
+printf 'x\n' >> docs/user/release-notes.md
+git add docs/user/release-notes.md
 printf 'true\n' > "$WORK/edit.sh"
-if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/changelog.md; then
+if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/user/release-notes.md; then
     fail "a pre-staged change was accepted"
 else
     grep -q "already staged" "$WORK/out" \
@@ -124,8 +124,8 @@ reset_tree
 
 # 5. an attribution line in the message
 printf 'A records change\n\nCo-Authored-By: someone <x@y>\n' > "$WORK/attributed"
-printf 'printf "\\n" >> docs/changelog.md\n' > "$WORK/edit.sh"
-if run --edit "$WORK/edit.sh" --message "$WORK/attributed" -- docs/changelog.md; then
+printf 'printf "\\n" >> docs/user/release-notes.md\n' > "$WORK/edit.sh"
+if run --edit "$WORK/edit.sh" --message "$WORK/attributed" -- docs/user/release-notes.md; then
     fail "an attributed message was accepted"
 else
     grep -q "attribution" "$WORK/out" \
@@ -136,13 +136,13 @@ reset_tree
 
 # 6. the happy path: one commit, the named path only, pushed once
 cat > "$WORK/edit.sh" <<'EDIT'
-printf '\n## 1970-01-01 00:00 [test]\n\nA fixture entry.\n' >> docs/changelog.md
-printf 'untracked\n' > docs/plan/record-test-leftover.md
+printf '\n## 1970-01-01 00:00 [test]\n\nA fixture entry.\n' >> docs/user/release-notes.md
+printf 'untracked\n' > docs/record-test-leftover.txt
 EDIT
-if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/changelog.md; then
+if run --edit "$WORK/edit.sh" --message "$WORK/message" -- docs/user/release-notes.md; then
     if ! committed; then
         fail "the happy path produced no commit"
-    elif [ "$(git show --name-only --format= HEAD)" != "docs/changelog.md" ]; then
+    elif [ "$(git show --name-only --format= HEAD)" != "docs/user/release-notes.md" ]; then
         fail "the commit carries paths that were not named: $(git show --name-only --format= HEAD | tr '\n' ' ')"
     elif [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
         fail "the commit was not pushed"

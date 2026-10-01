@@ -41,7 +41,7 @@ Cross-linking rules:
   `docs/user/` page owns.
 - The downloads page links to supported hardware (compatibility) and security
   (verification); supported hardware links to the BSP porting entry point
-  ([../boards/porting.md](../boards/porting.md)); security links to support for the
+  ([../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md)); security links to support for the
   advisory contact.
 - Footer links on every page: documentation, security, support, licensing.
 
@@ -56,7 +56,7 @@ these briefs. A claim carries exactly one status from this closed set:
   with specific hardware; the status line cites the repository evidence and the
   page names the boards.
 - **proposed** — the capability is planned and not delivered; the status line
-  cites the plan record (`docs/plan/PLAN-0xx.md`). Proposed work is always
+  cites the design that describes it. Proposed work is always
   rendered as forward-looking ("planned", "designed") and **never** in the
   present tense of an existing feature.
 - **unsupported** — Mica OS does not provide this and does not currently plan to;
@@ -66,7 +66,7 @@ The status line is a Markdown blockquote of this exact shape (em dash with
 spaces as the separator, evidence references in backticks, multiple references
 separated by comma and space):
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 
 **Marketing language must never outrun the evidence.** The site may never
 claim more than the documentation; where the documentation records a gap, the
@@ -83,7 +83,7 @@ the machine-readable release manifest each release directory carries, and
 per-board evidence from the board dossiers, so a new release updates the site by
 regeneration rather than by editing prose.
 
-> status: shipped — evidence: `docs/design/release-artifacts.md`, `docs/boards/qualification.md`
+> status: shipped — evidence: `mica-build:README.md`, `docs/boards/qualification.md`
 
 Support windows are the exception, and it is a rule rather than a delay:
 nothing binds a window to a release, so there is no release fact to regenerate

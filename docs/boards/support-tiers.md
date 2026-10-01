@@ -61,7 +61,7 @@ is. Field-reliability language belongs to whoever holds the evidence.
 
 **Definition.** Everything else: no dossier, an out-of-support kernel tier,
 unresolved redistribution rights, or a port that was never taken through the
-[porting manual](porting.md). "It boots" does not move a board out of this
+[porting manual](https://github.com/micaoss/mica-build/blob/main/boards/README.md). "It boots" does not move a board out of this
 tier — field reliability, recovery, update and lifecycle ownership are
 exactly the things a booting image leaves unproven.
 
@@ -97,10 +97,11 @@ physical qualification row.
 | `uefi-arm64` | generic arm64 system, UEFI systemd-boot with a signed UKI | ESP/SYSTEM/DATA | yes | complete image | QEMU API, update, fault and reboot rows — [uefi-arm64.md](uefi-arm64.md) | bring-up (QEMU reference) |
 | `cx3576` | Rockchip RK3576, U-Boot with a signed FIT | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | physical rows not tested — [cx3576.md](cx3576.md) | bring-up |
 | `s905x5m` | Amlogic S7D (BM201), U-Boot with a signed FIT, SD boot | FIRMWARE/SYSTEM/DATA | yes | complete image, static verification | build and fixture rows only; physical rows not tested — [s905x5m.md](s905x5m.md) | bring-up |
+| `mini-x64` | generic amd64 system for 128 MB of flash, UEFI systemd-boot with a signed UKI; its one product runs OpenRC | ESP/SYSTEM/DATA | yes | complete image | QEMU lifecycle over `mini-x64.basic` | bring-up (QEMU) |
 
 "Release target" is `BOARD_RELEASE_TARGET` in the board's `board.env`. It
-says that the board's images are built and published and that its products
-appear in the version index. **It is not a claim that the board boots on
+says that the board's products (`<board>.basic`, and `<board>.full` where the
+board has it) are built and published, each as a release of its own. **It is not a claim that the board boots on
 hardware** — that claim lives in the dossier, and for `s905x5m` the dossier
 still says four physical rows untested with `RFCT-922` open.
 
@@ -134,17 +135,17 @@ draws — a release target is not a hardware claim — gets stated for this
 board.
 uefi-x64 and uefi-arm64 evidence is emulator evidence, not field evidence.
 It is also dated evidence, and it is uneven in two directions. Between the
-UEFI boards: since
-2026-09-19 every amd64 product is booted automatically — on each push to
-`main` and again in its release run — so `uefi-x64` carries a boot per push
-and per release, while `uefi-arm64` carries none: the gate's boot step is
-amd64-only and was skipped for both its products
-([harness](../design/build-harness.md) section 4). And between UEFI and FIT:
+UEFI boards: every amd64 product is booted automatically in its release run
+(`mica-build:.github/workflows/release-product.yml`, one runtime stage of the
+UEFI lifecycle), so `uefi-x64` and `mini-x64` carry a boot per release, while
+`uefi-arm64` carries none: the boot step is amd64-only and is skipped for its
+products
+([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4). And between UEFI and FIT:
 the `cx3576` and `s905x5m` images are started by nothing in these
 repositories, because no suite boots a FIT image at all — `tests/suites/lifecycle-uboot-fit/` runs on the
 host and carries no QEMU, and both suites that do start a guest refuse a FIT
 board by name. The FIT side is checked on every push; it is unstarted, not
-unattended. Four of the eight published products are on that
+unattended. Four of the nine released products are on that
 side, and `cx3576` has been there through six releases, so it is the rule for
 the FIT backend rather than a new board's exception. A published image is not
 a booted image, and for these two boards that gap is the whole distance. The three `uefi`
@@ -157,11 +158,11 @@ hardware driver set (AHCI, NVMe, USB storage, the common NICs as modules; no
 MMC). Its qualification is unchanged: QEMU `virt` only. Carrying a driver is
 not evidence that a machine boots.
 
-`uefi-x64` and `uefi-arm64` are **generic systems**, named for the firmware
+`uefi-x64`, `uefi-arm64` and `mini-x64` are **generic systems**, named for the firmware
 class that starts them rather than for a machine; `cx3576` and `s905x5m` are
 **hardware boards**, named for the product
 ([decision](../decisions/2026-09-16-generic-systems-named-by-firmware.md)).
 They were called `x64` and `virt-arm64` until 2026-09-16, and releases
 published before that date carry the old names.
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`

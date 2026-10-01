@@ -47,11 +47,12 @@ reconciles it into systemd units — networking, Wi-Fi, SSH, containers, MQTT �
 and `apid` serves the authenticated HTTPS API those settings are read and
 written through, with a built-in web UI as one client of that API.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/micad.md`, `docs/design/api.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/micad.md`, `docs/design/api.md`
 
 **Applications ride on top, not inside.** Native applications enter the image
 as build-time Debian packages and update with the system; independently
-released applications run as pinned OCI containers under podman and Quadlet,
+released applications run as pinned OCI containers under podman, supervised by
+`mica-containerd` on either init,
 off by default until the integrator enables them.
 
 > status: shipped — evidence: `mica-podman:locks/upstream.lock`, `docs/design/containers.md`
@@ -76,7 +77,6 @@ the image, not an untrusted app marketplace.
   setup, bounded flash and field recovery — see
   [embedded differences](embedded.md).
 - **Not a fleet management service.** Mica OS ships authenticated LAN management;
-  a cloud fleet control plane is a separate product decision that has not been
-  made.
+  a cloud fleet control plane is not part of the published product.
 
-> status: proposed — evidence: `docs/task/20260912-2058-fleet-runtime.md`
+> status: unsupported

@@ -3,7 +3,7 @@
 这里按板卡回答四个问题：**这块板能不能跑 Mica OS、跑到什么程度、镜像怎么进去、
 出问题怎么回来。**每块板一页，章节顺序相同，可以直接对照着看。
 
-本页是**给中文读者的现状快照，记于 2026-09-20**。板卡状态的权威表是英文的
+本页是**给中文读者的现状快照，记于 2026-10-01**。板卡状态的权威表是英文的
 [`docs/boards/support-tiers.md`](../../boards/support-tiers.md#current-boards)——
 两边不一致时以英文为准，这里按缺陷处理。
 
@@ -15,27 +15,28 @@
 | [`uefi-arm64`](uefi-arm64.md) | 通用 arm64 机器（UEFI + ACPI） | arm64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU 参考） | 无 |
 | [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot，签名 FIT | 是 | bring-up | 有一条用户报告，无证据行 |
 | [`s905x5m`](s905x5m.md) | BM201 / Amlogic S905X5M（S7D） | arm64 | U-Boot，签名 FIT，从 SD 启动 | 是 | bring-up | 无 |
+| [`mini-x64`](mini-x64.md) | 小型 amd64 机器（UEFI），128 MB 闪存 | amd64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU） | 无 |
 
 没有任何板卡达到 `mica-qualified`：没有任何板卡档案里有一条注明日期的实机合格行。
 层级的定义见[支持层级](../../boards/support-tiers.md)，共三级：`mica-qualified`
 （Mica OS 自己跑完并拥有合格矩阵）、`integrator-qualified / bring-up`（合约满足，
 现场证据由集成商持有或仍在积累）、`unsupported`（没有档案，不做任何声明）。
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
 
-## 现在到底是什么状态（2026-09-20）
+## 现在到底是什么状态（2026-10-01）
 
-**发布是通的。**每块板都是发布目标：镜像会被构建、签名、发布，产品会进入版本索引。
-今天的最新索引是 `mica.20260920-0046`，覆盖四块板各一个 `dev` 与一个 `prod` 产品。
-`s905x5m` 是最后被开放的一块，由 2026-09-19 的用户决定开放，首个发布
-`s905x5m.20260920-0033`。
+**每块板都是发布目标**，它的每个产品各自发布：每块板都有默认的 `<board>.basic`，除
+`mini-x64` 外还有带容器引擎的 `<board>.full`。**九个产品里目前只有两个有发布**：
+`cx3576.full` 与 `mini-x64.basic`。其余产品还没有发布，没有镜像可下载，需要从源码构建
+（[构建指南](../../user/build.md)）。
 
 **“是发布目标”不等于“能在实机上跑”。**它只说明镜像被发布了。今天的实际验证情况
 分成三档：
 
 | 验证档位 | 板卡 | 含义 |
 |---|---|---|
-| 每次推送与每次发布都自动启动 | `uefi-x64` | 自 2026-09-19 起，amd64 产品在 QEMU 里被真的启动到 guest 自己的通过标记 |
+| 每次发布时自动启动 | `uefi-x64`、`mini-x64` | 每个 amd64 产品在 QEMU 里跑一轮 UEFI lifecycle 的运行阶段 |
 | 只构建与静态校验，有过手工 QEMU 记录 | `uefi-arm64` | 自动启动步骤只跑 amd64，所以它没有自动启动记录；已有的 QEMU 证据早于板卡改名 |
 | 没有任何自动流程会启动 | `cx3576`、`s905x5m` | 没有任何套件会启动 FIT 镜像——FIT 那套跑在宿主机上、不带 QEMU，两套会启动 guest 的套件按名字拒绝 FIT 板卡 |
 
@@ -45,18 +46,14 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 （[支持层级](../../boards/support-tiers.md)）。凡是本目录里写到实机步骤的地方，
 都标了“未验证”。
 
-**有三轮 `uefi` 发布不会启动，必须避开。**`20260916-0845`、`20260916-1653` 和
-`20260919-2103` 里的 `uefi-x64`、`uefi-arm64` 镜像会在 PID 1 拒绝镜像自己签名身份里
-的板卡名，并在 1.7 秒时关机（板卡改名了，读这个名字的被 pin 住的客户端没有跟上）。
-请取 `20260919-2356` 或更新的镜像。`cx3576` 从未受影响。这些发布保留不删，修复靠
-取代（[获取发布版](../user/download.md)）。
-
-> status: shipped — evidence: `docs/design/mica-index.md`, `docs/design/build-harness.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/user/download.md`
 
 ## 怎么选
 
 - **只想先看看这套系统长什么样** → [`uefi-x64`](uefi-x64.md)，在 QEMU 里跑，
-  这是唯一有自动启动证据的路径。
+  这是有自动启动证据的基线。
+- **要装进 128 MB 闪存** → [`mini-x64`](mini-x64.md)：OpenRC、管理面、SSH 与
+  容器，没有 USB。
 - **想在通用 arm64 机器上试** → [`uefi-arm64`](uefi-arm64.md)。它携带了通用硬件
   驱动（AHCI、NVMe、USB 存储、常见网卡），但**携带驱动不等于有证据证明某台机器
   能启动**，并且完全没有 MMC 驱动。
@@ -66,7 +63,7 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 - **手上是 BM201 / S905X5M** → [`s905x5m`](s905x5m.md)。**今天没有任何受支持的办法
   把 Mica OS 装进一块空板**：它的 U-Boot 从 eMMC boot0 执行，而发布的磁盘镜像只覆盖
   SD 介质，不装引导器。
-- **要上一块全新的板** → 英文的[板卡合约](../../boards/contract.md)与[移植指南](../../boards/porting.md)。
+- **要上一块全新的板** → 英文的[板卡合约](https://github.com/micaoss/mica-build/blob/main/boards/README.md)与[移植指南](https://github.com/micaoss/mica-build/blob/main/boards/README.md)。
 
 ## 不按板卡分、按主题看的页面
 
@@ -85,6 +82,6 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 
 每页的事实来自三处：英文板卡档案（`docs/boards/<board>.md`）、
 `mica-build:boards/<board>/` 里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
-`uefi-x64` 没有板卡档案，它那页会逐条注明来源。
+`uefi-x64` 与 `mini-x64` 没有板卡档案，它们那页会逐条注明来源。
 
 > status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`

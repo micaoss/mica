@@ -45,13 +45,15 @@ new identity. No identity is stored in the bootloader's attempt records.
 - On a DHCP network: the device requests an address on its wired interfaces
   and announces the `mica-xxxxxxxx` hostname to the DHCP server. Its own name
   also resolves locally on the device regardless of DNS.
-- The management surface is **apid over HTTPS** on the device's address (port
-  443, with port 80 redirecting). The TLS certificate is generated per device,
-  so a first visit shows a self-signed-certificate warning — expected, and
-  worth explaining to operators rather than training them to ignore warnings
-  elsewhere.
+- The management surface is **apid** on the device's address: plain HTTP on
+  port 8080 out of the box. Turn HTTPS on from the console's access page (or
+  `PUT /api/v1/web`) and it serves on 8443 with a certificate generated per
+  device, and 8080 only redirects there; a first HTTPS visit shows a
+  self-signed-certificate warning — expected, and worth explaining to
+  operators rather than training them to ignore warnings elsewhere. An
+  operator can upload the device's own certificate instead.
 
-> status: shipped — evidence: `mica-core:apid/`, `docs/design/remote-management.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid`, `docs/design/remote-management.md`
 
 On cx3576 neither Ethernet port has a MAC address in hardware, so the device
 derives one for each of them from the eMMC chip identifier and from where the
@@ -130,7 +132,7 @@ one document may be written onto a whole batch of cards.
 document version and digest were last applied and what the last import attempt
 did. It returns no value the document carried.
 
-> status: shipped — evidence: `mica-core:micad/src/provisioning_doc.rs`, `mica-core:apid/src/provisioning_api.rs`, `docs/design/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/mica-apid/src/provisioning_api.rs`, `docs/design/provisioning.md`
 
 **What has never been executed on hardware.** The document parser, its
 validators and the status route are covered by tests. The *transports* are
@@ -196,4 +198,4 @@ before the first sign-in is physical custody of the medium, and nothing else.
   a fielded device for the reason [recovery.md](recovery.md) section 5 states.
   Store the credential accordingly.
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/access.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/access.md`

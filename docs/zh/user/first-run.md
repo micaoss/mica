@@ -38,11 +38,12 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 
 - 在 DHCP 网络上：设备在有线接口上请求地址，并把 `mica-xxxxxxxx` 主机名
   通告给 DHCP 服务器。不论 DNS 如何，这个名字在设备本地总能解析。
-- 管理接口是设备地址上的 **apid over HTTPS**（443 端口，80 端口重定向）。
-  TLS 证书是每设备生成的，因此第一次访问会看到自签名证书警告——这是预期
-  行为，值得向操作者解释清楚，而不是训练他们对所有警告视而不见。
+- 管理接口是设备地址上的 **apid**：出厂时是 8080 端口上的明文 HTTP。在控制台的
+  访问页面（或 `PUT /api/v1/web`）开启 HTTPS 后，它在 8443 端口用每设备生成的证书提供
+  服务，8080 只做重定向；第一次 HTTPS 访问会看到自签名证书警告——这是预期行为，值得向
+  操作者解释清楚，而不是训练他们对所有警告视而不见。操作者也可以上传设备自己的证书。
 
-> status: shipped — evidence: `mica-core:apid/`, `docs/design/remote-management.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid`, `docs/design/remote-management.md`
 
 在 cx3576 上，两个以太网口都没有硬件 MAC 地址，因此设备会用 eMMC 芯片标识
 与该网口在板上的挂接位置为每个口推导一个地址。这样得到的地址在重启、重新
@@ -111,7 +112,7 @@ WiFi 客户端网络，以及时间设置。每个键都映射到一个已经存
 `GET /api/v1/provisioning/status` 向已认证的调用方报告最后应用的文档版本与
 摘要，以及最后一次导入尝试做了什么。它不返回文档携带的任何取值。
 
-> status: shipped — evidence: `mica-core:micad/src/provisioning_doc.rs`, `mica-core:apid/src/provisioning_api.rs`, `docs/design/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/mica-apid/src/provisioning_api.rs`, `docs/design/provisioning.md`
 
 **哪些从未在硬件上执行过。**文档解析器、它的校验器和状态路由都有测试覆盖。
 **传输通道没有**：没有任何测试、没有任何台架运行把真实的引导分区或真实的
@@ -164,4 +165,4 @@ U 盘送进一次真实启动，其中引导分区通道尤其从未在物理板
   已上线的设备上会被拒绝，原因见 [recovery.md](recovery.md) 第 5 节。
   请据此保管凭据。
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/access.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/access.md`

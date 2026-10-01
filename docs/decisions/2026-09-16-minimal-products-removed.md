@@ -11,7 +11,7 @@
 The `<board>-minimal` products are deleted, on every board. They are not kept
 unpublished — that was the 2026-09-15 position — they do not exist.
 
-- `mica-build:products/x64-minimal`, `virt-arm64-minimal`, `cx3576-minimal`
+- `products/x64-minimal` of `mica-build`, `virt-arm64-minimal`, `cx3576-minimal`
   and `s905x5m-minimal` are deleted, and no `uefi-x64-minimal` or
   `uefi-arm64-minimal` is created in the rename
   (`docs/decisions/2026-09-16-generic-systems-named-by-firmware.md`).

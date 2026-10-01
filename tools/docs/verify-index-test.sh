@@ -83,7 +83,7 @@ new_fixture() {
     cp "${ROOT}/docs/README.md" "${dir}/docs/"
     cp "${VERIFIER}" "${dir}/tools/docs/"
     cp -R "${ROOT}/docs/design" "${ROOT}/docs/user" "${ROOT}/docs/hardware" \
-          "${ROOT}/docs/website" "${ROOT}/docs/boards" "${ROOT}/docs/research" \
+          "${ROOT}/docs/website" "${ROOT}/docs/boards" \
           "${dir}/docs/"
 }
 
@@ -216,15 +216,15 @@ expect_fail "a website README entry whose document is gone" 1 \
 
 FIX="${WORK}/unindexed-boards-document"
 new_fixture "${FIX}"
-cp "${FIX}/docs/boards/porting.md" "${FIX}/docs/boards/unlisted.md"
+cp "${FIX}/docs/boards/support-tiers.md" "${FIX}/docs/boards/unlisted.md"
 expect_fail "a boards document with no README row" 1 \
     "docs/boards/unlisted.md exists but is not indexed in docs/README.md"
 
-FIX="${WORK}/dangling-research-entry"
+FIX="${WORK}/dangling-boards-entry"
 new_fixture "${FIX}"
-rm "${FIX}/docs/research/root-closure.md"
-expect_fail "a research README entry whose document is gone" 1 \
-    "indexes 'root-closure.md' under research/, but docs/research/root-closure.md does not exist"
+rm "${FIX}/docs/boards/assurance.md"
+expect_fail "a boards README entry whose document is gone" 1 \
+    "indexes 'assurance.md' under boards/, but docs/boards/assurance.md does not exist"
 
 echo
 total=$((PASS_N + FAIL_N))

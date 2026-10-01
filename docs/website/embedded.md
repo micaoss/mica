@@ -34,7 +34,7 @@ and the OS build consumes those artifacts without reaching into their build.
 Kernel configurations must satisfy a shared assertion set, so every board
 carries the features the OS depends on.
 
-> status: shipped — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:common/kernel/mica-required.fragment`, `docs/boards/contract.md`
+> status: shipped — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:boards/README.md`
 
 ### Factory and offline setup
 
@@ -86,7 +86,7 @@ credential recovery, a full factory reset, and the reflash. Every tier names
 what it costs before it is offered. **Five of those seven rungs are operations
 an operator can perform; the two named below are not.**
 
-> status: shipped — evidence: `docs/design/recovery.md`, `mica-core:micad/src/reset.rs`
+> status: shipped — evidence: `docs/design/recovery.md`, `mica-core:crates/micad/src/reset.rs`
 
 **Two rungs of that ladder cannot be climbed on any board that exists.**
 Credential recovery and the full factory reset are gated on a physical-presence
@@ -108,11 +108,11 @@ An appliance lives for years on a kernel and bootloader its vendor may stop
 maintaining. Mica OS records BSP provenance per board — source repository, synced
 commit, deviation register — and the board contract's next layer is published:
 the staged porting manual, the vendor intake rubric and the field-reliability
-qualification process, with [../boards/porting.md](../boards/porting.md) as the
+qualification process, with [../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md) as the
 integrator's entry point. The evidence those procedures collect is a board
 fact and is not in yet: no board has a dated physical qualification row, and long-term CVE response is assigned as a lifecycle duty by
 the tier definitions rather than written up as a procedure.
 
-> status: shipped — evidence: `docs/boards/cx3576-bsp-sync.md`
-> status: shipped — evidence: `docs/boards/porting.md`, `docs/boards/intake.md`, `docs/boards/qualification.md`, `docs/boards/support-tiers.md`
+> status: shipped — evidence: `mica-build:boards/cx3576/README.md`
+> status: shipped — evidence: `mica-build:boards/README.md`, `docs/boards/qualification.md`, `docs/boards/support-tiers.md`
 > status: board-dependent — evidence: `docs/boards/cx3576.md`

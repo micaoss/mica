@@ -53,7 +53,7 @@ component, or a nondeterministic signature, makes every release look like a
 change to both and leaves only `full` packages. Keeping release identity in
 the deployment, which is signed per release anyway, lets the components stay
 byte-stable, together with packages that keep their versions
-(`docs/decisions/2026-09-15-package-versions.md`).
+(`mica-build-tools:docs/spec/package-versions.md`).
 
 ## Removal condition
 

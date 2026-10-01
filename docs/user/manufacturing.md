@@ -65,7 +65,7 @@ A document is applied **only while the device has no administrator
 credential**. A unit that has already been claimed cannot be re-provisioned
 from a medium, at the factory or anywhere else.
 
-> status: shipped — evidence: `mica-core:micad/src/provisioning_doc.rs`, `docs/design/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/design/provisioning.md`
 
 ## 3. What a factory record must contain
 

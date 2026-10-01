@@ -2,10 +2,10 @@
 
 `uefi-x64` is not a board but a **generic system**: one image for amd64
 machines whose firmware is UEFI, named for the firmware class that starts it
-rather than for a machine. It is also this project's baseline — the only target
-with automatic boot evidence.
+rather than for a machine. It is also this project's baseline, booted
+automatically in every release run of its products.
 
-Snapshot written 2026-09-20; status is owned by the
+Snapshot written 2026-09-29; status is owned by the
 [tiers table](../boards/support-tiers.md#current-boards).
 
 **It has no board dossier.** `docs/boards/` holds dossiers for `cx3576`,
@@ -29,7 +29,7 @@ configuration, and the [flashing](../user/flashing.md) page.
 
 | Feature | State | Note |
 |---|---|---|
-| Containers (Podman) | ships | `BOARD_FEATURES="containers"` |
+| Containers (Podman) | ships in `uefi-x64.full` | `BOARD_FEATURES="containers"`; `uefi-x64.basic` leaves the engine out |
 | USB storage | driver built in, unverified on hardware | XHCI and EHCI with `USB_STORAGE`; `USB_UAS` is off, so a UAS-only enclosure falls back to bulk-only transport or is not driven |
 | SATA | driver built in, unverified on hardware | AHCI and `ATA_PIIX` |
 | NVMe | driver built in, unverified on hardware | — |
@@ -63,12 +63,10 @@ as `eth0`.
 
 ## Obtaining an image
 
-The products are `uefi-x64-dev` and `uefi-x64-prod`, published as
-`mica-uefi-x64-<profile>-<release>.img.gz`.
-
-**Avoid `20260916-0845`, `20260916-1653` and `20260919-2103`**: those images
-power the machine down at PID 1. Take `20260919-2356` or newer. Verification
-and the index are covered by [download](../user/download.md).
+The products are `uefi-x64.basic` (the default) and `uefi-x64.full` (with
+containers), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
+image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
+[download](../user/download.md).
 
 ## Flashing
 
@@ -135,7 +133,7 @@ The full ladder and the cost of each step is [recovery](../user/recovery.md).
 | Item | Result | Note |
 |---|---|---|
 | QEMU lifecycle: API, power actions, reboot, runtime, updates, reset | pass | the acceptance column of the tiers table |
-| Automatic boot on each push and each release | pass, since 2026-09-19 | amd64 products boot to the guest's own pass marker |
+| Automatic boot in each release run | yes | amd64 products boot one runtime stage of the UEFI lifecycle |
 | Physical cold boot, write, recovery | not tested | no hardware |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/design/build-harness.md`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

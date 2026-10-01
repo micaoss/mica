@@ -19,12 +19,12 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 层级定义、认证矩阵与准入评估标准已随 BSP 文档发布：层级在
 [../../boards/support-tiers.md](../../boards/support-tiers.md)，矩阵及其行语法在
 [../../boards/qualification.md](../../boards/qualification.md)，厂商准入评估标准在
-[../../boards/intake.md](../../boards/intake.md)。词汇存在不等于某块板卡挣得了
+[../../boards/intake.md](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md)。词汇存在不等于某块板卡挣得了
 层级：今天没有任何板卡是 mica-qualified，因为在档的唯一一份档案里，每一行
 认证结果都是 `not tested`——今天的板卡凭本仓库中的证据持有其地位，而不是
 凭一份完成的档案。
 
-> status: shipped — evidence: `docs/boards/support-tiers.md`, `docs/boards/qualification.md`, `docs/boards/intake.md`
+> status: shipped — evidence: `docs/boards/support-tiers.md`, `docs/boards/qualification.md`
 > status: board-dependent — evidence: `docs/boards/cx3576.md`
 
 ## 2. 当前硬件地位
@@ -34,10 +34,10 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 | cx3576（CX3576-Z，RK3576，arm64） | 参考硬件板卡：厂商内核、带 A/B 握手的主线 U-Boot、WiFi/蓝牙 | 完整契约据以构建和测试的板卡；行为在本地验证，硬件上的验收在设计记录中跟踪 |
 | uefi-x64（通用 UEFI x86_64） | QEMU 与 CI 基线 | 作为开发与验证目标受支持，不是产品板卡 |
 
-自带硬件的集成商从 [../../boards/porting.md](../../boards/porting.md) 开始；
+自带硬件的集成商从 [../../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md) 开始；
 板卡契约本身（产物边界、内核断言集、布局 schema）已发布并由构建强制。
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `docs/boards/contract.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/README.md`
 
 ## 3. 生命周期归属
 

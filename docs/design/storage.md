@@ -24,8 +24,9 @@ create new state directories without a separate mount per service. On first
 boot `mica-seed-var` copies the packaged var template after quota setup, preserving
 ownership, modes and symlinks. Later boots retain its content. The protected
 `/var/lib/mica` and Bluetooth credential binds remain outside the general var
-quota. Unit and Quadlet sources are bound to their existing search paths, then
-reloaded after DATA is ready. Netavark definitions use `/mica/containers/networks`.
+quota. Unit sources are bound to their existing search paths, then reloaded
+after DATA is ready; container declarations are `mica-containerd`'s, on STATE
+(`/var/lib/mica/containerd/`). Netavark definitions use `/mica/containers/networks`.
 
 The `/mica`, `/var` and `/mica/containers` binds use private mount propagation.
 Protected state and container child mounts stay at their logical paths; they

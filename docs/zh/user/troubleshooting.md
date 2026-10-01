@@ -21,7 +21,7 @@ Mica OS 上的诊断遵循一个顺序：获得访问，精确识别正在运行
 完整的访问模型，含每个通道能做什么、不能做什么，见
 [../design/access.md](../../design/access.md)。
 
-> status: shipped — evidence: `docs/design/access.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/access.md`, `mica-core:crates/mica-apid/openapi.json`
 
 > status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
@@ -45,7 +45,7 @@ wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认
 是对着夹具目录树证明的，不是对着 cx3576 或 uefi-x64 板卡。那里出现缺失或不合理
 的读数，是一次带上板卡身份的升级，绝不是一个"绿色"结果。
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 3. 读取证据
 
@@ -61,15 +61,13 @@ wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认
 - **更新状态：**`mica-deploy status` 报告 current/candidate/fallback 部署、尝试次数、
   组件验证及失败部署。另保存 `GET /api/v1/update` 的管理视图。
 
-- **容器：**[../design/containers.md](../../design/containers.md) 中的故障表
-  覆盖常见情形——添加文件后单元不存在（`systemctl daemon-reload`；
-  Quadlet 生成器的 `--dryrun` 打印解析错误）、单元从不启动（缺
-  `[Install]` 节）、名字解析不了（不在同一网络）、存储满
-  （`podman system df`）。
+- **容器：**`mica-containerd ctl list` 显示每个已声明的容器及其状态，
+  `ctl logs <name>` 显示它的日志；micad 拒绝的声明会在那次设置写入的任务里报告，
+  存储快满时看 `podman system df`（[../design/containers.md](../../design/containers.md)）。
 - **配置写入：**一次设置写入返回一个任务；其结果（已应用、无变化、失败
   及原因）通过 API 可观察，而不是从行为里猜。
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/design/containers.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/design/containers.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 4. 当某个正常命令缺失或损坏时
 
@@ -115,7 +113,7 @@ BusyBox 的 applet 选项更少、行为也与 GNU 版本不同。
 Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒绝文本就是诊断：
 
 - 缺失或过期的包池、缺失的 BSP 产物、或从不同 commit 构建的池，都会点名
-  要运行的确切 `make` 目标；[../design/build.md](../../design/build.md) 中的
+  要运行的确切 `make` 目标；[../design/build.md](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md) 中的
   构建失败表把常见信息映射到动作。
 - `make os-verify`（及 uefi-x64 等价物）逐项对照镜像契约检查组装好的
   镜像；红色的检查会写明它读到了什么、期望什么。用生成的信任根构建的镜像
@@ -126,7 +124,7 @@ Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒
 绕过它，因为这些检查的存在正是为了拦下那些通过了一切、却在硬件上失败的
 产物。
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-build:make os-verify`
+> status: shipped — evidence: `mica-build:docs/design/image.md`, `mica-build:make os-verify`
 
 ## 6. 支持快照
 
@@ -154,7 +152,7 @@ Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒
 设计记录里有本页顺序所隐含的那几棵决策树——没有网络、时间不对、DATA 写满、
 更新或回滚失败、意外重启——每一棵都按决定分支的那个快照成员展开。
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 7. 何时停止诊断
 

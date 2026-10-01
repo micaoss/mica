@@ -4,7 +4,7 @@ One page per board, answering four questions in the same order every time:
 **does this board run Mica OS, how far has that been proven, how does an image
 get onto it, and how do you get back when it goes wrong.**
 
-This is a dated snapshot, written 2026-09-20. The authoritative status table is
+This is a dated snapshot, written 2026-10-01. The authoritative status table is
 [board support tiers](../boards/support-tiers.md#current-boards); where the two
 disagree, the tiers table wins and this page is the defect.
 
@@ -16,6 +16,7 @@ disagree, the tiers table wins and this page is the defect.
 | [`uefi-arm64`](uefi-arm64.md) | generic arm64 machine (UEFI + ACPI) | arm64 | systemd-boot, signed UKI | yes | bring-up (QEMU reference) | none |
 | [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot, signed FIT | yes | bring-up | one user report, no evidence row |
 | [`s905x5m`](s905x5m.md) | BM201 / Amlogic S905X5M (S7D) | arm64 | U-Boot, signed FIT, SD boot | yes | bring-up | none |
+| [`mini-x64`](mini-x64.md) | small amd64 machine (UEFI), 128 MB of flash | amd64 | systemd-boot, signed UKI | yes | bring-up (QEMU) | none |
 
 No board is `mica-qualified`: no dossier carries a dated physical
 qualification row. The tiers themselves are defined by evidence and ownership —
@@ -23,22 +24,23 @@ qualification row. The tiers themselves are defined by evidence and ownership �
 bring-up` (the contract is met; the field evidence belongs to the integrator or
 is still being accumulated), `unsupported` (no dossier, no claim).
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
+> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
 
-## Where the project actually stands (2026-09-20)
+## Where the project actually stands (2026-10-01)
 
-**Publishing works.** Every board is a release target: its images are built,
-signed and published, and its products enter the version index. The newest
-index is `mica.20260920-0046`, carrying a `dev` and a `prod` product for each
-board. `s905x5m` was the last to open, by user decision on 2026-09-19, with its
-first release `s905x5m.20260920-0033`.
+**Every board is a release target**, and each of its products is released on
+its own: `<board>.basic`, the default, on every board, and `<board>.full`, with
+the container engine, on all but `mini-x64`. **Two of the nine have a release
+so far**: `cx3576.full` and `mini-x64.basic`. The others have none yet, so
+there is no image to download for them; they are built from source
+([build guide](../user/build.md)).
 
 **Being a release target is not a claim about hardware.** It says the images
 are published. What has actually started an image splits three ways:
 
 | How far it is started | Board | What that means |
 |---|---|---|
-| Booted on each push and each release | `uefi-x64` | Since 2026-09-19 every amd64 product boots in QEMU to the guest's own pass marker |
+| Booted in each release run | `uefi-x64`, `mini-x64` | Every amd64 product boots one runtime stage of the UEFI lifecycle in QEMU |
 | Built and statically verified; a manual QEMU record | `uefi-arm64` | The gate's boot step is amd64-only, so this board carries no automatic boot; its QEMU evidence predates the board rename |
 | Started by nothing in these repositories | `cx3576`, `s905x5m` | No suite boots a FIT image: the FIT suite runs on the host with no QEMU, and both suites that do start a guest refuse a FIT board by name |
 
@@ -48,20 +50,14 @@ boot was reported by the user on 2026-09-20; it arrived as a sentence with no
 artefact, so it is a report and not a qualification row, and it moves nothing
 in the tiers table. Every physical step on these pages is marked unverified.
 
-**Three `uefi` rounds do not boot and must be avoided.** The `uefi-x64` and
-`uefi-arm64` images in `20260916-0845`, `20260916-1653` and `20260919-2103`
-refuse the board name inside their own signed identity at PID 1 and power the
-machine down 1.7 seconds in — the boards were renamed and the pinned client
-that reads that name was not. Take `20260919-2356` or newer. `cx3576` was never
-affected. The broken releases are kept, not deleted; the repair is replacement
-([download](../user/download.md)).
-
-> status: shipped — evidence: `docs/design/mica-index.md`, `docs/design/build-harness.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/user/download.md`
 
 ## Choosing a board
 
-- **To see what the system is** → [`uefi-x64`](uefi-x64.md) under QEMU. It is
-  the only path with automatic boot evidence.
+- **To see what the system is** → [`uefi-x64`](uefi-x64.md) under QEMU, the
+  baseline with automatic boot evidence.
+- **To fit into 128 MB of flash** → [`mini-x64`](mini-x64.md): OpenRC, the
+  management plane, SSH and containers, no USB.
 - **To try a generic arm64 machine** → [`uefi-arm64`](uefi-arm64.md). It
   carries generic hardware drivers (AHCI, NVMe, USB storage, the common NICs),
   but **carrying a driver is not evidence that a machine boots**, and it has no
@@ -73,8 +69,8 @@ affected. The broken releases are kept, not deleted; the repair is replacement
   supported way to install Mica OS onto a blank board**: its U-Boot runs from
   eMMC boot0 while the published disk image covers SD media only and installs
   no bootloader.
-- **To bring up a new board** → the [board contract](../boards/contract.md) and
-  the [porting guide](../boards/porting.md).
+- **To bring up a new board** → the [board contract](https://github.com/micaoss/mica-build/blob/main/boards/README.md) and
+  the [porting guide](https://github.com/micaoss/mica-build/blob/main/boards/README.md).
 
 ## The same ground, by topic instead of by board
 
@@ -94,7 +90,7 @@ point of view; the topic pages above own the detail.
 
 Each page draws on the English board dossier (`docs/boards/<board>.md`), the
 board's own `board.env` and `evidence.json` in `mica-build:boards/<board>/`, and the user
-documentation. `uefi-x64` has no dossier, and its page names the source of each
-fact instead.
+documentation. `uefi-x64` and `mini-x64` have no dossier, and their pages name
+the source of each fact instead.
 
 > status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`

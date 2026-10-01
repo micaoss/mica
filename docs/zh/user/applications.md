@@ -5,9 +5,9 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 1. **原生应用**在构建时以 Debian 包的形式组合进签名系统镜像。它们与操作
    系统一起更新和回滚，在同一个签名 A/B bundle 里，并且是集成商能力——
    没有设备上的软件包安装，设备上永远没有 `apt`。
-2. **容器**是独立发布的路径：由 podman 通过 systemd 的 Quadlet 生成器运行
-   的固定摘要 OCI 镜像，按集成商自己的节奏交付与更新，在 OS 更新中原样
-   保留。
+2. **容器**是独立发布的路径：向 micad 声明、由 `mica-containerd` 监管、
+   用 podman 运行的固定摘要 OCI 镜像，两种 init 都支持，按集成商自己的节奏
+   交付与更新，在 OS 更新中原样保留。带 `containers` 特性的产品才有它。
 
 两条路径的默认客户都是受信任的产品集成商，不是不受信任的应用市场——
 其安全后果在下文直白陈述。
@@ -24,9 +24,9 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 | 是否在签名镜像里 | 是 | 否——镜像在运行时拉取 |
 | 谁为它签名 | 签名部署记录，以及内核验证的 dm-verity 根哈希签名 | 今天没有任何东西 |
 | OS 回滚会不会把它带回去 | 会，与 OS 一起原子回滚 | 不会——它跨过回滚继续运行 |
-| 它的失败会不会让 OS 回滚 | 不会——失败的 unit 只被上报，不致命；只有健康闸**要求**的成员才会让 OS 回滚，而任何应用都不在那个集合里 | 不会——没有东西盯着它 |
+| 它的失败会不会让 OS 回滚 | 不会——失败的 unit 只被上报，不致命；只有健康闸**要求**的成员才会让 OS 回滚，而任何应用都不在那个集合里 | 不会——`mica-containerd` 按它的策略重启它，此外没有东西盯着它 |
 | 代码放在哪 | 只读 verity 根 | DATA 上的 `/mica/containers/storage` |
-| 运行中的设备上能否更改 | 不能 | 能——`/etc/containers/systemd` 里的一个文件 |
+| 运行中的设备上能否更改 | 不能 | 能——通过 API、控制台或 `/mica/config/container.json` 修改 `container` 设置 |
 | 是否需要打开容器开关 | 不需要 | 需要 |
 
 有两条后果值得读两遍。两条路径的失败本身都不会让 OS 回滚：健康闸只要求
@@ -52,7 +52,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 组件是添加一个 producer，不是编辑构建阶段。结果封在 verity 密封的根里，
 只能通过发布新的签名镜像来更新。
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-core:scripts/deb/`, `mica-build:tools/deb/`, `mica-build:rootfs/packages/`
+> status: shipped — evidence: `mica-build:docs/design/packages.md`, `mica-core:scripts/deb/`, `mica-build:rootfs/packages/`
 
 集成商指南——[../../design/native-applications.md](../../design/native-applications.md)——
 覆盖 producer 约定、专用服务账户、可写状态归属、健康与日志、按名字的设备
@@ -62,61 +62,47 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 
 > status: shipped — evidence: `docs/design/native-applications.md`, `make docs-verify`
 
-## 3. 容器：podman 与 Quadlet
+## 3. 容器：podman 与 mica-containerd
 
-镜像随附引擎（podman、crun、conmon、netavark、aardvark-dns、Quadlet
-生成器），从固定版本的上游源码构建。Mica OS 不做容器编排：你用 systemd 的
-语言描述工作负载——`.container`、`.network`、`.volume` 文件——由 Quadlet
-把它们变成单元。带测试样例的集成商指南是
-[../design/containers.md](../../design/containers.md)；其中每个样例都由测试
-套件送进随附的生成器（`make os-quadlet-doc-test`），因此失效的样例会让
-构建变红，而不是留在文档里。
+带 `containers` 特性的产品随附引擎（podman、crun、conmon、netavark、
+aardvark-dns）及其监管进程 `mica-containerd`，从固定版本的上游源码构建。
+Mica OS 不做容器编排：你在 micad 的 `container` 设置里逐个声明容器——镜像、
+命令、环境变量、发布的端口、卷、重启策略、是否开机启动、资源限制——micad 把
+整组交给 `mica-containerd`，由它运行、重启并在开机时启动它们。集成商指南是
+[../design/containers.md](../../design/containers.md)。
 
 操作员需要的运行事实：
 
-- **一个开关。**设置树中的 `container.enabled`，默认 `false`。它为 false
-  时什么都不运行，也不存在任何容器单元。通过认证 API 或 UI 的 Services
-  页面设置。
-- **定义放哪。**`/etc/containers/systemd`，它绑定到一个 DATA/state 支持的
-  目录——定义在重启和 A/B 更新中保留。添加或修改文件后：
-  `systemctl daemon-reload`，然后启动单元。
-- **数据放哪。**命名卷落在 DATA 上的 `/mica/containers/storage`；bind mount
-  主机路径放在 `/srv` 下。绝不要用 `/var`——它小、可丢弃、按设计会被清空
+- **一个开关。**设置树中的 `container.enabled`，默认 `false`。它为 false 时
+  监管进程停止，也不声明任何容器。通过认证 API 或控制台设置。
+- **声明放哪。**`container` 文档，即 DATA 上的 `/mica/config/container.json`，
+  或通过 API。声明在重启和 A/B 更新中保留，配置重置会删掉它。
+- **数据放哪。**镜像和命名卷落在 DATA 上的 `/mica/containers`；bind mount 的
+  主机路径必须在 `/mica/` 下。绝不要用 `/var`——它小、可丢弃、按设计会被清空
   （[storage.md](storage.md)）。
-- **日志**进 journal（`journalctl -u <name>.service`），它是易失的。
-- **没有自动镜像更新。**没有 auto-update 定时器；拉取新镜像并决定何时
-  重启是安全的，属于集成商——理由与 OS 更新采用 A/B 且刻意为之相同。
+- **日志**由监管进程保存在内存里（`mica-containerd ctl logs <name>`），重启后丢失。
+- **没有自动镜像更新。**拉取新镜像并决定何时重启是安全的，属于集成商——理由与
+  OS 更新采用 A/B 且刻意为之相同。
 
-> status: shipped — evidence: `docs/design/containers.md`, `mica-build:make os-quadlet-doc-test`, `mica-podman:locks/upstream.lock`
+> status: shipped — evidence: `docs/design/containers.md`, `mica-podman:README.md`, `mica-core:docs/mica-core.md`
 
-两条安全事实，按设计记录的原话陈述：
+两条安全事实：
 
-- **容器以 root 运行。**rootless 模式没有构建。任何能写 Quadlet 文件的
-  东西都能以 root 的能力运行代码；这正是那个开关所把守的，也是它默认
-  关闭的原因。
+- **容器以 root 运行。**rootless 模式没有构建。任何能声明容器的东西都能以
+  root 的能力运行代码；这正是那个开关与认证 API 所把守的，也是开关默认关闭的原因。
 - **镜像签名不做验证。**随附策略接受一切；保护一次拉取的是 registry TLS
-  和摘要引用。收紧它是构建时的改动，因为策略文件在只读根里——容器指南
-  写明了机制，以及它必须从哪里进来。
+  和摘要引用。收紧它是构建时的改动，因为策略文件在只读根里。
 
 > status: shipped — evidence: `docs/design/containers.md`
 
 ### 安全地发布一个容器版本
 
-集成商在这条路径上要做的四个决定，容器指南里都有经过测试的样例：
-
-- **按摘要固定，并从你验证过的东西启动。**tag 是别人可以移动的指针；
-  `Image=...@sha256:...` 是内容本身。再加上 `Pull=never`，单元要么运行
-  设备上已有的镜像，要么根本不启动，而不是在启动时无人值守地去找
-  registry。
-- **registry 凭据由你放置和轮换。**`podman login --authfile` 写到你指定的
-  位置；把那个路径放在 DATA/state 上，让它挺过更新，因为 podman 对 root 的
-  默认位置在 tmpfs 上。该文件是编码的，不是加密的，Mica OS 不管理它。
-- **回滚是手工的，并且需要旧镜像。**把 `Image=` 改回上一个摘要再重启。
-  这只在旧镜像还留在设备上时有效——`podman image prune` 会删掉它，之后
-  回滚就需要 registry。
+- **按摘要固定。**tag 是别人可以移动的指针；`image@sha256:...` 是内容本身。
+- **registry 凭据由你放置和轮换**；Mica OS 不管理它。
+- **回滚就是用上一个摘要重新声明。**只有旧镜像还在设备上或 registry 里时才行。
 - **数据兼容性归你。**见第 6 节。
 
-> status: shipped — evidence: `docs/design/containers.md`, `mica-build:make os-quadlet-doc-test`
+> status: shipped — evidence: `docs/design/containers.md`
 
 ## 4. 总线上的应用，与 MQTT
 
@@ -128,7 +114,7 @@ SSH、凭据、更新、电源、容器启用——永远不是 MQTT item，桥�
 寻址管理守护进程。完整契约，含登记、D-Bus 策略、冲突处理与默认只读桥
 模式，见 [../design/bus.md](../../design/bus.md)。
 
-> status: shipped — evidence: `docs/design/bus.md`, `mica-core:mqttd/`
+> status: shipped — evidence: `docs/design/bus.md`, `mica-core:crates/mica-mqttd`
 
 ## 5. 应用 UI
 
@@ -138,7 +124,7 @@ apid 可以用集成商的 Web UI 替代内置 UI。在内置界面的 System �
 版本。无论自定义 bundle 状态如何，内置 UI 始终在 `/_ui/` 可达——坏掉的自定义 UI
 永远不会把你锁在管理面之外。见 [api.md](api.md)。
 
-> status: shipped — evidence: `docs/design/api.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/api.md`, `mica-core:crates/mica-apid/openapi.json`
 
 在外接屏幕上渲染同一 UI 的专用 HDMI kiosk 是一份设计，本仓库中没有已发布
 的实现。
@@ -178,4 +164,4 @@ registry 凭据和应用密钥都是有人放在 DATA/state 上、root 可读的
 健康闸回滚——是另一个产品，另一份成本。其设计见
 [托管应用](../../design/applications.md)；尚未实现，也不在上面的指南里描述。
 
-> status: proposed — evidence: `docs/task/20260912-2058-managed-applications.md`
+> status: proposed — evidence: `docs/design/applications.md`

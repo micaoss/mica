@@ -2,7 +2,7 @@
 
 The dashboard is the React/Vite SPA embedded in `apid` and served at `/_ui/`.
 It is a client of the [management API](api.md), with no private management
-protocol. Its source is `mica-core:apid/ui/`; the generated OpenAPI document
+protocol. Its source is `mica-core:crates/mica-apid/ui/`; the generated OpenAPI document
 defines the backend contract.
 
 ## Navigation and ownership

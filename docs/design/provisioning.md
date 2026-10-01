@@ -202,7 +202,7 @@ write per boot, and a live state that never settles.
 **What survives into the current model:** bcrypt is still the format Mica OS writes
 into `/etc/shadow`, for exactly the libcrypt reason measured above — but the
 only thing written there now is the **transient** root password
-(`mica-core:micad/src/transient.rs`, cost 12), and the idempotency question does not
+(`mica-core:crates/micad/src/transient.rs`, cost 12), and the idempotency question does not
 arise because it is written once per operator action rather than on every
 reconcile. `mica-shadow-reconcile` recognises it by an exact hash match against
 its marker, not by `bcrypt::verify`.
@@ -257,7 +257,7 @@ a later phase should close.
 sshd, not `pam_unix`, not the serial console, not apid — which has always
 authenticated its admin against `access.webAdmin` rather than against this. No
 code path in the repository calls a verifier against
-`access.device.passwordHash`; `mica-core:micad/src/identity.rs::verify_password`, the
+`access.device.passwordHash`; `mica-core:crates/micad/src/identity.rs::verify_password`, the
 function that was written to, is now `#[cfg(test)]` precisely because it had no
 caller outside its own tests.
 
@@ -356,10 +356,10 @@ different rules and not the same one applied twice:
 
 ### 4.1 The provisioning document — channels 1 and 2 (shipped)
 
-One file, one format, two transports. `mica-core:micad/src/provisioning_doc.rs`
+One file, one format, two transports. `mica-core:crates/micad/src/provisioning_doc.rs`
 parses, validates and applies it; `mica-system:overlay/usr/lib/mica/mica-provisioning-import`
 and its unit put the media where micad can read them;
-`mica-core:apid/src/provisioning_api.rs` reports what happened.
+`mica-core:crates/mica-apid/src/provisioning_api.rs` reports what happened.
 
 **The split is deliberate.** The transport is shell, because mounting a
 GPT-labelled partition read-only is shell's job; everything that decides what a
@@ -426,7 +426,7 @@ and nothing may derive one from the other.
 
 **There is no certificate section, and no hostname.** There is no settings
 path to carry certificates onto. The only certificate on the device is apid's
-self-signed TLS pair, a file pair on DATA/state (`mica-core:apid/src/tls.rs`), not a
+self-signed TLS pair, a file pair on DATA/state (`mica-core:crates/mica-apid/src/tls.rs`), not a
 setting — so a certificate section would mean inventing a setting, which this
 document deliberately does not do. A document carrying one is refused naming
 the key. The hostname is out for a related reason: the device names itself from

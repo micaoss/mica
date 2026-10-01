@@ -50,7 +50,7 @@ CSPRNG 抽出 32 个十六进制字符的 `deviceId`，从中派生 `mica-xxxxxx
 配置文档**只在设备还没有管理员凭据时**才被应用。已经被认领的单元不能用
 介质重新配置——在工厂也不行。
 
-> status: shipped — evidence: `mica-core:micad/src/provisioning_doc.rs`, `docs/design/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/design/provisioning.md`
 
 ## 3. 一份工厂记录必须包含什么
 

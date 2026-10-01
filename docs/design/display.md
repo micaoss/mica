@@ -23,9 +23,9 @@ board graphics stack (BSP: kernel DRM + HDMI + GPU driver/firmware)
 
 - **`mica-gui` container**: cog (WPE WebKit) holding DRM/KMS directly through
   GBM — no X, no Wayland, no compositor. The whole display layer (container
-  image, systemd/Quadlet orchestration, HDMI probing) lives in its own
+  image, its orchestration, HDMI probing) lives in its own
   repository, `bkhq/mica-gui` on git.ds.cc; the base image only runs it
-  through the podman/Quadlet machinery it already ships. Headless
+  through the podman and `mica-containerd` it already ships. Headless
   deployments simply do not deploy the container. Its one interface to the
   page is a URL. (Two earlier delivery ideas are retired: a sysext layer,
   and host packages — the container needs no second mechanism.) Runs as a systemd unit, like every other
@@ -90,7 +90,7 @@ The image does not ship a userspace splash renderer or a kiosk service.
 The console policy is covered by signed QEMU acceptance; actual CX3576 USB
 keyboard, EDID negotiation and visual output require testing the flashed image.
 
-## 5. Board requirements (extends [board contract](../boards/contract.md) §4)
+## 5. Board requirements (extends [board contract](https://github.com/micaoss/mica-build/blob/main/boards/README.md) §4)
 
 **Giving another board a logo is four things in this order**, and the order is
 the point *(2026-09-20)*: `CONFIG_LOGO` (with `LOGO_LINUX_CLUT224`) in the

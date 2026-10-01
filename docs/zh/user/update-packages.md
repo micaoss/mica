@@ -13,28 +13,29 @@ Mica OS 的发布在镜像旁边同时发布更新归档。本页说明哪个归
 
 > status: unsupported
 
-## 1. 一个部署，三种归档
+## 1. 一个部署，最多四种归档
 
-每个产品发布有一个签名部署，最多发布成三个携带同一份描述符的 `MICAUPD1` 归档：
+每个产品发布有一个签名部署，最多发布成四个携带同一份描述符的 `MICAUPD1` 归档：
 
 | 类型 | 文件 | 何时发布 |
 |---|---|---|
-| `full` | `mica-<product>-<stamp>.micaupd` | 始终 |
-| `root` | `mica-<product>-<stamp>.root.micaupd` | 相对该产品上一个发布，kernel 标识未变 |
-| `kernel` | `mica-<product>-<stamp>.kernel.micaupd` | rootfs 标识未变 |
+| `full` | `mica-<board>.<variant>-<stamp>.micaupd` | 始终 |
+| `root` | `mica-<board>.<variant>-<stamp>.root.micaupd` | 相对该产品上一个发布，kernel 标识未变 |
+| `kernel` | `mica-<board>.<variant>-<stamp>.kernel.micaupd` | rootfs 标识未变 |
+| `core` | `mica-<board>.<variant>-<stamp>.core.micaupd` | core 发布：沿用上一个发布的 kernel 与 root，换上新的 core 组件（`release.yml -f core=true`） |
 
 两者都变时只发布 `full`。`root` 这条路径在 2026-09-16 第一次跑在真实发布上，一次覆盖
-全部六个产品，并且面对的是真实存在的设备
-（[记录](../../task/20260916-1653-root-only-archive.md)）。`root` 归档携带 rootfs 对象，`kernel` 归档携带启动产物以及
+全部六个产品，并且面对的是真实存在的设备。`root` 归档携带 rootfs 对象，`kernel` 归档携带启动产物以及
 带模块和固件的 support 镜像；它们略去的对象必须已经在设备上，所以每个归档都声明自己
 要求什么。更新归档不压缩。后缀是生产侧的命名约定——客户端读的是 `MICAUPD1` 头部，
 不是文件名。
 
-**已回答：归档类型只按 root 与 kernel 标识计算，而引导器根本不在任何一种归档里。**
-一个归档打包一份签名描述符加上恰好两个对象族——kernel（`boot.efi` 或 `boot.itb`、
-`support.img`、`support.roothash.p7s`）与 root（`rootfs.img`、
-`rootfs.roothash.p7s`）。`full` 是两者，`root` 略去 kernel 对象，`kernel` 略去 root
-对象，不存在第三个族。固件不是部署描述符的成员，它只进入**工厂镜像**；所以 U-Boot 变动
+**已回答：引导器根本不在任何一种归档里。**一个归档打包一份签名描述符
+（`mica/deployment/v3`）加上最多三个对象族——kernel（`boot.efi` 或 `boot.itb`、
+`support.img`、`support.roothash.p7s`）、root（`rootfs.img`、`rootfs.roothash.p7s`）
+与 core 组件（每个是 `core.img` 加它签名的根哈希：`micad` 与控制台）。`full` 包含全部，
+`root` 只含 root 的，`kernel` 只含 kernel 的，`core` 只含 core 组件；只更新 core 时沿用
+设备上已有的 root，前提是 root 的接口等级在组件支持的范围内。固件不是部署描述符的成员，它只进入**工厂镜像**；所以 U-Boot 变动
 不会改变归档的任何一个字节，既不可能迫使发 `full`，也不可能压掉 `root` 或 `kernel`。
 
 这也了结了关于 `s905x5m` 的担心：它与另外三块板一样，从第二个发布起照常发部分更新，
@@ -89,8 +90,8 @@ Mica OS 的发布在镜像旁边同时发布更新归档。本页说明哪个归
 ```sh
 mica-deploy probe                                   # 工作区就绪情况与可用空间
 mica-deploy import /path/to/mica-<product>-<stamp>.micaupd
-mica-deploy check  --source <origin> --channel stable|beta|dev
-mica-deploy fetch  --source <origin> --channel stable|beta|dev
+mica-deploy check  --source <origin>
+mica-deploy fetch  --source <origin>
 mica-deploy install /mica/updates/verified/<id>.json --objects /mica/updates/verified/objects
 mica-deploy status | mica-deploy booted             # 正在运行什么
 mica-deploy confirm | mica-deploy rollback | mica-deploy reject <id>
@@ -193,30 +194,28 @@ deployment id 或获取路径是 **422** `validation_failed`，后端拒绝是 *
 和 `release-identity.env` 都已移除，软件包版本里也不带它们
 （[稳定组件标识](../../decisions/2026-09-15-stable-component-ids.md)）。
 
-用索引把 deployment id 映射回一个发布：
+用那个发布的 lock 里的 `product` 行把 deployment id 映射回一个发布：
 
 ```sh
-jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json
+awk -F'\t' '$1 == "product" {print $2, $5, $6}' mica-build.lock   # 产品、代次、deployment id
 ```
 
-> status: shipped — evidence: `mica-core:crates/micad/src/system_info.rs`, `docs/design/mica-index.md`, `docs/decisions/2026-09-15-stable-component-ids.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/system_info.rs`, `docs/design/release-lock.md`, `docs/decisions/2026-09-15-stable-component-ids.md`
 
-## 9. 从索引里挑文件
+## 9. 从产品的发布里挑文件
 
-`micaoss/mica-build` 的版本索引 `mica.<YYYYMMDD-HHMM>` 是唯一一处列出每个已发布产品
-最新产物的地方。在 `mica-index.json` 里，每个产品携带：
+每个产品各自发布为 `micaoss/mica-build` 的 `<board>.<variant>.<YYYYMMDD-HHMM>`；
+要取的是最新那个（[获取发布版](download.md)）。它的 `mica-build.lock` 写明设备要比对的东西：
 
-- `generation`、`deployment`、`kernel` 和 `rootfs`：用来与设备比较的标识；
-- `updates[]`：每个归档一条，含 `kind`、`file`、`url`、`sha256`、`size` 和
-  `requires`，其中 `requires.generationBelow` 是该归档的代次，
-  `requires.kernel` 或 `requires.rootfs` 指出该归档不携带的那个组件；
-- `images[]`：磁盘镜像的同类信息，外加压缩方式和解压后的身份。
+- `product` 行：代次，以及 deployment、kernel 与 rootfs 标识；
+- 每个更新归档一条 `asset` 行：类型（`full`、`root`、`kernel`）、文件名与 sha256。
 
-所以：找到产品，把 `requires` 与设备正在运行的东西比对，下载 `url`，核对 `sha256`，
-然后导入。结构见 [mica-index](../../design/mica-index.md)；校验方式见
+所以：找到产品的最新发布，把它的 kernel 与 rootfs 标识与设备正在运行的比对——`root`
+归档要求设备的 kernel 标识就是这个发布的，`kernel` 归档要求 rootfs 标识相同——下载
+文件，对照 `asset` 行核对 sha256，然后导入。校验方式见
 [获取发布版](download.md#4-哪一步该核对哪个摘要)。
 
-> status: shipped — evidence: `docs/design/mica-index.md`, `docs/decisions/2026-09-15-mica-version-index.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`
 
 ## 10. 在线更新：设备对服务器的要求
 
@@ -224,27 +223,30 @@ jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.
 
 - 来源解析后恰好是 `http(s)://<host>/v1/manifest.json`，没有 query、fragment 或
   凭据；
-- 该文档是包在 `mica/catalog/v2` 载荷外的签名信封，规范 JSON，最大 1 MiB，带单调
-  递增的 `revision`（同一 revision 再次出现必须逐字节相同），`issuedAt` 与
-  `expiresAt` 相距最多 30 天，最多 128 个 release、12 个 channel；
-- `channels` 是按**板卡 + 产品 + 通道**为键的头表，每条指出最高代次及其 release；
-  不是该键最高 release 的头会被拒绝；
-- 每个对象的 `url` 必须等于 `<origin>/v1/objects/<sha256>`；传输支持按 range 续传，
-  速率低于 1 KiB/s 时放弃。
+- 该文档是 `mica/catalog/v3` 目录：**不签名**的规范 JSON（键排序、无空白——设备会把它
+  重新序列化，不能逐字节还原的文档会被拒绝），最多 128 个 release 与 head，每个**板卡与
+  产品**一个 head，带单调递增的 `revision`；没有 channel，也没有过期时间，所以被扣下的
+  目录读起来就是“没有更新的”；
+- 对象只写摘要与长度，设备从 `<origin>/v1/objects/<sha256>` 获取；传输支持按 range 续传，
+  速率低于 1 KiB/s 时放弃；
+- 信任来自每个发布自己的签名描述符：设备只取自己的板卡、架构与产品，只取比当前运行的
+  代次更高的代次，也只取那份描述符点名的对象。
 
 设备去拨哪个地址由操作者决定，它会接受什么则不由操作者决定。镜像里烧进去的
-`mica/meta/v1` 清单携带 `update.source`、`channel`、`policy`（`off`、`check`、
-`auto`）和 `checkIntervalMinutes`，DATA 上的 `/mica/config/updates.json` **只能**覆盖
-这四个键。声明信任锚的文档会被拒绝：信任锚在签名镜像内部。
+`mica/meta/v2` 清单携带 `update.source`、`policy`（`off`、`check`、`auto`）和
+`checkIntervalMinutes`，DATA 上的 `/mica/config/updates.json`（`mica/update-config/v2`）
+**只能**覆盖这些键。带 channel 的 v1 文档会被拒绝，声明信任锚的文档也会被拒绝：信任锚
+在签名镜像内部。
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy/src/catalog.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `docs/design/remote-management.md`
 
-## 11. 运行一台更新服务器
+## 11. 更新服务器
 
-本仓库不再附带更新服务器。分发由 fleet 服务（`micaoss/mica-fleet`）负责：它在
-`/v1/manifest.json` 发布目录、在 `/v1/objects/` 下提供对象，其文档在那边。本仓库提供
-的是 fleet 的输入——第 1 节的签名归档与第 9 节的索引——以及第 10 节的契约，设备会对
-任何服务方强制执行这份契约。曾经代替 fleet 的 `mica-build:update-server/` 已于
+`mica-res` 是设备应当读取的更新平面：`res.micaos.dev/v1` 提供第 10 节的目录，只给出每个
+产品的当前发布，并把 `/v1/objects/<sha256>` 重定向到它的下载站
+（`mica-res:docs/modules/resource.md`）。它不持有任何密钥；设备信任的是发布自己的签名
+描述符。**发布还没有推送到它**，所以今天设备的来源要指向操作者自己运行、实现了第 10 节的
+服务器，内容就是第 1 节的归档。曾经代替它的 `mica-build` 的 `update-server/` 已于
 2026-09-21 移除。
 
 > status: unsupported

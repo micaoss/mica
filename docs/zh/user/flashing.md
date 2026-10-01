@@ -1,6 +1,6 @@
 # 把 Mica OS 镜像写入板卡
 
-一个发布为每个产品发布一份压缩镜像 `mica-<product>-<release>.img.gz`。这个文件
+一个发布为每个产品发布一份压缩镜像 `mica-<board>.<variant>-<stamp>.img.gz`。这个文件
 是一整块 GPT 磁盘镜像：分区表、启动部件、签名根，以及一个空的 DATA。本页讲它
 如何逐块板地进入设备，以及哪些步骤目前还不是已验证的流程。
 
@@ -15,11 +15,8 @@
 产物，因此不是证据行，本页也不当它是
 （[支持层级](../../boards/support-tiers.md)）。
 下面的 QEMU 小节是实际跑过的；硬件小节是从仓库里读出来的，未验证之处都有标注。
-日期很重要：板卡改名之后到 2026-09-19 之间发布的三轮 `uefi`（`20260916-0845`、
-`20260916-1653`、`20260919-2103`）不会启动，而是在 PID 1 把机器关掉。请取
-`20260920-0622` 或更新的镜像——它之前的那一轮仍然没有控制台登录
-（[获取发布版](download.md) 第 1 节）；而自 `20260919-2356` 起，每个 amd64 产品都会被自动启动——每次推送
-时一次，发布运行里再一次——而 `uefi-arm64` 镜像只被构建和校验、没有自动流程启动它，
+每个 amd64 产品都会在它的发布流程里被自动启动，而 `uefi-arm64` 镜像只被构建和校验、
+没有自动流程启动它，
 `cx3576` 与 `s905x5m` 的镜像则没有任何自动流程会启动：没有任何套件会启动 FIT 镜像——
 FIT 那套跑在宿主机上，里面没有 QEMU（[获取发布版](download.md) 第 1 节）。
 
@@ -30,17 +27,13 @@ FIT 那套跑在宿主机上，里面没有 QEMU（[获取发布版](download.md
 先校验文件，再解压：
 
 ```sh
-sha256sum -c SHA256SUMS                              # 发布自带的清单，覆盖 .gz
-gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
-sha256sum disk.img                                   # 与 uncompressedSha256 比较
+sha256sum -c SHA256SUMS                              # 发布自带的清单：lock
+gzip -dc mica-uefi-x64.basic-<stamp>.img.gz > disk.img
+sha256sum disk.img                                   # 与层注解 mica.uncompressed-sha256 比较
 ```
 
-完整的摘要链——发布清单、lock 的 `asset` 行、索引的 `uncompressedSha256`、OCI 层
-注解——见[获取发布版](download.md#4-哪一步该核对哪个摘要)。以
-`mica-x64-dev-20260915-2230.img.gz` 为例——它发布于 2026-09-16 板卡改名之前，
-所以带的是旧产品名——解压后的镜像是 1 881 145 344 字节，sha256 为
-`e27709a9e54f6ffe92f4737cac18f3c00023547e406f7c670bfedb0d3849c6ef`，索引和 OCI 层
-都是这么写的。
+完整的摘要链——`SHA256SUMS`、lock 的 `asset` 行、OCI 层及其 `mica.uncompressed-*`
+注解——见[获取发布版](download.md#4-哪一步该核对哪个摘要)。
 
 然后记住关于这次写入的三件事：
 
@@ -66,13 +59,12 @@ sha256sum disk.img                                   # 与 uncompressedSha256 �
 | `uefi-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，只要带 ACPI 的 UEFI 启动 `EFI/BOOT/BOOTAA64.EFI` | 自 2026-09-16 起是发布目标；仅在 QEMU 下合格 |
 | `cx3576` | `rockchip-loader` | 能——U-Boot 就写在镜像的第 64 扇区 | 未在实机上验证 |
 | `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在镜像之外 | 没有受支持的路径 |
+| `mini-x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI`；没有 USB 驱动，所以不能从 USB 介质启动 | 仅在 QEMU 下合格 |
 
-`uefi-x64`、`uefi-arm64`、`cx3576` 自 `20260916-1653` 起都有已发布的镜像；
-`s905x5m` 于 2026-09-19 被开放为发布目标，自其首个发布起开始发布——这改变的
-是“有什么可下载”，不是“能写入什么”：它的镜像仍然不会装上任何引导器，理由见第 6 节。
+每块板都发布镜像；对 `s905x5m` 来说这改变的是“有什么可下载”，不是“能写入什么”：它的镜像仍然不会装上任何引导器，理由见第 6 节。
 没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`, `mica-build:boards/cx3576/images.tsv`
 
 ## 3. uefi-x64
 
@@ -117,7 +109,7 @@ ESP 是 FAT，卷标 `MICAESP`，携带 `EFI/BOOT/BOOTX64.EFI` 和 `loader/loade
 > # NOT VERIFIED: never run against physical hardware by this project
 > lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS      # 插入设备前后各看一次
 > udevadm info --query=property --name=/dev/sdX | grep -E 'ID_BUS|ID_MODEL|ID_SERIAL'
-> gzip -dc mica-uefi-x64-dev-<release>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+> gzip -dc mica-uefi-x64.basic-<stamp>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
 > sync
 > sudo cmp -n 1881145344 /dev/sdX disk.img            # 或者回读后比较 sha256
 > sudo sfdisk -d /dev/sdX                             # 应为 2048、1050624、3147776
@@ -202,7 +194,7 @@ mica-deploy import /run/mica/import/update.micaupd
 整套验收——启动、运行时、更新、故障、重置、关机——在 `mica-build` 里是一个 target：
 
 ```sh
-make lifecycle-uefi PRODUCT=uefi-arm64-dev
+make lifecycle-uefi PRODUCT=uefi-arm64.dev
 ```
 
 > status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/boards/uefi-arm64.md`
@@ -272,9 +264,9 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 
 ## 7. 首次启动
 
-- **DATA 扩容。** `systemd-repart` 把 DATA 分区扩展到设备大小，
+- **DATA 扩容。** 在 systemd 产品上，`systemd-repart` 把 DATA 分区扩展到设备大小，
   `systemd-growfs@mnt-data` 扩展它的文件系统；两个 unit 都必须是 active，验收套件
-  会让不满足的启动失败。`make os-repart-test`（特权 docker）证明这次扩容不会抹掉
+  会让不满足的启动失败。OpenRC 产品由 `mica-data-layout` 扩容。`make os-repart-test`（特权 docker）证明这次扩容不会抹掉
   loader；这个 target 存在，但 CI 不跑它。
 - **一开始就有两个部署。** 工厂镜像携带两条签名部署记录，代次 g-1 和 g——对
   `x64-dev` `20260915-2230` 来说是第 3 代和第 4 代。在设备上就是
@@ -289,8 +281,8 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
   `mica-provisioning.toml` 放到 ESP 上（仅 UEFI 板卡）；树里今天没有任何产品带着它，
   所以已发布的镜像里没有。设备拿到它之后做什么见[首次启动](first-run.md)。
 - **正在运行的是哪个版本。** `mica-deploy status` 和 `mica-deploy booted` 报告运行中
-  的 deployment id；用索引映射回去：
-  `jq -r '.products[]|[.product,.release,.generation,.deployment]|@tsv' mica-index.json`。
+  的 deployment id；一个发布的 `mica-build.lock` 里的 `product` 行写明它发布的
+  deployment id：`awk -F'\t' '$1 == "product"' mica-build.lock`。
 
 > status: shipped — evidence: `mica-build:src/image/file-image.ts`, `mica-build:make os-repart-test`, `mica-core:crates/mica-deploy`, `docs/design/storage.md`
 

@@ -13,7 +13,7 @@ version/generation, deployment/kernel/root IDs, byte lengths and digests. A full
 a signed component deployment update. Firmware has its own maintenance artifact,
 recovery and readback workflow.
 
-> status: shipped — evidence: `mica-build:src/image/component-cli.ts`, `mica-build:src/image/components.ts`, `docs/design/build.md`
+> status: shipped — evidence: `mica-build:src/image/component-cli.ts`, `mica-build:src/image/components.ts`, `mica-build:docs/design/image.md`
 
 ## Verification
 
@@ -27,17 +27,18 @@ or historical update compatibility is offered.
 
 ## Publication
 
-A scoped release publishes the signed archives and images as release assets,
-and the Mica version index names the newest release of every product. The
-channel catalogues devices poll are the fleet service's, not this repository's.
-A release is not a physical-board qualification. Generate any download list
-from the index and the delivered artifact records; do not hand-write release
-identities or claim absent evidence.
+A product release (`<board>.<variant>.<YYYYMMDD-HHMM>`) publishes the signed
+archives and images as release assets, and a product's newest release is the
+one to take; there is no index. The channel catalogues devices poll are an
+update server's, not this repository's. A release is not a physical-board
+qualification. Generate any download list from each product's newest release
+and its `mica-build.lock`; do not hand-write release identities or claim
+absent evidence.
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/user/download.md`
 
 Public hosting, release support windows and a public downloadable release history
-remain unprovided. Link [build instructions](../design/build.md),
+remain unprovided. Link [build instructions](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md),
 [user downloads](../user/download.md) and [installation](../user/install.md).
 
 > status: unsupported

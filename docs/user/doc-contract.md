@@ -80,9 +80,9 @@ above, the separator an em dash with spaces, each evidence reference in
 backticks, multiple references separated by `, `:
 
 ```
-> status: shipped — evidence: `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 > status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
-> status: proposed — evidence: `docs/task/20260912-2058-fleet-runtime.md`
+> status: proposed — evidence: `docs/design/applications.md`
 > status: unsupported
 ```
 
@@ -91,17 +91,17 @@ backticks, multiple references separated by `, `:
 - `shipped` and `board-dependent` must cite an existing repository path (a
   file or a directory) or a `make <target>` that exists in the top-level
   `Makefile`.
-- `proposed` must cite at least one open tracking record: a detail file under
-  `docs/plan/` or `docs/task/` whose index entry is pending (`[ ]`) or in
-  progress (`[-]`). When the record completes or closes, the gate fails until
-  the page is relabelled.
+- `proposed` must cite what describes the work: the design that labels it not
+  implemented, or the record of the repository that will implement it
+  (`<repository>:docs/...`). This repository keeps no task or plan records.
+  When the work lands, the page is relabelled.
 - `unsupported` carries no evidence; the absence is the claim.
 - Evidence is verified to exist before it is cited. A dead evidence reference
   is a broken claim, not a cosmetic defect.
 - No `path:line` citations anywhere in this set. A document coupled to line
   numbers is falsified by edits that leave its meaning intact. Where a precise
   contract is needed, the artifact that carries it is named instead — for
-  example, the HTTP surface is `mica-core:apid/openapi.json`.
+  example, the HTTP surface is `mica-core:crates/mica-apid/openapi.json`.
 
 ### Proposed content
 
@@ -307,7 +307,7 @@ English source.
   `privileged.yml` has never run, and two screens on still said the lane
   builds, verifies, gates and repart-tests every product); two copies of a
   shared fixture diffed against each other, both saying `x64`, the check
-  passing ([harness](../design/build-harness.md) section 4). Each piece is
+  passing ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4). Each piece is
   defensible alone, which is why no lexical gate can judge the pair, so the
   check is procedural: **a claim about other text — a count, a boundary, a
   negation — is not finished until you have read the text it ranges over**,
@@ -659,7 +659,7 @@ English source.
   property** *(2026-09-20, from two rules written the same day that look like
   they disagree)*. A triage of dropped files sorts by **consequence**, because
   the consequence is what you do about the file
-  ([harness](../design/build-harness.md) section 7). A class of defects sorts
+  ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 7). A class of defects sorts
   by **repair**, because two defects with the same symptom and different
   repairs are two classes. The test case: a matcher comparing unit patterns
   literally, so `disable getty@.service` never matched `getty@tty1.service`

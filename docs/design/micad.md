@@ -214,7 +214,7 @@ on dot-paths and are untouched. Two consequences that are not free:
   claiming that would buy the appearance of erasure.
 - **A secret-bearing key is spelled with a name the redactor already carries,
   or the change that adds it adds the name.** The redactor
-  (`mica-core:apid/src/redact.rs`) is a denylist of field names and is
+  (`mica-core:crates/mica-apid/src/redact.rs`) is a denylist of field names and is
   fail-open by design. The moved schema satisfies the rule with nothing added:
   its only secret-bearing keys are `wifi.ap.psk` and
   `wifi.client.networks[].psk`, both spelled `psk`. The rule exists because the
@@ -326,7 +326,7 @@ state under its own name on the live-state tree. Two rules bind every one of the
   file and reloading leaves the device behind.
 
 Which reconcilers exist, what each renders and drives, and the measured detail behind every
-cell are `mica-core`'s to state: [`mica-core:docs/design/micad.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
+cell are `mica-core`'s to state: [`mica-core:docs/mica-core.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
 §4. The settings a reconciler reads are §2.1 above; the rules its documents inherit are
 §2.1a.
 
@@ -336,7 +336,7 @@ cell are `mica-core`'s to state: [`mica-core:docs/design/micad.md`](https://gith
 `com.mica.micad` on the system bus, object `/com/mica/micad`, interface
 `com.mica.micad1`. Structured values cross as JSON strings. The member list and what each
 one does are `mica-core`'s to state:
-[`mica-core:docs/design/micad.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
+[`mica-core:docs/mica-core.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
 §5.
 
 What this document owns is the boundary:

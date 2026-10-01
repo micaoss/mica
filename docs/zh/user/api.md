@@ -1,22 +1,23 @@
 # API 参考
 
-Mica OS 管理 API 由一份机器可读契约规定：**`mica-core:apid/openapi.json`**。
+Mica OS 管理 API 由一份机器可读契约规定：**`mica-core:crates/mica-apid/openapi.json`**。
 它从服务这些路由的同一份代码生成，CI 保证它与随附二进制报告的内容一致——
 因此它不会像手写端点清单那样偏离设备。本页刻意不复制端点清单；它告诉你
 契约在哪里，并陈述 schema 本身表达不了的事实。
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 
 ## 1. 一段话说清这个面
 
-apid 在 443 端口提供 HTTPS（80 端口重定向），`/api` 是完整的管理协议：
+apid 默认在 8080 端口提供明文 HTTP，开启后（`PUT /api/v1/web`）在 8443 端口提供 HTTPS，
+HTTP 随之只做重定向；`/api` 是完整的管理协议：
 带版本的设置与状态读取、类型化写入、排队的任务记录、初始设置与会话生命
 周期、UI 选择、实时网络观察、更新状态和系统动作。错误是 JSON 信封。
 `/healthz` 是 `/api` 之外唯一的运维例外，它只证明 apid 进程在监听——
 不证明 micad 或其他任何东西健康。`/_ui/` 上的内置浏览器 UI 是同一 API 的
 普通客户端，没有特权旁路。
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/remote-management.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/remote-management.md`
 
 ## 2. 认证
 
@@ -32,7 +33,7 @@ apid 在 443 端口提供 HTTPS（80 端口重定向），`/api` 是完整的管
 或改变设备状态的一切都需要上述凭据之一。登录尝试有持久退避的限速并被
 审计（[security.md](security.md)）。
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/access.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/access.md`
 
 ## 3. 版本化
 
@@ -41,7 +42,7 @@ API 当前使用 `/api/v1/...`。系统开发阶段默认不保证不同构建�
 当前策略不要求为破坏性变更添加第二套版本路由或兼容适配器
 （[doc-contract.md](doc-contract.md)）。
 
-> status: shipped — evidence: `mica-core:apid/openapi.json`, `docs/design/api.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/api.md`
 
 ## 4. 什么不是公开 API
 
@@ -54,7 +55,7 @@ API 当前使用 `/api/v1/...`。系统开发阶段默认不保证不同构建�
 - **`/_ui` 与自定义 UI 资源**是静态内容，不是契约；自定义 bundle 无法
   遮蔽 `/api` 路由。
 
-> status: shipped — evidence: `docs/design/bus.md`, `mica-core:dist/`
+> status: shipped — evidence: `docs/design/bus.md`, `mica-core:crates/micad/dist/`
 
 ## 5. 试一试
 
@@ -65,4 +66,4 @@ API 验收套件在 QEMU 里启动 uefi-x64 镜像，通过真实套接字驱动
 bash micad:tests/suites/apid-api/run.sh
 ```
 
-> status: shipped — evidence: `mica-core:tests/apid-api/run.sh`
+> status: shipped — evidence: `mica-build:tests/suites/apid-api/run.sh`

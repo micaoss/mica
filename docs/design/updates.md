@@ -30,27 +30,38 @@ content from untrusted root metadata or an editable version label.
 
 ## Acquisition and installation
 
-The catalog source is an explicit `/v1/manifest.json` URL. Its signed
-`mica/catalog/v2` envelope binds deployment associations, origin/digest object
-URLs and channel heads `{board, product, channel, releaseId, generation}`,
-keyed by board, product and channel. The client enforces validity intervals, revisions and content consistency;
-clock uncertainty can defer acquisition without blocking installed offline boot.
+The catalog source is an explicit `/v1/manifest.json` URL. The catalog,
+`mica/catalog/v3`, is **unsigned** canonical JSON listing releases and one head
+per board and product; its objects name a digest and a length and are fetched
+from `<origin>/v1/objects/<sha256>`. Trust comes from each release's own
+signed descriptor: the client takes only its own board, architecture and
+product, only a generation above the one it runs and only the objects that
+descriptor names. The revision is checkpointed as a consistency check against
+a confused mirror; there is no channel and no expiry, so a withheld catalog
+reads as "nothing newer" (`mica-core:docs/mica-core.md` section 6.2). The
+server devices are meant to read is `res.micaos.dev/v1` of `mica-res`, which
+offers the current release of each product.
 
 Files live under `/mica/updates/{staging,downloads,verified}` on physical DATA.
 The workspace probe checks mount identity, writability, free space and bounded
 contents. HTTP ranges resume partial objects; complete bytes and lengths must
 match authenticated metadata. `MICAUPD1` offline imports carry the same signed
-deployment and at most five unique objects, with no archive paths or links.
+deployment and any subset of its objects, with no archive paths or links.
 Decided 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and
 implemented in `mica-core` since its release `20260915-0728` (`2a4c98d`;
 written by `mica-build` since `0094a097`): an import may carry from 0 to the
 descriptor's object count (a `root` or `kernel` archive), and every missing
-object must already be in the store. The `mica/deployment/v2` descriptor's
-required signed `product` field must equal the device's product: the single
-unquoted `PRODUCT=<name>` line of `/usr/lib/mica/product.conf`, a five-line
-file (`PRODUCT`, `BOARD`, `PROFILE`, and the quoted `FEATURES` and
-`COMPONENTS`). A catalogue server is keyed by product. There is no minimum
-running release rule.
+object must already be in the store. Deployments are `mica/deployment/v3`
+(v2 is still read): the root states its `interfaceLevel` (`mica/rootfs/v3`),
+and the deployment names its **core components** (`mica/core/v1`, one per
+package — `micad` and the console), each running on its root's level with
+every need met inside the deployment. A core component is a verity image
+installed beside the root under `cores/<id>/` and composed over the root's
+`/usr` and `/etc` at boot, so a `core` archive updates the management plane
+over the root the device already has. The descriptor's required signed
+`product` field must equal the device's product: the unquoted `PRODUCT=<name>`
+line of `/usr/lib/mica/product.conf`. A catalogue server is keyed by product.
+There is no minimum running release rule.
 
 Installation requires the authenticated running deployment A to be confirmed
 healthy. It verifies every new or reused object and checks destination capacity,
@@ -102,8 +113,9 @@ there is no UI action that clears those installation constraints.
 
 ## Policy and reboot
 
-Public `/mica/config/updates.json` settings overlay factory defaults for source,
-channel, mode, allowed network, schedule and reboot policy. They cannot inject
+Public `/mica/config/updates.json` settings (`mica/update-config/v2`) overlay
+the factory defaults (`mica/meta/v2`) for source, mode, allowed network,
+schedule and reboot policy; a v1 document that carries a channel is refused. They cannot inject
 metadata keys. Automatic checks/fetches use the same native acquisition path.
 The reboot gate retains maintenance-window, health, active-install and override
 checks; an override does not interrupt an installation.

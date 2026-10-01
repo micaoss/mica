@@ -71,7 +71,7 @@
 help:
 	@echo "  docs-verify         assert the docs catalog, links, truth-status lines and board dossiers"
 	@echo "  docs-verify-test    prove those assertions actually fail on fixtures where their facts are false, and lint the scripts"
-	@echo "  docs-verify-world   check the claims these records make about other repositories against those repositories (needs the network)"
+	@echo "  docs-verify-world   check the claims and the <repository>:<path> citations these documents make about other repositories (needs the network)"
 	@echo "  (a records change)  bash tools/docs/record.sh --edit <script> --message <file> -- <path>..."
 	@echo "  website             build the site into website/dist, publishing the documents website/ allowlists"
 	@echo "  website-deploy      build, then upload website/dist to Cloudflare Workers"
@@ -85,6 +85,7 @@ docs-verify:
 
 docs-verify-world:
 	bash tools/docs/verify-world.sh
+	bash tools/docs/verify-citations.sh
 
 docs-verify-test:
 	bash tools/docs/verify-index-test.sh
@@ -93,6 +94,7 @@ docs-verify-test:
 	bash tools/docs/verify-coverage-test.sh
 	bash tools/docs/verify-board-test.sh
 	bash tools/docs/verify-world-test.sh
+	bash tools/docs/verify-citations-test.sh
 	bash tools/docs/record-test.sh
 	bash tools/docs/shell-lint.sh
 	bash tools/docs/shell-lint-test.sh

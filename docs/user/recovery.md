@@ -90,7 +90,7 @@ data. It cannot recover a lost credential or undo persistent writes. Reboot is a
 separate action. QEMU covers the real action and subsequent fallback; physical
 cx3576 execution remains separately qualified.
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:apid/openapi.json`, `mica-core:tests/apid-api/src/phases/07-update-rollback.ts`
+> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
 
 ## 5. The destructive steps: resets and credential recovery
 
@@ -114,13 +114,12 @@ that boot. An interrupted reset is replayable: the next boot finishes it.
   authenticated, no physical presence needed.
 
 **Read this before you run it: the update settings go back too.** A
-configuration reset returns the **update channel** and the **update server
-address** to the values your device's image was built with, discarding any
+configuration reset returns the **update server address** and the update
+policy to the values your device's image was built with, discarding any
 change an operator made. Which is a recovery route or a surprise depending on
 what those built-in values are, and there are only two cases:
 
-- **The image names a server.** The device goes back to that server and that
-  channel. If somebody re-pointed the device at a server that turned out to
+- **The image names a server.** The device goes back to that server. If somebody re-pointed the device at a server that turned out to
   be wrong, this is how you undo it without a reflash and without physical
   access.
 - **The image names no server** — which is the case for a build whose
@@ -185,7 +184,7 @@ spends every setting to recover one. See
 - **Preserves, by design:** the device identity, calibration data, the update
   metadata in DATA/meta and both retained deployments. A reset resets *state*, not the
   installed software version.
-- **Also goes back:** the update channel and the update server address, to
+- **Also goes back:** the update server address and policy, to
   the values the image was built with — Step 3's warning applies here
   unchanged, including the case where the built-in address is *none* and the
   device is left with no update server at all.
@@ -228,7 +227,7 @@ could read it.
 If the device is going to another party and its data must not go with it,
 destroy the medium. Nothing softer is honest today, and section 6 says why.
 
-> status: shipped — evidence: `mica-core:micad/src/reset.rs`, `mica-core:apid/src/routes.rs`, `docs/design/manufacturing.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/reset.rs`, `mica-core:crates/mica-apid/src/routes`, `docs/design/manufacturing.md`
 
 ## 6. Below the OS: reflash and disposal
 

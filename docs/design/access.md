@@ -95,7 +95,7 @@ because it is workspace policy rather than one repository's build detail)*:
   `podman` is already root; that is also why the operator account `mica`
   exists without being an access path, and why a container privilege
   restriction constrains nobody who is not already constrained. If a later stage ever wants
-  rootless, `uidmap` is a row of `mica-system-base:upstream.pkgs` — pinned for
+  rootless, `uidmap` is a row of `mica-system-base:locks/upstream.pkgs` — pinned for
   later stages, not installed in the root — rather than a change to the base
   root.
 - **`/etc/subuid` and `/etc/subgid` are kept, inert in this configuration —
@@ -112,7 +112,7 @@ because it is workspace policy rather than one repository's build detail)*:
   `/etc/subuid` and is a **rootful** consumer *(found in the pinned podman
   source by `mica-podman`, 2026-09-20; not re-measured here)*. Nothing in the
   shipped configuration passes it, so the ranges do nothing **today** — but an
-  integrator writing a Quadlet unit can reach them, and with no `uidmap` in
+  integrator running podman by hand can reach them, and with no `uidmap` in
   the root what they would meet is a failure rather than a mapping. The
   correct statement is *nothing shipped invokes the one flag that reaches
   them*, not *nothing can*.
@@ -142,8 +142,7 @@ about the base root, not about a product root). The measurement from a real
 compose that started all of this — on `uefi-x64`, the only product the
 report has run on: 2980 paths carried, 703 left behind, 626
 owned by a package and claimed by nothing, 77 shipped by no package at all —
-is what `mica-system-base` now publishes as a list with each writer named
-([proposal](../task/20260920-0610-producer-data-assets.md)).
+is what `mica-system-base` now publishes as a list with each writer named.
 
 **The local virtual-terminal question is not settled design: it is one board's
 policy and three boards' accident** *(2026-09-20)*. It arose from
@@ -152,13 +151,18 @@ every product root. The first version of the claim — *a board with a display
 has no VT login* — overstated what had been looked at: that symlink governs
 `tty1` at boot, while Alt+F2 goes through `systemd-logind` activating
 `autovt@ttyN.service` on demand, a different mechanism
-([harness](build-harness.md) section 4).
+([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4).
 
 The base root **ships `tty1` enabled**: `systemd`'s postinst writes that
 symlink, and it is line 51 of `mica-system-base`'s own unowned-paths artefact
 with `systemd.postrm` named as its writer. So a product root loses it by
 exactly the mechanism that lost the `pam.d` files, and what the loss *agrees
-with* is what decides whether it was meant:
+with* is what decides whether it was meant.
+
+*(Since 2026-09-28 the drop-in below and the `getty@tty1` mask are Base's:
+`mica-systemd` ships them on every systemd root
+(`mica-system-base:debs/mica-systemd/payload/etc/systemd/`), and no board
+overlay carries them. What follows is the analysis that led there.)*
 
 - **`cx3576`: deliberate, and the reason is a capability rather than a
   preference.** Its board package carries
@@ -252,9 +256,9 @@ shell is the base image's.
 
 ## 3. Configuration model — **[implemented]**
 
-Implemented by `mica-core:micad-settings/src/model.rs` (the tree),
-`mica-core:micad/src/reconciler/sshd.rs` (the reconciler) and
-`mica-core:micad/src/transient.rs` (the transient password).
+Implemented by `mica-core:crates/micad-settings/src/model.rs` (the tree),
+`mica-core:crates/micad/src/reconciler/sshd.rs` (the reconciler) and
+`mica-core:crates/micad/src/transient.rs` (the transient password).
 
 ### 3.1 As shipped
 
@@ -412,7 +416,7 @@ part of its common selection (user, 2026-09-14); it is not a board component.
 §2, §3.1, §3.2 and §4.1 describe the Dropbear behaviour images carry today:
 `mica-system-base` selects `dropbear-bin` and its base root gate asserts that
 `usr/sbin/sshd`, `usr/bin/ssh` and `usr/lib/openssh` are **absent**
-(`mica-system-base:packages.tsv`, `mica-system-base:src/rootfs.ts`), and micad's
+(`mica-system-base:locks/packages.tsv`, `mica-system-base:src/rootfs.ts`), and micad's
 only SSH reconciler drives `dropbear.service`
 (`mica-core:crates/micad/src/reconciler/sshd.rs`).
 
@@ -516,10 +520,10 @@ root password below.
 
 ### 4.1 Phase 1 as shipped — **[implemented]**
 
-Implemented by `mica-core:micad/src/reconciler/sshd.rs` (keys),
-`mica-core:micad/src/transient.rs` and `mica-core:micad/src/bus.rs` (the transient
+Implemented by `mica-core:crates/micad/src/reconciler/sshd.rs` (keys),
+`mica-core:crates/micad/src/transient.rs` and `mica-core:crates/micad/src/bus.rs` (the transient
 password), `mica-system:overlay/usr/lib/mica/mica-shadow-reconcile` (the boot
-clear) and `mica-core:apid/src/routes.rs` (the operator-facing pane).
+clear) and `mica-core:crates/mica-apid/src/routes` (the operator-facing pane).
 
 **The default state of a device is: SSH off, root with no password, no keys.**
 Both dev and prod images. First-boot provisioning seeds `access.ssh.enabled`
@@ -634,10 +638,10 @@ keeping every other account locked; it is not permanent architecture.
 
 ### 4.4 The claim: how a device stops being anyone's — **[implemented]**
 
-Implemented by `mica-core:apid/src/routes.rs` (the claim, its record, the
-rotation gate and `GET /api/v1/claim`), `mica-core:micad-settings/src/model.rs`
+Implemented by `mica-core:crates/mica-apid/src/routes` (the claim, its record, the
+rotation gate and `GET /api/v1/claim`), `mica-core:crates/micad-settings/src/model.rs`
 (`access.claim`, settings schema **v11**) and, for the other channel,
-`mica-core:micad/src/provisioning_doc.rs`.
+`mica-core:crates/micad/src/provisioning_doc.rs`.
 
 **A claim is the unclaimed → claimed transition, and `access.webAdmin` is the
 one fact that decides which side of it a device is on.** It always was. What
@@ -802,7 +806,7 @@ may post the same body again.
 
 **A retry after an interrupted claim mints no second identity and no second
 credential.** The device identity is drawn once by
-`mica-core:micad/src/identity.rs` and the claim never touches it. If the save
+`mica-core:crates/micad/src/identity.rs` and the claim never touches it. If the save
 did not land, the retry claims a device that is exactly as it was. If it did
 land and only the answer was lost, the retry is the 409 above — so there is
 never a second token that also works and that nobody was told about. The
@@ -815,7 +819,7 @@ either demand a rotation that already happened or excuse one that never did.
 ### 5.1 Runtime — **[implemented]**
 
 `enabled: false` → the reconciler stops and runtime-disables `ssh.service`
-(`mica-core:micad/src/reconciler/sshd.rs`). Reversible, and the default.
+(`mica-core:crates/micad/src/reconciler/sshd.rs`). Reversible, and the default.
 
 ### 5.2 DATA/meta lockdown — **[not implemented]**
 
@@ -839,7 +843,7 @@ decision.
 
 **A correction this section used to carry the other way.** It said factory reset
 itself was not implemented. That is no longer true: `ResetTier::FullFactory`
-exists and `mica-core:micad/src/reset.rs` executes it
+exists and `mica-core:crates/micad/src/reset.rs` executes it
 (`docs/design/recovery.md` §2). What remains true is the operator-facing answer —
 **field full-factory reset is unsupported**, because the tier is presence-gated
 and no shipped board declares a physical recovery action, so no fielded device
@@ -949,7 +953,7 @@ reading them as a record of the events §6 lists below and not as a complete
 history of who was on the device.
 
 **[implemented] Failure counters and backoff state persist across a restart.**
-`GuardStore` (`mica-core:apid/src/auth.rs`) wraps the in-RAM `LoginGuard` and
+`GuardStore` (`mica-core:crates/mica-apid/src/auth.rs`) wraps the in-RAM `LoginGuard` and
 writes the consecutive-failure run and the window deadline to
 `login_guard.json` on every mutation, atomically and 0600. A refused attempt
 mutates nothing and therefore writes nothing — without that check an
@@ -960,7 +964,7 @@ apid keeps its counters and TLS material in `/var/lib/mica/apid`, backed by
 DATA/state. They survive reboot and ordinary component updates. DATA/meta owns
 separate lifecycle and deployment records on the same physical filesystem.
 
-The directory is 0700 (`StateDirectoryMode=0700` in `mica-core:dist/apid.service`;
+The directory is 0700 (`StateDirectoryMode=0700` in `mica-core:crates/mica-apid/dist/apid.service`;
 apid's own `ensure_state_dir` uses the same mode when it creates the path
 itself), every file in it is 0600, and the unit orders itself after the DATA/state
 mount with `RequiresMountsFor=/var/lib/mica` — counters written to a tmpfs
@@ -975,7 +979,7 @@ lockout: the failure direction here has to be open, because the alternative is
 an appliance no operator can reach.
 
 **[implemented] A bounded persistent audit trail.** `Audit`
-(`mica-core:apid/src/audit.rs`) appends one JSONL line per audited event — RFC 3339
+(`mica-core:crates/mica-apid/src/audit.rs`) appends one JSONL line per audited event — RFC 3339
 UTC timestamp, event, outcome, source address — into a two-file ring capped at
 ~512 KiB total, mirrored to the journal so the volatile log tells the same
 story. Lines are fsynced individually, because the two most consequential
@@ -1123,7 +1127,7 @@ operator. The path is unusable, and is documented as unusable.
 
 **The path back in is now code, and it is not yet a door.**
 `docs/design/recovery.md` section 5 designed it and
-`POST /api/v1/recovery/credential` (`mica-core:apid/src/routes.rs`) implements
+`POST /api/v1/recovery/credential` (`mica-core:crates/mica-apid/src/routes`) implements
 it: under the physical-presence contract of that document's section 4, the flow
 **mints a new management credential and returns it once** on the channel that
 proved presence, never discloses, decrypts or recovers the previous secret,

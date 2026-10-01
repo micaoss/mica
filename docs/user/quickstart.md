@@ -1,6 +1,6 @@
 # Quickstart
 
-The shortest honest path to a running Mica OS system is a published `uefi-x64-dev`
+The shortest honest path to a running Mica OS system is a published `uefi-x64.basic`
 image under QEMU. That is also the only path that is qualified today: no
 physical machine has been booted from a release image
 ([flashing](flashing.md)).
@@ -18,15 +18,16 @@ images.
 ## 2. Take a published image
 
 ```sh
-REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSLO "$REL/uefi-x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/uefi-x64/<release>/mica-uefi-x64-dev-<release>.img.gz"
-sha256sum -c SHA256SUMS
-gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
+REL=https://github.com/micaoss/mica-build/releases/download/uefi-x64.basic.<stamp>
+curl -fsSLO "$REL/SHA256SUMS"
+curl -fsSLO "$REL/mica-build.lock"
+curl -fsSLO "$REL/mica-uefi-x64.basic-<stamp>.img.gz"
+sha256sum -c SHA256SUMS                       # the lock, which names the image's sha256
+gzip -dc mica-uefi-x64.basic-<stamp>.img.gz > disk.img
 ```
 
-Which release, and how to check the decompressed image against the version
-index, is [download](download.md). The image is a whole GPT disk — ESP,
+How to find the newest `<stamp>`, and how to check the image against the lock
+and its OCI layer, is [download](download.md). The image is a whole GPT disk — ESP,
 SYSTEM and DATA — carrying two signed deployment records.
 
 > status: shipped — evidence: `docs/user/download.md`, `mica-build:src/image/file-layout.ts`
@@ -41,7 +42,7 @@ command lines are in [flashing](flashing.md#4-qemu-x64-and-uefi-arm64).
 From a `mica-build` checkout the whole thing is one target:
 
 ```sh
-make lifecycle-uefi PRODUCT=uefi-x64-dev
+make lifecycle-uefi PRODUCT=uefi-x64.dev
 ```
 
 It boots the product and exercises runtime, updates, faults, reset and
@@ -54,11 +55,13 @@ shutdown.
 ```sh
 make locks-verify
 make os-pool
-make product PRODUCT=uefi-x64-dev
-make product-verify PRODUCT=uefi-x64-dev
+make product PRODUCT=uefi-x64.dev
+make product-verify PRODUCT=uefi-x64.dev
 ```
 
-The result lands in `mica-build:_out/products/uefi-x64-dev/`. A build never invents
+The result lands in `_out/products/uefi-x64.dev/` of the `mica-build` checkout. `uefi-x64.dev` is
+the development variant, built locally and never released; `uefi-x64.basic`
+builds the same way. A build never invents
 keys or inputs: signing material is explicit (`make os-devkeys` writes a
 development set) and every input comes from `locks/`. The full path, online
 and offline, is the [build guide](build.md).

@@ -11,16 +11,16 @@
 
 ## 1. 选择并校验镜像
 
-镜像按产品发布为 `mica-<product>-<release>.img.gz`，绑定一块板卡和一种架构；
+镜像按产品发布为 `mica-<board>.<variant>-<stamp>.img.gz`，绑定一块板卡和一种架构；
 profile（`dev` 或 `prod`）固化在该产品签名后的内核命令行里。从发布里取文件，
-用 `SHA256SUMS` 校验，再把解压后的镜像与版本索引里的 `uncompressedSha256`
-比较：[获取发布版](download.md)。自己构建的镜像，对应的门是
+用 `SHA256SUMS` 所列的 lock 校验，再把解压后的镜像与它 OCI 层的
+`mica.uncompressed-sha256` 比较：[获取发布版](download.md)。自己构建的镜像，对应的门是
 `make product-verify PRODUCT=<name>`。
 
 校验和只能证明文件完整到达，它不说明谁签的名：发布的启动公钥证书要通过它所属的
-交付渠道取得（[密钥交付](../../design/key-delivery.md)），而不是从下载文件旁边取。
+交付渠道取得（[密钥交付](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md)），而不是从下载文件旁边取。
 
-> status: shipped — evidence: `docs/user/download.md`, `mica-build:make product-verify`, `docs/design/key-delivery.md`
+> status: shipped — evidence: `docs/user/download.md`, `mica-build:make product-verify`
 
 ## 2. 让板卡信任签名者
 

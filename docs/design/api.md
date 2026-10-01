@@ -1,8 +1,10 @@
 # Management API and UI hosting
 
-`apid` owns HTTPS, authentication, the JSON management API and static UI
-hosting. `micad` owns settings, reconciliation and system actions over D-Bus.
-The generated OpenAPI document (`mica-core:apid/openapi.json`) is the
+`apid` owns the listeners (plain HTTP on 8080 by default, HTTPS on 8443 once
+`access.web` turns it on, with a per-device or uploaded certificate),
+authentication, the JSON management API and static UI hosting. It is micad's
+executable under another name, in micad's core component. `micad` owns settings, reconciliation and system actions over D-Bus.
+The generated OpenAPI document (`mica-core:crates/mica-apid/openapi.json`) is the
 operation and schema contract. This page explains ownership and behavior;
 it does not duplicate the route inventory.
 
@@ -86,7 +88,7 @@ aliases are refused. SPA fallback remains inside the selected resource root.
 `apid/build.rs` embeds the complete frontend build supplied by the package
 producer. `index.html` is the stable entry; content-hashed route, locale and
 vendor chunks remain separately addressable and cacheable. The frontend build
-and its dependency lock are under `mica-core:apid/ui/`.
+and its dependency lock are under `mica-core:crates/mica-apid/ui/`.
 
 ## 5. Custom UI lifecycle
 
@@ -108,6 +110,6 @@ inside the authenticated immutable root, independent of DATA UI selection.
 
 Rust route and bus tests verify authentication, path isolation, validation and
 task behavior. The OpenAPI generation gate checks the committed schema against
-the binary. The API harness (`mica-core:tests/apid-api/README.md`) exercises
+the binary. The API harness (`mica-build:tests/suites/apid-api/README.md`) exercises
 the full service stack on a fresh current QEMU image. The harness writes its result to
 `_out/<board>/apid-api/result.json`.

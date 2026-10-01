@@ -32,12 +32,11 @@ to `images.tsv`. So:
 
 - A board is `[a-z0-9][a-z0-9-]*` and **never contains a dot**. Both
   repositories enforce it, and the dot tag form depends on it
-  (`docs/decisions/2026-09-16-scoped-tags-use-a-dot.md`).
+  (`mica-build-tools:docs/spec/release-lock.md`).
 - A product is `<board>-<variant>`, where the variant says what the image is
   for: `dev`, `prod`, and later for example `cloud`. *Amended by the user on
-  2026-09-27*: a product is `<board>.<variant>`, or the board's own name for a
-  board with one product (`docs/boards/contract.md` 1.1,
-  `docs/design/release-lock.md` 1.0).
+  2026-09-27*: a product is `<board>.<variant>`; every board has `basic`, the
+  default (`docs/boards/contract.md` 1.1, `docs/design/release-lock.md` 1.0).
 - A board package is `mica-board-<board>`.
 - A platform-specific guest board is `<platform>-<arch>`.
 
@@ -52,10 +51,11 @@ to `images.tsv`. So:
 | OCI product bundles | `image.<product>.<release>`, `update.<product>.<release>` |
 | release assets | `mica-<product>-<release>.<suffix>` |
 
-### 5. The product set after today
+### 5. The product set
 
-`uefi-x64-dev`, `uefi-x64-prod`, `uefi-arm64-dev`, `uefi-arm64-prod`,
-`cx3576-dev`, `cx3576-prod`, `s905x5m-dev`. There are no minimal products
+The set of 2026-09-16 (`uefi-x64-dev` ... `s905x5m-dev`) was replaced on
+2026-09-27 by `<board>.<variant>` products; today's set is
+`docs/boards/contract.md` 1.1. There are no minimal products
 (`docs/decisions/2026-09-16-minimal-products-removed.md`).
 
 ## History

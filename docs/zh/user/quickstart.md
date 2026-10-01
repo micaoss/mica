@@ -1,7 +1,7 @@
 # 快速上手
 
 到一个运行中的 Mica OS 系统，最短且诚实的路径是：在 QEMU 里跑一个已发布的
-`uefi-x64-dev` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
+`uefi-x64.basic` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
 启动过（[刷写](../../user/flashing.md)）。
 
 ## 1. 需要什么
@@ -16,14 +16,15 @@
 ## 2. 取一个已发布的镜像
 
 ```sh
-REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSLO "$REL/uefi-x64/<release>/SHA256SUMS"
-curl -fsSLO "$REL/uefi-x64/<release>/mica-uefi-x64-dev-<release>.img.gz"
-sha256sum -c SHA256SUMS
-gzip -dc mica-uefi-x64-dev-<release>.img.gz > disk.img
+REL=https://github.com/micaoss/mica-build/releases/download/uefi-x64.basic.<stamp>
+curl -fsSLO "$REL/SHA256SUMS"
+curl -fsSLO "$REL/mica-build.lock"
+curl -fsSLO "$REL/mica-uefi-x64.basic-<stamp>.img.gz"
+sha256sum -c SHA256SUMS                       # 校验 lock，lock 里写明了镜像的 sha256
+gzip -dc mica-uefi-x64.basic-<stamp>.img.gz > disk.img
 ```
 
-选哪个发布、以及如何用版本索引校验解压后的镜像，见[获取发布版](download.md)。
+怎么找到最新的 `<stamp>`、以及如何对照 lock 与 OCI 层校验镜像，见[获取发布版](download.md)。
 镜像是一整块 GPT 磁盘——ESP、SYSTEM、DATA——并携带两条签名部署记录。
 
 > status: shipped — evidence: `docs/user/download.md`, `mica-build:src/image/file-layout.ts`
@@ -38,7 +39,7 @@ virtio 磁盘启动。参考命令行见
 在 `mica-build` 检出里，这一整套是一个 target：
 
 ```sh
-make lifecycle-uefi PRODUCT=uefi-x64-dev
+make lifecycle-uefi PRODUCT=uefi-x64.dev
 ```
 
 它启动产品并依次验证运行时、更新、故障、重置和关机。
@@ -50,11 +51,12 @@ make lifecycle-uefi PRODUCT=uefi-x64-dev
 ```sh
 make locks-verify
 make os-pool
-make product PRODUCT=uefi-x64-dev
-make product-verify PRODUCT=uefi-x64-dev
+make product PRODUCT=uefi-x64.dev
+make product-verify PRODUCT=uefi-x64.dev
 ```
 
-产物落在 `mica-build:_out/products/uefi-x64-dev/`。构建不会凭空造出密钥或输入：签名
+产物落在 `mica-build` 检出目录下的 `_out/products/uefi-x64.dev/`。`uefi-x64.dev` 是开发变体，只在本地
+构建、从不发布；`uefi-x64.basic` 用同样的方式构建。构建不会凭空造出密钥或输入：签名
 材料是显式的（`make os-devkeys` 写出一套开发密钥），每一项输入都来自 `locks/`。
 在线与离线的完整路径见[构建指南](../../user/build.md)。
 

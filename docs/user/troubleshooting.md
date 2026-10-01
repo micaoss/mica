@@ -26,7 +26,7 @@ In order of preference:
 The full access model, including what each channel can and cannot do, is
 [../design/access.md](../design/access.md).
 
-> status: shipped — evidence: `docs/design/access.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/access.md`, `mica-core:crates/mica-apid/openapi.json`
 
 > status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
 
@@ -55,7 +55,7 @@ reset-cause adapters report has been proven against fixture trees, not against
 the cx3576 or uefi-x64 boards. An absent or implausible reading there is an
 escalation carrying the board identity, never a green result.
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 3. Reading the evidence
 
@@ -74,17 +74,15 @@ escalation carrying the board identity, never a green result.
   deployments, attempt state, component verification and failed deployments.
   Capture `GET /api/v1/update` for the management view as well.
 
-- **Containers:** the failure table in
-  [../design/containers.md](../design/containers.md) covers the common cases —
-  unit missing after adding a file (`systemctl daemon-reload`; the Quadlet
-  generator's `--dryrun` prints parse errors), unit never starting (no
-  `[Install]` section), names not resolving (not on the same network),
-  storage full (`podman system df`).
+- **Containers:** `mica-containerd ctl list` shows each declared container
+  and its state, and `ctl logs <name>` its log; a declaration micad refused is
+  reported by the settings write's task, and storage running full shows in
+  `podman system df` ([../design/containers.md](../design/containers.md)).
 - **Configuration writes:** a settings write returns a task; its outcome
   (applied, unchanged, failed and why) is observable through the API rather
   than guessed from behaviour.
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/design/containers.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/design/containers.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 4. When a normal command is missing or broken
 
@@ -137,7 +135,7 @@ degrading, so the refusal text is the diagnosis:
 
 - A missing or stale package pool, a missing BSP artifact, or a pool built
   from a different commit each name the exact `make` target to run; the
-  build-failure table in [../design/build.md](../design/build.md) maps the
+  build-failure table in [../design/build.md](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md) maps the
   common messages to actions.
 - `make os-verify` (and the uefi-x64 equivalent) checks an assembled image
   against the image contract check by check; a red check names what it read
@@ -149,7 +147,7 @@ The rule of thumb: a Mica OS refusal is designed to be quoted verbatim to suppor
 or into an issue; do not work around it, because the checks exist to stop
 artifacts that pass everything and fail on hardware.
 
-> status: shipped — evidence: `docs/design/build.md`, `mica-build:make os-verify`
+> status: shipped — evidence: `mica-build:docs/design/image.md`, `mica-build:make os-verify`
 
 ## 6. The support snapshot
 
@@ -183,7 +181,7 @@ The design record carries the decision trees this page's order implies — no
 network, wrong time, DATA full, a failed update or rollback, an unexpected
 reboot — each branching on the snapshot member that decides it.
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:apid/openapi.json`
+> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 7. When to stop diagnosing
 

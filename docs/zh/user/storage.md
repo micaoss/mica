@@ -33,7 +33,7 @@ Mica OS 使用三个分区：UEFI 板为 ESP/SYSTEM/DATA，U-Boot 板（cx3576�
 目录重置只清除允许的指定范围，保留身份和部署/生命周期记录。系统回滚不撤销应用
 数据写入。完整重刷替换镜像内容，并不安全擦除镜像范围之外的每个物理扇区。
 
-> status: shipped — evidence: `mica-core:micad/src/storage_status.rs`, `mica-core:micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
+> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
 
 ## 故障
 

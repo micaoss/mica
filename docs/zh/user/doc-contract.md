@@ -68,9 +68,9 @@ Mica OS 是嵌入式一体机操作系统。用户文档服务三类读者，按
 em dash，每个证据引用放在反引号里，多个引用以 `, ` 分隔：
 
 ```
-> status: shipped — evidence: `mica-core:apid/openapi.json`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 > status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
-> status: proposed — evidence: `docs/task/20260912-2058-fleet-runtime.md`
+> status: proposed — evidence: `docs/design/applications.md`
 > status: unsupported
 ```
 
@@ -78,15 +78,15 @@ em dash，每个证据引用放在反引号里，多个引用以 `, ` 分隔：
 
 - `shipped` 与 `board-dependent` 必须引用一个存在的仓库路径（文件或
   目录），或顶层 `Makefile` 中存在的 `make <target>`。
-- `proposed` 必须引用至少一个未关闭的跟踪记录：`docs/plan/` 或 `docs/task/`
-  下的详情文件，且其索引条目为待办（`[ ]`）或进行中（`[-]`）。记录完成或
-  关闭后，门禁会失败，直到该页重新标注。
+- `proposed` 必须引用描述这项工作的东西：把它标为未实现的设计文档，或将要实现它的
+  那个仓库里的记录（`<repository>:docs/...`）。本仓库不保存任务与计划记录。工作落地后，
+  该页重新标注。
 - `unsupported` 不携带证据；缺席本身就是声明。
 - 证据在被引用之前先验证其存在。死掉的证据引用是坏掉的声明，不是外观
   缺陷。
 - 本集内任何地方都不使用 `path:line` 引用。与行号耦合的文档会被那些
   并未改变其含义的编辑证伪。需要精确契约时，改为点名承载它的产物——
-  例如，HTTP 接口面就是 `mica-core:apid/openapi.json`。
+  例如，HTTP 接口面就是 `mica-core:crates/mica-apid/openapi.json`。
 
 ### 提案内容
 
@@ -137,7 +137,7 @@ em dash，每个证据引用放在反引号里，多个引用以 `, ` 分隔：
   的现在时描述（`docs/design/build-harness.md` 记下 `privileged.yml` 从未运行过，
   再往下两屏却仍说这条流水线会构建、校验、把关并做 repart 测试每一个产品）；同一份
   fixture 的两份副本互相逐字节比对，两边都写着 `x64`，检查通过
-  （[构建门](../../design/build-harness.md) 第 4 节）。每一块单独看都站得住，所以
+  （[构建门](https://github.com/micaoss/mica-build/blob/main/README.md) 第 4 节）。每一块单独看都站得住，所以
   没有任何词法门禁能判定这一对；检查只能是流程性的：**一句关于其它文本的断言——
   计数、边界、否定——在你读完它所涵盖的那些文本之前都不算写完**，而当两个产物只
   互相核对时，其中至少一个还必须与真实世界核对。*一节里写下、两屏之后被推翻的

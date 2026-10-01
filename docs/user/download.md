@@ -1,168 +1,128 @@
 # Getting a release: what is published and how to check it
 
 Mica OS is published as GitHub releases of `micaoss/mica-build`. Everything is
-anonymous: no token, no registry login. Two kinds of release matter to a
-reader here.
+anonymous: no token, no registry login. A release is one product:
 
 | Release | Tag | Carries |
 |---|---|---|
-| The version index | `mica.<YYYYMMDD-HHMM>` | `mica-index.json`, `mica-build.lock`, `SHA256SUMS` |
-| A scoped product release | `<scope>.<YYYYMMDD-HHMM>` | `mica-build.lock`, each product's `mica-<product>-<release>.img.gz`, its `.micaupd` archives, `SHA256SUMS` |
+| A product release | `<board>.<variant>.<YYYYMMDD-HHMM>` | `mica-<board>.<variant>-<stamp>.img.gz`, its `.micaupd` archives, `mica-build.lock`, `SHA256SUMS` |
 
-A scoped tag separates its scope from the stamp with a dot since 2026-09-16
-([decision](../decisions/2026-09-16-scoped-tags-use-a-dot.md)); releases
-published before that date carry the older `<scope>/<stamp>` form in their own
-URLs. The index release is the one GitHub marks *latest*, and it is cut
-automatically after a scoped release; a scope is a board (all of its published
-products) or a single product. The index is the entry point: it names every
-current product, its files, their sizes and their hashes, so a reader does not
-have to walk the release list.
+Each product releases on its own, so there is no index to start from: a
+product's newest release is the newest tag that starts with
+`<board>.<variant>.`. The version index of the earlier scheme (`mica.<stamp>`,
+`mica-index.json`) is no longer cut, and the releases published under the
+earlier product names were deleted on 2026-09-28.
 
-> status: shipped — evidence: `docs/design/mica-index.md`, `docs/design/release-lock.md`, `docs/decisions/2026-09-15-mica-version-index.md`
+**Where releases are going.** Each release is meant to be posted to `mica-res`
+as it is published: res keeps the complete version history, serves the files
+from `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>`, derives
+`catalog/products.json` (every product and its newest release) and serves the
+device update plane at `https://res.micaos.dev/v1`
+(`mica-res:docs/spec/release-publishing.md`). `mica-build` does not post its
+releases yet, so today the GitHub releases below are the only source.
+
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`, `mica-res:docs/spec/release-publishing.md`
 
 ## 1. What exists to download
 
-Images and update archives exist only for products whose board is a release
-target, which since `s905x5m.20260920-0033` is all four: `uefi-x64`,
-`uefi-arm64`, `cx3576` and `s905x5m`, eight products in the index
-`mica.20260920-0046`. Every published product is a `dev` or `prod` product; the minimal products were removed on 2026-09-16
-([decision](../decisions/2026-09-16-minimal-products-removed.md)), and the
-releases cut before that date keep their minimal assets.
+Every board is a release target, so nine products are released:
+`<board>.basic`, the default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`
+and `mini-x64`, and `<board>.full`, which adds the container engine, on all but
+`mini-x64`. **Two of them have a release so far, `cx3576.full` and
+`mini-x64.basic`**; for the others there is nothing to download yet, and they
+are built from source ([build guide](build.md)). A `dev` product is built
+locally and never released; there are no minimal products
+([decision](../decisions/2026-09-16-minimal-products-removed.md)).
 
-**Three `uefi` rounds do not boot; the newest releases supersede them.** The
-`uefi-x64` and `uefi-arm64` images of `20260916-0845`, `20260916-1653` and
-`20260919-2103` refuse the board name in their own signed identity at PID 1
-and power the machine down at 1.7 seconds: the boards were renamed while the
-pinned client that reads that name was not. `cx3576` was never affected — its
-name did not change. Those releases stay published and are not deleted
-([release-lock](../design/release-lock.md) 2.1); the fix is the superseding
-release, not a deletion.
-
-**Take `20260920-0622` or later** — `uefi-x64`, `uefi-arm64`, `cx3576` and
-`s905x5m` at that stamp, with the index `mica.20260920-0636`, from
-`73aca2c`. Two repairs are in the images, and both matter before you flash
-one:
-
-- `20260919-2356` (index `mica.20260920-0008`, from `f46b64a6`) fixed the
-  board name: the `mica-core` release it pins, `20260919-2226`, matches
-  `uefi-x64` and `uefi-arm64` in the arm whose absence made the earlier images
-  power down at PID 1. Both `uefi-x64` products of that round were **booted in
-  their release run** and reached the guest's own pass marker; the boot step
-  is amd64-only, so the other products were built and statically verified but
-  not started.
-- `20260920-0622` fixed the **console login**, which no image before it had:
-  `/etc/pam.d/login` and the four `common-*` files were missing, so the login
-  stack could not be assembled on any board and no account could log in
-  ([access](../design/access.md) section 2). SSH through micad was never
-  affected. Those roots now carry sixteen files in `/etc/pam.d` with every
-  include resolving.
-
-**A published image is not a booted image**, and the catalogue is split in
-half on that: four of the eight products — `cx3576-dev`, `cx3576-prod`,
-`s905x5m-dev`, `s905x5m-prod` — are started by nothing automatic, because no
-suite boots a FIT image. They are checked on every push, in ways that never
-start them. (A hardware boot of `cx3576` was reported by the user on
-2026-09-20; it is a report, not a qualification row —
-[support tiers](../boards/support-tiers.md).) The `uefi-x64` images are booted on every push and
-in every release, and the `uefi-arm64` ones carry hand-run QEMU rows that
-predate the board rename ([harness](../design/build-harness.md) section 4). Being a release target means the images are built, published and
-indexed; it is not a claim about hardware
+**A published image is not a booted image.** Four of the nine products —
+`cx3576.basic`, `cx3576.full`, `s905x5m.basic`, `s905x5m.full` — are started by
+nothing automatic, because no suite boots a FIT image. (A hardware boot of
+`cx3576` was reported by the user on 2026-09-20; it is a report, not a
+qualification row — [support tiers](../boards/support-tiers.md).) Every amd64
+product (`uefi-x64.*`, `mini-x64.basic`) is booted in its release run, and the
+`uefi-arm64` ones carry hand-run QEMU rows ([harness](https://github.com/micaoss/mica-build/blob/main/README.md)
+section 4). Being a release target means the images are built and published;
+it is not a claim about hardware
 ([support tiers](../boards/support-tiers.md)).
 
-Per product a release carries:
+A release carries:
 
-- `mica-<product>-<release>.img.gz` — the factory disk image, gzip-compressed.
-  No raw `.img` is uploaded.
-- `mica-<product>-<release>.micaupd` — the full update archive, always.
+- `mica-<board>.<variant>-<stamp>.img.gz` — the factory disk image,
+  gzip-compressed. No raw `.img` is uploaded.
+- `mica-<board>.<variant>-<stamp>.micaupd` — the full update archive, always.
 - `.root.micaupd` and `.kernel.micaupd` — the partial archives, when the
-  component they omit is unchanged since the previous release
+  component they omit is unchanged since the product's previous release, and
+  `.core.micaupd`, the core components alone
   ([update packages](update-packages.md)).
+- `mica-build.lock` and `SHA256SUMS`, which lists the lock.
 
 > status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/boards/support-tiers.md`
 
-## 2. Pick the file from the index
+## 2. Find a product's newest release
 
 ```sh
-REL=https://github.com/micaoss/mica-build/releases/download
-curl -fsSL "$REL/mica.<index release>/mica-index.json" -o mica-index.json
-
-jq -r '.products[] | select(.product=="uefi-x64-dev")
-       | .images[], .updates[] | [.kind, .url, .sha256, .size] | @tsv' mica-index.json
+PRODUCT=uefi-x64.basic
+TAG=$(curl -fsSL "https://api.github.com/repos/micaoss/mica-build/releases?per_page=100" \
+  | jq -r --arg p "$PRODUCT." '[.[] | select(.draft == false and (.tag_name | startswith($p)))][0].tag_name')
+echo "$TAG"                                   # uefi-x64.basic.<YYYYMMDD-HHMM>
 ```
 
-One file answers the whole question: every indexed product with its board,
-profile, generation, deployment, kernel and rootfs identity, its release, its
-OCI bundles, its image and update files with URL, sha256 and size, and the
-catalogue of every board and product. `previous` names the index before it.
+The GitHub API lists releases newest first. `gh release list -R micaoss/mica-build`
+shows the same list.
 
-> status: shipped — evidence: `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:README.md`
 
 ## 3. Download and verify
 
 ```sh
-curl -fsSLO "$REL/uefi-x64.<release>/SHA256SUMS"
-curl -fsSLO "$REL/uefi-x64.<release>/mica-build.lock"
-curl -fsSLO "$REL/uefi-x64.<release>/mica-uefi-x64-dev-<release>.img.gz"
-sha256sum -c SHA256SUMS                       # lists the lock and every asset
+REL=https://github.com/micaoss/mica-build/releases/download/$TAG
+STAMP=${TAG##*.}
+curl -fsSLO "$REL/SHA256SUMS"
+curl -fsSLO "$REL/mica-build.lock"
+curl -fsSLO "$REL/mica-$PRODUCT-$STAMP.img.gz"
+sha256sum -c SHA256SUMS                       # lists the lock
+awk -F'\t' '$1 == "asset" && $5 == "mica-'"$PRODUCT-$STAMP"'.img.gz" {print $6 "  " $5}' mica-build.lock \
+  | sha256sum -c -                            # the lock names the image's sha256
 ```
 
-That is the one check that needs no other input. Everything else — the lock,
-the index and the OCI layer — states the same digests again from a different
-direction, which is section 4.
+The chain is `SHA256SUMS` → the lock → the `asset` row's sha256 → the file
+([release lock](../design/release-lock.md) 1.2.2).
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`
 
 ## 4. Which digest at which step
 
-Four independent statements cover one image, and they are checked in
+Three independent statements cover one image, and they are checked in
 different places:
 
-1. **The release list.** `SHA256SUMS` covers the lock and every image and
-   update asset of that release — the compressed file, not the image inside
-   it. `sha256sum SHA256SUMS` is the release's trust hash, the value locks and
-   index entries quote.
-2. **The lock's `asset` row** names the same digest, so a reader who trusts
-   the lock does not have to trust the list:
+1. **`SHA256SUMS`** lists the lock alone; `sha256sum SHA256SUMS` is the
+   release's trust hash, the value a lock that consumes this release quotes.
+2. **The lock's `asset` row** names the digest of the compressed file:
    ```sh
-   awk -F'\t' '$1 == "asset" && $2 == "uefi-x64-dev"' mica-build.lock
+   awk -F'\t' '$1 == "asset" && $2 == "'"$PRODUCT"'"' mica-build.lock
    ```
-3. **The index** describes both forms: `sha256` and `size` are the `.gz`,
-   `uncompressedSha256` and `uncompressedSize` are what `gzip -dc` produces.
+3. **The OCI layer** carries the same file and is readable anonymously: the
+   layer digest equals the asset row's sha256, and its
+   `mica.uncompressed-sha256` and `mica.uncompressed-size` annotations are what
+   `gzip -dc` produces:
    ```sh
-   gzip -dc mica-uefi-x64-dev-<release>.img.gz | sha256sum
-   jq -r '.products[]|select(.product=="uefi-x64-dev")|.images[]
-          |[.file,.sha256,.size,.uncompressedSha256,.uncompressedSize]|@tsv' mica-index.json
-   ```
-4. **The OCI layer** carries the same facts and is readable anonymously; the
-   layer digest equals the asset row's sha256, and its `mica.uncompressed-*`
-   annotations equal the index's fields:
-   ```sh
-   REF=$(jq -r '.products[]|select(.product=="uefi-x64-dev")|.bundles.image' mica-index.json)
+   REF=$(awk -F'\t' '$1 == "bundle" && $2 == "'"$PRODUCT"'" && $3 == "image" {print $4}' mica-build.lock)
    T=$(curl -fsS "https://ghcr.io/token?scope=repository:micaoss/mica-build:pull&service=ghcr.io" | jq -r .token)
    curl -fsSL -H "Authorization: Bearer $T" \
      -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
      "https://ghcr.io/v2/micaoss/mica-build/manifests/${REF##*@}" | jq '.layers'
+   gzip -dc "mica-$PRODUCT-$STAMP.img.gz" | sha256sum
    ```
 
-Inside an index release the same idea applies to the index itself:
-`sha256sum -c SHA256SUMS`, `jq -r .lock.sha256` against
-`sha256sum mica-build.lock`, and `jq -r .previous.trust` against the previous
-index's trust hash.
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/mica-index.md`
-
-## 5. Prove the release against its sources
+## 5. What the lock says about the release
 
 The lock is a `mica-lock v1` file naming the release's commit and every input
-that went into it — pools, packages, boards, upstream images and, for a
-scoped release, the images and archives themselves. From a clean checkout of
-`mica-build` at the index's commit, the index can be rebuilt from the
-published releases and compared byte for byte:
-
-```sh
-bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release>
-bash bin/bun.sh src/cli.ts scoped-release verify-index mica.<index release> --full
-```
+that went into it: the board's pool, packages and components, the input
+releases of `mica-build-env`, `mica-system-base`, `mica-core` and
+`mica-podman` with their trust hashes, and the product's signed deployment,
+bundles and assets ([release lock](../design/release-lock.md) 1.2.2).
 
 A checksum next to a file proves only that the file arrived intact. What makes
 an image trustworthy is the signature chain inside it
@@ -170,7 +130,7 @@ an image trustworthy is the signature chain inside it
 that signer; the hashes above are the integrity half, not the authenticity
 half.
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/design/release-lock.md`, `docs/design/release-signing.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `docs/design/release-signing.md`
 
 ## 6. Next
 
