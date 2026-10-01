@@ -12,8 +12,8 @@
  */
 
 /**
- * The product a download was built for — `dev`, `minimal`, `prod`. Not a fixed
- * set: the catalogue names the products, and the page offers what it finds.
+ * The product variant a download was built for — `basic`, `full`. Not a fixed
+ * set: the catalogue names the variants, and the page offers what it finds.
  */
 export type Profile = string
 
@@ -23,15 +23,15 @@ export type DownloadKind = 'image' | 'update' | 'firmware'
 export const DOWNLOAD_KINDS: DownloadKind[] = ['image', 'update', 'firmware']
 
 /**
- * Which of a form's variants this is. A deployment publishes up to three update
+ * Which of a form's variants this is. A deployment publishes up to four update
  * archives — `full` always, `root` when the kernel identity is unchanged,
- * `kernel` when the rootfs is — and they are not interchangeable, so the row
- * says which one it is.
+ * `kernel` when the rootfs is, `core` for the core components alone — and they
+ * are not interchangeable, so the row says which one it is.
  */
-export type DownloadVariant = 'full' | 'root' | 'kernel'
+export type DownloadVariant = 'full' | 'root' | 'kernel' | 'core'
 
 export interface Download {
-  /** Board identifier, as `mica-boards` names it. */
+  /** Board identifier, as `mica-build` names it. */
   board: string
   profile: Profile
   kind: DownloadKind

@@ -30,7 +30,7 @@
         { "id": "recovery", "doc": "user/recovery" },
         { "id": "trouble", "doc": "user/troubleshooting" },
         { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/cx3576.md" },
-        { "id": "bench", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/cx3576-bench.md" }
+        { "id": "bench", "url": "https://github.com/micaoss/mica/blob/9dd6302/docs/boards/cx3576-bench.md" }
       ]
     },
     {
@@ -41,6 +41,16 @@
         { "id": "update", "doc": "user/update-rollback" },
         { "id": "trouble", "doc": "user/troubleshooting" },
         { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/s905x5m.md" }
+      ]
+    },
+    {
+      "board": "mini-x64",
+      "guides": [
+        { "id": "install", "doc": "user/install" },
+        { "id": "flashing", "doc": "user/flashing" },
+        { "id": "firstRun", "doc": "user/first-run" },
+        { "id": "update", "doc": "user/update-rollback" },
+        { "id": "trouble", "doc": "user/troubleshooting" }
       ]
     }
   ]

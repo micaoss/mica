@@ -1,30 +1,35 @@
 import { describe, expect, it } from 'vitest'
 import { storedCatalogue } from './catalog-store'
 
-const INDEX = {
-  products: [{
-    product: 'uefi-x64-dev',
-    board: 'uefi-x64',
-    profile: 'dev',
-    deployment: 'd',
-    release: 'uefi-x64.20260916-0845',
-    images: [{ kind: 'disk', file: 'a.img.gz', url: 'https://u/a', sha256: 's', size: 1 }],
-    updates: [],
+const PRODUCT = {
+  product: 'mini-x64.basic',
+  board: 'mini-x64',
+  variant: 'basic',
+  releases: [{
+    release: 'mini-x64.basic.20260930-2247',
+    stamp: '20260930-2247',
+    product: 'mini-x64.basic',
+    board: 'mini-x64',
+    variant: 'basic',
+    assets: [{ kind: 'image', path: 'mica/mini-x64.basic/20260930-2247/a.img.gz', sha256: 'a'.repeat(64), size: 1 }],
   }],
 }
 
 describe('storedCatalogue', () => {
-  it('records what it read and when', () => {
-    const stored = storedCatalogue(INDEX, 'mica.20260916-1709', '2026-09-20T09:00:00.000Z')
+  it('records what it read, from where and when', () => {
+    const stored = storedCatalogue([PRODUCT], 'https://dl.test/catalog/products.json', '2026-10-01T09:00:00.000Z')
 
-    expect(stored.latestRelease).toBe('mica.20260916-1709')
-    expect(stored.refreshedAt).toBe('2026-09-20T09:00:00.000Z')
+    expect(stored.source).toBe('https://dl.test/catalog/products.json')
+    expect(stored.refreshedAt).toBe('2026-10-01T09:00:00.000Z')
     expect(stored.downloads).toHaveLength(1)
   })
 
-  it('refuses to publish an index that parses to nothing', () => {
-    expect(() => storedCatalogue({ products: [{ ...INDEX.products[0], release: 'nightly' }] }, 'mica.x', 'now'))
+  it('publishes an empty catalogue when nothing has been posted', () => {
+    expect(storedCatalogue([], 'res', 'now').downloads).toEqual([])
+  })
+
+  it('refuses product documents that parse to nothing', () => {
+    expect(() => storedCatalogue([{ ...PRODUCT, releases: [{ ...PRODUCT.releases[0], stamp: 'nightly' }] }], 'res', 'now'))
       .toThrow('parsed to no downloads')
-    expect(() => storedCatalogue({ products: [] }, 'mica.x', 'now')).toThrow('parsed to no downloads')
   })
 })

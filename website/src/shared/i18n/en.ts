@@ -74,6 +74,7 @@ export const en: typeof zh = {
       { board: 'uefi-arm64', hw: 'Generic arm64 system, UEFI', status: 'Bring-up, QEMU reference' },
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'Bring-up, image builds, physical tests pending' },
       { board: 's905x5m', hw: 'Amlogic S7D (BM201)', status: 'Bring-up, image builds, physical tests pending' },
+      { board: 'mini-x64', hw: 'Small amd64 system, UEFI, 128 MB of flash', status: 'Bring-up, QEMU' },
     ],
     more: 'All boards and support tiers',
     request: 'Request a new board',
@@ -92,7 +93,7 @@ export const en: typeof zh = {
     },
     filters: {
       board: 'Board',
-      profile: 'Profile',
+      profile: 'Variant',
       query: 'Version or deployment ID',
       all: 'All',
     },
@@ -100,10 +101,11 @@ export const en: typeof zh = {
       full: 'full',
       root: 'root only',
       kernel: 'kernel only',
+      core: 'core only',
     },
     cols: {
       board: 'Board',
-      profile: 'Profile',
+      profile: 'Variant',
       kind: 'Form',
       version: 'Version',
       released: 'Released',
@@ -153,7 +155,7 @@ export const en: typeof zh = {
   flow: {
     heading: 'From image to the field',
     steps: [
-      { no: '01', title: 'Pick the board', body: 'The board contract states what the system needs; BSPs and kernels come from mica-boards.' },
+      { no: '01', title: 'Pick the board', body: 'The board contract states what the system needs; BSPs and kernels come from mica-build.' },
       { no: '02', title: 'Compose the image', body: 'mica-build imports the pinned packages, then composes, signs, verifies and tests a product image.' },
       { no: '03', title: 'Install and first run', body: 'Installation and first configuration need no network and no cloud service; SSH stays off by default.' },
       { no: '04', title: 'Update and roll back', body: 'Signed A/B deployments reach the device; a failed health check returns it to the deployment that last worked.' },
@@ -177,7 +179,7 @@ export const en: typeof zh = {
     sections: [
       { no: '01', title: 'Architecture', body: 'How the parts of the system fit together.', path: 'docs/architecture.md' },
       { no: '02', title: 'User documentation', body: 'Quickstart, installation, first run, updates and rollback.', path: 'docs/user/' },
-      { no: '03', title: 'Boards', body: 'The board contract, the porting guide and the support tiers.', path: 'docs/boards/' },
+      { no: '03', title: 'Boards', body: 'The support tiers, the assurance ladder and the board dossiers.', path: 'docs/boards/' },
       { no: '04', title: 'Design records', body: 'Why the build, the containers and the security model are shaped this way.', path: 'docs/design/' },
       { no: '05', title: 'Decisions', body: 'Settled choices, each with its reasoning and a review date.', path: 'docs/decisions/' },
       { no: '06', title: 'Tasks and plans', body: 'Every change is investigated and proposed before it is implemented.', path: 'docs/task/ · docs/plan/' },

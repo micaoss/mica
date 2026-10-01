@@ -18,7 +18,8 @@
         { "name": "uefi-x64", "dir": "hardware" },
         { "name": "uefi-arm64", "dir": "hardware" },
         { "name": "cx3576", "dir": "hardware" },
-        { "name": "s905x5m", "dir": "hardware" }
+        { "name": "s905x5m", "dir": "hardware" },
+        { "name": "mini-x64", "dir": "hardware" }
       ]
     },
     {

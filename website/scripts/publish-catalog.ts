@@ -1,43 +1,31 @@
 /**
- * Builds the download catalogue from mica-build's latest index and writes it as
- * the two files the workflow puts into KV.
+ * Builds the download catalogue from the documents `mica-res` derives from the
+ * releases posted to it, and writes it as the two files the workflow puts into
+ * KV. The Worker only reads that key.
  *
- * It runs on a CI runner because the Worker cannot: refreshing from Cloudflare's
- * shared egress failed continuously against GitHub, with 403 from the API and
- * 429 from the release download.
+ * Before the first release is posted, res answers 404 for its directory: that is
+ * published as an empty catalogue, which the pages show as "nothing published
+ * yet", not as a failure.
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import process from 'node:process'
 import { storedCatalogue } from '../src/features/download/catalog-store'
+import { readCatalogue, RES_DOWNLOAD_BASE } from '../src/features/download/res-catalog'
 
-const REPO = process.env.CATALOG_REPO ?? 'micaoss/mica-build'
-const INDEX_ASSET = 'mica-index.json'
+const BASE = process.env.CATALOG_BASE ?? RES_DOWNLOAD_BASE
 const OUT = '.tmp'
 
 async function main(): Promise<void> {
   const now = new Date().toISOString()
-  const entry = `https://github.com/${REPO}/releases/latest/download/${INDEX_ASSET}`
-
-  const redirect = await fetch(entry, { redirect: 'manual' })
-  const location = redirect.headers.get('location')
-  if (!location)
-    throw new Error(`${entry} answered ${redirect.status}, not a redirect to the asset`)
-
-  const release = decodeURIComponent(
-    /\/releases\/download\/([^/]+)\//.exec(new URL(location).pathname)?.[1] ?? location,
-  )
-  const response = await fetch(location)
-  if (!response.ok)
-    throw new Error(`${INDEX_ASSET} of ${release} answered ${response.status}`)
-
-  const catalogue = storedCatalogue(await response.json(), release, now)
+  const { documents } = await readCatalogue(BASE)
+  const catalogue = storedCatalogue(documents, `${BASE}/catalog/products.json`, now)
   const status = { lastAttemptAt: now, trigger: 'ci', lastSuccessAt: now, lastError: null }
 
   await mkdir(OUT, { recursive: true })
   await writeFile(`${OUT}/catalog.json`, JSON.stringify(catalogue))
   await writeFile(`${OUT}/catalog-status.json`, JSON.stringify(status))
 
-  console.log(`${release}: ${catalogue.downloads.length} downloads ready to publish`)
+  console.log(`${BASE}: ${documents.length} product(s), ${catalogue.downloads.length} download(s) ready to publish`)
 }
 
 main().catch((error: Error) => {

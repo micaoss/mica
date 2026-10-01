@@ -13,9 +13,14 @@ on:
       - '.github/workflows/website.yml'
   # Publishing is deliberately manual: run this workflow from the Actions tab.
   workflow_dispatch:
+  # Releases are posted to mica-res on mica-build's own schedule and nothing
+  # there triggers a build here, so the catalogue is refreshed on a clock too.
+  schedule:
+    - cron: '17 * * * *'
 
 jobs:
   checks:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     defaults:
@@ -33,14 +38,45 @@ jobs:
       # The build reads ../docs, so a documentation change rebuilds the site.
       - run: bun run build
 
-  # The download catalogue read mica-build's mica-index.json, which no release
-  # publishes since products release one by one. It moves to the documents
-  # mica-res derives (catalog/products.json) once releases are posted there;
-  # until then the catalogue is neither checked nor republished here.
+  # Reads the documents mica-res derives from the posted releases
+  # (catalog/products.json and each product's document), checks them against
+  # the site's boards, and publishes the download catalogue into KV. Before the
+  # first release is posted the catalogue is published empty.
+  catalog:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run check:catalog
+      - run: bun run publish:catalog
+      - name: Publish the catalogue to KV
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: kv key put catalog --binding KV --remote --path .tmp/catalog.json
+      - name: Publish the status to KV
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: kv key put catalog-status --binding KV --remote --path .tmp/catalog-status.json
 
   deploy:
     if: github.event_name == 'workflow_dispatch'
-    needs: [checks]
+    needs: [checks, catalog]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:

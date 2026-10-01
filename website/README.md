@@ -54,25 +54,28 @@ control loads the earlier ones.
 ### Where the rows come from
 
 ```
-mica-build's latest release ──> mica-index.json ──(CI, hourly)──> KV ──> GET /api/catalog
+mica-build ──posts each release──> mica-res ──> catalog/products.json
+                                             └─> catalog/products/<product>.json
+        ──(CI: on push, hourly, on demand)──> KV ──> GET /api/catalog
 ```
 
-`mica-build` publishes a version index — `mica-index.json` on the release GitHub marks
-*latest*. It is the documented entry point: one file names every current product with its
-board, profile, deployment identity, release, and each image and update archive with its
-URL, sha256 and size (`mica:docs/design/mica-index.md`). Nothing is inferred from a file
-name.
+Every release is posted to `mica-res` as it is published
+(`mica-res:docs/spec/release-publishing.md`), and res derives two documents on its
+download host, `https://dl.res.micaos.dev`: the directory of products, each with its newest
+release and where its document is, and each product's document, its releases newest first
+with their files, sizes and hashes. Nothing is read from GitHub and nothing is inferred from a
+file name (`src/features/download/res-catalog.ts`). A row's variant (`basic`, `full`) is the
+page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which
+archive it is.
 
-**The catalogue is built in CI, not in the Worker.** The website workflow's `index` job
-reads the index, parses it (`scripts/publish-catalog.ts`) and writes the result into KV with
-`wrangler kv key put`; the Worker only reads that key. The Worker used to refresh it on a
-cron, and that failed continuously: GitHub answered 403 to the API and 429 to the release
-download, because Cloudflare's egress addresses are shared and heavily used against GitHub.
-A token would have fixed the API call, but CI needs none and reads GitHub from GitHub.
+**The catalogue is built in CI, not in the Worker.** The website workflow's `catalog` job
+reads the documents (`scripts/publish-catalog.ts`) and writes the result into KV with
+`wrangler kv key put`; the Worker only reads that key.
 
-A publish is refused when the index names products and none of them parses — that means the
-shape moved under the parser, not that everything was unpublished, and an empty catalogue
-would blank every board page.
+Before the first release is posted, res answers 404 for its directory, and the catalogue is
+published **empty**: every board page then says nothing is published yet, which is the truth.
+A publish is refused when product documents exist and none of them parses — that means the
+shape moved under the parser, not that everything was unpublished.
 
 To refresh on demand, run the workflow: `gh workflow run website --repo micaoss/mica`.
 
@@ -81,18 +84,12 @@ To refresh on demand, run the workflow: `gh workflow run website --repo micaoss/
 `GET /api/catalog` answers a `status` beside the rows — when the publish ran, what triggered
 it, when one last succeeded — so a stale catalogue says so rather than looking current.
 
-### Checking the live index
+### Checking the live catalogue
 
-`bun run check:index` reads the live `mica-index.json` and fails if a published product
-parses to no downloads, or if a board that is a release target upstream is missing from the
-site's board list. The website workflow runs it hourly and on every push, because
-`mica-build` publishes on its own schedule and nothing there triggers a build here.
-
-It exists because both faults have happened and both passed every unit test: the fixtures
-were written in the shape the parser expected, so they could not notice the release stamp
-changing separator (every product dropped) or `x64` becoming `uefi-x64` (its board page went
-empty). The logic is `src/features/download/index-check.ts`, unit-tested; the script is the
-fetch around it.
+`bun run check:catalog` reads what res serves and fails if a published product parses to no
+downloads, or if a product is published for a board the site has no page for. The `catalog`
+job runs it before every publish. The logic is `src/features/download/catalog-check.ts`,
+unit-tested; the script is the fetch around it.
 
 ### Setting it up
 
@@ -100,8 +97,8 @@ The KV namespace is bound in `wrangler.jsonc` and CI publishes into it with the
 `CLOUDFLARE_API_TOKEN` the deploy already uses; that token needs **Workers KV Storage: Edit**
 as well as Workers Scripts: Edit. No GitHub token is involved.
 
-`CATALOG_REPO` selects the repository the index is read from, defaulting to
-`micaoss/mica-build`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
+`CATALOG_BASE` selects the download host the documents are read from, defaulting to
+`https://dl.res.micaos.dev`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
 
 ### The sample
 

@@ -84,6 +84,7 @@ export const zh = {
       { board: 'uefi-arm64', hw: '通用 arm64 系统，UEFI', status: 'bring-up，QEMU 参考' },
       { board: 'cx3576', hw: 'Rockchip RK3576', status: 'bring-up，镜像可构建，实机测试待做' },
       { board: 's905x5m', hw: 'Amlogic S7D（BM201）', status: 'bring-up，镜像可构建，实机测试待做' },
+      { board: 'mini-x64', hw: '小型 amd64 系统，UEFI，128 MB 闪存', status: 'bring-up，QEMU' },
     ],
     more: '全部板卡与支持等级',
     request: '请求支持新板卡',
@@ -102,7 +103,7 @@ export const zh = {
     },
     filters: {
       board: '板卡',
-      profile: 'Profile',
+      profile: '变体',
       query: '版本或部署 ID',
       all: '全部',
     },
@@ -110,10 +111,11 @@ export const zh = {
       full: '完整',
       root: '仅 root',
       kernel: '仅 kernel',
+      core: '仅 core 组件',
     },
     cols: {
       board: '板卡',
-      profile: 'Profile',
+      profile: '变体',
       kind: '形态',
       version: '版本',
       released: '发布',
@@ -188,7 +190,7 @@ export const zh = {
     sections: [
       { no: '01', title: '架构', body: '系统各部分如何拼在一起。', path: 'docs/architecture.md' },
       { no: '02', title: '用户文档', body: '快速上手、安装、首次配置、更新与回滚。', path: 'docs/user/' },
-      { no: '03', title: '板卡', body: '板卡合约、移植指南与支持等级表。', path: 'docs/boards/' },
+      { no: '03', title: '板卡', body: '支持等级表、启动保证阶梯与板卡档案。', path: 'docs/boards/' },
       { no: '04', title: '设计记录', body: '构建、容器与安全模型为什么长成这样。', path: 'docs/design/' },
       { no: '05', title: '决策', body: '已定下的选择，带上理由与复核日期。', path: 'docs/decisions/' },
       { no: '06', title: '任务与计划', body: '每项改动在实现之前先被调查与提案。', path: 'docs/task/ · docs/plan/' },

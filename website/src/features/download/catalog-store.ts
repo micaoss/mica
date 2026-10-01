@@ -1,22 +1,20 @@
 import type { Download } from './catalog'
-import { downloadsFromIndex } from './mica-index'
+import { downloadsFromRes } from './res-catalog'
 
 /**
  * What the site stores for the download pages, and what publishing it means.
  *
- * The catalogue is built where GitHub can be read reliably — a CI runner — and
- * written into KV from there. The Worker only reads it: refreshing from a
- * Cloudflare egress address failed continuously, first with the API's anonymous
- * 403 and then with 429 from the release download, because that egress is shared
- * and heavily used against GitHub.
+ * The catalogue is read from the documents `mica-res` derives from the
+ * releases posted to it, in CI, and written into KV from there; the Worker
+ * only reads that key.
  */
 
 export interface StoredCatalogue {
   downloads: Download[]
   /** When this copy was built. */
   refreshedAt: string
-  /** The index release it was read from. */
-  latestRelease?: string
+  /** Where it was read from. */
+  source?: string
 }
 
 export interface RefreshStatus {
@@ -29,14 +27,15 @@ export interface RefreshStatus {
 }
 
 /**
- * An index that names products but parses to nothing means the shape moved under
- * the parser, not that everything was unpublished, so it is refused rather than
- * published: an empty catalogue would blank every board page.
+ * Product documents that parse to nothing mean the shape moved under the
+ * parser, not that everything was unpublished, so they are refused rather than
+ * published: an empty catalogue would blank every board page. No documents at
+ * all is an honest empty catalogue: nothing has been posted to res yet.
  */
-export function storedCatalogue(index: unknown, release: string, now: string): StoredCatalogue {
-  const downloads = downloadsFromIndex(index)
-  if (downloads.length === 0)
-    throw new Error(`${release} parsed to no downloads`)
+export function storedCatalogue(documents: unknown[], source: string, now: string): StoredCatalogue {
+  const downloads = downloadsFromRes(documents)
+  if (documents.length > 0 && downloads.length === 0)
+    throw new Error(`${source}: ${documents.length} product document(s) parsed to no downloads`)
 
-  return { downloads, refreshedAt: now, latestRelease: release }
+  return { downloads, refreshedAt: now, source }
 }
