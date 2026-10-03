@@ -69,8 +69,9 @@ from the descriptor's. One signed deployment therefore ships as `full`,
 
 Metadata trust resides in authenticated kernel policy. Public factory update
 settings select a source and policy; they cannot replace anchors.
-Installed boot does not depend on downloading an unexpired catalog. Catalog
-freshness and monotonic revision checks apply when acquiring a new release.
+Installed boot does not depend on reaching an update server. The update
+documents are unsigned and carry no expiry; the manifest's revision is checked
+for monotonicity when a new release is acquired.
 
 ## Content verification
 

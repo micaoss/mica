@@ -244,7 +244,7 @@ the image ships and assert none of them falls in a reconciler-owned namespace.
 The AP PSK is one of the two per-device secrets minted on the device at first
 boot. The full credential model — why the secrets are generated on device, why
 there are two of them rather than one, and why there are two hash formats — is
-stated once in **`docs/integrate/provisioning.md` §3** and is not restated here.
+stated once in **`docs/integrate/provisioning.md` section 2** and is not restated here.
 
 What matters for Wi-Fi specifically:
 

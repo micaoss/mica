@@ -19,7 +19,8 @@ and geometry before creating the mappings.
 
 Native installation authenticates release metadata and component bytes before
 publishing immutable files and the boot-visible candidate. Acquisition verifies
-the signed catalog, expiry, board and replay policy, with bounded download/import.
+the signed descriptor, the board and product, and the generation, with bounded
+download and import.
 Current and retained fallback objects remain protected during staging and GC.
 No loader firmware is installed through the ordinary OS update action.
 

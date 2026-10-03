@@ -25,7 +25,7 @@ configuration once, atomically, before anything else consumes it:
 
 A durable undo journal covers the DATA configuration documents and DATA identity
 record. A pending rollback must finish before the next startup can consume them
-([../integrate/provisioning.md](../integrate/provisioning.md#413-idempotence-and-atomicity)).
+([../integrate/provisioning.md](../integrate/provisioning.md)).
 A failed seed aborts loudly and the next boot retries from scratch; a
 half-provisioned device that looks provisioned is the failure this design
 refuses. SSH host keys are generated on the device on first boot, and DATA

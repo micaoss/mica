@@ -1,267 +1,119 @@
-# Design: Security Lifecycle — Keys, Credentials, Releases, Response
+# Security lifecycle
 
-> Who does what, to which trust material, when. This document assigns an
-> owning **role** to every lifecycle procedure — key ceremonies, channel
-> promotion, support windows, vulnerability response — and states each
-> procedure's real maturity. The ceremony *commands* live in
-> `docs/security/signing.md` and are not duplicated here; this document
-> owns the surrounding lifecycle. Companion to
-> `docs/security/model.md` (what the material defends) and
-> `docs/reference/manufacturing.md` (the factory half of identity).
+Who holds which trust material, how it is created, rotated and recovered, and
+how releases and vulnerabilities are handled. The mechanisms each key drives
+are [signing](signing.md); what they defend is the [model](model.md).
 
-## 0. Markers, and the owner roles
+## 1. Where the project stands
 
-Markers follow `docs/reference/access.md` discipline, with this document's
-set (a lifecycle's sections are procedures, like
-`docs/security/signing.md`'s):
+- **Every release so far is signed with development keys.** Production key
+  custody is not established, and no release claims it. A device reports
+  whether it trusts production or development keys
+  (`GET /api/v1/system/info`).
+- There is no published security contact, no advisory channel, no support
+  window and no end-of-life policy.
+- There is no fleet certificate authority and no device enrolment.
 
-- **[procedure]** — shipped tooling supports every step; executable today.
-- **[partial]** — executable with a named gap.
-- **[proposed]** — the tooling or operational channel does not exist; prose
-  only, kept honest here rather than implied to be enforced.
+What follows separates what exists from the procedure that is to be stood up.
 
-**Roles, not people.** Four owner roles are named throughout. A person may
-hold more than one role in a small organisation, with one exception noted
-below; the point is that every procedure has exactly one accountable role:
+> status: unsupported
+
+## 2. Trust material
+
+| Material | Authenticates | Created | Rotation | If lost or compromised |
+|---|---|---|---|---|
+| **Boot keys** | the loader and kernel a board starts: the UKI under UEFI, the FIT under U-Boot | a build input, separate from the others | a new loader or firmware carrying the new anchor; firmware moves only through the offline maintenance route | a complete reflash |
+| **Content keys** | the root, support and core component images, through signatures the kernel requires on every verity mapping | a build input; the public certificate is built into the kernel | a kernel that carries the new certificate beside or instead of the old; never a mutable keyring | a complete reflash when no accepted combination remains |
+| **Metadata keys** | deployment descriptors and firmware records | a build input; the public keys are in the signed kernel | an overlap set: the new key is added before the old is removed, and no key is removed while a published artifact depends on it | a complete reflash when no accepted combination remains |
+| **The API's TLS identity** | "the same device as last time", to a browser that accepted it | self-signed on the device the first time HTTPS serves | replaced by an administrator, with an uploaded chain or a fresh self-signed one | regenerated; a configuration reset removes it |
+| **The admin password and API tokens** | the management API | set by whoever claims the device | through the API | none: see below |
+| **SSH authorized keys** | a root shell | enrolled by an administrator | edit the list | none: see below |
+| **The transient root password** | SSH and the local consoles until the next boot | set by an administrator | — | gone at the next boot by design |
+
+Rules that hold across the table:
+
+- **The three signing domains are separate keys.** A key of one cannot stand
+  in for another.
+- **Private keys never enter an image, a package or a release.** The build
+  takes public certificates; signing happens where the private key is held.
+- **Trust anchors are not settings.** No API, configuration document or update
+  source can add or replace one; they change only with the signed kernel that
+  carries them.
+- **An installed deployment boots offline.** Nothing about booting waits for a
+  network, a revocation list or a clock. There is no expiry, so withholding or
+  retiring a release on a server does not revoke what a device already runs.
+- **A generation only rises**, and failed deployments are remembered, so a
+  device does not return to a release it rejected.
+- **There is no software recovery for a lost administrator credential.** An
+  operator who loses the admin password, every token and every key reflashes
+  the device, which costs everything on it ([access](../reference/access.md)
+  section 7). Support states this up front.
+- The device password minted at first boot authenticates nothing and is never
+  offered to a customer as a credential
+  ([provisioning](../integrate/provisioning.md) section 2).
+
+> status: shipped — evidence: `docs/security/signing.md`, `mica-core:docs/mica-core.md`, `mica-build:README.md`
+
+## 3. Custody
+
+Custody is by role, and every procedure has exactly one accountable role.
 
 | Role | Accountable for |
 |---|---|
-| **release owner** | key ceremonies and custody, channel promotion, release publication, support windows and EOL |
-| **security owner** | vulnerability intake, severity assignment, advisories, incident response |
-| **manufacturing owner** | factory inputs, injection, manufacturing records, quarantine and rework (`docs/reference/manufacturing.md`) |
-| **support owner** | field escalation intake, RMA authorization, linking field failures back to releases and manufacturing records |
+| Release owner | key custody and ceremonies, release publication, support windows |
+| Security owner | vulnerability intake, severity, advisories, incident response |
+| Manufacturing owner | factory inputs, records, quarantine and rework ([manufacturing](../reference/manufacturing.md)) |
+| Support owner | field escalation, returns, linking failures to releases and factory records |
 
-Exception: the **security owner** must be able to trigger an emergency
-release, so where staffing allows, release and security ownership are held by
-different people — a compromise of the release path is precisely the incident
-the security owner must be able to respond to independently.
+Where staffing allows, release and security ownership are held by different
+people: a compromise of the release path is the incident the security owner
+must be able to answer independently.
 
-## 1. Credential inventory and lifecycle
+Production private material exists only on ceremony media and the release
+host. CI uses disposable development material and never imports a production
+key. The build refuses an image whose factory shadow file carries a usable
+password, and a development-key marker travels with the public defaults so a
+release gate and the device can both report it.
 
-Every class of trust material, with its generation, injection, storage,
-rotation, revocation and recovery. **Production private material is never in
-git** — see §1.6, which is the one rule with build-time teeth today.
+> status: proposed — evidence: `docs/security/signing.md`
 
-### 1.1 Metadata signing keys — owner: release owner — **[implemented]** software flow
+## 4. Releases
 
-Ed25519 anchors authenticate current catalog, deployment and firmware envelopes.
-They are explicit kernel-package inputs; public factory settings do not carry
-editable trust keys. The server receives an explicit overlap set and refuses to
-remove an anchor while a published artifact still depends on it. Withdraw or
-replace those artifacts before removing the key.
+A release is one product, signed, published by `mica-build`
+([how releases work](../releases/how-releases-work.md)). Releases signed with
+development material are development releases; a candidate or stable release
+waits for production keys. Promotion between channels, soak requirements,
+support windows and end-of-life notices are procedure to be defined, and no
+tooling or commitment exists for them today.
 
-Catalog issue/expiry times and revision checkpoints protect acquisition freshness.
-Deployment generations and recorded failed IDs prevent automatic rollback to a
-known failed release. Installed offline boot uses authenticated installed metadata
-without requiring a fresh catalog or network clock. Do not describe catalog expiry
-as revocation of an already installed deployment.
+One gate does exist: a release whose claims exceed its board's recorded
+evidence, including an assurance level above the board's, is refused when its
+manifest is assembled.
 
-Rotation requires a separately authenticated kernel policy carrying the intended
-overlap/removal, plus matching signed deployment associations. Preserve a usable
-retained combination throughout the ceremony. Recovery from lost or compromised
-anchors follows [key delivery](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md) and the explicit complete-image
-reflash path when no accepted association remains. No mutable settings API imports
-an older trust root or walks a historical metadata format.
+> status: shipped — evidence: `mica-build:src/image/release-manifest.ts`, `mica-build:src/boot/dev-keys.ts`
 
-### 1.2 Content signing keys — owner: release owner — **[implemented]** software flow
+## 5. Security response
 
-Content certificates authenticate detached PKCS#7 root hashes for root and support.
-The kernel's builtin trust policy requires these signatures for every corresponding
-verity mapping. Blocks are authenticated when read. A build-time checksum or a
-userspace signature check cannot replace the kernel's required signature.
+None of this has an operating channel yet; it is the procedure to stand up.
 
-The signer/certificate are explicit build inputs. Private keys never enter the
-root, kernel package, firmware package or release directory. Certificate overlap
-and removal are kernel-package changes; they do not use a mutable rootfs keyring.
-Ordinary boot never waits for network validation, CRL delivery or catalog refresh.
-Do not claim a wall-clock signer-expiry window as installed-boot revocation.
+- **Intake.** A published contact and disclosure policy. Until one exists,
+  report privately to the maintainers. Every report gets an acknowledgement, a
+  record and a severity.
+- **Severity**, judged against the stated [model](model.md) and its limits, so
+  a report that restates a documented limit is answered with the document:
 
-`src/boot/dev-keys.ts` creates separate boot/content/metadata development
-domains only when explicitly invoked with a new output directory. Its marker is
-baked with the public defaults. The native observer reports that provenance;
-`bin/bun.sh src/cli.ts --release gate` refuses marked material on candidate/stable channels.
-Releases signed with the development material therefore target the development
-channel only; candidate and stable releases wait for production keys (user,
-2026-09-14). Production key custody is not yet established.
-Empty or malformed generated markers fail release assembly. A missing marker is
-not proof of operational key custody or physical qualification.
+  | Severity | Means | Fix target |
+  |---|---|---|
+  | critical | compromise of the management plane without credentials; an update accepted that signing should refuse; code that survives the verified root | emergency release |
+  | high | escalation beyond the documented root-equivalence; defeat of a credential mechanism; denial of update or recovery | next release |
+  | medium | weaknesses needing local access or unusual configuration; disclosure short of credentials | a scheduled release |
+  | low | hardening gaps | with related work |
 
-Current negative tests cover domain separation, unknown/missing/modified
-signatures, metadata/object tampering, staged overlap and old-key removal. Production custody ceremonies
-and physical platform qualification are not inferred from those tests.
+- **Advisories**, one per fixed vulnerability, naming the affected releases
+  and boards, the fixed release and any workaround. An advisory is also how an
+  overstated claim is retracted.
+- **Incidents**: contain (suspend publication), assess (which keys, releases
+  and devices), rotate (the row of section 2), notify (including what cannot be
+  fixed remotely: re-anchoring a device is a physical-contact event), record.
 
-### 1.3 Device TLS identities — owner: release owner (policy), support owner (field) — **[partial]**
-
-What exists: apid generates a **self-signed** certificate on first start into
-its DATA/state directory and reuses it (`mica-core:crates/mica-apid/src/tls.rs`); it
-authenticates nothing beyond "same device as last time" to a browser that
-has accepted it. There is no device certificate hierarchy, no fleet CA and no
-enrollment — first-boot provisioning deliberately mints no PKI
-(`docs/integrate/provisioning.md` §2, "What was NOT carried over").
-
-- **Generation** — on device, first apid start; never in the image.
-- **Rotation/revocation** — delete the pair on DATA/state; the next start
-  regenerates. No expiry-driven or fleet-driven rotation exists.
-- **Recovery** — wiping DATA/state regenerates identity wholesale, as with every
-  DATA/state credential.
-- A managed device identity (fleet CA, enrollment, revocation) is
-  **[proposed]** and proceeds with the fleet/remote-management work
-  (`docs/reference/remote.md`), not here.
-
-### 1.4 Administrator credentials — owner: support owner (field procedure) — **[procedure]**
-
-Three live credential classes, each with its lifecycle already designed and
-shipped; this section assigns ownership and cross-references rather than
-restating:
-
-- **apid webAdmin credential** — hash on DATA/state; set at setup through apid.
-- **SSH authorized keys** — the persistent access credential; rotation is
-  editing the `access.ssh.authorizedKeys` list, and every key is a root key
-  (`docs/reference/access.md` section 5).
-- **Transient root password** — self-revoking by design: cleared by
-  `mica-shadow-reconcile` on the next boot via the marker mechanism
-  (`docs/reference/access.md` section 5, `mica-core:crates/micad/src/transient.rs`).
-
-**Recovery is deliberately absent**: an operator who loses the webAdmin
-credential and every key has no software path back in, and the recovery is a
-whole-disk reflash that costs everything on the device
-(`docs/reference/access.md` section 7). Support procedures must state this up front
-rather than discover it on a call. The inert first-boot device password
-authenticates nothing (`docs/integrate/provisioning.md` §3.6) and must never be
-offered to a customer as a credential.
-
-### 1.5 Board boot keys — owner: release owner — **[implemented]** software flow, physical qualification pending
-
-UEFI authenticates systemd-boot and signed UKIs. cx3576's fixed-policy U-Boot
-requires the FIT signer embedded in its control FDT. Boot keys are separate from
-content and metadata signing keys. Hardware authentication of every earlier
-mutable stage remains platform-specific and is not claimed by these mechanisms.
-
-The firmware maintenance workflow authenticates previous/candidate packages,
-keeps recovery material outside the ESP, writes only the declared offline target
-and compares readback before recording success. cx3576 full-image flashing verifies
-the complete written image before reset. QEMU and host stubs do not replace
-physical USB, watchdog or power-loss tests. No OTP/fuse change is part of ordinary
-component update or development key generation.
-
-### 1.6 Production private material is never in git — **[implemented]** where checkable
-
-The rule, and its mechanisms: `meta/` and `mica-deploy:.devkeys/` are
-gitignored, both generators refuse to overwrite existing keys, the pack stage
-fails any build whose factory shadow carries a usable hash
-(`docs/reference/access.md` section 8), and a first-boot settings tree is asserted to
-contain no secret material (`docs/integrate/provisioning.md` §3.1). What no
-check can see — a production key pasted into an unrelated file — remains a
-custody rule owned by the release owner: production private material exists
-only on ceremony media and the release host, per
-`docs/security/signing.md` §4.
-
-## 2. Release operating procedures — owner: release owner
-
-### 2.1 Channels and promotion — **[proposed]**
-
-Three channels, promotion strictly forward, one release at a time:
-
-- **development** — every successful build; dev keys permitted; no support
-  claim attaches.
-- **candidate** — built from a tagged source state with production signing
-  (`docs/security/signing.md` §3); promoted from development when the
-  repository gates are green and the release artifacts are complete.
-- **stable** — promoted from candidate, never directly from development,
-  when: the candidate has soaked on bench hardware for every board the
-  release claims, with the board's ladder-level evidence rows current
-  (`docs/security/model.md` §5); A/B update *and rollback* from the
-  previous stable have been exercised; release notes exist; and no open
-  release-blocking severity (§3.2) targets it.
-
-Promotion is a signing act, not a file move — a channel's metadata is signed
-per `docs/security/signing.md` §3 — and a publication gate must refuse
-a release whose claims exceed its board evidence, including any boot-assurance
-claim above the board's evidenced ladder level. The unsupported-claim
-publication gate is **[implemented]** by `checkBoardEvidence` in
-`src/image/release-manifest.ts`. Channel promotion remains **[proposed]**;
-until it exists, promotion is this procedure executed by hand by the release
-owner, recorded in the release notes.
-
-### 2.2 Signing and key custody — **[procedure]**
-
-Custody follows [release signing](signing.md) and
-[key delivery](https://github.com/micaoss/mica/blob/9dd6302/docs/design/key-delivery.md): independent boot/content/metadata private material,
-restricted signer access, recorded public fingerprints, and retained recovery
-inputs for every accepted association. CI uses explicit disposable development
-material. It must not import production private keys or claim production custody.
-A role or medium handover requires a recorded review of the corresponding trust
-domain and its accepted public anchors.
-
-### 2.3 Support windows and end of life — **[proposed]**
-
-Policy, stated so a customer can plan against it and so EOL is an announced
-event rather than a discovered one:
-
-- A **stable release** is supported until superseded by the next stable,
-  plus a fixed overlap window during which security fixes are backported to
-  it; the window's length is a product commitment set per release in its
-  release notes, never silently shortened.
-- **Per-board support** is bounded by the board's qualification: a
-  board/revision whose evidence lapses or whose vendor BSP input becomes
-  unmaintainable moves to unsupported with an advisory, not by omission.
-- **End of life** of a channel, release line or board is announced through
-  the advisory mechanism (§3.3) with a minimum notice period stated in the
-  announcement, and names the last release, the end of security fixes, and
-  the recommended migration.
-
-No tooling enforces any of this today; the support owner tracks windows and
-the release owner announces EOL. That is the honest state.
-
-## 3. Security response — owner: security owner
-
-All four subsections are **[proposed]** as operational channels — none has
-tooling or a published endpoint today — and they are written as the procedure
-to stand up, not as one that exists.
-
-### 3.1 Vulnerability intake
-
-A published security contact (a `SECURITY.md` at the repository root naming
-an address and a disclosure policy) is the intake channel; until it is
-published, intake is private disclosure to the maintainers through the forge,
-and publishing the contact is the security owner's first deliverable.
-Every report gets an acknowledgement, a tracking record, and a severity
-(§3.2) within the triage target below. Reports are held privately until a
-fix ships or the reporter-agreed disclosure date arrives, whichever is first.
-
-### 3.2 Severity classes and patch targets
-
-| Severity | Definition (this system's terms) | Triage | Fix target |
-|---|---|---|---|
-| **critical** | remote compromise of the management plane without credentials; update-authenticity bypass (a bundle or metadata accepted that signing should refuse); persistent code execution surviving the verity root | 24 h | emergency release within 7 days, backported to every supported stable |
-| **high** | authenticated-to-root escalation beyond the documented root-equivalence set; defeat of a shipped credential mechanism; denial of update or recovery | 72 h | next release within 30 days, backported to supported stable |
-| **medium** | weaknesses requiring local access or unusual configuration; information disclosure short of credentials | 1 week | next scheduled release, target 90 days |
-| **low** | hardening gaps, defense-in-depth findings | 2 weeks | recorded; scheduled with related work |
-
-Severity is judged against the real model — e.g. "any SSH key is a root key"
-is documented behaviour (`docs/reference/access.md` section 5), not a finding — and
-against `docs/security/model.md`'s stated limits, so a report that
-restates a documented limit is answered with the document, not a patch.
-
-### 3.3 Advisory publication
-
-One advisory per fixed vulnerability at fix release, and per EOL event
-(§2.3): affected releases/boards, severity, the fixed release, workarounds if
-any, and credit. Advisories are published where releases are published, and
-an advisory is also the vehicle for honestly retracting an overstated claim,
-should one ship despite §2.1's gate.
-
-### 3.4 Incident response
-
-For a live compromise (key compromise, malicious release, fleet-affecting
-exploitation), in order: **contain** (suspend publication; a compromised metadata
-online key ends the repository lineage — `docs/security/signing.md`
-§1.6 — and a compromised signer is reissued per §2.2 there); **assess**
-(which keys, which releases, which devices; the custody minutes and audit
-trail are the record); **rotate** (the relevant §1 procedure — root rotation,
-signer reissue, or fresh repository; any use of `--allow-rollback` is itself
-a recorded incident); **notify** (advisory per §3.3, including what cannot be
-fixed remotely — e.g. re-anchoring devices while anchor provisioning remains
-unbuilt is a physical-contact event, and the advisory must say so); and
-**record** (a written post-incident note whose action items land as tracked
-work, not resolutions in prose).
+> status: proposed — evidence: `docs/security/model.md`

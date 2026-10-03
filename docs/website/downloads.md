@@ -29,11 +29,10 @@ or historical update compatibility is offered.
 
 A product release (`<board>.<variant>.<YYYYMMDD-HHMM>`) publishes the signed
 archives and images as release assets, and a product's newest release is the
-one to take; there is no index. The channel catalogues devices poll are an
-update server's, not this repository's. A release is not a physical-board
+one to take; there is no index. A release is not a physical-board
 qualification. The download list is generated from the documents the resource
-service builds from the posted releases (the manifest at
-`https://res.micaos.dev/update/v2/manifest.json` and each release's document),
+service builds from the posted releases (the manifest under
+`https://res.micaos.dev/update/` and each release's document),
 and is empty while no release is posted there;
 do not hand-write release identities or claim absent evidence.
 

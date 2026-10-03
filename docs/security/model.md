@@ -118,7 +118,7 @@ limit, explicitly:
 - DATA and its state/meta namespaces are plain ext4. Settings, the apid admin password
   hash, sshd host keys, authorized SSH keys, WiFi credentials, Bluetooth
   pairing keys and the two per-device plaintext secrets
-  (`/var/lib/mica/secrets/`, `docs/integrate/provisioning.md` §3.4) are readable
+  (`/var/lib/mica/secrets/`, `docs/integrate/provisioning.md` section 2) are readable
   by anyone holding the medium.
 - The confidentiality that does exist is against the *online* and
   *unprivileged local* attacker: hashes rather than plaintexts in the

@@ -52,10 +52,10 @@ Instead, micad owns persistence (the settings tree) and application:
   and published as `time.timezone.available` in live state, a warning and
   never a failure.
 
-## 3. Boot ordering: RTC → saved floor → network time → TLS/catalog
+## 3. Boot ordering: RTC → saved floor → network time → TLS
 
 The trusted-clock floor is `max(RTC, saved clock)`, in place before anything
-that validates certificate or metadata expiry runs:
+that validates a certificate's validity runs:
 
 1. **RTC.** The kernel (and systemd's built-in epoch clamp) set the initial
    clock from the RTC where the board has one. cx3576 declares an
@@ -69,12 +69,11 @@ that validates certificate or metadata expiry runs:
    boots no earlier than the last minute it was known to be running.
 3. **Network time.** timesyncd (in `sysinit.target`) polls the managed or
    fallback servers on the pinned adaptive policy and disciplines the clock.
-4. **TLS/catalog consumers.** Everything that validates expiries starts after
+4. **TLS consumers.** Everything that validates certificate validity starts after
    `sysinit.target`, i.e. after the floor is in place; network time then only
    moves the clock forward-or-slightly-sideways from a floor that was already
-   sane. What those consumers validate is boundary (b) of
-   `docs/security/model.md` §3; the floor is what keeps its expiry
-   checks meaningful.
+   sane. Update authenticity does not depend on the clock: the update
+   documents carry no expiry ([updates](updates.md)).
 
 The ordering `Before=systemd-timesyncd.service` on the mount is load-bearing:
 timesyncd reads the clock file once, at startup, so a bind that arrives later

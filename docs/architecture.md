@@ -149,9 +149,8 @@ off. There is no image profile package or profile file
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`): development and
 production images differ by the kernel command line parameter
 `mica.profile=dev|prod`, carried only in signed boot configuration; no
-difference is implemented yet (`docs/reference/access.md` section 8). The one-way
-DATA/meta lockdown is designed, and marked not implemented
-(`docs/reference/access.md` section 8).
+difference in access follows from it, and there is no irreversible shell
+lockdown (`docs/reference/access.md` section 8).
 
 ## 6. Repository map
 

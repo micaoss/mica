@@ -20,11 +20,12 @@ separate from authenticating every first mutable hardware boot stage.
 
 ## 2. Update authenticity and key lifecycle
 
-The updater checks signed deployment/catalog metadata, board identity and exact
+The updater checks the signed deployment descriptor, product and board identity and exact
 component bytes before staging. It preserves current and retained fallback
 objects, publishes a candidate only after durable writes, and confirms through
 the health gate. Loader firmware is a separate signed maintenance artifact.
-Catalog expiry gates acquisition; it does not expire installed offline boot.
+The server's documents are unsigned and carry no expiry: withholding a release
+does not revoke what a device already runs.
 
 Metadata anchors are embedded in authenticated kernel policy. Editable update
 source settings cannot replace them. Content-anchor overlap/removal is a

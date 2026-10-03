@@ -157,11 +157,9 @@ configuring a device that has never had a network.
 
 > status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`
 
-**Three of the five channels the design lists do not exist**, and each is an
-absence to plan around rather than work in progress: the AP captive portal has
-its transport and not the portal, the HDMI local setup wizard has a browser
-client and no kiosk or input chain to run it on a device's own screen, and the
-serial console wizard was never built. Nor does the shipped removable-media path
+**There is no captive portal, no on-screen setup wizard and no serial
+wizard**, and each is an absence to plan around: the access point has its
+transport and no portal behind it. Nor does the shipped removable-media path
 verify a signature or import on hotplug — media are consulted once, at boot.
 Factory injection is absent too: versioned inputs, verification at injection and
 a per-device record are described in [../integrate/manufacturing.md](../integrate/manufacturing.md) and

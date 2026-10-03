@@ -108,12 +108,12 @@ current product only; history is in Git.
   - `qualification.md` — field-reliability qualification: the matrix and its binding rules
   - `board-template.md` — the board page template: the eleven validated sections
 - `security/` — the security posture, the model, the lifecycle and the trust chain
-  - `lifecycle.md` — key and credential lifecycles, owner roles, release channels, support windows and security response
+  - `lifecycle.md` — trust material and its custody, owner roles, releases and security response
   - `model.md` — threat and physical-access boundaries, the I1–I4 boot-assurance ladder and honest limits
   - `overview.md` — the security posture: what is protected, by what, and the named gaps
   - `signing.md` — independent boot, content and metadata trust, rotation and firmware maintenance
 - `reference/` — the contracts of the product's behaviour on a device
-  - `access.md` — debug and maintenance access: channels, authentication, lockdown layers
+  - `access.md` — how an operator reaches a device: the API, SSH, the consoles, and being locked out
   - `api.md` — management API: ownership, authentication, tasks and isolated UI hosting
   - `boot.md` — U-Boot signed FIT selection, redundant native records and health confirmation
   - `diagnostics.md` — system information, observed network state, board telemetry and the bounded redacted support snapshot
