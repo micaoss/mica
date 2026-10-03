@@ -38,10 +38,11 @@ jobs:
       # The build reads ../docs, so a documentation change rebuilds the site.
       - run: bun run build
 
-  # Reads the documents mica-res derives from the posted releases
-  # (catalog/products.json and each product's document), checks them against
-  # the site's boards, and publishes the download catalogue into KV. Before the
-  # first release is posted the catalogue is published empty.
+  # Reads the update documents mica-res builds from the posted releases (the
+  # manifest, each product's history, each release's document), checks them
+  # against the site's boards, and publishes the download catalogue into KV. A
+  # manifest with no products publishes an empty catalogue; a document that
+  # does not answer fails the job.
   catalog:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-26.04

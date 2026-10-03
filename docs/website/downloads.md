@@ -32,8 +32,9 @@ archives and images as release assets, and a product's newest release is the
 one to take; there is no index. The channel catalogues devices poll are an
 update server's, not this repository's. A release is not a physical-board
 qualification. The download list is generated from the documents `mica-res`
-derives from the posted releases (`catalog/products.json` and each product's
-document on `dl.res.micaos.dev`), and is empty until a release is posted there;
+builds from the posted releases (the manifest at
+`https://res.micaos.dev/update/v2/manifest.json` and each release's document),
+and is empty while no release is posted there;
 do not hand-write release identities or claim absent evidence.
 
 > status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/user/download.md`

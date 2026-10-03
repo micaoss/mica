@@ -54,28 +54,30 @@ control loads the earlier ones.
 ### Where the rows come from
 
 ```
-mica-build ──posts each release──> mica-res ──> catalog/products.json
-                                             └─> catalog/products/<product>.json
+mica-build ──posts each release──> mica-res
+    <root>v2/manifest.json            every product and its latest release
+    <root>v2/<product>/releases.json  that product's releases, newest first
+    <release directory>/index.json    one release: its files, sizes and hashes
         ──(CI: on push, hourly, on demand)──> KV ──> GET /api/catalog
 ```
 
 Every release is posted to `mica-res` as it is published
-(`mica-res:docs/spec/release-publishing.md`), and res derives two documents on its
-download host, `https://dl.res.micaos.dev`: the directory of products, each with its newest
-release and where its document is, and each product's document, its releases newest first
-with their files, sizes and hashes. Nothing is read from GitHub and nothing is inferred from a
-file name (`src/features/download/res-catalog.ts`). A row's variant (`basic`, `full`) is the
-page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which
+(`mica-res:docs/spec/release-publishing.md`), and res builds the update documents from its
+registry (`mica-res:docs/modules/resource.md`). The root is `https://res.micaos.dev/update/`,
+the one a device is configured with. Nothing is read from GitHub and nothing is inferred from
+a file name (`src/features/download/res-catalog.ts`). A release's variant (`basic`, `full`) is
+the page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which
 archive it is.
 
 **The catalogue is built in CI, not in the Worker.** The website workflow's `catalog` job
 reads the documents (`scripts/publish-catalog.ts`) and writes the result into KV with
 `wrangler kv key put`; the Worker only reads that key.
 
-Before the first release is posted, res answers 404 for its directory, and the catalogue is
-published **empty**: every board page then says nothing is published yet, which is the truth.
-A publish is refused when product documents exist and none of them parses — that means the
-shape moved under the parser, not that everything was unpublished.
+A manifest that names no product is published as an **empty** catalogue: every board page
+then says nothing is published yet. A document that does not answer fails the job — an
+address that moved must never read as "nothing published", which is what happened on
+2026-10-02 when the documents moved and the site went on publishing an empty catalogue in
+green. A publish is also refused when releases exist and none of them parses.
 
 To refresh on demand, run the workflow: `gh workflow run website --repo micaoss/mica`.
 
@@ -97,8 +99,8 @@ The KV namespace is bound in `wrangler.jsonc` and CI publishes into it with the
 `CLOUDFLARE_API_TOKEN` the deploy already uses; that token needs **Workers KV Storage: Edit**
 as well as Workers Scripts: Edit. No GitHub token is involved.
 
-`CATALOG_BASE` selects the download host the documents are read from, defaulting to
-`https://dl.res.micaos.dev`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
+`CATALOG_ROOT` selects the update root the documents are read from, defaulting to
+`https://res.micaos.dev/update/`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
 
 ### The sample
 

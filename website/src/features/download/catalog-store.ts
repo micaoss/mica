@@ -4,7 +4,7 @@ import { downloadsFromRes } from './res-catalog'
 /**
  * What the site stores for the download pages, and what publishing it means.
  *
- * The catalogue is read from the documents `mica-res` derives from the
+ * The catalogue is read from the update documents `mica-res` builds from the
  * releases posted to it, in CI, and written into KV from there; the Worker
  * only reads that key.
  */
@@ -27,15 +27,15 @@ export interface RefreshStatus {
 }
 
 /**
- * Product documents that parse to nothing mean the shape moved under the
- * parser, not that everything was unpublished, so they are refused rather than
- * published: an empty catalogue would blank every board page. No documents at
- * all is an honest empty catalogue: nothing has been posted to res yet.
+ * Releases that parse to nothing mean the shape moved under the parser, not
+ * that everything was unpublished, so they are refused rather than published:
+ * an empty catalogue would blank every board page. No releases at all is an
+ * honest empty catalogue: the manifest names no product.
  */
-export function storedCatalogue(documents: unknown[], source: string, now: string): StoredCatalogue {
-  const downloads = downloadsFromRes(documents)
-  if (documents.length > 0 && downloads.length === 0)
-    throw new Error(`${source}: ${documents.length} product document(s) parsed to no downloads`)
+export function storedCatalogue(releases: unknown[], source: string, now: string): StoredCatalogue {
+  const downloads = downloadsFromRes(releases)
+  if (releases.length > 0 && downloads.length === 0)
+    throw new Error(`${source}: ${releases.length} release(s) parsed to no downloads`)
 
   return { downloads, refreshedAt: now, source }
 }

@@ -1,20 +1,23 @@
 import type { Download, DownloadKind, DownloadVariant } from './catalog'
 
 /**
- * Reads the documents `mica-res` derives from the releases posted to it
- * (`mica-res:docs/modules/resource.md`): `catalog/products.json` says which
- * products exist and where each one's document is, and
- * `catalog/products/<product>.json` (`mica/res-product/v1`) holds that
- * product's releases, newest first, each with its files.
+ * Reads the update documents `mica-res` builds from the releases posted to it
+ * (`mica-res:docs/modules/resource.md`):
  *
- * Every field shown comes from a release record the producer posted; nothing is
- * inferred from a file name, and a record missing what a row needs is skipped.
+ *   <root>v2/manifest.json            every product and its latest release
+ *   <root>v2/<product>/releases.json  that product's releases, newest first
+ *   <baseUrl><path>                   one release, complete: its files
+ *
+ * Every document that links to others carries a `baseUrl` and names each link
+ * as a `path` relative to it. Every field shown comes from a release the
+ * producer posted; nothing is inferred from a file name, and a record missing
+ * what a row needs is skipped.
  */
 
-/** Where res serves public bytes and its documents. */
-export const RES_DOWNLOAD_BASE = 'https://dl.res.micaos.dev'
+/** The update root a device is configured with. */
+export const RES_UPDATE_ROOT = 'https://res.micaos.dev/update/'
 
-export interface ResAsset {
+export interface ResFile {
   kind: string
   form?: string
   path: string
@@ -24,131 +27,123 @@ export interface ResAsset {
   uncompressedSize?: number
 }
 
+/** `mica/release/v1`: one release, at `<its directory>/index.json`. */
 export interface ResRelease {
-  release: string
-  stamp: string
+  schema?: string
+  baseUrl: string
+  id: string
   product: string
   board: string
   variant: string
   version?: string
   generation?: number
   publishedAt?: string
-  assets?: ResAsset[]
+  files?: ResFile[]
 }
 
-export interface ResProduct {
+/** `mica/catalog/v2`: the manifest. */
+export interface ResManifest {
   schema?: string
-  product: string
-  board: string
-  variant: string
-  releases?: ResRelease[]
+  revision?: number
+  baseUrl?: string
+  products?: { product: string, board: string, variant: string, latest?: { id: string, generation?: number, path: string } }[]
 }
 
-export interface ResDirectoryEntry {
-  product: string
-  board: string
-  variant: string
-  /** The product document's key on the download host. */
-  document: string
-}
-
-export interface ResDirectory {
+/** `mica/releases/v1`: a product's history. */
+export interface ResHistory {
   schema?: string
-  products?: ResDirectoryEntry[]
+  baseUrl?: string
+  product?: string
+  releases?: { id: string, generation?: number, path: string }[]
 }
 
 const UPDATE_FORMS: DownloadVariant[] = ['full', 'root', 'kernel', 'core']
 const KINDS: DownloadKind[] = ['image', 'update', 'firmware']
 
-/** `20260929-0107` -> `2026-09-29`. The stamp is a UTC minute, so the date is its prefix. */
-function dateOf(release: ResRelease): string | null {
-  if (release.publishedAt && /^\d{4}-\d{2}-\d{2}/.test(release.publishedAt))
-    return release.publishedAt.slice(0, 10)
-  const match = /^(\d{4})(\d{2})(\d{2})-\d{4}$/.exec(release.stamp ?? '')
-  return match ? `${match[1]}-${match[2]}-${match[3]}` : null
+/** The UTC-minute stamp a release id ends with: `mini-x64.basic.20261001-2113` -> `20261001-2113`. */
+function stampOf(id: string): string | null {
+  return /(\d{8}-\d{4})$/.exec(id ?? '')?.[1] ?? null
 }
 
-function row(product: ResProduct, release: ResRelease, asset: ResAsset, date: string, base: string): Download | null {
-  if (!KINDS.includes(asset.kind as DownloadKind))
+/** The publication date res recorded, else the date the stamp begins with. */
+function dateOf(release: ResRelease, stamp: string): string {
+  if (release.publishedAt && /^\d{4}-\d{2}-\d{2}/.test(release.publishedAt))
+    return release.publishedAt.slice(0, 10)
+  return `${stamp.slice(0, 4)}-${stamp.slice(4, 6)}-${stamp.slice(6, 8)}`
+}
+
+function row(release: ResRelease, file: ResFile, stamp: string): Download | null {
+  if (!KINDS.includes(file.kind as DownloadKind))
     return null
-  if (!asset.path || !/^[0-9a-f]{64}$/.test(asset.sha256 ?? '') || typeof asset.size !== 'number')
+  if (!file.path || !/^[0-9a-f]{64}$/.test(file.sha256 ?? '') || typeof file.size !== 'number')
     return null
-  const kind = asset.kind as DownloadKind
+  const kind = file.kind as DownloadKind
   // An update archive's form decides which one applies, so an update whose form
   // this page does not know is skipped rather than shown as a plain update.
-  if (kind === 'update' && !UPDATE_FORMS.includes(asset.form as DownloadVariant))
+  if (kind === 'update' && !UPDATE_FORMS.includes(file.form as DownloadVariant))
     return null
-  const variant = kind === 'update' ? (asset.form as DownloadVariant) : undefined
+  const variant = kind === 'update' ? (file.form as DownloadVariant) : undefined
 
   return {
-    board: product.board,
-    profile: product.variant,
+    board: release.board,
+    profile: release.variant,
     kind,
     ...(variant ? { variant } : {}),
-    version: release.stamp,
-    releasedAt: date,
-    bytes: asset.size,
-    ...(typeof asset.uncompressedSize === 'number' ? { uncompressedBytes: asset.uncompressedSize } : {}),
-    digest: `sha256:${asset.sha256}`,
-    href: `${base}/${asset.path}`,
-    filename: asset.path.slice(asset.path.lastIndexOf('/') + 1),
+    version: stamp,
+    releasedAt: dateOf(release, stamp),
+    bytes: file.size,
+    ...(typeof file.uncompressedSize === 'number' ? { uncompressedBytes: file.uncompressedSize } : {}),
+    digest: `sha256:${file.sha256}`,
+    href: `${release.baseUrl}${file.path}`,
+    filename: decodeURIComponent(file.path.slice(file.path.lastIndexOf('/') + 1)),
   }
 }
 
-/** The download rows of a set of product documents. */
-export function downloadsFromRes(documents: unknown[], base: string = RES_DOWNLOAD_BASE): Download[] {
+/** The download rows of a set of release documents. */
+export function downloadsFromRes(releases: unknown[]): Download[] {
   const downloads: Download[] = []
-  for (const value of documents) {
-    const product = value as ResProduct | null
-    if (!product?.board || !product.variant || !Array.isArray(product.releases))
+  for (const value of releases) {
+    const release = value as ResRelease | null
+    if (!release?.board || !release.variant || !release.baseUrl?.endsWith('/'))
       continue
-    for (const release of product.releases) {
-      const date = release && dateOf(release)
-      if (!date)
-        continue
-      for (const asset of release.assets ?? []) {
-        const download = row(product, release, asset, date, base)
-        if (download)
-          downloads.push(download)
-      }
+    const stamp = stampOf(release.id)
+    if (!stamp)
+      continue
+    for (const file of release.files ?? []) {
+      const download = row(release, file, stamp)
+      if (download)
+        downloads.push(download)
     }
   }
   return downloads
 }
 
-/** The product documents `catalog/products.json` points at. */
-export function documentKeys(directory: unknown): string[] {
-  const products = (directory as ResDirectory | null)?.products
-  if (!Array.isArray(products))
-    return []
-  return products
-    .map(entry => entry?.document)
-    .filter((key): key is string => typeof key === 'string' && /^catalog\/products\/[a-z0-9][a-z0-9.-]*\.json$/.test(key))
-}
-
-/** A document on the download host, or null when it does not exist yet. */
-export async function readDocument(base: string, key: string, get: typeof fetch = fetch): Promise<unknown | null> {
-  const url = `${base}/${key}`
+async function readJson(url: string, get: typeof fetch): Promise<unknown> {
   const response = await get(url, { headers: { accept: 'application/json' } })
-  if (response.status === 404)
-    return null
   if (!response.ok)
     throw new Error(`${url} answered ${response.status}`)
   return response.json()
 }
 
 /**
- * The directory and every product document it names. Before the first release
- * is posted the directory does not exist, which reads as no products.
+ * The manifest and every release document of every product it names.
+ *
+ * Nothing here reads as "nothing published": before the first release res
+ * answers a manifest with no products, so a missing document is a fault -- an
+ * address that moved, or a release whose document is gone -- and is thrown.
  */
-export async function readCatalogue(base: string, get: typeof fetch = fetch): Promise<{ directory: unknown, documents: unknown[] }> {
-  const directory = await readDocument(base, 'catalog/products.json', get)
-  const documents: unknown[] = []
-  for (const key of documentKeys(directory)) {
-    const document = await readDocument(base, key, get)
-    if (document === null)
-      throw new Error(`catalog/products.json names ${key}, which ${base} does not serve`)
-    documents.push(document)
+export async function readCatalogue(root: string, get: typeof fetch = fetch): Promise<{ manifest: ResManifest, releases: ResRelease[] }> {
+  const manifest = await readJson(`${root}v2/manifest.json`, get) as ResManifest
+  if (!Array.isArray(manifest?.products))
+    throw new Error(`${root}v2/manifest.json names no products list`)
+
+  const releases: ResRelease[] = []
+  for (const product of manifest.products) {
+    const history = await readJson(`${root}v2/${encodeURIComponent(product.product)}/releases.json`, get) as ResHistory
+    if (!history?.baseUrl?.endsWith('/') || !Array.isArray(history.releases))
+      throw new Error(`the history of ${product.product} carries no baseUrl or no releases`)
+    for (const entry of history.releases)
+      releases.push(await readJson(`${history.baseUrl}${entry.path}`, get) as ResRelease)
   }
-  return { directory, documents }
+  return { manifest, releases }
 }

@@ -5,23 +5,23 @@
  */
 import process from 'node:process'
 import { checkCatalog } from '../src/features/download/catalog-check'
-import { readCatalogue, RES_DOWNLOAD_BASE } from '../src/features/download/res-catalog'
+import { readCatalogue, RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
 import { zh } from '../src/shared/i18n/zh'
 
-const BASE = process.env.CATALOG_BASE ?? RES_DOWNLOAD_BASE
+const ROOT = process.env.CATALOG_ROOT ?? RES_UPDATE_ROOT
 
 async function main(): Promise<void> {
-  const { directory, documents } = await readCatalogue(BASE)
-  const problems = checkCatalog(directory, documents, zh.boards.rows.map(row => row.board))
+  const { manifest, releases } = await readCatalogue(ROOT)
+  const problems = checkCatalog(manifest, releases, zh.boards.rows.map(row => row.board))
 
   if (problems.length > 0) {
-    console.error(`${BASE}: ${problems.length} problem(s)`)
+    console.error(`${ROOT}: ${problems.length} problem(s)`)
     for (const problem of problems)
       console.error(`  - ${problem}`)
     process.exit(1)
   }
 
-  console.log(`${BASE}: the site reads every published product (${documents.length})`)
+  console.log(`${ROOT}: the site reads every published product (${manifest.products?.length ?? 0} product(s), ${releases.length} release(s))`)
 }
 
 main().catch((error: Error) => {
