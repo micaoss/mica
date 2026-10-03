@@ -21,7 +21,7 @@ carry the same signed descriptor:
 
 When both changed, only `full` is published. Changes are decided by the
 component identities against the product's previous `mica-build.lock`
-(`product` rows, `docs/design/release-lock.md` 1.2.2).
+(`product` rows, `docs/reference/release-lock.md` 1.2.2).
 
 **Modules** stay in the kernel component's support image, unchanged; the
 runkit refuses a module release that does not match the kernel.
@@ -59,12 +59,12 @@ per product.
 kinds as `update <kind> builtin - <suffix>` rows: `full` (mandatory,
 `micaupd`), `root` (`root.micaupd`) and `kernel` (`kernel.micaupd`); `-` is
 the runtime image of every builtin row, including `image disk builtin - img`
-(`docs/boards/contract.md` 3.1). A product selects `UPDATE_KINDS` in its
+(`mica-build:boards/README.md` 3.1). A product selects `UPDATE_KINDS` in its
 `product.env` (default all, `full` always). Each archive is a release asset
 `mica-<product>-<YYYYMMDD-HHMM>.<suffix>` and a layer of the OCI manifest
 `update.<product>.<YYYYMMDD-HHMM>` (annotations `mica.update-kind`,
 `mica.deployment-id`, `mica.generation`), recorded by `bundle` and `asset`
-rows of `mica-build.lock` (`docs/design/release-lock.md` 1.2.2).
+rows of `mica-build.lock` (`docs/reference/release-lock.md` 1.2.2).
 
 **Unchanged roots.** A `root` or `kernel` archive needs the other part's
 identity to stay unchanged across releases; packages whose inputs did not

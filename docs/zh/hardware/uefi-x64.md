@@ -5,11 +5,11 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 它的产品在每次发布时都会被自动启动。
 
 现状快照记于 2026-09-29。状态以英文的
-[支持层级表](../../boards/support-tiers.md#current-boards)为准。
+[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
 
-**它没有板卡档案。**`docs/boards/` 下有 `cx3576`、`s905x5m` 和 `uefi-arm64` 的
+**它没有板卡档案。**`docs/hardware/` 下有 `cx3576`、`s905x5m` 和 `uefi-arm64` 的
 档案，没有这一块。本页的事实来自 `mica-build:boards/uefi-x64/board.env`、
-`evidence.json`、内核配置，以及中文[刷写](../user/flashing.md)页。
+`evidence.json`、内核配置，以及中文[刷写](../start/flashing.md)页。
 
 ## 概况
 
@@ -60,16 +60,16 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 产品是 `uefi-x64.basic`（默认）与 `uefi-x64.full`（带容器），各自发布为
 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
-校验方法见[获取发布版](../user/download.md)。
+校验方法见[获取发布版](../start/download.md)。
 
 ## 刷机
 
 **在 QEMU 里跑**（这是唯一被实际执行过的路径）：先用 `virt-fw-vars` 把发布的启动
 证书注册进 OVMF 变量存储，再以 `qemu-system-x86_64 -machine q35` 启动解压后的镜像。
-完整命令行见[刷写](../user/flashing.md) 第 4 节。
+完整命令行见[刷写](../start/flashing.md) 第 4 节。
 
 **写到实体机器上（未验证）**：整盘 `dd` 写入，不要写某个分区；写完 `sync` 并回读
-比较。没有人在这个项目里做过一次实体写入，具体命令与告诫见[刷写](../user/flashing.md)
+比较。没有人在这个项目里做过一次实体写入，具体命令与告诫见[刷写](../start/flashing.md)
 第 3 节。
 
 **Secure Boot（未验证）**：机器必须把该发布的启动证书注册进固件的 `db`，或者关掉
@@ -82,13 +82,13 @@ Secure Boot。关掉它不削弱 root——签名的内核命令行里仍带
 
 DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 和 g），所以更新不会让设备
 失去可启动的回退；loader 每份部署一个启动项，三次尝试，健康门通过后 bless。
-详见[刷写](../user/flashing.md) 第 7 节与[首次启动](../user/first-run.md)。
+详见[刷写](../start/flashing.md) 第 7 节与[首次启动](../start/first-run.md)。
 
 ## 更新
 
 通过更新归档升级，不要靠重刷（重刷会抹掉 DATA）。这块板发布 `full`、`root`、
-`kernel` 三种归档，选哪个见[更新包](../user/update-packages.md)；A/B 切换、健康确认
-与回滚见[更新与回滚](../user/update-rollback.md)。QEMU 里跑过完整的更新、故障与
+`kernel` 三种归档，选哪个见[更新包](../operate/update-packages.md)；A/B 切换、健康确认
+与回滚见[更新与回滚](../operate/update-rollback.md)。QEMU 里跑过完整的更新、故障与
 回退验收。
 
 ## 恢复
@@ -99,7 +99,7 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 - 兜底是整盘重刷：启动另一份介质并重写磁盘。代价是全部分区**以及设备身份**。
 - 安全擦除不存在。设备要离开你的控制，销毁介质。
 
-阶梯全文与每一步的代价见[恢复](../user/recovery.md)。
+阶梯全文与每一步的代价见[恢复](../operate/recovery.md)。
 
 ## 已知限制
 
@@ -116,4 +116,4 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 | 每次发布时自动启动 | 是 | amd64 产品跑一轮 UEFI lifecycle 的运行阶段 |
 | 实体机器冷启动 / 写入 / 恢复 | 未测试 | 没有实机 |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

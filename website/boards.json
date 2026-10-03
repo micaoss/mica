@@ -4,53 +4,53 @@
     {
       "board": "uefi-x64",
       "guides": [
-        { "id": "install", "doc": "user/install" },
-        { "id": "flashing", "doc": "user/flashing" },
-        { "id": "firstRun", "doc": "user/first-run" },
-        { "id": "update", "doc": "user/update-rollback" },
-        { "id": "trouble", "doc": "user/troubleshooting" }
+        { "id": "install", "doc": "start/install" },
+        { "id": "flashing", "doc": "start/flashing" },
+        { "id": "firstRun", "doc": "start/first-run" },
+        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "trouble", "doc": "operate/troubleshooting" }
       ]
     },
     {
       "board": "uefi-arm64",
       "guides": [
-        { "id": "quickstart", "doc": "user/quickstart" },
-        { "id": "install", "doc": "user/install" },
-        { "id": "flashing", "doc": "user/flashing" },
-        { "id": "update", "doc": "user/update-rollback" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/uefi-arm64.md" }
+        { "id": "quickstart", "doc": "start/quickstart" },
+        { "id": "install", "doc": "start/install" },
+        { "id": "flashing", "doc": "start/flashing" },
+        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/uefi-arm64-dossier.md" }
       ]
     },
     {
       "board": "cx3576",
       "guides": [
-        { "id": "install", "doc": "user/install" },
-        { "id": "flashing", "doc": "user/flashing" },
-        { "id": "update", "doc": "user/update-rollback" },
-        { "id": "recovery", "doc": "user/recovery" },
-        { "id": "trouble", "doc": "user/troubleshooting" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/cx3576.md" },
+        { "id": "install", "doc": "start/install" },
+        { "id": "flashing", "doc": "start/flashing" },
+        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "recovery", "doc": "operate/recovery" },
+        { "id": "trouble", "doc": "operate/troubleshooting" },
+        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/cx3576-dossier.md" },
         { "id": "bench", "url": "https://github.com/micaoss/mica/blob/9dd6302/docs/boards/cx3576-bench.md" }
       ]
     },
     {
       "board": "s905x5m",
       "guides": [
-        { "id": "install", "doc": "user/install" },
-        { "id": "flashing", "doc": "user/flashing" },
-        { "id": "update", "doc": "user/update-rollback" },
-        { "id": "trouble", "doc": "user/troubleshooting" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/boards/s905x5m.md" }
+        { "id": "install", "doc": "start/install" },
+        { "id": "flashing", "doc": "start/flashing" },
+        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "trouble", "doc": "operate/troubleshooting" },
+        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/s905x5m-dossier.md" }
       ]
     },
     {
       "board": "mini-x64",
       "guides": [
-        { "id": "install", "doc": "user/install" },
-        { "id": "flashing", "doc": "user/flashing" },
-        { "id": "firstRun", "doc": "user/first-run" },
-        { "id": "update", "doc": "user/update-rollback" },
-        { "id": "trouble", "doc": "user/troubleshooting" }
+        { "id": "install", "doc": "start/install" },
+        { "id": "flashing", "doc": "start/flashing" },
+        { "id": "firstRun", "doc": "start/first-run" },
+        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "trouble", "doc": "operate/troubleshooting" }
       ]
     }
   ]

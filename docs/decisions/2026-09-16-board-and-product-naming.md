@@ -2,7 +2,7 @@
 
 - **date**: 2026-09-16
 - **kind**: engineering decision
-- **owner**: `mica-boards` (board names and their directories) and `mica-build` (product names and image kinds); the contract text is `docs/boards/contract.md` section 1.1
+- **owner**: `mica-boards` (board names and their directories) and `mica-build` (product names and image kinds); the contract text is `mica-build:boards/README.md` section 1.1
 - **review sunset**: 2027-03-16
 - **status**: accepted (user, 2026-09-16); written so a new variant does not need a fresh discussion; the two renames it builds on are `docs/decisions/2026-09-16-generic-systems-named-by-firmware.md` and `docs/decisions/2026-09-16-minimal-products-removed.md`
 
@@ -36,7 +36,7 @@ to `images.tsv`. So:
 - A product is `<board>-<variant>`, where the variant says what the image is
   for: `dev`, `prod`, and later for example `cloud`. *Amended by the user on
   2026-09-27*: a product is `<board>.<variant>`; every board has `basic`, the
-  default (`docs/boards/contract.md` 1.1, `docs/design/release-lock.md` 1.0).
+  default (`mica-build:boards/README.md` 1.1, `docs/reference/release-lock.md` 1.0).
 - A board package is `mica-board-<board>`.
 - A platform-specific guest board is `<platform>-<arch>`.
 
@@ -55,7 +55,7 @@ to `images.tsv`. So:
 
 The set of 2026-09-16 (`uefi-x64-dev` ... `s905x5m-dev`) was replaced on
 2026-09-27 by `<board>.<variant>` products; today's set is
-`docs/boards/contract.md` 1.1. There are no minimal products
+`mica-build:boards/README.md` 1.1. There are no minimal products
 (`docs/decisions/2026-09-16-minimal-products-removed.md`).
 
 ## History

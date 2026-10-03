@@ -23,25 +23,30 @@ describe('the publishing allowlist', () => {
   it('keeps the engineering record out of the site', () => {
     const sources = PUBLISHED_DOCS.flatMap(doc => Object.values(doc.sources))
     for (const source of sources) {
-      expect(source).not.toMatch(/^(?:design|decisions|task|plan|boards|research)\//)
-      expect(source).not.toMatch(/^zh\/(?:design|decisions|task|plan)\//)
+      expect(source).not.toMatch(/^(?:reference|decisions|website)\//)
+      expect(source).not.toMatch(/^zh\/(?:reference|decisions)\//)
     }
   })
 
   it('publishes exactly what the allowlist file names', () => {
     const named = allowlist.groups.flatMap(group => group.docs.map((doc) => {
       const entry = doc as { name: string, dir?: string, slug?: string }
-      return entry.slug ?? `${entry.dir ?? 'user'}/${entry.name}`
+      return entry.slug ?? (entry.dir ? `${entry.dir}/${entry.name}` : entry.name)
     }))
     expect(PUBLISHED_DOCS.map(doc => doc.slug)).toEqual(named)
   })
 
-  it('reads an entry outside docs/user/ from its own directory in both locales', () => {
+  it('reads an entry from its own directory in both locales', () => {
     const hardware = PUBLISHED_DOCS.find(doc => doc.slug === 'hardware/cx3576')
     expect(hardware?.sources).toEqual({
       en: 'hardware/cx3576.md',
       zh: 'zh/hardware/cx3576.md',
     })
+  })
+
+  it('reads an entry without a directory from the documentation root', () => {
+    const root = PUBLISHED_DOCS.find(doc => doc.slug === 'contributing')
+    expect(root?.sources).toEqual({ en: 'contributing.md', zh: 'zh/contributing.md' })
   })
 
   it('lets an entry override its slug, so a directory index is not /README/', () => {

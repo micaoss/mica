@@ -5,10 +5,10 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 内核、xz 压缩的根，以及唯一的产品 `mini-x64.basic`，它运行 OpenRC，带管理面、SSH 与容器。
 
 现状快照记于 2026-10-01。状态以英文的
-[支持层级表](../../boards/support-tiers.md#current-boards)为准。
+[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
 
 **它没有板卡档案。**以下内容读自 `mica-build:boards/mini-x64/board.env`、它的
-`layout.tsv`、`evidence.json` 与内核配置，以及[刷写](../user/flashing.md)页。
+`layout.tsv`、`evidence.json` 与内核配置，以及[刷写](../start/flashing.md)页。
 
 ## 一览
 
@@ -55,16 +55,16 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 ## 获取镜像
 
 产品是 `mini-x64.basic`，发布为 `mini-x64.basic.<YYYYMMDD-HHMM>`，镜像文件名
-`mica-mini-x64.basic-<YYYYMMDD-HHMM>.img.gz`。校验方法见[获取发布版](../user/download.md)。
+`mica-mini-x64.basic-<YYYYMMDD-HHMM>.img.gz`。校验方法见[获取发布版](../start/download.md)。
 
 ## 刷机
 
 **在 QEMU 里**——与 `uefi-x64` 相同：用 `virt-fw-vars` 把发布的启动证书写进 OVMF
 变量库，再用 `qemu-system-x86_64 -machine q35` 启动解压后的镜像。命令行见
-[刷写](../user/flashing.md)第 4 节。
+[刷写](../start/flashing.md)第 4 节。
 
 **写进实体机器（未验证）**：写整个设备，不要只写一个分区，然后 `sync` 并回读比对
-（[刷写](../user/flashing.md)第 3 节）。
+（[刷写](../start/flashing.md)第 3 节）。
 
 > status: unsupported
 
@@ -88,4 +88,4 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 | 每次发布时自动启动 | 是 | amd64 产品跑一轮 UEFI lifecycle 的运行阶段 |
 | 实机冷启动、写盘、恢复 | 未测试 | 没有硬件 |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`

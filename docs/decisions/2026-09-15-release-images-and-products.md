@@ -4,7 +4,7 @@
 - **kind**: engineering decision
 - **owner**: the mica-build owner; the mica-boards owner for release targets
 - **review sunset**: 2027-03-15
-- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/design/release-lock.md` 1.2.2 and section 2); the form of the OCI image layer confirmed by the user ("a": the layer is the `.gz` asset); released: the compressed `.img.gz` images and the prod products `x64-prod` and `cx3576-prod` in `mica-build` `x64/20260915-2042` and `cx3576/20260915-2042` (`a1f13280`); **the product half is superseded** by `docs/decisions/2026-09-26-release-variants-full-and-basic.md` (products `<board>.<variant>`, no `dev` release), and every board has been a release target since 2026-09-19; the image form (gzip-compressed assets, the OCI layer) stands
+- **status**: accepted (user, 2026-09-15; the image compression corrected the same day from zstd to gzip: "git不要发布img 发布gzip压缩版"; `mica-build`'s form B accepted, `docs/reference/release-lock.md` 1.2.2 and section 2); the form of the OCI image layer confirmed by the user ("a": the layer is the `.gz` asset); released: the compressed `.img.gz` images and the prod products `x64-prod` and `cx3576-prod` in `mica-build` `x64/20260915-2042` and `cx3576/20260915-2042` (`a1f13280`); **the product half is superseded** by `docs/decisions/2026-09-26-release-variants-full-and-basic.md` (products `<board>.<variant>`, no `dev` release), and every board has been a release target since 2026-09-19; the image form (gzip-compressed assets, the OCI layer) stands
 
 ## Decision
 
@@ -30,7 +30,7 @@ threshold.
   `mica.compression=gzip`, `mica.uncompressed-sha256` and
   `mica.uncompressed-size`; the lock rows are unchanged, and the `asset` row
   names the `.gz` with its sha256, the layer digest
-  (`docs/design/release-lock.md` 1.2.2 and section 2).
+  (`docs/reference/release-lock.md` 1.2.2 and section 2).
 - Update kinds stay uncompressed (`.micaupd`, `.root.micaupd`,
   `.kernel.micaupd`).
 - The raw signed image is still built, gated and verified.
@@ -42,7 +42,7 @@ local builds and CI when this was written, were removed on 2026-09-16
 products are the dev features with `PROFILE=prod`, still signed with the development keys and published on
 the development channel
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`,
-`docs/design/release-artifacts.md` channels).
+`mica-build:README.md` channels).
 
 ## Rationale
 

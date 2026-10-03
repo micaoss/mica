@@ -26,7 +26,7 @@ unpublished — that was the 2026-09-15 position — they do not exist.
   The key, its default in `tools/product.sh`, the release scope filter and
   their tests are removed. Its one consumer, the `publish` field of the index
   catalogue, is redefined as "the product's board is a release target", which
-  reproduces today's output exactly (`docs/design/mica-index.md` 3.1). Keeping
+  reproduces today's output exactly (the retired version index). Keeping
   `PUBLISH` as a documented key no product sets was the alternative and was
   rejected.
 - The coverage minimal gave — that the floor composes with no feature selected

@@ -6,9 +6,9 @@
 - **Audience**: integrators pricing a product lifetime; operators and field
   engineers with a failing device; procurement checking lifecycle commitments.
 - **Navigation position**: page 7. Links to
-  [../user/support.md](../user/support.md) for the case-filing procedure,
+  [../releases/support.md](../releases/support.md) for the case-filing procedure,
   [supported hardware](hardware.md) for per-board ownership, and
-  [../user/troubleshooting.md](../user/troubleshooting.md) as the first stop.
+  [../operate/troubleshooting.md](../operate/troubleshooting.md) as the first stop.
 
 ## Content outline
 
@@ -22,10 +22,10 @@
 ### Start with the documentation
 
 Most field problems are covered by the
-[troubleshooting guide](../user/troubleshooting.md) and the
-[recovery guide](../user/recovery.md), and both are written decision-tree
+[troubleshooting guide](../operate/troubleshooting.md) and the
+[recovery guide](../operate/recovery.md), and both are written decision-tree
 first: data-preserving actions before irreversible ones. The
-[support guide](../user/support.md) describes how to escalate beyond them.
+[support guide](../releases/support.md) describes how to escalate beyond them.
 
 ### Who owns what
 
@@ -46,8 +46,8 @@ a separate question its dossier answers. No board holds the mica-qualified tier
 today — no board has a dated physical qualification row — so the first bullet describes the ownership that tier would
 carry, not a board the site can point at.
 
-> status: shipped — evidence: `docs/boards/support-tiers.md`
-> status: board-dependent — evidence: `docs/boards/cx3576.md`
+> status: shipped — evidence: `docs/hardware/support-tiers.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
 
 ### Lifecycle and support windows
 
@@ -59,7 +59,7 @@ supported until superseded plus an overlap stated in its own release notes,
 per-board support bounded by the board's qualification, EOL announced with a
 notice period — and lives in the security lifecycle record.
 
-> status: shipped — evidence: `mica-build:README.md`, `docs/design/security-lifecycle.md`
+> status: shipped — evidence: `mica-build:README.md`, `docs/security/lifecycle.md`
 
 **The site may not print a window, a date or an advisory-coverage promise.**
 No tooling binds a window to a release, no release is published for one to
@@ -78,4 +78,4 @@ set and the booted deployment. A bounded, redacted diagnostic snapshot can be
 collected and downloaded to attach to the case; the device never uploads it
 anywhere.
 
-> status: shipped — evidence: `docs/design/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `docs/reference/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`

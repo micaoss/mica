@@ -23,14 +23,19 @@ describe('portal links', () => {
     expect(sectionHrefs('en')).toHaveLength(7)
   })
 
-  it('sends the engineering record to the repository, not the site', () => {
+  it('sends what the site does not publish to the repository', () => {
     const hrefs = sectionHrefs('zh')
-    // Boards, design records, decisions, tasks and plans, changelog.
-    for (const index of [0, 2, 3, 4, 5, 6]) expect(hrefs[index]).toContain(REPO)
+    // Architecture, reference, decisions.
+    for (const index of [0, 4, 6]) expect(hrefs[index]).toContain(REPO)
   })
 
-  it('keeps the published user documentation on the site', () => {
-    expect(sectionHrefs('zh')[1]).toBe('/docs/user/quickstart/')
-    expect(sectionHrefs('en')[1]).toBe('/en/docs/user/quickstart/')
+  it('keeps the published sections on the site', () => {
+    expect(sectionHrefs('zh')[1]).toBe('/docs/start/quickstart/')
+    expect(sectionHrefs('en')[1]).toBe('/en/docs/start/quickstart/')
+    const slugs = new Set(PUBLISHED_DOCS.map(doc => doc.slug))
+    for (const index of [1, 2, 3, 5]) {
+      const slug = sectionHrefs('zh')[index].replace(/^\/docs\//, '').replace(/\/$/, '')
+      expect(slugs.has(slug)).toBe(true)
+    }
   })
 })

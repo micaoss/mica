@@ -6,7 +6,7 @@
 - **Audience**: integrators selecting or qualifying a board; support engineers
   checking what a claimed board is actually entitled to.
 - **Navigation position**: page 4, after [downloads](downloads.md). Links to
-  [../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md) as the integrator entry point and to
+  [`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md) as the integrator entry point and to
   [support](support.md) for lifecycle ownership.
 
 ## Content outline
@@ -22,7 +22,7 @@
 Mica OS does not call any image that boots "supported". A board's level is defined
 by who qualified it and what evidence exists, using the taxonomy the BSP
 documentation defines in
-[../boards/support-tiers.md](../boards/support-tiers.md):
+[../hardware/support-tiers.md](../hardware/support-tiers.md):
 
 - **mica-qualified** — qualified by the Mica OS project against the field
   reliability matrix (dated boot, A/B update, power-cut, storage, recovery
@@ -34,7 +34,7 @@ documentation defines in
 - **unsupported** — no evidence dossier exists. Mica OS makes no claim that the
   board works, and the site says so.
 
-> status: shipped — evidence: `docs/boards/support-tiers.md`
+> status: shipped — evidence: `docs/hardware/support-tiers.md`
 
 The taxonomy is published vocabulary, not a claim about any board: a level is
 earned by a completed qualification matrix in the board's dossier, and no
@@ -48,7 +48,7 @@ regenerates from the dossiers per the [content contract](contract.md).
 
 | Board | Architecture | Level | Evidence dossier |
 |-------|--------------|-------|------------------|
-| CX3576-Z (Rockchip RK3576) | arm64 | bring-up | [../boards/cx3576.md](../boards/cx3576.md) |
+| CX3576-Z (Rockchip RK3576) | arm64 | bring-up | [../hardware/cx3576-dossier.md](../hardware/cx3576-dossier.md) |
 | Generic UEFI x86_64 | x86_64 | bring-up (QEMU/CI baseline) | `boards/uefi-x64/board.env` |
 
 The CX3576-Z has a full in-repository BSP — vendor kernel tree with recorded
@@ -63,7 +63,7 @@ Neither board carries a completed field-reliability qualification matrix — the
 cx3576 dossier holds the matrix with every row at `not tested`, and the
 uefi-x64 baseline has no dossier at all — so neither is presented as mica-qualified.
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
 
 ### Bringing your own board
 
@@ -77,6 +77,6 @@ the BSP boundary, and must satisfy the shared kernel assertion set.
 The staged porting manual, intake rubric, board template and qualification
 procedure are published, and together they are the integrator's path from a
 blank board to a supported row on this page; start at
-[../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md).
+[`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md).
 
-> status: shipped — evidence: `mica-build:boards/README.md`, `docs/boards/board-template.md`, `docs/boards/qualification.md`
+> status: shipped — evidence: `mica-build:boards/README.md`, `docs/hardware/dossier-template.md`, `docs/hardware/qualification.md`

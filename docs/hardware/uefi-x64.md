@@ -6,12 +6,12 @@ rather than for a machine. It is also this project's baseline, booted
 automatically in every release run of its products.
 
 Snapshot written 2026-09-29; status is owned by the
-[tiers table](../boards/support-tiers.md#current-boards).
+[tiers table](support-tiers.md#current-boards).
 
-**It has no board dossier.** `docs/boards/` holds dossiers for `cx3576`,
+**It has no board dossier.** `docs/hardware/` holds dossiers for `cx3576`,
 `s905x5m` and `uefi-arm64`, not for this one. What follows is read from
 `mica-build:boards/uefi-x64/board.env`, its `evidence.json`, its kernel
-configuration, and the [flashing](../user/flashing.md) page.
+configuration, and the [flashing](../start/flashing.md) page.
 
 ## At a glance
 
@@ -66,19 +66,19 @@ as `eth0`.
 The products are `uefi-x64.basic` (the default) and `uefi-x64.full` (with
 containers), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
 image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
-[download](../user/download.md).
+[download](../start/download.md).
 
 ## Flashing
 
 **Under QEMU** — the only path anyone here has executed: enrol the release's
 boot certificate into an OVMF variable store with `virt-fw-vars`, then start
 the decompressed image with `qemu-system-x86_64 -machine q35`. The command
-lines are in [flashing](../user/flashing.md) section 4.
+lines are in [flashing](../start/flashing.md) section 4.
 
 **Onto a physical machine (unverified)**: write the whole device, never a
 partition, then `sync` and read back to compare. No physical write has been
 performed by this project; the commands and their warnings are in
-[flashing](../user/flashing.md) section 3.
+[flashing](../start/flashing.md) section 3.
 
 **Secure Boot (unverified)**: the machine must carry the release's boot
 certificate in its firmware `db`, or Secure Boot must be off. Turning it off
@@ -93,14 +93,14 @@ DATA grows to the medium; the factory image already carries two signed
 deployments (generations g-1 and g), so an update never leaves the device
 without a bootable fallback; the loader carries one entry per deployment with
 three attempts, blessed once the health gate passes. See
-[flashing](../user/flashing.md) section 7 and [first run](../user/first-run.md).
+[flashing](../start/flashing.md) section 7 and [first run](../start/first-run.md).
 
 ## Updates
 
 Upgrade with an update archive, not by reflashing — a reflash erases DATA.
 This board publishes `full`, `root` and `kernel` archives; which one applies is
-[update packages](../user/update-packages.md), and the A/B switch, health
-confirmation and rollback are [update and rollback](../user/update-rollback.md).
+[update packages](../operate/update-packages.md), and the A/B switch, health
+confirmation and rollback are [update and rollback](../operate/update-rollback.md).
 The full update, fault and fallback acceptance runs under QEMU.
 
 ## Recovery
@@ -116,7 +116,7 @@ The full update, fault and fallback acceptance runs under QEMU.
 - There is no secure erase. A device leaving your control means destroying the
   medium.
 
-The full ladder and the cost of each step is [recovery](../user/recovery.md).
+The full ladder and the cost of each step is [recovery](../operate/recovery.md).
 
 ## Known limitations
 
@@ -136,4 +136,4 @@ The full ladder and the cost of each step is [recovery](../user/recovery.md).
 | Automatic boot in each release run | yes | amd64 products boot one runtime stage of the UEFI lifecycle |
 | Physical cold boot, write, recovery | not tested | no hardware |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

@@ -24,7 +24,7 @@ export interface DocGroup {
 /** One entry of the allowlist file. */
 interface AllowlistDoc {
   name: string
-  /** The directory under the documentation root; `user` when the entry omits it. */
+  /** The directory under the documentation root; the root itself when the entry omits it. */
   dir?: string
   /** The site slug, when it should not be `<dir>/<name>`. */
   slug?: string
@@ -33,16 +33,18 @@ interface AllowlistDoc {
 
 /**
  * Resolves one entry to its sources. English is `<dir>/<name>.md` and Chinese
- * `zh/<dir>/<name>.md`, which is how `docs/` lays out every translated tree,
+ * `zh/<dir>/<name>.md` (no `<dir>/` for a root document), which is how `docs/` lays out every translated tree,
  * so a tree is published by being named here and nowhere else.
  */
 function sourceDoc(entry: AllowlistDoc): PublishedDoc {
-  const { name, dir = 'user', slug = `${dir}/${name}`, locales = ['zh', 'en'] } = entry
+  const { name, dir, locales = ['zh', 'en'] } = entry
+  const path = dir ? `${dir}/${name}` : name
+  const slug = entry.slug ?? path
   const sources: Partial<Record<LocaleCode, string>> = {}
   if (locales.includes('en'))
-    sources.en = `${dir}/${name}.md`
+    sources.en = `${path}.md`
   if (locales.includes('zh'))
-    sources.zh = `zh/${dir}/${name}.md`
+    sources.zh = `zh/${path}.md`
   return { slug, sources }
 }
 

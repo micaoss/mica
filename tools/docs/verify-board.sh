@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Asserts that every board dossier under docs/boards/ carries the section list
-# board-template.md mandates, and that its qualification matrix rows are
+# Asserts that every board dossier under docs/hardware/ carries the section list
+# dossier-template.md mandates, and that its qualification matrix rows are
 # honest. Read-only: it opens files and prints, and changes nothing.
 #
 #   bash tools/docs/verify-board.sh          (or: make docs-verify)
@@ -14,7 +14,7 @@
 # extras, and order.
 #
 # A DOSSIER IS DISCOVERED, NOT NAMED. The template fixes the instance shape
-# ("Board dossier: <board>" as the H1), so every docs/boards/*.md whose H1 starts `# Board dossier:` is
+# ("Board dossier: <board>" as the H1), so every docs/hardware/*.md whose H1 starts `# Board dossier:` is
 # validated. A new board's dossier is gated the day it lands, with no edit
 # here.
 #
@@ -25,9 +25,9 @@
 # having checked anything.
 set -euo pipefail
 
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../docs/boards" && pwd)"
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../docs/hardware" && pwd)"
 
-TEMPLATE=board-template.md
+TEMPLATE=dossier-template.md
 FAIL=0
 CHECKS=0
 
@@ -52,7 +52,7 @@ for f in ./*.md; do
 done
 
 if [ "${#dossiers[@]}" -eq 0 ]; then
-    fail "no dossier instance found (no docs/boards/*.md with an H1 starting '# Board dossier:'); nothing would be asserted"
+    fail "no dossier instance found (no docs/hardware/*.md with an H1 starting '# Board dossier:'); nothing would be asserted"
 else
     ok
 fi

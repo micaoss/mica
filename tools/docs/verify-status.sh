@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Asserts that every truth-status line under docs/user/, docs/hardware/,
-# docs/website/ and docs/boards/ follows the grammar in docs/user/doc-contract.md and cites
+# Asserts that every truth-status line under docs/start/, docs/operate/,
+# docs/integrate/, docs/hardware/, docs/security/, docs/releases/ and
+# docs/website/ follows the grammar in docs/contributing.md and cites
 # evidence that exists. Read-only: it opens files and prints, changes nothing.
 #
 #   bash tools/docs/verify-status.sh          (or: make docs-verify)
 #
-# THE GRAMMAR (doc-contract.md section 3, normative):
+# THE GRAMMAR (docs/contributing.md section 3, normative):
 #
 #   > status: <s>
 #   > status: <s> — evidence: `ref`, `ref`
@@ -59,7 +60,7 @@ ref_exists() {
 }
 
 # A `> status:` line inside a fenced block is the GRAMMAR SPECIMEN in
-# doc-contract.md teaching what the four statuses look like, not a claim about
+# contributing.md teaching what the four statuses look like, not a claim about
 # the product. Asserting it would require the illustrative `proposed` example
 # to name a record that stays open forever, and a gate that fails on an example
 # teaching the format is reporting prose as a defect. Fences are
@@ -132,7 +133,7 @@ check_status_line() {
     fi
 }
 
-TREES=(docs/user docs/hardware docs/website docs/boards)
+TREES=(docs/start docs/operate docs/integrate docs/hardware docs/security docs/releases docs/website)
 echo "tools/docs/verify-status.sh: truth-status lines under ${TREES[*]}"
 
 for tree in "${TREES[@]}"; do

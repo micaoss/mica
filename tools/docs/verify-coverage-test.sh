@@ -40,25 +40,25 @@ fail() { FAIL_N=$((FAIL_N + 1)); echo "FAIL: $*"; }
 new_fixture() {
     local dir="$1"
     rm -rf "${dir}"
-    mkdir -p "${dir}/docs/user" "${dir}/docs/website" "${dir}/docs/boards" \
-             "${dir}/docs/zh/user" "${dir}/docs/design"
+    mkdir -p "${dir}/docs/start" "${dir}/docs/website" "${dir}/docs/releases" \
+             "${dir}/docs/zh/start" "${dir}/docs/reference"
     mkdir -p "${dir}/tools/docs"
     cp "${VERIFIER}" "${dir}/tools/docs/"
-    printf '# fixture user page\n\n> status: shipped — evidence: `docs/user/page.md`\n' \
-        >"${dir}/docs/user/page.md"
+    printf '# fixture user page\n\n> status: shipped — evidence: `docs/start/page.md`\n' \
+        >"${dir}/docs/start/page.md"
     printf '# fixture website page\n' >"${dir}/docs/website/page.md"
-    printf '# fixture boards page\n'     >"${dir}/docs/boards/page.md"
-    printf '# fixture design page\n'  >"${dir}/docs/design/page.md"
-    printf '# 夹具用户页面\n\n> status: shipped — evidence: `docs/user/page.md`\n' \
-        >"${dir}/docs/zh/user/page.md"
+    printf '# fixture boards page\n'     >"${dir}/docs/releases/page.md"
+    printf '# fixture design page\n'  >"${dir}/docs/reference/page.md"
+    printf '# 夹具用户页面\n\n> status: shipped — evidence: `docs/start/page.md`\n' \
+        >"${dir}/docs/zh/start/page.md"
     cat >"${dir}/docs/zh/README.md" <<'EOF'
 # fixture zh index
 
 | 源页面 | 源版本 | 覆盖状态 |
 |---|---|---|
-| `../user/page.md` | db66fc02 | current |
+| `../start/page.md` | db66fc02 | current |
 | `../website/page.md` | db66fc02 | not-translated |
-| `../boards/page.md` | db66fc02 | not-translated |
+| `../releases/page.md` | db66fc02 | not-translated |
 EOF
 }
 
@@ -139,18 +139,18 @@ expect_all_pass "baseline: three rows, one translated page, both directions"
 # it meant to cover is left with no row a reader could count.
 FIX="${WORK}/unparseable-row"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/zh/README.md" '| `../boards/page.md` | db66fc02 | not-translated |' \
-    '| `../boards/page.md` | db66fc02 |'
+replace_line "${FIX}/docs/zh/README.md" '| `../releases/page.md` | db66fc02 | not-translated |' \
+    '| `../releases/page.md` | db66fc02 |'
 expect_fail "a row missing its status cell" 2 \
     "row does not parse" \
-    "docs/boards/page.md has 0 coverage rows"
+    "docs/releases/page.md has 0 coverage rows"
 
 # --- 2. a row for a page outside the gated trees -----------------------------
-# docs/design/page.md exists, so the row is not merely dead: it is a coverage
+# docs/reference/page.md exists, so the row is not merely dead: it is a coverage
 # claim about a tree this table does not govern.
 FIX="${WORK}/out-of-scope-row"
 new_fixture "${FIX}"
-append_line "${FIX}/docs/zh/README.md" '| `../design/page.md` | db66fc02 | current |'
+append_line "${FIX}/docs/zh/README.md" '| `../reference/page.md` | db66fc02 | current |'
 expect_fail "a row for a tree the table does not govern" 1 \
     "is outside the gated trees"
 
@@ -172,40 +172,40 @@ expect_fail "a coverage status outside the taxonomy" 1 \
 # --- 5. a source version that is not a commit --------------------------------
 FIX="${WORK}/prose-version"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/zh/README.md" '| `../boards/page.md` | db66fc02 | not-translated |' \
-    '| `../boards/page.md` | unknown | not-translated |'
+replace_line "${FIX}/docs/zh/README.md" '| `../releases/page.md` | db66fc02 | not-translated |' \
+    '| `../releases/page.md` | unknown | not-translated |'
 expect_fail "a source version column decayed into prose" 1 \
     "carries source version 'unknown'"
 
 # --- 6. `current` with no translation behind it ------------------------------
 FIX="${WORK}/current-without-file"
 new_fixture "${FIX}"
-rm "${FIX}/docs/zh/user/page.md"
+rm "${FIX}/docs/zh/start/page.md"
 expect_fail "a 'current' row whose translation was deleted" 1 \
-    "is 'current' but docs/zh/user/page.md does not exist"
+    "is 'current' but docs/zh/start/page.md does not exist"
 
 # --- 7. an English page with no row ------------------------------------------
 FIX="${WORK}/untracked-page"
 new_fixture "${FIX}"
-printf '# a second fixture user page\n' >"${FIX}/docs/user/second.md"
+printf '# a second fixture user page\n' >"${FIX}/docs/start/second.md"
 expect_fail "an English page the table never mentions" 1 \
-    "docs/user/second.md has 0 coverage rows"
+    "docs/start/second.md has 0 coverage rows"
 
 # --- 8. an English page with two rows ----------------------------------------
 # Neither per-row check can see this: both copies parse, and both are true.
 FIX="${WORK}/duplicate-row"
 new_fixture "${FIX}"
-append_line "${FIX}/docs/zh/README.md" '| `../user/page.md` | db66fc02 | current |'
+append_line "${FIX}/docs/zh/README.md" '| `../start/page.md` | db66fc02 | current |'
 expect_fail "one page claimed by two rows" 1 \
-    "docs/user/page.md has 2 coverage rows"
+    "docs/start/page.md has 2 coverage rows"
 
 # --- 9. a translated page whose row was left behind --------------------------
 # The reverse direction, and the one a forward-only check would miss: the file
 # is there, the row says it is not.
 FIX="${WORK}/translated-but-not-current"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/zh/README.md" '| `../user/page.md` | db66fc02 | current |' \
-    '| `../user/page.md` | db66fc02 | lagging |'
+replace_line "${FIX}/docs/zh/README.md" '| `../start/page.md` | db66fc02 | current |' \
+    '| `../start/page.md` | db66fc02 | lagging |'
 expect_fail "a translated page whose row does not say 'current'" 1 \
     "is translated but docs/zh/README.md does not carry a 'current' row"
 
@@ -215,10 +215,10 @@ expect_fail "a translated page whose row does not say 'current'" 1 \
 # two pages state different statuses.
 FIX="${WORK}/status-line-drift"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/zh/user/page.md" '> status: shipped — evidence: `docs/user/page.md`' \
+replace_line "${FIX}/docs/zh/start/page.md" '> status: shipped — evidence: `docs/start/page.md`' \
     '> status: proposed — evidence: `docs/plan/PLAN-001.md`'
 expect_fail "a translated page whose status line does not match its source" 1 \
-    "docs/zh/user/page.md carries different '> status:' lines than its source docs/user/page.md"
+    "docs/zh/start/page.md carries different '> status:' lines than its source docs/start/page.md"
 
 # --- 11. a table with no rows at all -----------------------------------------
 # Five assertions fire, and all five are wanted: the floor itself, one per
@@ -228,9 +228,9 @@ new_fixture "${FIX}"
 printf '# fixture zh index\n\nno coverage table here.\n' >"${FIX}/docs/zh/README.md"
 expect_fail "a coverage table emptied of every row" 5 \
     "carries zero coverage rows" \
-    "docs/user/page.md has 0 coverage rows" \
+    "docs/start/page.md has 0 coverage rows" \
     "docs/website/page.md has 0 coverage rows" \
-    "docs/boards/page.md has 0 coverage rows" \
+    "docs/releases/page.md has 0 coverage rows" \
     "is translated but docs/zh/README.md does not carry a 'current' row"
 
 echo

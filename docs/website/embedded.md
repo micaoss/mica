@@ -47,7 +47,7 @@ has never seen a network. The whole journey, from choosing an artifact through
 flashing, first boot, claim and repeatable initial configuration, is documented
 end to end.
 
-> status: shipped — evidence: `docs/design/provisioning.md`, `mica-system:overlay/usr/lib/mica/mica-seed-state`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system:overlay/usr/lib/mica/mica-seed-state`
 
 **The site may not call that journey proven.** No step of it has been executed
 on physical hardware from this tree — the flash, the first boot and both
@@ -65,7 +65,7 @@ component objects; DATA holds state, configuration, applications and a bounded
 variable-data tier. Only DATA grows to fill the medium, and the OS never
 assumes it can grow SYSTEM or firmware.
 
-> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `docs/design/storage.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `docs/reference/storage.md`
 
 ### Field recovery
 
@@ -76,8 +76,8 @@ or the check fails, the boot records return to the retained confirmed
 deployment automatically. Below the OS, boards with a maskROM USB loader path
 can be reflashed whole when nothing else answers.
 
-> status: shipped — evidence: `docs/design/uboot-ab-handshake.md`
-> status: board-dependent — evidence: `docs/design/access.md`
+> status: shipped — evidence: `docs/reference/boot.md`
+> status: board-dependent — evidence: `docs/reference/access.md`
 
 The recovery ladder above that is designed and ordered least-destructive first:
 read-only diagnosis, a guarded manual rollback that refuses any switch it
@@ -86,7 +86,7 @@ credential recovery, a full factory reset, and the reflash. Every tier names
 what it costs before it is offered. **Five of those seven rungs are operations
 an operator can perform; the two named below are not.**
 
-> status: shipped — evidence: `docs/design/recovery.md`, `mica-core:crates/micad/src/reset.rs`
+> status: shipped — evidence: `docs/reference/recovery.md`, `mica-core:crates/micad/src/reset.rs`
 
 **Two rungs of that ladder cannot be climbed on any board that exists.**
 Credential recovery and the full factory reset are gated on a physical-presence
@@ -108,11 +108,11 @@ An appliance lives for years on a kernel and bootloader its vendor may stop
 maintaining. Mica OS records BSP provenance per board — source repository, synced
 commit, deviation register — and the board contract's next layer is published:
 the staged porting manual, the vendor intake rubric and the field-reliability
-qualification process, with [../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md) as the
+qualification process, with [`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md) as the
 integrator's entry point. The evidence those procedures collect is a board
 fact and is not in yet: no board has a dated physical qualification row, and long-term CVE response is assigned as a lifecycle duty by
 the tier definitions rather than written up as a procedure.
 
 > status: shipped — evidence: `mica-build:boards/cx3576/README.md`
-> status: shipped — evidence: `mica-build:boards/README.md`, `docs/boards/qualification.md`, `docs/boards/support-tiers.md`
-> status: board-dependent — evidence: `docs/boards/cx3576.md`
+> status: shipped — evidence: `mica-build:boards/README.md`, `docs/hardware/qualification.md`, `docs/hardware/support-tiers.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`

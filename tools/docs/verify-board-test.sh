@@ -9,8 +9,8 @@
 # of the real template and dossier with one mutation applied -- the approach
 # verify-index-test.sh established. The verifier resolves its own directory
 # from ${BASH_SOURCE}, so a copy at ${case}/tools/docs/verify-board.sh reads
-# ${case}/docs/boards, and unlike the link and status gates this one's inputs
-# live entirely inside docs/boards/, so the SHIPPED template and dossier are the
+# ${case}/docs/hardware, and unlike the link and status gates this one's inputs
+# live entirely inside docs/hardware/, so the SHIPPED template and dossier are the
 # baseline, copied verbatim -- a fixture this script had authored would prove
 # only that the script can spell.
 #
@@ -19,8 +19,8 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERIFIER="${HERE}/verify-board.sh"
-TEMPLATE="${HERE}/../../docs/boards/board-template.md"
-DOSSIER="${HERE}/../../docs/boards/cx3576.md"
+TEMPLATE="${HERE}/../../docs/hardware/dossier-template.md"
+DOSSIER="${HERE}/../../docs/hardware/cx3576-dossier.md"
 
 for required in "${VERIFIER}" "${TEMPLATE}" "${DOSSIER}"; do
     [ -e "${required}" ] || { echo "error: ${required} not found" >&2; exit 1; }
@@ -37,9 +37,9 @@ fail() { FAIL_N=$((FAIL_N + 1)); echo "FAIL: $*"; }
 new_fixture() {
     local dir="$1"
     rm -rf "${dir}"
-    mkdir -p "${dir}/docs/boards" "${dir}/tools/docs"
+    mkdir -p "${dir}/docs/hardware" "${dir}/tools/docs"
     cp "${VERIFIER}" "${dir}/tools/docs/"
-    cp "${TEMPLATE}" "${DOSSIER}" "${dir}/docs/boards/"
+    cp "${TEMPLATE}" "${DOSSIER}" "${dir}/docs/hardware/"
 }
 
 # Replaces the single line matching $2 in file $1 with $3 ("" deletes it),
@@ -113,14 +113,14 @@ expect_all_pass "baseline: the shipped template and dossier, copied verbatim"
 # --- 1. a required heading missing from the dossier --------------------------
 FIX="${WORK}/missing-heading"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/boards/cx3576.md" '## Console' ''
+replace_line "${FIX}/docs/hardware/cx3576-dossier.md" '## Console' ''
 expect_fail "a dossier without the Console section" 1 \
-    "cx3576.md is missing the required heading '## Console'"
+    "cx3576-dossier.md is missing the required heading '## Console'"
 
 # --- 2. an H2 the template does not name -------------------------------------
 FIX="${WORK}/extra-heading"
 new_fixture "${FIX}"
-printf '\n## Bench notes\n\nScratch.\n' >>"${FIX}/docs/boards/cx3576.md"
+printf '\n## Bench notes\n\nScratch.\n' >>"${FIX}/docs/hardware/cx3576-dossier.md"
 expect_fail "a dossier with a heading outside the template list" 1 \
     "carries the heading '## Bench notes', which is outside the template's section list"
 
@@ -130,14 +130,14 @@ new_fixture "${FIX}"
 # One sed pass: the Console line falls through both later substitutions and
 # lands as Peripherals; the Peripherals line becomes Console.
 sed -i 's/^## Console$/## Peripherals/; t; s/^## Peripherals$/## Console/' \
-    "${FIX}/docs/boards/cx3576.md"
+    "${FIX}/docs/hardware/cx3576-dossier.md"
 expect_fail "a dossier with Console and Peripherals swapped" 1 \
     "carries every required heading but not in the template's order"
 
 # --- 4. a qualification result outside the vocabulary ------------------------
 FIX="${WORK}/bad-result-cell"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/boards/cx3576.md" \
+replace_line "${FIX}/docs/hardware/cx3576-dossier.md" \
     '| Warm boot | not tested | — | needs bench hardware |' \
     '| Warm boot | untested | — | needs bench hardware |'
 expect_fail "a result cell saying 'untested'" 1 \
@@ -146,7 +146,7 @@ expect_fail "a result cell saying 'untested'" 1 \
 # --- 5. a pass row without an ISO date ---------------------------------------
 FIX="${WORK}/pass-without-date"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/boards/cx3576.md" \
+replace_line "${FIX}/docs/hardware/cx3576-dossier.md" \
     '| Cold boot | not tested | — | needs bench hardware |' \
     '| Cold boot | pass | — | claimed without a run on record |'
 expect_fail "a pass row with no date" 1 \
@@ -156,14 +156,14 @@ expect_fail "a pass row with no date" 1 \
 # The vacuity guard: zero required headings must never validate anything.
 FIX="${WORK}/empty-template-list"
 new_fixture "${FIX}"
-sed -i '/^[0-9][0-9]*\. `## /d' "${FIX}/docs/boards/board-template.md"
+sed -i '/^[0-9][0-9]*\. `## /d' "${FIX}/docs/hardware/dossier-template.md"
 expect_fail "a template yielding zero required headings" 1 \
     "yields zero required H2 headings; every dossier would pass vacuously"
 
 # --- 7. no dossier instance at all -------------------------------------------
 FIX="${WORK}/no-dossier"
 new_fixture "${FIX}"
-rm "${FIX}/docs/boards/cx3576.md"
+rm "${FIX}/docs/hardware/cx3576-dossier.md"
 expect_fail "a tree with no dossier to validate" 1 \
     "no dossier instance found"
 
@@ -171,7 +171,7 @@ expect_fail "a tree with no dossier to validate" 1 \
 FIX="${WORK}/no-qualification-rows"
 new_fixture "${FIX}"
 sed -i '/^## Qualification results$/,$ { /^|/d }' \
-    "${FIX}/docs/boards/cx3576.md"
+    "${FIX}/docs/hardware/cx3576-dossier.md"
 expect_fail "a dossier with zero qualification rows" 1 \
     "has zero qualification rows; 'never implicitly green' would pass vacuously"
 

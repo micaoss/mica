@@ -40,8 +40,8 @@ fail() { FAIL_N=$((FAIL_N + 1)); echo "FAIL: $*"; }
 new_fixture() {
     local dir="$1"
     rm -rf "${dir}"
-    mkdir -p "${dir}/docs/user" "${dir}/docs/hardware" "${dir}/docs/website" \
-             "${dir}/docs/boards" "${dir}/docs/plan" "${dir}/docs/task" "${dir}/pkgs"
+    mkdir -p "${dir}/docs/start" "${dir}/docs/hardware" "${dir}/docs/website" \
+             "${dir}/docs/releases" "${dir}/docs/plan" "${dir}/docs/task" "${dir}/pkgs"
     mkdir -p "${dir}/tools/docs"
     cp "${VERIFIER}" "${dir}/tools/docs/"
     : >"${dir}/pkgs/artifact.json"
@@ -58,13 +58,17 @@ new_fixture() {
 fixture-check other-target:
 	true
 EOF
-    cat >"${dir}/docs/user/page.md" <<'EOF'
+    cat >"${dir}/docs/start/page.md" <<'EOF'
 # fixture user page
 
 > status: shipped — evidence: `pkgs/artifact.json`, `docs/plan/`
 
 > status: unsupported
 EOF
+    for tree in operate integrate security; do
+        mkdir -p "${dir}/docs/${tree}"
+        printf '# fixture %s page\n\n> status: unsupported\n' "${tree}" >"${dir}/docs/${tree}/page.md"
+    done
     cat >"${dir}/docs/hardware/page.md" <<'EOF'
 # fixture hardware page
 
@@ -75,7 +79,7 @@ EOF
 
 > status: board-dependent — evidence: `make fixture-check`
 EOF
-    cat >"${dir}/docs/boards/page.md" <<'EOF'
+    cat >"${dir}/docs/releases/page.md" <<'EOF'
 # fixture boards page
 
 > status: proposed — evidence: `docs/plan/20260101-0000-fixture-plan.md`
@@ -153,7 +157,7 @@ expect_all_pass "baseline: all four statuses, both evidence forms"
 # --- 1. a status word outside the taxonomy -----------------------------------
 FIX="${WORK}/unknown-status"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/user/page.md" '> status: unsupported' \
+replace_line "${FIX}/docs/start/page.md" '> status: unsupported' \
     '> status: planned'
 expect_fail "a status word outside the taxonomy" 1 \
     "does not parse -- '> status: planned'"
@@ -179,7 +183,7 @@ expect_fail "an evidence ref without backticks" 1 \
 # --- 4. shipped with no evidence ---------------------------------------------
 FIX="${WORK}/shipped-bare"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/user/page.md" '> status: shipped — evidence:' \
+replace_line "${FIX}/docs/start/page.md" '> status: shipped — evidence:' \
     '> status: shipped'
 expect_fail "shipped without evidence" 1 \
     "shipped requires evidence"
@@ -202,7 +206,7 @@ expect_fail "evidence citing an undefined make target" 1 \
 # --- 7. proposed without evidence ------------------------------------------
 FIX="${WORK}/proposed-no-evidence"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/boards/page.md" '`docs/plan/20260101-0000-fixture-plan.md`' \
+replace_line "${FIX}/docs/releases/page.md" '`docs/plan/20260101-0000-fixture-plan.md`' \
     '> status: proposed'
 expect_fail "proposed with no evidence" 1 \
     "proposed requires evidence"
@@ -217,7 +221,7 @@ expect_fail "proposed citing a deleted record" 1 \
 # --- 9. unsupported carrying evidence ----------------------------------------
 FIX="${WORK}/unsupported-evidence"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/user/page.md" '> status: unsupported' \
+replace_line "${FIX}/docs/start/page.md" '> status: unsupported' \
     '> status: unsupported — evidence: `pkgs/artifact.json`'
 expect_fail "unsupported with an evidence clause" 1 \
     "unsupported carries no evidence"

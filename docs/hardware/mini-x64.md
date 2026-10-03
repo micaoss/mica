@@ -7,11 +7,11 @@ flash: its own `tinyconfig`-based kernel, an xz root, and one product,
 containers.
 
 Snapshot written 2026-10-01; status is owned by the
-[tiers table](../boards/support-tiers.md#current-boards).
+[tiers table](support-tiers.md#current-boards).
 
 **It has no board dossier.** What follows is read from
 `mica-build:boards/mini-x64/board.env`, its `layout.tsv`, `evidence.json` and
-kernel configuration, and the [flashing](../user/flashing.md) page.
+kernel configuration, and the [flashing](../start/flashing.md) page.
 
 ## At a glance
 
@@ -61,18 +61,18 @@ as `eth0`.
 The product is `mini-x64.basic`, released as
 `mini-x64.basic.<YYYYMMDD-HHMM>` with the image
 `mica-mini-x64.basic-<YYYYMMDD-HHMM>.img.gz`. Verification is in
-[download](../user/download.md).
+[download](../start/download.md).
 
 ## Flashing
 
 **Under QEMU** — as for `uefi-x64`: enrol the release's boot certificate into an
 OVMF variable store with `virt-fw-vars`, then start the decompressed image with
 `qemu-system-x86_64 -machine q35`. The command lines are in
-[flashing](../user/flashing.md) section 4.
+[flashing](../start/flashing.md) section 4.
 
 **Onto a physical machine (unverified)**: write the whole device, never a
 partition, then `sync` and read back to compare
-([flashing](../user/flashing.md) section 3).
+([flashing](../start/flashing.md) section 3).
 
 > status: unsupported
 
@@ -100,4 +100,4 @@ services each package ships for that init
 | Automatic boot in each release run | yes | amd64 products boot one runtime stage of the UEFI lifecycle |
 | Physical cold boot, write, recovery | not tested | no hardware |
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`

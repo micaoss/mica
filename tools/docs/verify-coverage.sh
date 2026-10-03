@@ -5,8 +5,8 @@
 #
 #   bash tools/docs/verify-coverage.sh          (or: make docs-verify)
 #
-# THE RULE (docs/user/doc-contract.md section 5, normative): English under
-# docs/user/ and docs/hardware/ is authoritative, a tracked Chinese set lives
+# THE RULE (docs/contributing.md section 5, normative): English under
+# the gated trees is authoritative, a tracked Chinese set lives
 # under docs/zh/, and
 # docs/zh/README.md carries a per-page coverage table naming, for every page in
 # the gated trees, the source page, the source version it was translated from,
@@ -16,7 +16,7 @@
 # resolved from docs/zh/, and whose remaining two cells are the source version
 # and the coverage status:
 #
-#   | `../user/api.md` | db66fc02 | current |
+#   | `../operate/api.md` | db66fc02 | current |
 #
 # WHAT IS ENFORCED:
 #   - every candidate row parses into exactly the three cells above;
@@ -31,12 +31,12 @@
 #     is the one status that asserts a translation exists;
 #   - every English page in the gated trees has EXACTLY one row: none means
 #     an untracked page, two mean two claims that will drift apart;
-#   - every file under docs/zh/user/ and docs/zh/hardware/ has a `current`
+#   - every file under a translated docs/zh/ tree has a `current`
 #     row -- the direction that
 #     catches a translation whose row was left behind at `not-translated`;
 #   - every `current` row's zh page carries the same `> status:` lines, in the
 #     same order, as its English source. The truth-status line is normative
-#     (doc-contract.md section 3) and the English page is authoritative
+#     (docs/contributing.md section 3) and the English page is authoritative
 #     (section 5), so a status that drifted in translation is a mistranslated
 #     claim about the product, which prose review is worst at catching.
 #
@@ -49,7 +49,7 @@ set -euo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 TABLE=docs/zh/README.md
-TREES=(user hardware website boards)
+TREES=(start operate integrate hardware security releases website)
 
 FAIL=0
 CHECKS=0
@@ -72,7 +72,7 @@ coverage_rows() {
     sed -nE "$ROW_SED" "$TABLE"
 }
 
-# `../user/api.md` -> the docs/ path it names, and the docs/zh/ path that
+# `../operate/api.md` -> the docs/ path it names, and the docs/zh/ path that
 # would hold its translation.
 source_path() { echo "docs/${1#../}"; }
 zh_path()     { echo "docs/zh/${1#../}"; }
@@ -144,10 +144,10 @@ for tree in "${TREES[@]}"; do
 done
 
 # --- 3. every translated page under the mirrored trees has a `current` row --
-# The trees that carry a translation, not every gated tree: docs/website/ and
-# docs/boards/ are `not-translated` by policy, so a file under docs/zh/ for
-# them would be the anomaly, and there is none to walk.
-for tree in user hardware; do
+# The trees that carry a translation, not every gated tree: docs/website/ is
+# `not-translated` by policy, so a file under docs/zh/ for
+# it would be the anomaly, and there is none to walk.
+for tree in start operate integrate hardware security releases; do
     for f in "docs/zh/$tree"/*.md; do
         [ -e "$f" ] || continue
         path="../$tree/$(basename "$f")"

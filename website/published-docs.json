@@ -1,14 +1,14 @@
 {
-  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is the document; `dir` is its directory under the documentation root and defaults to `user`; `slug` overrides the site path, which is otherwise `<dir>/<name>`; `locales` defaults to both, and is narrowed only when one original is genuinely missing. Groups are the sidebar's, in order.",
+  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is the document; `dir` is its directory under the documentation root, and an entry without one sits at the root; `slug` overrides the site path, which is otherwise `<dir>/<name>`; `locales` defaults to both, and is narrowed only when one original is genuinely missing. Groups are the sidebar's, in order.",
   "groups": [
     {
       "id": "start",
       "docs": [
-        { "name": "quickstart" },
-        { "name": "download" },
-        { "name": "install" },
-        { "name": "flashing" },
-        { "name": "first-run" }
+        { "name": "quickstart", "dir": "start" },
+        { "name": "download", "dir": "start" },
+        { "name": "install", "dir": "start" },
+        { "name": "flashing", "dir": "start" },
+        { "name": "first-run", "dir": "start" }
       ]
     },
     {
@@ -25,27 +25,27 @@
     {
       "id": "operating",
       "docs": [
-        { "name": "configuration" },
-        { "name": "applications" },
-        { "name": "update-rollback" },
-        { "name": "storage" }
+        { "name": "configuration", "dir": "operate" },
+        { "name": "applications", "dir": "integrate" },
+        { "name": "update-rollback", "dir": "operate" },
+        { "name": "storage", "dir": "operate" }
       ]
     },
     {
       "id": "trouble",
       "docs": [
-        { "name": "troubleshooting" },
-        { "name": "recovery" }
+        { "name": "troubleshooting", "dir": "operate" },
+        { "name": "recovery", "dir": "operate" }
       ]
     },
     {
       "id": "reference",
       "docs": [
-        { "name": "doc-contract" },
-        { "name": "security" },
-        { "name": "api" },
-        { "name": "release-notes" },
-        { "name": "support" }
+        { "name": "contributing" },
+        { "name": "overview", "dir": "security", "slug": "security" },
+        { "name": "api", "dir": "operate" },
+        { "name": "release-notes", "dir": "releases" },
+        { "name": "support", "dir": "releases" }
       ]
     }
   ]

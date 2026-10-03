@@ -31,7 +31,7 @@ is a squashfs sealed by a dm-verity hash tree; every block read at runtime is
 checked against a root hash fixed at build time. There is no configuration
 drift, because there is nothing on the root to drift.
 
-> status: shipped — evidence: `mica-build:src/rootfs/build.ts`, `docs/design/ro-root.md`
+> status: shipped — evidence: `mica-build:src/rootfs/build.ts`, `docs/reference/ro-root.md`
 
 **Updates publish authenticated deployments.** Kernel/support and root components
 are installed independently. Objects are verified and synced before the native
@@ -40,14 +40,14 @@ candidate has three attempts before the retained deployment is selected. Normal
 updates preserve shared DATA and never replace boot firmware. Physical-board
 power-loss and watchdog qualification remain separate from VM evidence.
 
-> status: shipped — evidence: `mica-deploy:src`, `docs/design/uboot-ab-handshake.md`, `mica-build:stages/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-deploy:src`, `docs/reference/boot.md`, `mica-build:stages/compose/90-pack.Dockerfile`
 
 **One management plane owns the device.** `micad` holds the settings tree and
 reconciles it into systemd units — networking, Wi-Fi, SSH, containers, MQTT —
 and `apid` serves the authenticated HTTPS API those settings are read and
 written through, with a built-in web UI as one client of that API.
 
-> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/design/micad.md`, `docs/design/api.md`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/reference/management.md`, `docs/reference/api.md`
 
 **Applications ride on top, not inside.** Native applications enter the image
 as build-time Debian packages and update with the system; independently
@@ -55,7 +55,7 @@ released applications run as pinned OCI containers under podman, supervised by
 `mica-containerd` on either init,
 off by default until the integrator enables them.
 
-> status: shipped — evidence: `mica-podman:locks/upstream.lock`, `docs/design/containers.md`
+> status: shipped — evidence: `mica-podman:locks/upstream.lock`, `docs/integrate/containers.md`
 
 ### Who it is for
 

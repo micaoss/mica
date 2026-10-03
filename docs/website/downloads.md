@@ -23,7 +23,7 @@ served beside an untrusted artifact is insufficient authentication. All current
 development acceptance flashes complete latest images. No old-layout migration
 or historical update compatibility is offered.
 
-> status: shipped — evidence: `mica-build:bin/bun.sh src/cli.ts`, `docs/design/release-signing.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:bin/bun.sh src/cli.ts`, `docs/security/signing.md`, `docs/start/download.md`
 
 ## Publication
 
@@ -37,10 +37,10 @@ service builds from the posted releases (the manifest at
 and is empty while no release is posted there;
 do not hand-write release identities or claim absent evidence.
 
-> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/start/download.md`
 
 Public hosting, release support windows and a public downloadable release history
 remain unprovided. Link [build instructions](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md),
-[user downloads](../user/download.md) and [installation](../user/install.md).
+[user downloads](../start/download.md) and [installation](../start/install.md).
 
 > status: unsupported

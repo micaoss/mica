@@ -5,7 +5,7 @@ One page per board, answering four questions in the same order every time:
 get onto it, and how do you get back when it goes wrong.**
 
 This is a dated snapshot, written 2026-10-01. The authoritative status table is
-[board support tiers](../boards/support-tiers.md#current-boards); where the two
+[board support tiers](support-tiers.md#current-boards); where the two
 disagree, the tiers table wins and this page is the defect.
 
 ## The boards
@@ -24,7 +24,7 @@ qualification row. The tiers themselves are defined by evidence and ownership �
 bring-up` (the contract is met; the field evidence belongs to the integrator or
 is still being accumulated), `unsupported` (no dossier, no claim).
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
 
 ## Where the project actually stands (2026-10-01)
 
@@ -33,7 +33,7 @@ its own: `<board>.basic`, the default, on every board, and `<board>.full`, with
 the container engine, on all but `mini-x64`. **Two of the nine have a release
 so far**: `cx3576.full` and `mini-x64.basic`. The others have none yet, so
 there is no image to download for them; they are built from source
-([build guide](../user/build.md)).
+([build guide](../start/build.md)).
 
 **Being a release target is not a claim about hardware.** It says the images
 are published. What has actually started an image splits three ways:
@@ -50,7 +50,7 @@ boot was reported by the user on 2026-09-20; it arrived as a sentence with no
 artefact, so it is a report and not a qualification row, and it moves nothing
 in the tiers table. Every physical step on these pages is marked unverified.
 
-> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/start/download.md`
 
 ## Choosing a board
 
@@ -76,21 +76,21 @@ in the tiers table. Every physical step on these pages is marked unverified.
 
 | To learn | Read |
 |---|---|
-| What a release contains and how to verify it | [download](../user/download.md) |
-| Flashing in full, including the QEMU command lines | [flashing](../user/flashing.md) |
-| Which update archive applies, and how a device takes it | [update packages](../user/update-packages.md), [update and rollback](../user/update-rollback.md) |
-| The recovery ladder, and which steps exist today | [recovery](../user/recovery.md) |
-| Partitions and where data belongs | [storage](../user/storage.md) |
-| How the whole system fits together | [overview](../user/overview.md), [architecture](../architecture.md) |
+| What a release contains and how to verify it | [download](../start/download.md) |
+| Flashing in full, including the QEMU command lines | [flashing](../start/flashing.md) |
+| Which update archive applies, and how a device takes it | [update packages](../operate/update-packages.md), [update and rollback](../operate/update-rollback.md) |
+| The recovery ladder, and which steps exist today | [recovery](../operate/recovery.md) |
+| Partitions and where data belongs | [storage](../operate/storage.md) |
+| How the whole system fits together | [overview](../start/overview.md), [architecture](../architecture.md) |
 
 Each board page summarises flashing, updates and recovery from that board's
 point of view; the topic pages above own the detail.
 
 ## Where these pages come from
 
-Each page draws on the English board dossier (`docs/boards/<board>.md`), the
+Each page draws on the English board dossier (`docs/hardware/<board>-dossier.md`), the
 board's own `board.env` and `evidence.json` in `mica-build:boards/<board>/`, and the user
 documentation. `uefi-x64` and `mini-x64` have no dossier, and their pages name
 the source of each fact instead.
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`
+> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`, `docs/hardware/s905x5m-dossier.md`, `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards`

@@ -6,7 +6,7 @@ import { DOC_GROUPS } from './src/shared/docs/published'
 import { en } from './src/shared/i18n/en'
 import { zh } from './src/shared/i18n/zh'
 
-// The sidebar mirrors docs/user/, which is what the content contract's
+// The sidebar mirrors the published guides, which is what the content contract's
 // documentation brief specifies. Group labels come from the same dictionaries
 // the rest of the site uses.
 const sidebar = DOC_GROUPS.map(group => ({

@@ -5,8 +5,8 @@
 证据仍然只有 QEMU aarch64 `virt`。**携带驱动不等于有证据证明某台机器能启动。**
 
 现状快照记于 2026-09-20。事实来自英文板卡档案
-[`docs/boards/uefi-arm64.md`](../../boards/uefi-arm64.md) 与
-`mica-build:boards/uefi-arm64/`；状态以[支持层级表](../../boards/support-tiers.md#current-boards)为准。
+[`docs/hardware/uefi-arm64-dossier.md`](../../hardware/uefi-arm64-dossier.md) 与
+`mica-build:boards/uefi-arm64/`；状态以[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
 
 ## 概况
 
@@ -43,7 +43,7 @@
 解析后的配置少一个就构建失败。代价也记着：内核模块从 71 个增加到 232 个，`Image`
 24.5 MB，CI 内核任务从 330 秒变成 718 秒。
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
+> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
 
 ## 分区布局
 
@@ -85,7 +85,7 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot 
 guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031 或 EFI 的 RTC、
 打开的 ACPI button（否则宿主请求的优雅关机传不进去）。完整说明、9p 导入离线更新的
 做法，以及 `make lifecycle-uefi PRODUCT=uefi-arm64.dev` 这一整套验收，见
-[刷写](../user/flashing.md) 第 4 节。
+[刷写](../start/flashing.md) 第 4 节。
 
 **写到实体 arm64 机器上（未验证）**：与 `uefi-x64` 同理，整盘写入，机器需信任该发布
 的启动证书。没有任何实体 arm64 机器被验证过。
@@ -95,13 +95,13 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 ## 首次启动
 
 与 `uefi-x64` 相同：DATA 扩容、出厂两份部署、三次尝试的计数启动项、健康门确认。
-见[刷写](../user/flashing.md) 第 7 节。
+见[刷写](../start/flashing.md) 第 7 节。
 
 ## 更新
 
 发布 `full`、`root`、`kernel` 三种归档。QEMU 里跑过 root-only、kernel-only 与组合
 更新，包括三次健康失败后退回保留部署、固件与身份不变。见
-[更新包](../user/update-packages.md)、[更新与回滚](../user/update-rollback.md)。
+[更新包](../operate/update-packages.md)、[更新与回滚](../operate/update-rollback.md)。
 
 ## 恢复
 
@@ -110,7 +110,7 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 - 这块板的“恢复”就是在宿主上重写磁盘镜像：能写这个镜像文件的宿主已经等于换了设备，
   所以没有带内恢复需要保护。
 
-见[恢复](../user/recovery.md)。
+见[恢复](../operate/recovery.md)。
 
 ## 已知限制
 
@@ -140,4 +140,4 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 | 射频与现场总线 | 不适用 | 这块板不声明 |
 | 物理恢复动作 | 不适用 | 不存在物理在场断言 |
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`
+> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`

@@ -33,7 +33,7 @@ The release identity lives only in the signed deployment
 
 - **R1** `release-identity.env` is removed from the root. `micad`'s
   `system_info` drops `system.commitDate` and the package-version
-  `system.gitStamp` (`docs/design/diagnostics.md`).
+  `system.gitStamp` (`docs/reference/diagnostics.md`).
 - **R2** `mica/rootfs/v2` replaces v1 and has no `version` field (a
   `mica-core` contract change).
 - **K1** The kernel `buildId` hashes the pinned inputs of the tool image, not

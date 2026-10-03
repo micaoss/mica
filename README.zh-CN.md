@@ -42,10 +42,10 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 | `s905x5m` | Amlogic S7D（BM201） | bring-up；没有自动流程启动它，且没有受支持的办法装进空板 | 暂无 |
 | `mini-x64` | 通用 amd64，UEFI，128 MB 闪存 | bring-up，QEMU；只有一个产品 `mini-x64.basic`，运行 OpenRC | `mini-x64.basic` |
 
-还没有发布的产品没有镜像可下载，请从源码构建（[构建指南](docs/user/build.md)）。
+还没有发布的产品没有镜像可下载，请从源码构建（[构建指南](docs/start/build.md)）。
 
 尚无板卡完成认证：没有任何板卡档案里有注明日期的实机合格行，也没有任何实机启动拥有
-证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/boards/support-tiers.md)是权威且最新的表，并说明每个等级的
+证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/hardware/support-tiers.md)是权威且最新的表，并说明每个等级的
 含义；中文的[支持硬件列表](docs/zh/hardware/README.md)按板卡讲同一件事。
 
 ## 从这里开始
@@ -53,12 +53,12 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 | 我想…… | 读 |
 |---|---|
 | 了解系统如何拼在一起 | [架构](docs/architecture.md) |
-| 构建一份镜像并启动它 | [快速上手](docs/zh/user/quickstart.md)、[构建指南](docs/design/build.md)、[安装](docs/zh/user/install.md) |
-| 配置与运维一台设备 | [首次配置](docs/zh/user/first-run.md)、[配置](docs/zh/user/configuration.md)、[更新与回滚](docs/zh/user/update-rollback.md) |
-| 把我的应用跑上去 | [应用](docs/zh/user/applications.md)、[容器](docs/design/containers.md) |
+| 构建一份镜像并启动它 | [快速上手](docs/zh/start/quickstart.md)、[构建指南](docs/start/build.md)、[安装](docs/zh/start/install.md) |
+| 配置与运维一台设备 | [首次配置](docs/zh/start/first-run.md)、[配置](docs/zh/operate/configuration.md)、[更新与回滚](docs/zh/operate/update-rollback.md) |
+| 把我的应用跑上去 | [应用](docs/zh/integrate/applications.md)、[容器](docs/integrate/containers.md) |
 | 看某块板卡的现状与刷机步骤 | [支持硬件列表](docs/zh/hardware/README.md) |
 | 上一块新板子 | [`mica-build:boards/`](https://github.com/micaoss/mica-build/blob/main/boards/README.md)，每块板卡在那里带着自己的完整构建 |
-| 审视安全态势 | [安全](docs/zh/user/security.md)、[安全模型](docs/design/security-model.md) |
+| 审视安全态势 | [安全](docs/zh/security/overview.md)、[安全模型](docs/security/model.md) |
 | 浏览全部 | [中文用户指南](docs/zh/README.md) · [English documentation](docs/README.md) |
 
 ## 仓库
@@ -91,7 +91,7 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 
 Debian 包来自 `mica-system-base` 的发布，每份发布带一个 `mica-system-base.lock` 及其
 `SHA256SUMS`。消费方原样提交这份 lock 为 `locks/mica-system-base.lock`，连同它的 pin
-`locks/pins/mica-system-base.pin`（[release lock](docs/design/release-lock.md)），并遵循
+`locks/pins/mica-system-base.pin`（[release lock](docs/reference/release-lock.md)），并遵循
 mica-system-base README 中 *Consuming a release* 的规则。
 
 开发镜像与生产镜像之间没有 image profile 包，二者的区别是签名内核命令行参数

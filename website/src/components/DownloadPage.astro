@@ -20,8 +20,8 @@ const boards = copy.boards.rows.map(row => ({
   status: row.status,
   href: boardDownloadHref(locale, row.board),
 }))
-const quickstart = docsPageHref(locale, 'user/quickstart')
-const identify = docsPageHref(locale, 'user/download')
+const quickstart = docsPageHref(locale, 'start/quickstart')
+const identify = docsPageHref(locale, 'start/download')
 ---
 
 <BaseLayout copy={copy} title={`${copy.download.title} — Mica OS`} description={copy.download.lead}>

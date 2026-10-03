@@ -8,7 +8,7 @@
   the disclosure contact.
 - **Navigation position**: page 6. Links to [downloads](downloads.md) for
   verification procedure, [support](support.md) for contact, and
-  [../user/security.md](../user/security.md) for the operator-facing model.
+  [../security/overview.md](../security/overview.md) for the operator-facing model.
 
 ## Content outline
 
@@ -26,7 +26,7 @@ verifies blocks on demand. Native deployment metadata binds the exact board,
 kernel and root association. UEFI Secure Boot or required FIT signatures protect
 boot executables under the selected enforcing firmware and public anchors.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/design/release-signing.md`
+> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/security/signing.md`
 
 Updates authenticate catalogs and component bytes, persist candidates before
 selection, and retain a known authenticated fallback. Boot, content and metadata
@@ -39,7 +39,7 @@ HTTPS management authenticates administrator sessions and bearer tokens, protect
 browser writes with CSRF checks, and keeps login backoff/audit state. SSH is off
 by default. The verified userspace profile does not imply a shell-free image.
 
-> status: shipped — evidence: `docs/design/access.md`, `mica-system:profile`
+> status: shipped — evidence: `docs/reference/access.md`, `mica-system:profile`
 
 ### Evidence limits
 
@@ -50,7 +50,7 @@ qualification still need the local bench. No hardware-rooted or fused boot claim
 is made. DATA is unencrypted; privileged workloads can modify allowed persistent
 state. There is no old-layout compatibility or migration path.
 
-> status: board-dependent — evidence: `docs/design/security-model.md`, `docs/boards/cx3576.md`
+> status: board-dependent — evidence: `docs/security/model.md`, `docs/hardware/cx3576-dossier.md`
 
 ### Advisories and reporting
 
@@ -59,7 +59,7 @@ triage and patch targets, advisory publication, incident response and
 end-of-life, each with one accountable owner role and each stating its own
 maturity.
 
-> status: shipped — evidence: `docs/design/security-lifecycle.md`
+> status: shipped — evidence: `docs/security/lifecycle.md`
 
 **The site must not present any of it as an operating channel.** There is no
 published security contact or disclosure policy, no advisory feed and no

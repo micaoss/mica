@@ -36,12 +36,12 @@ position, content outline and draft copy.
 
 Cross-linking rules:
 
-- Every page links into the user documentation set under `docs/user/` for the
+- Every page links into the guides under `docs/start/`, `docs/operate/` and `docs/integrate/` for the
   operational detail it summarises; the site never restates a procedure that a
-  `docs/user/` page owns.
+  guide page owns.
 - The downloads page links to supported hardware (compatibility) and security
   (verification); supported hardware links to the BSP porting entry point
-  ([../boards/porting.md](https://github.com/micaoss/mica-build/blob/main/boards/README.md)); security links to support for the
+  ([`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md)); security links to support for the
   advisory contact.
 - Footer links on every page: documentation, security, support, licensing.
 
@@ -83,7 +83,7 @@ the machine-readable release manifest each release directory carries, and
 per-board evidence from the board dossiers, so a new release updates the site by
 regeneration rather than by editing prose.
 
-> status: shipped — evidence: `mica-build:README.md`, `docs/boards/qualification.md`
+> status: shipped — evidence: `mica-build:README.md`, `docs/hardware/qualification.md`
 
 Support windows are the exception, and it is a rule rather than a delay:
 nothing binds a window to a release, so there is no release fact to regenerate

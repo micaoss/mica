@@ -76,13 +76,13 @@ release-target.s905x5m	line	micaoss/mica-build:boards/s905x5m/board.env	BOARD_RE
 release-target.mini-x64	line	micaoss/mica-build:boards/mini-x64/board.env	BOARD_RELEASE_TARGET=1	docs/boards/support-tiers.md
 logo-policy-in-mica-systemd	line	micaoss/mica-system-base:debs/mica-systemd/payload/etc/systemd/logind.conf.d/50-mica-console.conf	NAutoVTs=0	docs/design/access.md
 #
-# The container-ceiling rows below are the claims docs/design/containers.md 8
+# The container-ceiling rows below are the claims docs/integrate/containers.md 8
 # makes about another repository's kernel configuration. The absence rows are
 # expected to FLIP when the authorised repair lands: a red world job then means
 # the section's dated note is stale and the capability text replaces it, which is
 # the gate doing its job rather than a regression.
-io-throttling.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
-io-throttling.uefi-arm64	line	micaoss/mica-build:boards/uefi-arm64/kernel/config/uefi-arm64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
+io-throttling.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/integrate/containers.md
+io-throttling.uefi-arm64	line	micaoss/mica-build:boards/uefi-arm64/kernel/config/uefi-arm64.config	CONFIG_BLK_DEV_THROTTLING=y	docs/integrate/containers.md
 # AND THESE TWO ARE A DIFFERENT KIND OF FILE, WHICH THEIR OLD NAME DENIED.
 # uefi-x64 and uefi-arm64 have a `make kernel-config` target that RE-RECORDS
 # the committed config from the build, so their rows above read a recorded
@@ -93,15 +93,15 @@ io-throttling.uefi-arm64	line	micaoss/mica-build:boards/uefi-arm64/kernel/config
 # carrying it, the input changed -- but they are not the other half of the
 # rows above, and calling them "unrecorded" implied a recording that does not
 # exist.
-io-throttling-vendor-input.cx3576	line	micaoss/mica-build:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
-io-throttling-vendor-input.s905x5m	line	micaoss/mica-build:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/design/containers.md
+io-throttling-vendor-input.cx3576	line	micaoss/mica-build:boards/cx3576/kernel/config/kernel-cx3576z.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/integrate/containers.md
+io-throttling-vendor-input.s905x5m	line	micaoss/mica-build:boards/s905x5m/kernel/config/kernel-s905x5m.config	# CONFIG_BLK_DEV_THROTTLING is not set	docs/integrate/containers.md
 # The floor itself, which is the requirement rather than any build's output:
 # every board merges this fragment and asserts each =y line against its final
 # .config, so this row and the two vendor-input rows above are the same symbol
 # read at two rungs of a four-rung ladder, and they are meant to disagree.
-io-throttling-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_BLK_DEV_THROTTLING=y	docs/design/containers.md
-memcg.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_MEMCG=y	docs/design/containers.md
-cfs-bandwidth.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CFS_BANDWIDTH=y	docs/design/containers.md
+io-throttling-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_BLK_DEV_THROTTLING=y	docs/integrate/containers.md
+memcg.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_MEMCG=y	docs/integrate/containers.md
+cfs-bandwidth.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uefi-x64.config	CONFIG_CFS_BANDWIDTH=y	docs/integrate/containers.md
 #
 # And the other side of the same gap: the board releases mica-build pins. The
 # rows above say what the next board release will carry; these say what the
@@ -126,7 +126,7 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uef
 # REMOVED 2026-09-29: the board-release rows named each board's newest tag
 # (`<board>.<stamp>`). A release is one product now, `<board>.<variant>.<stamp>`,
 # and the board tags they named were deleted on 2026-09-28, so there is no
-# per-board tag left to watch (docs/design/containers.md 8).
+# per-board tag left to watch (docs/integrate/containers.md 8).
 #
 # The floor itself is now more than one symbol, and these rows are the shape of
 # the decision rather than of a scatter: PSI and IOCOST are ON for every board
@@ -161,10 +161,10 @@ cfs-bandwidth.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/kernel/config/uef
 # is asserted against the fragment" is not expressible as a line in a file, so
 # that half is the third form of docs/decisions/2026-09-20-coordination-state-
 # is-a-record.md: the record alone.
-shipped-config-check	no-path	micaoss/mica-build:src/verify/checks-kernel.ts	absent	docs/design/containers.md
-psi-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/design/containers.md
-iocost-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/design/containers.md
-taskstats-floor-off	line	micaoss/mica-build:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/design/containers.md
+shipped-config-check	no-path	micaoss/mica-build:src/verify/checks-kernel.ts	absent	docs/integrate/containers.md
+psi-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_PSI=y	docs/integrate/containers.md
+iocost-floor	line	micaoss/mica-build:common/kernel/mica-required.fragment	CONFIG_BLK_CGROUP_IOCOST=y	docs/integrate/containers.md
+taskstats-floor-off	line	micaoss/mica-build:common/kernel/mica-required.fragment	# CONFIG_TASKSTATS is not set	docs/integrate/containers.md
 #
 # THE ROW THAT WAS WRITTEN TO FLIP, AND DID, AND IS GONE. For four minutes
 # net-classid-denied.uefi-x64 asserted that uefi-x64's recorded config carried
@@ -174,4 +174,4 @@ taskstats-floor-off	line	micaoss/mica-build:common/kernel/mica-required.fragment
 # comment said it should be. What replaces it is an ordinary row guarding the
 # repair: the floor names the SELECTOR off, because a selected symbol cannot be
 # switched off directly, and a red here is a regression in the normal sense.
-net-classid-selector-off	line	micaoss/mica-build:common/kernel/mica-required.fragment	# CONFIG_NET_CLS_CGROUP is not set	docs/design/containers.md
+net-classid-selector-off	line	micaoss/mica-build:common/kernel/mica-required.fragment	# CONFIG_NET_CLS_CGROUP is not set	docs/integrate/containers.md

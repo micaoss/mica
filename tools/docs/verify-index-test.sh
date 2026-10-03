@@ -82,9 +82,9 @@ new_fixture() {
     mkdir -p "${dir}/docs" "${dir}/tools/docs"
     cp "${ROOT}/docs/README.md" "${dir}/docs/"
     cp "${VERIFIER}" "${dir}/tools/docs/"
-    cp -R "${ROOT}/docs/design" "${ROOT}/docs/user" "${ROOT}/docs/hardware" \
-          "${ROOT}/docs/website" "${ROOT}/docs/boards" \
-          "${dir}/docs/"
+    for tree in start operate integrate hardware security reference releases website; do
+        cp -R "${ROOT}/docs/${tree}" "${dir}/docs/"
+    done
 }
 
 # Duplicates the line matching $2 in file $1, and fails loudly if that line was
@@ -167,14 +167,14 @@ FIX="${WORK}/baseline"
 new_fixture "${FIX}"
 expect_all_pass "baseline: the shipped docs tree, copied verbatim"
 
-# --- 1. a design/ document listed twice in the README ------------------------
-FIX="${WORK}/design-entry-twice"
+# --- 1. a reference/ document listed twice in the README ------------------------
+FIX="${WORK}/reference-entry-twice"
 new_fixture "${FIX}"
-# `wifi.md`, not `api.md`: `api.md` has a row under BOTH design/ and user/,
+# `wifi.md`, not `api.md`: `api.md` has a row under BOTH reference/ and operate/,
 # and duplicate_line rightly aborts on a pattern that is not unique in the file.
 duplicate_line "${FIX}/docs/README.md" '  - `wifi.md`'
-expect_fail "docs/README.md listing wifi.md twice under design/" 1 \
-    "lists 'wifi.md' 2 times under design/" \
+expect_fail "docs/README.md listing wifi.md twice under reference/" 1 \
+    "lists 'wifi.md' 2 times under reference/" \
     "will drift apart unnoticed"
 
 # --- 2. the pre-existing assertions, driven in the failing direction ---------
@@ -182,9 +182,9 @@ expect_fail "docs/README.md listing wifi.md twice under design/" 1 \
 # disarm them while the duplicate case above goes on passing.
 FIX="${WORK}/dangling-readme-entry"
 new_fixture "${FIX}"
-rm "${FIX}/docs/design/api.md"
+rm "${FIX}/docs/reference/api.md"
 expect_fail "a README entry whose document a rename deleted" 1 \
-    "indexes 'api.md' under design/, but docs/design/api.md does not exist"
+    "indexes 'api.md' under reference/, but docs/reference/api.md does not exist"
 
 # The forward direction, and the one this gate exists for: a document that is
 # never listed is not broken, does not fail a build, and is simply never found
@@ -192,20 +192,20 @@ expect_fail "a README entry whose document a rename deleted" 1 \
 # task half of this pair was carrying it.
 FIX="${WORK}/unindexed-document"
 new_fixture "${FIX}"
-cp "${FIX}/docs/design/api.md" "${FIX}/docs/design/unlisted.md"
-expect_fail "a design document with no README row" 1 \
-    "docs/design/unlisted.md exists but is not indexed in docs/README.md"
+cp "${FIX}/docs/reference/api.md" "${FIX}/docs/reference/unlisted.md"
+expect_fail "a reference document with no README row" 1 \
+    "docs/reference/unlisted.md exists but is not indexed in docs/README.md"
 
 # --- 3. the other trees, one case per check_readme_dir call ------------------
 # Each call is driven in a failing direction once, rotating the assertion
 # type, so removing any single call from verify-index.sh turns a case here red. The mutated names are chosen to be unique across the whole
-# README -- `api.md` appears under both design/ and user/, and duplicate_line
+# README -- `api.md` appears under both reference/ and operate/, and duplicate_line
 # would rightly abort on an ambiguous pattern.
 FIX="${WORK}/user-entry-twice"
 new_fixture "${FIX}"
 duplicate_line "${FIX}/docs/README.md" '  - `quickstart.md`'
-expect_fail "docs/README.md listing quickstart.md twice under user/" 1 \
-    "lists 'quickstart.md' 2 times under user/" \
+expect_fail "docs/README.md listing quickstart.md twice under start/" 1 \
+    "lists 'quickstart.md' 2 times under start/" \
     "will drift apart unnoticed"
 
 FIX="${WORK}/dangling-website-entry"
@@ -214,17 +214,17 @@ rm "${FIX}/docs/website/downloads.md"
 expect_fail "a website README entry whose document is gone" 1 \
     "indexes 'downloads.md' under website/, but docs/website/downloads.md does not exist"
 
-FIX="${WORK}/unindexed-boards-document"
+FIX="${WORK}/unindexed-hardware-document"
 new_fixture "${FIX}"
-cp "${FIX}/docs/boards/support-tiers.md" "${FIX}/docs/boards/unlisted.md"
-expect_fail "a boards document with no README row" 1 \
-    "docs/boards/unlisted.md exists but is not indexed in docs/README.md"
+cp "${FIX}/docs/hardware/support-tiers.md" "${FIX}/docs/hardware/unlisted.md"
+expect_fail "a hardware document with no README row" 1 \
+    "docs/hardware/unlisted.md exists but is not indexed in docs/README.md"
 
-FIX="${WORK}/dangling-boards-entry"
+FIX="${WORK}/dangling-hardware-entry"
 new_fixture "${FIX}"
-rm "${FIX}/docs/boards/assurance.md"
-expect_fail "a boards README entry whose document is gone" 1 \
-    "indexes 'assurance.md' under boards/, but docs/boards/assurance.md does not exist"
+rm "${FIX}/docs/hardware/assurance.md"
+expect_fail "a hardware README entry whose document is gone" 1 \
+    "indexes 'assurance.md' under hardware/, but docs/hardware/assurance.md does not exist"
 
 echo
 total=$((PASS_N + FAIL_N))

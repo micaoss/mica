@@ -7,9 +7,9 @@ still the QEMU aarch64 `virt` machine. **Carrying a driver is not evidence that
 a machine boots.**
 
 Snapshot written 2026-09-20, from the dossier
-[`docs/boards/uefi-arm64.md`](../boards/uefi-arm64.md) and
+[`docs/hardware/uefi-arm64-dossier.md`](uefi-arm64-dossier.md) and
 `mica-build:boards/uefi-arm64/`; status is owned by the
-[tiers table](../boards/support-tiers.md#current-boards).
+[tiers table](support-tiers.md#current-boards).
 
 ## At a glance
 
@@ -49,7 +49,7 @@ the resolved configuration drops one. The measured cost is recorded too — 232
 kernel modules instead of 71, a 24.5 MB `Image`, and a CI kernel job that goes
 from 330 s to 718 s.
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
+> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
 
 ## Partition layout
 
@@ -93,7 +93,7 @@ The guest has to provide a PL011 console and only one, the i6300esb watchdog,
 an RTC through PL031 or EFI, and an enabled ACPI button so that a host's
 graceful shutdown request reaches the guest. The whole acceptance run is one
 target, `make lifecycle-uefi PRODUCT=uefi-arm64.dev`; importing an offline
-update over 9p is in [flashing](../user/flashing.md) section 4.
+update over 9p is in [flashing](../start/flashing.md) section 4.
 
 **Onto a physical arm64 machine (unverified)**: as for `uefi-x64` — a
 whole-device write, and the machine must trust the release's boot certificate.
@@ -105,15 +105,15 @@ No physical arm64 machine has been verified.
 
 As on `uefi-x64`: DATA grows, the image ships two deployments, entries are
 counted three attempts deep, and the health gate confirms. See
-[flashing](../user/flashing.md) section 7.
+[flashing](../start/flashing.md) section 7.
 
 ## Updates
 
 `full`, `root` and `kernel` archives are published. Root-only, kernel-only and
 combined updates have run under QEMU, including three failed health trials with
 the retained fallback taken and firmware and identity unchanged. See
-[update packages](../user/update-packages.md) and
-[update and rollback](../user/update-rollback.md).
+[update packages](../operate/update-packages.md) and
+[update and rollback](../operate/update-rollback.md).
 
 ## Recovery
 
@@ -125,7 +125,7 @@ the retained fallback taken and firmware and identity unchanged. See
   write that file has already replaced the device, so there is no in-band
   recovery to protect.
 
-See [recovery](../user/recovery.md).
+See [recovery](../operate/recovery.md).
 
 ## Known limitations
 
@@ -155,4 +155,4 @@ firmware, and a freshly assembled three-partition image.
 | Radios and fieldbus | N/A | this board declares none |
 | Physical recovery action | N/A | no physical presence assertion |
 
-> status: board-dependent — evidence: `docs/boards/uefi-arm64.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`
+> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`

@@ -4,7 +4,7 @@
 出问题怎么回来。**每块板一页，章节顺序相同，可以直接对照着看。
 
 本页是**给中文读者的现状快照，记于 2026-10-01**。板卡状态的权威表是英文的
-[`docs/boards/support-tiers.md`](../../boards/support-tiers.md#current-boards)——
+[`docs/hardware/support-tiers.md`](../../hardware/support-tiers.md#current-boards)——
 两边不一致时以英文为准，这里按缺陷处理。
 
 ## 板卡一览
@@ -18,18 +18,18 @@
 | [`mini-x64`](mini-x64.md) | 小型 amd64 机器（UEFI），128 MB 闪存 | amd64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU） | 无 |
 
 没有任何板卡达到 `mica-qualified`：没有任何板卡档案里有一条注明日期的实机合格行。
-层级的定义见[支持层级](../../boards/support-tiers.md)，共三级：`mica-qualified`
+层级的定义见[支持层级](../../hardware/support-tiers.md)，共三级：`mica-qualified`
 （Mica OS 自己跑完并拥有合格矩阵）、`integrator-qualified / bring-up`（合约满足，
 现场证据由集成商持有或仍在积累）、`unsupported`（没有档案，不做任何声明）。
 
-> status: board-dependent — evidence: `docs/boards/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
+> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
 
 ## 现在到底是什么状态（2026-10-01）
 
 **每块板都是发布目标**，它的每个产品各自发布：每块板都有默认的 `<board>.basic`，除
 `mini-x64` 外还有带容器引擎的 `<board>.full`。**九个产品里目前只有两个有发布**：
 `cx3576.full` 与 `mini-x64.basic`。其余产品还没有发布，没有镜像可下载，需要从源码构建
-（[构建指南](../../user/build.md)）。
+（[构建指南](../../start/build.md)）。
 
 **“是发布目标”不等于“能在实机上跑”。**它只说明镜像被发布了。今天的实际验证情况
 分成三档：
@@ -43,10 +43,10 @@
 **没有任何实机启动拥有证据行。**也没有任何把 Mica OS 镜像写进 U 盘、SATA、NVMe 或
 eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动成功——那是一条报告，
 没有附带产物，因此不是合格行，层级表里也没有任何一行因此移动
-（[支持层级](../../boards/support-tiers.md)）。凡是本目录里写到实机步骤的地方，
+（[支持层级](../../hardware/support-tiers.md)）。凡是本目录里写到实机步骤的地方，
 都标了“未验证”。
 
-> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/user/download.md`
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/start/download.md`
 
 ## 怎么选
 
@@ -69,19 +69,19 @@ eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动�
 
 | 想知道 | 读 |
 |---|---|
-| 一个发布由什么构成、怎么校验 | [获取发布版](../user/download.md) |
-| 刷写的完整说明（含 QEMU 命令行） | [刷写](../user/flashing.md) |
-| 更新归档怎么选、设备怎么接收 | [更新包](../user/update-packages.md)、[更新与回滚](../user/update-rollback.md) |
-| 恢复阶梯：哪些步骤今天真能走 | [恢复](../user/recovery.md) |
-| 分区、数据归属 | [存储](../user/storage.md) |
-| 整个系统怎么拼起来 | [一页读懂](../user/overview.md)、[架构](../../architecture.md) |
+| 一个发布由什么构成、怎么校验 | [获取发布版](../start/download.md) |
+| 刷写的完整说明（含 QEMU 命令行） | [刷写](../start/flashing.md) |
+| 更新归档怎么选、设备怎么接收 | [更新包](../operate/update-packages.md)、[更新与回滚](../operate/update-rollback.md) |
+| 恢复阶梯：哪些步骤今天真能走 | [恢复](../operate/recovery.md) |
+| 分区、数据归属 | [存储](../operate/storage.md) |
+| 整个系统怎么拼起来 | [一页读懂](../start/overview.md)、[架构](../../architecture.md) |
 
 各板页面里的“刷机 / 更新 / 恢复”是这些主题页的板卡视角摘要，细节以主题页为准。
 
 ## 这些页面的来源
 
-每页的事实来自三处：英文板卡档案（`docs/boards/<board>.md`）、
+每页的事实来自三处：英文板卡档案（`docs/hardware/<board>-dossier.md`）、
 `mica-build:boards/<board>/` 里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
 `uefi-x64` 与 `mini-x64` 没有板卡档案，它们那页会逐条注明来源。
 
-> status: board-dependent — evidence: `docs/boards/cx3576.md`, `docs/boards/s905x5m.md`, `docs/boards/uefi-arm64.md`, `mica-build:boards`
+> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`, `docs/hardware/s905x5m-dossier.md`, `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards`
