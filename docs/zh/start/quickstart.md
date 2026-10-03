@@ -2,7 +2,7 @@
 
 到一个运行中的 Mica OS 系统，最短且诚实的路径是：在 QEMU 里跑一个已发布的
 `uefi-x64.basic` 镜像。这也是今天唯一已验证的路径——还没有任何实体机器从发布镜像
-启动过（[刷写](../../start/flashing.md)）。
+启动过（[刷写](../start/flashing.md)）。
 
 ## 1. 需要什么
 
@@ -34,7 +34,7 @@ gzip -dc mica-uefi-x64.basic-<stamp>.img.gz > disk.img
 guest 必须信任该发布的启动证书：验收套件把它注册进一次性的 secure-boot 变量
 （由 `OVMF_VARS.fd`、ARM64 上由 `AAVMF_VARS.fd` 生成的 `vars.fd`），再把镜像作为
 virtio 磁盘启动。参考命令行见
-[刷写](../../start/flashing.md#4-qemu-x64-and-uefi-arm64)。
+[刷写](../start/flashing.md#4-qemu-x64-and-uefi-arm64)。
 
 在 `mica-build` 检出里，这一整套是一个 target：
 
@@ -58,7 +58,7 @@ make product-verify PRODUCT=uefi-x64.dev
 产物落在 `mica-build` 检出目录下的 `_out/products/uefi-x64.dev/`。`uefi-x64.dev` 是开发变体，只在本地
 构建、从不发布；`uefi-x64.basic` 用同样的方式构建。构建不会凭空造出密钥或输入：签名
 材料是显式的（`make os-devkeys` 写出一套开发密钥），每一项输入都来自 `locks/`。
-在线与离线的完整路径见[构建指南](../../start/build.md)。
+在线与离线的完整路径见[构建指南](../start/build.md)。
 
 > status: shipped — evidence: `mica-build:Makefile`, `mica-build:src/product/build.ts`, `docs/start/build.md`
 
@@ -78,8 +78,8 @@ make product-verify PRODUCT=uefi-x64.dev
 
 ## 6. 继续
 
-- [刷写](../../start/flashing.md)——按板卡把镜像写进设备。
-- [更新与回滚](../operate/updates.md)和[更新包](../../operate/updates.md)——让
+- [刷写](../start/flashing.md)——按板卡把镜像写进设备。
+- [更新与回滚](../operate/updates.md)和[更新包](../operate/updates.md)——让
   运行中的设备前进。
 - [应用](../integrate/applications.md)——负载与持久数据。
 

@@ -47,7 +47,7 @@ has never seen a network. The whole journey, from choosing an artifact through
 flashing, first boot, claim and repeatable initial configuration, is documented
 end to end.
 
-> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system:overlay/usr/lib/mica/mica-seed-state`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system-base:payload/usr/lib/mica/mica-seed-state`
 
 **The site may not call that journey proven.** No step of it has been executed
 on physical hardware from this tree — the flash, the first boot and both

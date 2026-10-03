@@ -40,7 +40,7 @@ candidate has three attempts before the retained deployment is selected. Normal
 updates preserve shared DATA and never replace boot firmware. Physical-board
 power-loss and watchdog qualification remain separate from VM evidence.
 
-> status: shipped — evidence: `mica-deploy:src`, `docs/reference/boot.md`, `mica-build:stages/compose/90-pack.Dockerfile`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src`, `docs/reference/boot.md`, `mica-build:stages/compose/90-pack.Dockerfile`
 
 **One management plane owns the device.** `micad` holds the settings tree and
 reconciles it into systemd units — networking, Wi-Fi, SSH, containers, MQTT —

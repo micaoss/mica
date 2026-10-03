@@ -19,7 +19,7 @@ Root, kernel and support references switch together. DATA is shared and is not
 rolled back. A hang also needs a functioning watchdog; physical cx3576 watchdog
 coverage remains a board qualification requirement.
 
-> status: shipped — evidence: `mica-deploy:src/boot.rs`, `mica-system:overlay/usr/lib/mica/mica-health`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/boot.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
 
 ## 2. Exhaustion and shared storage failure
 
@@ -90,7 +90,7 @@ data. It cannot recover a lost credential or undo persistent writes. Reboot is a
 separate action. QEMU covers the real action and subsequent fallback; physical
 cx3576 execution remains separately qualified.
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
 
 ## 5. The destructive steps: resets and credential recovery
 

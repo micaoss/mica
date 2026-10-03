@@ -125,7 +125,7 @@ for its release while developing, instead of the pinned release.
   cases fire.
 - `make lifecycle-uefi PRODUCT=<name>` runs the QEMU lifecycle suite (boot,
   runtime, updates, faults, reset, shutdown) over a UEFI product. **It is run
-  by hand**, and it is the full suite. Since 2026-09-19 one runtime stage of
+  by hand**, and it is the full suite. One runtime stage of
   it, no faults, runs automatically for every amd64 product — on every push to
   `main` and pull request from `ci.yml`, and again from `release.yml` when a
   release is published. No automated boot covers `arm64` or `cx3576`, so for

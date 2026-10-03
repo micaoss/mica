@@ -6,7 +6,7 @@
 
 **其中多少真正跑过。** 生产侧在每次发布时都会执行；设备侧在 QEMU 里由生命周期套件、
 以及 `mica-core` 的契约与故障测试执行。实体硬件上还没有完整一轮（导入、安装、重启、
-自动确认、回滚）的记录，见[支持层级](../../hardware/README.md#current-boards)。
+自动确认、回滚）的记录，见[支持层级](../hardware/README.md#current-boards)。
 
 > status: unsupported
 

@@ -3,8 +3,8 @@
 Flashing the CX3576-Z is an operator procedure, documented in
 [`docs/hardware/cx3576.md`](../../cx3576.md) and
 [`docs/start/flashing.md`](../../../start/flashing.md); the build tree carries
-no flashing tooling (user decision, 2026-09-22: the assembly builds
-components and products, flashing is documentation). Linux hosts use the
+no flashing tooling: the assembly builds components and products, and
+flashing is documentation. Linux hosts use the
 distribution's `rkdeveloptool`. macOS needs a native build, and this
 directory keeps what that build takes.
 

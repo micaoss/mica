@@ -17,7 +17,7 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 - **unsupported**——其余一切，包括内核低于支持底线的板卡。
 
 层级定义、认证矩阵与准入评估标准已随 BSP 文档发布：层级在
-[../../hardware/support-tiers.md](../../hardware/README.md)，矩阵及其行语法在
+[../../hardware/support-tiers.md](../hardware/README.md)，矩阵及其行语法在
 [../../hardware/qualification.md](../../hardware/qualification.md)，厂商准入评估标准在
 [`intake.md`](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md)。词汇存在不等于某块板卡挣得了
 层级：今天没有任何板卡是 mica-qualified，因为在案的每一份板卡页里，每一行

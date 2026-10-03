@@ -29,7 +29,7 @@ What a station can do is *witness* the first boot completing and *record* the
 every future factory-injected material (device certificates, fleet identity)
 has to fit.
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
 ## 2. Who creates the first credential
 
@@ -132,7 +132,7 @@ diagnosis.
 That invariant is the one part of this section the product enforces by
 construction rather than by procedure.
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
 Everything else above — the quarantine record, the segregation, pool
 accounting, duplicate detection, the rework generation and the scrap

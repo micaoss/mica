@@ -26,20 +26,20 @@ verifies blocks on demand. Native deployment metadata binds the exact board,
 kernel and root association. UEFI Secure Boot or required FIT signatures protect
 boot executables under the selected enforcing firmware and public anchors.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/security/signing.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `docs/security/signing.md`
 
 Updates authenticate catalogs and component bytes, persist candidates before
 selection, and retain a known authenticated fallback. Boot, content and metadata
 keys are independent. Root/kernel updates leave loader firmware untouched; its
 signed maintenance flow has separate recovery and readback.
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-deploy:src/acquisition.rs`, `mica-build:src/image/firmware-maintenance.ts`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-build:src/image/firmware-maintenance.ts`
 
 HTTPS management authenticates administrator sessions and bearer tokens, protects
 browser writes with CSRF checks, and keeps login backoff/audit state. SSH is off
 by default. The verified userspace profile does not imply a shell-free image.
 
-> status: shipped — evidence: `docs/reference/access.md`, `mica-system:profile`
+> status: shipped — evidence: `docs/reference/access.md`, `mica-system-base:payload/usr/lib/mica/mica-shadow-reconcile`
 
 ### Evidence limits
 

@@ -1,10 +1,9 @@
 # Release locks, pins and the offline build
 
-**This document has moved.** The release lock, the consumer's `locks/`, the
+The release lock, the consumer's `locks/`, the
 source cache and the offline build are specified in
 [`mica-build-tools`](https://github.com/micaoss/mica-build-tools), beside
-the one implementation of them *(user, 2026-09-29: "把tools和mica解耦合，
-后续所有的规范这边维护，mica只是让子仓库用tools即可")*:
+the one implementation of them:
 
 | What | Where |
 |---|---|

@@ -31,14 +31,14 @@ half-provisioned device that looks provisioned is the failure this design
 refuses. SSH host keys are generated on the device on first boot, and DATA
 grows to fill the disk (see [install.md](install.md)).
 
-> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system:overlay/usr/lib/mica/mica-seed-state`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system-base:payload/usr/lib/mica/mica-seed-state`
 
 The authenticated early loader creates `/mnt/data/state/machine-id` before
 systemd on every current target and binds it read-only at `/etc/machine-id`.
 It stays stable across reboot, update and rollback. A complete reflash creates a
 new identity. No identity is stored in the bootloader's attempt records.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:src/verify/checks-file-root.ts`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `mica-build:src/verify/checks-file-root.ts`
 
 ## 2. Finding the device
 
@@ -95,7 +95,7 @@ candidate for the `media` source. A medium that will not mount never becomes a
 document at all, so `journalctl -u mica-provisioning-import` is where an
 operator whose stick did nothing looks first — not the status route.
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
+> status: board-dependent — evidence: `mica-system-base:payload/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
 
 ### What it may carry, and what it refuses by name
 
@@ -142,7 +142,7 @@ has never run on a physical board. The mechanism ships; the procedure is
 unproven, and a board page is where a run of it gets recorded
 ([../hardware/qualification.md](../hardware/qualification.md)).
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-provisioning-import`, `docs/integrate/provisioning.md`
 
 ## 4. Claiming the device
 

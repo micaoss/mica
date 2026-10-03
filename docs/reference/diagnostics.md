@@ -81,20 +81,16 @@ An absent public-defaults manifest makes the observation unavailable. Public
 defaults do not contain signature anchors: metadata/content policy comes from the
 authenticated kernel package and boot anchors from its firmware trust domain.
 
-There is no `system.gitStamp` and no `system.commitDate` (decided 2026-09-15,
-`docs/decisions/2026-09-15-stable-component-ids.md`; implemented in
-`mica-core` since `20260915-1135`): package versions carry no commit
+There is no `system.gitStamp` and no `system.commitDate`
+(`docs/decisions/2026-09-15-stable-component-ids.md`): package versions carry no commit
 (`mica-build-tools:docs/spec/package-versions.md`), and the root carries no
 `/usr/share/mica/release-identity.env`, so a release that changes nothing in
 the root keeps its rootfs identity. The release identity of the running
 image is the `deployment` member (`version`, `generation`), read from the
 authenticated boot receipt.
 
-`daemon` has no `commit` either (decided 2026-09-15; implemented in
-`mica-core` since `20260915-1135`, where `micad --version` prints
-`micad 0.1.0-1`): `mica-core` removes `MICA_BUILD_COMMIT`
-(`mica-build-tools:docs/spec/package-versions.md` R3), so `daemon.version` and
-`micad --version` show the declared package version, such as `0.1.0-1`, and
+`daemon` has no `commit` either: `daemon.version` and `micad --version` show
+the declared version (`mica-build-tools:docs/spec/package-versions.md`), and
 no commit is compiled into the binary.
 
 `system.fileEpoch` is the manifest file's mtime: the `SOURCE_DATE_EPOCH` that
@@ -108,8 +104,7 @@ files carry", not "when was this image made". Reading it keeps the surface a
 reader of the existing seam rather than a second writer; naming it `buildDate`
 made it answer a question it cannot answer.
 
-**`release` is `/etc/os-release`, and it answers for the product since
-`mica-build` `77a124ba`** *(2026-09-20)*. The composition writes
+**`release` is `/etc/os-release`, and it answers for the product.** The composition writes
 `/usr/lib/os-release` with `NAME="Mica OS"`, `ID=mica`, `PRETTY_NAME`,
 `VERSION_ID`, `IMAGE_ID=<product>` and `IMAGE_VERSION=<version>`, and
 `/etc/os-release` is `base-files`' symlink to it, so this member reads the
@@ -118,39 +113,6 @@ expression the signed components take theirs from**, so the console banner,
 `os-release` and what was signed cannot disagree; on a release build it is the
 release string.
 
-**What that repair is worth recording for is the order, not the values.** For
-most of 2026-09-20 the same member read `PRETTY_NAME="Debian GNU/Linux 13
-(trixie)"` with no `ID=mica`, and `/etc/issue` read `Mica OS Base
-20260920-0832` — the **Base component's** release. The member was faithful
-throughout: it reports what the file says, so the **surface** was right and
-the **answer** was wrong, and a caller asking the system who it is got an
-available, well-formed, correct-looking statement about the wrong system with
-nothing in the response to say so. The repair writes the identity **after the
-`dpkg` run**; its first placement was beside the preset install, which runs
-*before* the packages are unpacked, where a `base-files` or `mica-system`
-unpack would have put the component's identity straight back. **A correction
-writes the right value once; a repair makes the wrong value unreachable**, and
-the two would have looked identical until the next package bump.
-
-Two things about the period before it are worth keeping, because both are
-about subjects rather than about values. Earlier records verified `/etc/issue`
-on a **Base root** and read `Mica OS 20260915-0209`: correct for the subject
-verified, and the same file answering a different question the moment the
-subject is a product. And the session probe accepted the line with a `Mica OS
-*` prefix match, which a component's string satisfies — **a prefix is an
-aperture**, and it passed a product that did not name itself. The anchored
-check that replaced it was verified the right way round: the old glob **could
-not have failed** on the Base's banner, and the new one **cannot pass** on it.
-
-`packages` carries at most 4096 rows and says `truncated: true` past that; a
-row that is not three tab-separated fields is counted in `malformedRows`
-and skipped. A Mica OS row is one whose package name starts with `mica`, the
-rule `verify` applies.
-
-The deployment observation is bounded and nonfatal. An unavailable backend
-produces an unavailable member with a reason, without hiding other system facts.
-Under `MICAD_DRY_RUN=1` the observer is not attached; the bus call fails instead of
-reading the build host's identity.
 
 ## 3. The observed network state
 

@@ -45,7 +45,7 @@ ship Debian's shared license directory, so a reference would dangle on the
 device. Producers that package vendor or Debian-sourced content record that
 content's own license instead.
 
-> status: shipped — evidence: `mica-system:copyright`
+> status: shipped — evidence: `mica-system-base:debs/copyright`
 
 ### SBOM and source offer
 

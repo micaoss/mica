@@ -67,7 +67,7 @@ wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认
 - **配置写入：**一次设置写入返回一个任务；其结果（已应用、无变化、失败
   及原因）通过 API 可观察，而不是从行为里猜。
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 4. 当某个正常命令缺失或损坏时
 
@@ -105,7 +105,7 @@ BusyBox 的 applet 选项更少、行为也与 GNU 版本不同。
 一切动态链接到同一个 libc，所以一个坏到连 `/lib` 都没了的系统同样失去了它——
 到那一步答案是 [recovery.md](recovery.md)，而不是一个 shell。
 
-> status: shipped — evidence: `mica-system:busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/reference/recovery.md`
+> status: shipped — evidence: `mica-system-base:debs/mica-busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/reference/recovery.md`
 
 ## 5. 读懂构建与验证的拒绝
 

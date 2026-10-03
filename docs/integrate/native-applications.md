@@ -148,12 +148,12 @@ required diagnostic evidence before reboot.
 Health is where the native path differs most from the container one, and it
 is worth being exact about what it does and does not promise — **it promises
 deliberately little**.
-`mica-system:overlay/usr/lib/mica/mica-health`
+`mica-system-base:payload/usr/lib/mica/mica-health`
 runs once per boot, waits for systemd to settle, and confirms the authenticated booted deployment
 when a **required set** passes: the boot transaction finished, micad answers on
 `com.mica.micad1`, apid answers on `/healthz`. The set is named by `require=`
 lines in
-`/etc/mica/health.conf` (`mica-system:overlay/etc/mica/health.conf`). Everything
+`/etc/mica/health.conf` (`mica-system-base:payload/etc/mica/health.conf`). Everything
 else the gate observes, **including a unit in the failed state**, is reported
 and never fatal. An unconfirmed deployment consumes the native UEFI/FIT trial budget before fallback.
 
@@ -246,7 +246,7 @@ rollback of either kind.
 ## 10. The writable unit directory, and why it is not this path
 
 `/usr/local/lib/systemd/system` is a bind of DATA/state
-(`mica-system:overlay/etc/systemd/system/usr-local-lib-systemd-system.mount`),
+(`mica-system-base:debs/mica-systemd/payload/etc/systemd/system/usr-local-lib-systemd-system.mount`),
 and a unit dropped there survives a reboot and an A/B update. It exists, it
 works, and it is deliberately **not** the supported way to deliver a native
 application.

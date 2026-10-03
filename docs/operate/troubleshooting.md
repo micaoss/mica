@@ -82,7 +82,7 @@ escalation carrying the board identity, never a green result.
   (applied, unchanged, failed and why) is observable through the API rather
   than guessed from behaviour.
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
 
 ## 4. When a normal command is missing or broken
 
@@ -125,7 +125,7 @@ dynamically linked against the same libc as everything else, so a system damaged
 badly enough to lose `/lib` has lost this too — at that point the answer is
 [recovery.md](recovery.md), not a shell.
 
-> status: shipped — evidence: `mica-system:busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/reference/recovery.md`
+> status: shipped — evidence: `mica-system-base:debs/mica-busybox`, `mica-build:src/verify/checks-busybox.ts`, `docs/reference/recovery.md`
 
 ## 5. Reading build and verify refusals
 

@@ -11,18 +11,17 @@ mappings. No earlier update format or mutable command-line trust input is read.
 |---|---|---|
 | UKI/FIT | Kernel, initramfs, fixed policy, and DTB where applicable | UEFI or the required-signature U-Boot control FDT |
 | Root/support image | PKCS#7 signature over the root hash; signed metadata binds full geometry, hash, length and signature bytes | Kernel dm-verity and native metadata verifier |
-| Deployment | `mica/deployment/v3` (v2 still read), product/board/arch/generation/version, complete kernel/root identities and the core components; the signed `product` field (such as `uefi-x64.basic`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
-| Core component | `mica/core/v1`, one per package (`micad`, `mica-apid-ui`): a verity image signed with the content key, its root's interface level and its needs | Early init, which composes it over the root |
-| Catalog | `mica/catalog/v3`, **unsigned**: releases and one head per board and product; trust is each release's signed descriptor | Acquisition client |
-| Firmware | `mica/firmware/v1`, board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
+| Deployment | the signed deployment descriptor: product/board/arch/generation/version, complete kernel/root identities and the core components; the signed `product` field (such as `uefi-x64.basic`) is required, and a device of another product refuses it | Factory assembler, early init and installer |
+| Core component | one per package (`micad`, `mica-apid-ui`): a verity image signed with the content key, its root's interface level and its needs | Early init, which composes it over the root |
+| Catalog | **unsigned**: the manifest and each release's document under the update root; trust is each release's signed descriptor | Acquisition client |
+| Firmware | board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
 
-The components themselves are `mica/kernel/v1`, `mica/rootfs/v3` (`v2` still
-read) and `mica/core/v1`, and a
-published update travels in a `mica/update-envelope/v1` envelope.
+The schema names and versions of these documents are
+`mica-core:docs/mica-core.md` section 6.2.
 
 **These payloads are addition-closed for readers already deployed, and the
 ordering that follows is the opposite of the producer-first instinct**
-*(measured in `mica-core`'s reader, 2026-09-20; read back here)*. **Every
+**Every
 deserialised struct** in `mica-core:crates/mica-deploy/src/components.rs`
 carries `#[serde(deny_unknown_fields)]` — all nine that derive `Deserialize`,
 `BootArtifact` being exactly `format` and `artifact` and `KernelComponent`
@@ -62,8 +61,7 @@ Offline archives (extension `.micaupd`) start with the eight-byte magic
 `MICAUPD1`, then the descriptor length (u32, big-endian), the signed
 descriptor, the object count, and for each object its digest, size and bytes;
 they reuse the deployment signature and carry only bounded
-digest/length-addressed objects. The layout is unchanged by the 2026-09-15
-decision, but the object count may be anything from 0 to the descriptor's
+digest/length-addressed objects. The object count may be anything from 0 to the descriptor's
 object count: every object the archive omits must already be present in the
 store, and an archive is no longer refused for an object count that differs
 from the descriptor's. One signed deployment therefore ships as `full`,

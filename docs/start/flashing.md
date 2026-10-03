@@ -11,14 +11,13 @@ procedure yet.
   [storage](../reference/storage.md).
 - After the board boots: [first run](first-run.md).
 - Replacing a running system instead of writing a whole image:
-  [update packages](../operate/updates.md).
+  [updates](../operate/updates.md).
 
 **What is qualified, stated once.** Every boot anyone here has seen was QEMU.
 No Mica OS image written to a USB stick, a SATA disk, an NVMe drive or an
-eMMC is on record here, and no physical boot has an evidence row. The user
-reported on 2026-09-20 that a `cx3576` booted on hardware; it is a report with
-no artefact attached, so it is not a row and this page does not treat it as
-one ([support tiers](../hardware/README.md)). The QEMU sections below are
+eMMC is on record here, and no physical boot has a qualification row; the one
+hardware observation on file, of a `cx3576`, is not one
+([board status](../hardware/README.md#current-boards)). The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
 where they are not verified. Every amd64 product is booted automatically in
 its release run, while a `uefi-arm64` image is built and verified but started
@@ -60,32 +59,29 @@ Then know three things about the write:
 
 ## 2. What the image carries, per board
 
-Every board declares exactly one image kind, `disk`, built in — no vendor
-packer is implemented. What differs is where the bootloader lives.
+Every board declares the image kind `disk`, the raw disk image; `s905x5m` also
+declares `usb-burn`, the USB burning package of its eMMC product. What differs
+is where the bootloader lives.
 
 | Board | Firmware format | Does the raw image boot a blank board? | State |
 |---|---|---|---|
 | `uefi-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
-| `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, where UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` | a release target since 2026-09-16; qualified under QEMU only |
+| `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, where UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` | qualified under QEMU only |
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
-| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the image | no supported path |
+| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the disk image; the USB burning package of `s905x5m.emmc-full` carries it | not verified on hardware |
 | `mini-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI`; no USB driver, so not from USB media | qualified under QEMU only |
 
-Every board publishes images; for `s905x5m` that changes what exists to
-download, not what can be written: its image still installs no bootloader,
-for the reason in section 6. There is no A/B partition pair to choose between
-and no conversion from an older layout: a write is a full write.
+There is no A/B partition pair to choose between and no conversion from an
+older layout: a write is a full write.
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`, `mica-build:boards/cx3576/images.tsv`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`, `mica-build:boards/s905x5m/images.tsv`
 
 ## 3. uefi-x64
 
 ### The image
 
 The published uefi-x64 image is a GPT disk with disk GUID
-`5AC35760-0064-4000-8000-000000000000` and three partitions, read out of
-`mica-x64-dev-20260915-2230.img` (the last image published under the old
-`x64` name; the layout is the board's and did not change with it):
+`5AC35760-0064-4000-8000-000000000000` and three partitions:
 
 | Partition | Type | Start sector | Size |
 |---|---|---|---|
@@ -150,8 +146,7 @@ Boot governs who may load the kernel, not whether the root is verified.
 ## 4. QEMU: uefi-x64 and uefi-arm64
 
 This is the path that is actually run, and for `uefi-arm64` it is the only
-path with evidence behind it. Since 2026-09-16 that board is a release target
-and its kernel carries generic hardware drivers — AHCI, NVMe, USB storage over
+path with evidence behind it. Its kernel carries generic hardware drivers — AHCI, NVMe, USB storage over
 xHCI and EHCI, and the common NICs as modules — but **carrying a driver is not
 evidence that a machine boots**: the qualification is QEMU `virt` only, as it
 is for `uefi-x64` ([board page](../hardware/uefi-arm64.md)).
@@ -194,7 +189,7 @@ What the guest must provide on `uefi-arm64`: the console is PL011
 (`console=ttyAMA0,115200n8`) and there is no other, the watchdog is the
 built-in i6300esb, the RTC is PL031 or EFI, and ACPI button is on so a
 host-requested graceful powerdown reaches the guest. `virtio-blk-pci` and
-`virtio-net-pci` are what the suite uses; since 2026-09-16 the kernel also
+`virtio-net-pci` are what the suite uses; the kernel also
 drives AHCI, NVMe, USB storage and the common NICs, so another disk or network
 model boots in principle — untested, like every non-virtio path here. There is
 no MMC driver at all, on purpose: a machine that boots from a platform MMC
@@ -240,7 +235,7 @@ sector 64, inside the protected range — the four bytes `RKNS` at byte offset
 separate idblock step, and no vendor `update.img` is produced for this board.
 
 The write path is `rkdeveloptool` over USB, run by the operator; the build
-tree carries no flashing tooling (user decision, 2026-09-22). **It must be the
+tree carries no flashing tooling. **It must be the
 decompressed `.img`**, exactly 1 299 MiB = 1 362 100 224 bytes.
 
 | Step | Loader/RockUSB mode | Maskrom mode |
@@ -272,28 +267,24 @@ patches kept in [`docs/hardware/cx3576/rkdeveloptool`](../hardware/cx3576/rkdeve
 
 ## 6. s905x5m
 
-There is no supported way to put Mica OS on a blank s905x5m today. The board
-was opened as a release target on 2026-09-19, so its images will be published
-like any other board's — and that changes nothing here: being published is not
-being installable, the board's physical qualification is still pending, and
-the paragraphs below are why.
+Neither route below has been run on a unit.
 
-The reason is where the firmware lives. Mica OS U-Boot (`u-boot.bin.signed`)
-executes from the eMMC boot0 area, behind a target-generated 512-byte Amlogic
-header, and the loader refuses an automatic boot when its source is not boot0.
-The disk image covers the SD medium only — `FIRMWARE` at sector 64, `SYSTEM`,
-`DATA` — so writing it to a card installs no bootloader, and only a board
-whose boot0 already carries the paired Mica OS U-Boot boots from it.
+**The eMMC product, `s905x5m.emmc-full`.** Its release carries a USB burning
+package: an Amlogic v2 burning image for the vendor USB Burning Tool, built
+from the product's disk image and the board's bootloader package. It writes
+the partition table, both bootloader targets, the vendor device tree and the
+three Mica OS partitions, and leaves the vendor's other partitions alone.
+Holding the recovery key at power-on puts the board into USB burning mode. The
+build unpacks every package it makes and proves each payload is its source.
 
-What exists towards a future procedure: `make -C boards/s905x5m uboot` builds
-the signed U-Boot and its DDR blob, and `make -C boards/s905x5m uboot-package`
-builds an Amlogic v2 `update.img` (pinned `aml_image_v2_packer`, verified by
-unpacking it again) carrying the signed U-Boot as `bootloader.PARTITION` and
-deliberately omitting `gpt.bin` and `bootloader_a`, so a burn frames the
-hardware boot areas and cannot touch a user-area GPT. Which host tool consumes
-that image, how boot0 is written and read back, and how a bricked board is
-recovered are all unwritten and untested — bench work owned by
-`mica-build`.
+**The SD products, `s905x5m.basic` and `s905x5m.full`.** Mica OS U-Boot
+executes from the eMMC boot0 area, and the loader refuses an automatic boot
+when its source is not boot0. The disk image covers the SD medium only —
+`FIRMWARE` at sector 64, `SYSTEM`, `DATA` — so writing it to a card installs no
+bootloader, and only a board whose boot0 already carries the matching Mica OS
+U-Boot boots from it. That U-Boot is installed with the board's bootloader
+package over the same USB burning mode
+(`mica-build:boards/s905x5m/loader/README.md`).
 
 > status: unsupported
 
@@ -306,8 +297,7 @@ recovered are all unwritten and untested — bench work owned by
   `make os-repart-test` (privileged docker) proves the growth cannot wipe the
   loader; it exists and CI does not run it.
 - **Two deployments from the start.** The factory image carries two signed
-  deployment records, generations g-1 and g — for `x64-dev` `20260915-2230`,
-  generations 3 and 4. On the device that is exactly two descriptors in
+  deployment records, generations g-1 and g. On the device that is exactly two descriptors in
   `/mnt/system/deployments/` and exactly two boot entries; an update never
   leaves a device without a bootable fallback.
 - **How the loader chooses.** The factory ESP carries `loader/loader.conf`
@@ -336,13 +326,13 @@ been run on hardware. The device-side half of this section is read out of
 
 ## 8. What flashing does not cover
 
-- **No vendor image kinds.** Every board declares `image disk builtin`; the
-  `rockchip-update` packer is named in the tooling and refused. A release
-  carries the raw disk image and the update archives, nothing else.
+- **One vendor image kind.** A release carries the raw disk image and the
+  update archives; the only vendor format is the USB burning package of
+  `s905x5m.emmc-full`.
 - **No partition-level A/B.** Both deployments are files on SYSTEM, so there
   is no "other slot" to flash ([updates](../reference/updates.md)).
 - **No upgrade by re-flashing.** Writing an image wipes DATA. To move a
   running device to a newer release, take an update archive
-  ([update packages](../operate/updates.md)).
+  ([updates](../operate/updates.md)).
 
 > status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/reference/updates.md`, `docs/operate/updates.md`

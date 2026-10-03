@@ -106,7 +106,7 @@ make offline-chain PRODUCTS=uefi-x64.dev
 - `make os-smoke-test`、`os-smoke-negative-test` 和 `os-factory-root-gate` 在真正发布的
   根里执行真正发布的二进制，并证明反例确实会触发。
 - `make lifecycle-uefi PRODUCT=<name>` 对一个 UEFI 产品跑 QEMU 生命周期套件（启动、
-  运行时、更新、故障、重置、关机）。**整套是手工运行的**；自 2026-09-19 起，其中一个
+  运行时、更新、故障、重置、关机）。**整套是手工运行的**；其中一个
   运行时阶段（不跑故障阶段）会对每个 amd64 产品自动运行——`ci.yml` 在每次推送 `main`
   和每个 pull request 上跑，`release.yml` 在发布时再跑一次。`arm64` 与 `cx3576` 没有
   任何自动启动，所以对它们而言，“某个产品能启动”带的仍是**上一次有人手工跑它的日期**
@@ -119,6 +119,6 @@ make offline-chain PRODUCTS=uefi-x64.dev
 
 它不会凭空造出密钥或 release：签名输入是显式的（`make os-devkeys` 生成开发用输入），
 其它输入来自 `locks/`。它也不发布：只有 release 才发布
-（[发布](../../releases/how-releases-work.md)）。
+（[发布](../releases/how-releases-work.md)）。
 
 > status: shipped — evidence: `mica-build:Makefile`, `docs/security/signing.md`

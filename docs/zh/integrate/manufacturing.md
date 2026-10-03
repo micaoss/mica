@@ -22,7 +22,7 @@ CSPRNG 抽出 32 个十六进制字符的 `deviceId`，从中派生 `mica-xxxxxx
 报出的 `deviceId`。这是设计中的那一步，也是未来任何工厂注入材料（设备证书、
 车队身份）必须套进去的形状。
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
 ## 2. 谁创建第一个凭据
 
@@ -104,7 +104,7 @@ DATA/state 镜像到另一台上以"保住"它的身份；序列号的连续性�
 
 这条不变式是本节里唯一由产品**以构造方式**（而不是靠流程）强制的部分。
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
 上面其余的一切——隔离记录、物理隔离、池账目、重复检测、返修的新一代记录与
 报废处置——都是对产线的要求，背后没有任何工具，也没有任何计划。

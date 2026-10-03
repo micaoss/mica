@@ -194,7 +194,7 @@ an update; the consequence is that an application which migrated its own
 schema on first start is, after any rollback, an old version pointed at new
 data. That contract is the integrator's to write and to test, on both paths.
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-health`, `docs/integrate/native-applications.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/native-applications.md`
 
 Managed and untrusted application controls — independently signed application
 bundles, a distributable container trust policy, admission that can refuse a

@@ -13,7 +13,7 @@ blocks on demand. Corrupt unread content is detected when accessed; boot does no
 scan the complete root image. Native init authenticates the selected deployment
 and geometry before creating the mappings.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:tests/suites/signed-boot-lab/init-matrix.sh`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `mica-build:tests/suites/signed-boot-lab/init-matrix.sh`
 
 ## I2 — authenticated normal updates
 
@@ -23,7 +23,7 @@ the signed catalog, expiry, board and replay policy, with bounded download/impor
 Current and retained fallback objects remain protected during staging and GC.
 No loader firmware is installed through the ordinary OS update action.
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-deploy:src/acquisition.rs`, `mica-core:scripts/gate/file-ab-faults/run.sh`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-core:scripts/gate/file-ab-faults/run.sh`
 
 ## I3 — authenticated boot executables and policy
 

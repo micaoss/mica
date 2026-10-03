@@ -14,7 +14,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 失败耗尽后选择保留的可用部署。root、kernel 和 support 引用一起切换，DATA 共享
 且不会回滚。卡死还需要可用看门狗复位，cx3576 物理覆盖仍需板级验收。
 
-> status: shipped — evidence: `mica-deploy:src/boot.rs`, `mica-system:overlay/usr/lib/mica/mica-health`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/boot.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`
 
 ## 2. 尝试耗尽与共享存储故障
 
@@ -72,7 +72,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 该操作保留 DATA 上的配置、凭据和应用数据，不能恢复丢失凭据或撤销持久写入。
 重启为独立操作。QEMU 已覆盖真实请求及随后回退，cx3576 实机执行单独验收。
 
-> status: shipped — evidence: `mica-deploy:src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments.rs`, `mica-core:crates/mica-apid/openapi.json`, `mica-build:tests/suites/apid-api/src/phases/07-update-rollback.ts`
 
 ## 5. 破坏性的步骤：重置与凭据恢复
 

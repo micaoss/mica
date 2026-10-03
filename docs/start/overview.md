@@ -125,14 +125,12 @@ checked before and after decompressing.
 
 ## 5. What is not here yet
 
-- Board-specific flashing formats (a Rockchip `update.img`, an Amlogic burn
-  image) are designed but not implemented: every board declares only the
-  `disk` image kind today.
+- The only board-specific flashing format is the USB burning package of
+  `s905x5m.emmc-full`; every other product publishes the raw disk image alone.
 - Nothing starts a FIT image: there is no suite that boots one, so the
   `cx3576` and `s905x5m` products are published and never started
-  ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4). A FIT boot suite would be
-  a new suite; it is unscoped and is a user decision.
-- Most products have no release yet, so neither the download host nor the
-  update root offers anything for them.
+  ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4).
+- A product without a release is offered by neither the download page nor
+  the update root; it is built from source.
 
 > status: unsupported

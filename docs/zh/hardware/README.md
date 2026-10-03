@@ -2,7 +2,7 @@
 
 每块板一页，每次都按同样的顺序回答四个问题：**这块板能不能跑 Mica OS、证明到了哪一步、
 镜像怎么写进去、出了问题怎么回来。** 本页给出板卡状态表，以及状态表使用的支持层级。
-英文页 [`docs/hardware/README.md`](../../hardware/README.md) 是权威。
+英文页 [`docs/hardware/README.md`](../hardware/README.md) 是权威。
 
 ## 当前板卡
 

@@ -12,7 +12,7 @@
 在对应强制验证固件和锚可信时，UEFI Secure Boot 或必需的 FIT 签名保护内核和早期
 策略。这与认证硬件的每一个可变启动阶段是不同的保证。
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/reference/ro-root.md`, `docs/security/signing.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `docs/reference/ro-root.md`, `docs/security/signing.md`
 
 ## 2. 更新真实性及密钥生命周期
 
@@ -28,7 +28,7 @@
 正在强制验证。更新状态另报启动/内容验证回执。构建不会隐式生成密钥，签名输入
 必须显式提供。
 
-> status: shipped — evidence: `mica-deploy:src/acquisition.rs`, `mica-deploy:src/deployments.rs`, `docs/security/signing.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-core:crates/mica-deploy/src/deployments.rs`, `docs/security/signing.md`
 
 ## 3. 访问与凭据
 
@@ -97,12 +97,10 @@ Warning: Extension REDIRECT revision 0 not supported, missing kernel module?
 `REDIRECT`、`SNAT`、`DNAT`、`MARK`、`CHECKSUM`、`CT --notrack`；匹配
 `addrtype`、`conntrack`、`state`、`mark`；纯裁决（`ACCEPT`、`DROP`、`RETURN`、
 跳转）与内建匹配（`-p`、`--dport`、`-i`、`-o`、`--tcp-flags`）；以及两个地址族
-各自的四张表 `filter`、`nat`、`mangle`、`raw`。在 2026-09-04 之前，`REDIRECT`、
-`CHECKSUM` 和 `CT` 在 arm64 板上可用、在 uefi-x64 上被拒绝——下限取代的正是那种不
-对称。
+各自的四张表 `filter`、`nat`、`mangle`、`raw`。
 
 **这个集合之外的东西，依赖它之前请先问，并且不要假设两块板子答得一样。**
-2026-09-04 实测，仍有四个扩展存在差异，而且方向并不一致：
+仍有四个扩展存在差异，而且方向并不一致：
 
 | | uefi-x64 | arm64（cx3576） |
 |---|---|---|
@@ -149,7 +147,7 @@ auto 模式，其中 nft 前端的优先级高于旧版，并且这里没有任�
 `/usr/local/lib/systemd/system`（[../integrate/applications.md](../integrate/applications.md)）。这是对
 产品当下行为的陈述，不是关于该如何运行防火墙的建议。
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
+> status: shipped — evidence: `mica-system-base:debs/mica-system`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. 安全生命周期
 

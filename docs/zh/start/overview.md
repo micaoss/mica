@@ -6,8 +6,8 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 部件、一个发布如何由它们构成，以及文件都在哪里。
 
 系统地图是 [../../architecture.md](../../architecture.md)。从源码构建系统见
-[构建指南](../../start/build.md)，镜像进入板卡见[刷写](flashing.md)，选更新见
-[更新包](../operate/updates.md)，维护者切发布见[发布](../../releases/how-releases-work.md)，
+[构建指南](../start/build.md)，镜像进入板卡见[刷写](flashing.md)，选更新见
+[更新包](../operate/updates.md)，维护者切发布见[发布](../releases/how-releases-work.md)，
 新板卡的引入见[移植](https://github.com/micaoss/mica-build/blob/main/boards/README.md)。
 
 ## 1. 仓库
@@ -78,7 +78,7 @@ SSH 与容器；其它每个产品运行 systemd。没有 minimal 产品
 
 每一块板都是发布目标。**这意味着它的产品会被发布；它不是“这块板能在实机上启动”的
 断言**——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行
-未测（[支持层级](../../hardware/README.md#current-boards)）。它甚至不是“这个镜像
+未测（[支持层级](../hardware/README.md#current-boards)）。它甚至不是“这个镜像
 被启动过”的断言：没有任何套件会启动 FIT 镜像，所以 `cx3576` 与 `s905x5m` 的产品在这棵
 树里没有任何东西会启动它们。
 
@@ -104,11 +104,10 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 
 ## 5. 还没有的东西
 
-- 板卡专用的刷写格式（Rockchip 的 `update.img`、Amlogic 的烧录镜像）有设计但未实现：
-  今天每块板只声明 `disk` 一种镜像类型。
+- 唯一的板卡专用刷写格式是 `s905x5m.emmc-full` 的 USB 烧录包；其他产品都只发布裸磁盘
+  镜像。
 - 没有任何东西会启动 FIT 镜像：不存在能启动它的套件，所以 `cx3576` 与 `s905x5m` 的
-  产品被发布、却从未被启动（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md) 第 4 节）。FIT 启动
-  套件将是一套**新**套件；它没有被估过工，是一个用户决定。
-- 大多数产品还没有发布，所以下载站和更新根地址都还没有它们的内容。
+  产品被发布、却从未被启动（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md) 第 4 节）。
+- 没有发布的产品，下载页和更新根都不提供；它从源码构建。
 
 > status: unsupported

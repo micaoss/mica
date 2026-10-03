@@ -26,7 +26,7 @@ The `/var` parent tree is read-only. Only explicitly supported leaves are
 writable; an arbitrary new `/var` directory fails with EROFS. Logs remain
 volatile, so save diagnostic evidence before shutting down a test device.
 
-> status: shipped — evidence: `docs/reference/storage.md`, `mica-system:overlay/etc/systemd/system/`
+> status: shipped — evidence: `docs/reference/storage.md`, `mica-system-base:debs/mica-systemd/payload/etc/systemd/system`
 
 ## Capacity and cleanup
 
@@ -41,7 +41,7 @@ identity and retained lifecycle/deployment records. OS rollback does not undo
 writable application data. Full reflash replaces the current image contents;
 it is not a secure erase of every physical sector beyond the image.
 
-> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
+> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system-base:payload/usr/lib/mica/mica-data-layout`
 
 ## Failure
 

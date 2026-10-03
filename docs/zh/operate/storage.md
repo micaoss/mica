@@ -22,7 +22,7 @@ Mica OS 使用三个分区：UEFI 板为 ESP/SYSTEM/DATA，U-Boot 板（cx3576�
 `/var` 父目录树只读，只有明确支持的叶目录可写；任意新建目录会以 EROFS 失败。
 日志为易失内容，关闭测试设备前先保存诊断证据。
 
-> status: shipped — evidence: `docs/reference/storage.md`, `mica-system:overlay/etc/systemd/system/`
+> status: shipped — evidence: `docs/reference/storage.md`, `mica-system-base:debs/mica-systemd/payload/etc/systemd/system`
 
 ## 容量和清理
 
@@ -33,7 +33,7 @@ Mica OS 使用三个分区：UEFI 板为 ESP/SYSTEM/DATA，U-Boot 板（cx3576�
 目录重置只清除允许的指定范围，保留身份和部署/生命周期记录。系统回滚不撤销应用
 数据写入。完整重刷替换镜像内容，并不安全擦除镜像范围之外的每个物理扇区。
 
-> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system:overlay/usr/lib/mica/mica-data-layout`
+> status: shipped — evidence: `mica-core:crates/micad/src/storage_status.rs`, `mica-core:crates/micad/src/reset.rs`, `mica-system-base:payload/usr/lib/mica/mica-data-layout`
 
 ## 故障
 

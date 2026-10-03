@@ -357,7 +357,7 @@ different rules and not the same one applied twice:
 ### 4.1 The provisioning document — channels 1 and 2 (shipped)
 
 One file, one format, two transports. `mica-core:crates/micad/src/provisioning_doc.rs`
-parses, validates and applies it; `mica-system:overlay/usr/lib/mica/mica-provisioning-import`
+parses, validates and applies it; `mica-system-base:payload/usr/lib/mica/mica-provisioning-import`
 and its unit put the media where micad can read them;
 `mica-core:crates/mica-apid/src/provisioning_api.rs` reports what happened.
 

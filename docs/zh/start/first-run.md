@@ -26,13 +26,13 @@ DNS，甚至可能没有网线。这个性质是设计出来的，不是碰巧�
 一半的设备正是这个设计要拒绝的失败。SSH 主机密钥在设备上于首次启动时生成，
 DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 
-> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system:overlay/usr/lib/mica/mica-seed-state`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-system-base:payload/usr/lib/mica/mica-seed-state`
 
 所有当前目标均由原生 init 在服务启动前将 machine id 建立并保存在 DATA/state，
 再只读绑定到 `/etc/machine-id`。它跨重启和组件更新保持稳定；格式错误或不可用的
 身份会被拒绝，不会静默生成临时替代身份。
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `mica-build:src/verify/checks-file-root.ts`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `mica-build:src/verify/checks-file-root.ts`
 
 ## 2. 找到设备
 
@@ -82,7 +82,7 @@ DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。
 `journalctl -u mica-provisioning-import` 才是"插了 U 盘却没反应"时第一个要
 看的地方——而不是状态路由。
 
-> status: board-dependent — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
+> status: board-dependent — evidence: `mica-system-base:payload/usr/lib/mica/mica-provisioning-import`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`
 
 ### 它能带什么，以及它点名拒绝什么
 
@@ -120,7 +120,7 @@ U 盘送进一次真实启动，其中引导分区通道尤其从未在物理板
 了；流程没有被证明，而记录一次真实运行的地方是板卡页
 （[../../hardware/qualification.md](../../hardware/qualification.md)）。
 
-> status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-provisioning-import`, `docs/integrate/provisioning.md`
 
 ## 4. 认领设备
 

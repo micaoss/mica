@@ -9,36 +9,33 @@ anonymous: no token, no registry login. A release is one product:
 
 Each product releases on its own, so there is no index to start from: a
 product's newest release is the newest tag that starts with
-`<board>.<variant>.`. The version index of the earlier scheme (`mica.<stamp>`,
-`mica-index.json`) is no longer cut, and the releases published under the
-earlier product names were deleted on 2026-09-28.
+`<board>.<variant>.`.
 
 **The same files are on the resource service.** The release run posts each
 release there (`mica-build:README.md`): the files are at
 `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>`, beside the
 release's own `index.json`, which lists them with their sizes and digests, and
-`https://res.micaos.dev/update/v2/manifest.json` names every product's current
-release. That is what the website's download pages and a device read; a
+the manifest under the update root `https://res.micaos.dev/update/` names every
+product's current release. That is what the website's download pages and a device read; a
 release an administrator deleted there is gone from both.
 
 > status: shipped — evidence: `docs/reference/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`
 
 ## 1. What exists to download
 
-Every board is a release target, so nine products are released:
-`<board>.basic`, the default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`
-and `mini-x64`, and `<board>.full`, which adds the container engine, on all but
-`mini-x64`. **Two of them have a release so far, `cx3576.full` and
-`mini-x64.basic`**; for the others there is nothing to download yet, and they
-are built from source ([build guide](build.md)). A `dev` product is built
+Every board is a release target. Its products are `<board>.basic`, the
+default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m` and `mini-x64`;
+`<board>.full`, which adds the container engine, on all but `mini-x64`; and
+`s905x5m.emmc-full`, laid out for that board's eMMC. **Which of them have a
+release is on the [download page](https://micaos.dev/download/)**; a product
+without one has nothing to download and is built from source
+([build guide](build.md)). A `dev` product is built
 locally and never released; there are no minimal products
 ([decision](../decisions/2026-09-16-minimal-products-removed.md)).
 
-**A published image is not a booted image.** Four of the nine products —
-`cx3576.basic`, `cx3576.full`, `s905x5m.basic`, `s905x5m.full` — are started by
-nothing automatic, because no suite boots a FIT image. (A hardware boot of
-`cx3576` was reported by the user on 2026-09-20; it is a report, not a
-qualification row — [support tiers](../hardware/README.md).) Every amd64
+**A published image is not a booted image.** The `cx3576` and `s905x5m`
+products are started by nothing automatic, because no suite boots a FIT image
+([board status](../hardware/README.md#current-boards)). Every amd64
 product (`uefi-x64.*`, `mini-x64.basic`) is booted in its release run, and the
 `uefi-arm64` ones carry hand-run QEMU rows ([harness](https://github.com/micaoss/mica-build/blob/main/README.md)
 section 4). Being a release target means the images are built and published;

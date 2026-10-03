@@ -16,7 +16,7 @@ UEFI Secure Boot or required FIT signatures protect the kernel and early policy
 when the corresponding enforcing firmware and anchor are trusted. This is
 separate from authenticating every first mutable hardware boot stage.
 
-> status: shipped — evidence: `mica-deploy:src/bin/mica-init.rs`, `docs/reference/ro-root.md`, `docs/security/signing.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `docs/reference/ro-root.md`, `docs/security/signing.md`
 
 ## 2. Update authenticity and key lifecycle
 
@@ -37,7 +37,7 @@ It is provenance information, not proof of active firmware enforcement. The
 update status reports the boot/content verification receipt separately. Key
 creation never happens implicitly during a build; supply inputs explicitly.
 
-> status: shipped — evidence: `mica-deploy:src/acquisition.rs`, `mica-deploy:src/deployments.rs`, `docs/security/signing.md`
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-core:crates/mica-deploy/src/deployments.rs`, `docs/security/signing.md`
 
 ## 3. Access and credentials
 
@@ -120,12 +120,10 @@ targets `MASQUERADE`, `REDIRECT`, `SNAT`, `DNAT`, `MARK`, `CHECKSUM` and `CT
 --notrack`; the matches `addrtype`, `conntrack`, `state` and `mark`; the plain
 verdicts (`ACCEPT`, `DROP`, `RETURN`, jumps) and the built-in matches (`-p`,
 `--dport`, `-i`, `-o`, `--tcp-flags`); and the four tables `filter`, `nat`,
-`mangle` and `raw` in both address families. Before 2026-09-04 `REDIRECT`,
-`CHECKSUM` and `CT` worked on the arm64 board and were refused on uefi-x64 — that
-asymmetry is what the floor replaced.
+`mangle` and `raw` in both address families.
 
 **Outside that set, ask before you rely on it, and do not assume the two boards
-answer alike.** Measured on 2026-09-04, four extensions still differ, and not
+answer alike.** Four extensions still differ, and not
 all in the same direction:
 
 | | uefi-x64 | arm64 (cx3576) |
@@ -180,7 +178,7 @@ directory `/usr/local/lib/systemd/system` like any other native application
 ([../integrate/applications.md](../integrate/applications.md)). That is a statement of what the product
 does now, not a recommendation of how to run a firewall.
 
-> status: shipped — evidence: `mica-system:system/control/mica-system.control`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
+> status: shipped — evidence: `mica-system-base:debs/mica-system`, `mica-build:common/kernel/mica-required.fragment`, `mica-build:src/verify/checks-firewall.ts`
 
 ## 6. Security lifecycle
 

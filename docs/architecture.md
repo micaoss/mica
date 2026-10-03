@@ -182,9 +182,7 @@ The interfaces between them are files, not directories:
   which `mica-build` builds from `boards/` and `common/` into the board's pool.
 - **The board bundle** — a board directory under `mica-build:boards/` produces a
   board's kernel, loader, firmware and board package; the engine consumes them
-  and never reaches into a board's build (`mica-build:boards/README.md`; one
-  repository since 2026-09-21,
-  `mica-build:boards/README.md`).
+  and never reaches into a board's build (`mica-build:boards/README.md`).
 - **The signed deployment envelope** — what `mica-build` signs and what `mica-deploy`
   authenticates on the device ([release signing](security/signing.md)).
 

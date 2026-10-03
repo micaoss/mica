@@ -46,14 +46,12 @@ The workspace probe checks mount identity, writability, free space and bounded
 contents. HTTP ranges resume partial objects; complete bytes and lengths must
 match authenticated metadata. `MICAUPD1` offline imports carry the same signed
 deployment and any subset of its objects, with no archive paths or links.
-Decided 2026-09-15 (`docs/decisions/2026-09-15-update-packages.md`) and
-implemented in `mica-core` since its release `20260915-0728` (`2a4c98d`;
-written by `mica-build` since `0094a097`): an import may carry from 0 to the
-descriptor's object count (a `root` or `kernel` archive), and every missing
-object must already be in the store. Deployments are `mica/deployment/v3`
-(v2 is still read): the root states its `interfaceLevel` (`mica/rootfs/v3`),
-and the deployment names its **core components** (`mica/core/v1`, one per
-package — `micad` and the console), each running on its root's level with
+An import may carry from 0 to the descriptor's object count (a `root`,
+`kernel` or `core` archive,
+`docs/decisions/2026-09-15-update-packages.md`), and every missing object must
+already be in the store. The root states its interface level, and the
+deployment names its **core components** (one per package — `micad` and the
+console), each running on its root's level with
 every need met inside the deployment. A core component is a verity image
 installed beside the root under `cores/<id>/` and composed over the root's
 `/usr` and `/etc` at boot, so a `core` archive updates the management plane
