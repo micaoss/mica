@@ -31,22 +31,15 @@
 
 ## 项目状态
 
-Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个产品（`<board>.<variant>`：
-默认的 `basic`，以及加上容器引擎的 `full`）各自构建、签名、发布——这并不意味着它能在实机上启动。
+Mica OS 处于活跃开发中。它的板卡都处于 bring-up 层级：通用系统 `uefi-x64`、
+`uefi-arm64`、`mini-x64`，以及硬件板 `cx3576`、`s905x5m`。每块板的产品各自构建、签名、
+发布，名为 `<board>.<variant>`——这并不意味着它能在实机上启动：**尚无板卡完成认证**，没有
+任何板卡页带有带日期的实机认证行。
 
-| 板卡 | 硬件 | 状态（2026-10-01） | 已发布的产品 |
-|---|---|---|---|
-| `uefi-x64` | 通用 amd64，UEFI | bring-up，QEMU 基线；在发布流程里被启动 | 暂无 |
-| `uefi-arm64` | 通用 arm64，UEFI | bring-up，QEMU 参考；只构建与校验，没有自动启动 | 暂无 |
-| `cx3576` | Rockchip RK3576 | bring-up；没有自动流程启动它——没有套件会启动 FIT 镜像 | `cx3576.full` |
-| `s905x5m` | Amlogic S7D（BM201） | bring-up；没有自动流程启动它，且没有受支持的办法装进空板 | 暂无 |
-| `mini-x64` | 通用 amd64，UEFI，128 MB 闪存 | bring-up，QEMU；只有一个产品 `mini-x64.basic`，运行 OpenRC | `mini-x64.basic` |
-
-还没有发布的产品没有镜像可下载，请从源码构建（[构建指南](docs/start/build.md)）。
-
-尚无板卡完成认证：没有任何板卡档案里有注明日期的实机合格行，也没有任何实机启动拥有
-证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/hardware/README.md)是权威且最新的表，并说明每个等级的
-含义；中文的[支持硬件列表](docs/zh/hardware/README.md)按板卡讲同一件事。
+- [板卡状态表](docs/zh/hardware/README.md#当前板卡)是记录板卡状态的唯一位置，并说明每个
+  层级的含义。
+- [下载页](https://micaos.dev/download/)列出有发布的产品。没有发布的产品从源码构建
+  （[构建指南](docs/zh/start/build.md)）。
 
 ## 从这里开始
 
@@ -78,24 +71,9 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 
 ## 包
 
-一份镜像由 Debian 包组合而成。`mica-build` 按固定版本从产出该包的仓库导入每个包，
-只有板卡包由它自己从 `boards/` 与 `common/` 构建。每个 pin 都是产出方的最新发布
-（`bin/mica-tools locks update`）。
-
-| 仓库 | 包 |
-|---|---|
-| `mica-system-base` | `mica-system`（系统策略）、`mica-busybox`（基础 root 的命令集）、`mica-ca-trust`、init 包 `mica-systemd` 与 `mica-openrc`（配 `mica-mdev`）、`mica-ssh`、`mica-tzdata`、Wi-Fi 包 `mica-wifi` 与 `mica-wifi-ap`、`mica-bluetooth`、`mica-systemd-boot`（未签名的引导器，由 `mica-build` 签名；从不装进 root） |
-| `mica-core` | core 组件 `micad`（含 `mica-apid`）与 `mica-apid-ui`，是启动时叠加在 root 上的 verity 镜像；以及软件包 `mica-mqttd`、`mica-mqtt-broker`、`mica-sftp-server`、`mica-deploy`、`mica-lifecycle`（早期启动与关机的可执行文件；从不装进 root） |
-| `mica-build` | 每块板卡的 `mica-board-<board>`，以及 s905x5m 的组件包；内核、U-Boot 与固件作为独立的板卡组件制品发布，不是包 |
-| `mica-podman` | `mica-podman`（Podman 容器引擎及其监管进程 `mica-containerd`） |
-
-Debian 包来自 `mica-system-base` 的发布，每份发布带一个 `mica-system-base.lock` 及其
-`SHA256SUMS`。消费方原样提交这份 lock 为 `locks/mica-system-base.lock`，连同它的 pin
-`locks/pins/mica-system-base.pin`（[release lock](docs/reference/release-lock.md)），并遵循
-mica-system-base README 中 *Consuming a release* 的规则。
-
-开发镜像与生产镜像之间没有 image profile 包，二者的区别是签名内核命令行参数
-`mica.profile=dev|prod`（[决策](docs/decisions/2026-09-14-no-image-profile-packages.md)）。
+一份镜像由 Debian 包和 core 组件组合而成。`mica-build` 按产出方的最新发布固定版本，从产出
+它的仓库取用每一个，板卡包则由它自己构建。每个仓库产出什么、消费方如何取用一次发布，写在
+该仓库的 README 里；lock 与 pin 的规则是 `mica-build-tools:docs/spec/release-lock.md`。
 
 ## 项目怎么运转
 

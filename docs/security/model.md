@@ -10,15 +10,13 @@
 
 ## 0. How to read the status markers
 
-The discipline is `docs/reference/access.md`: a security control that exists
+A security control that exists
 only as prose has no mechanism that will ever notice it is absent, so every
 mechanism below carries one of:
 
 - **[implemented]** — code exists and is named, by path.
 - **[partial]** — some of it exists; what is missing is named.
-- **[proposed]** — no code at all; prose only. It is this document's
-  equivalent of access.md's `[not implemented]`, chosen because most entries
-  here are boundaries a later plan must build, not gaps in shipped features.
+- **[proposed]** — no code at all; prose only.
 
 ## 1. Physical-access boundary
 

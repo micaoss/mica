@@ -1,8 +1,7 @@
 # Design: Remote Management & API Surface
 
-> Who reaches the device, over what, with which trust. Status markers follow
-> `docs/reference/access.md` section 0: **[implemented]** means code exists and is
-> named by path; **[not implemented]** means prose only.
+> Who reaches the device, over what, with which trust. **[implemented]** means
+> code exists and is named by path; **[not implemented]** means prose only.
 
 ## 1. What reaches the device today — **[implemented]**
 
@@ -34,8 +33,7 @@ actions. Its generated contract is `mica-core:crates/mica-apid/openapi.json`.
 apid never spawns a process and never talks to systemd itself.
 
 **SSH and the console are access channels, not management channels**, and
-both are closed by default: SSH is off on both image profiles, the tty3 shell
-has no reconciler, and the serial console has no account that accepts a
+both are closed by default: SSH is off, and the serial console has no account that accepts a
 credential (`docs/reference/access.md`).
 
 **No device-initiated management channel or fleet plane ships.** Nothing dials

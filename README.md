@@ -42,28 +42,18 @@ device), a cloud or server OS, or a fleet management service.
 
 ## Project status
 
-Mica OS is under active development. Every board below is a release target:
-each of its products (`<board>.<variant>`: `basic`, the default, and `full`,
-which adds the container engine) is built, signed and published as a release
-of its own — which says nothing about whether the board boots on hardware.
+Mica OS is under active development. Its boards are at the bring-up tier:
+the generic systems `uefi-x64`, `uefi-arm64` and `mini-x64`, and the hardware
+boards `cx3576` and `s905x5m`. Each board's products are built,
+signed and released on their own, as `<board>.<variant>`, which says nothing
+about whether the board boots on hardware: **no board is qualified**, and no
+board page carries a dated physical qualification row.
 
-| Board | Hardware | Status (2026-10-01) | Released products |
-|---|---|---|---|
-| `uefi-x64` | generic amd64, UEFI | bring-up, QEMU baseline; booted in a release run | none yet |
-| `uefi-arm64` | generic arm64, UEFI | bring-up, QEMU reference; built and verified, not booted automatically | none yet |
-| `cx3576` | Rockchip RK3576 | bring-up; started by nothing automatic — no suite boots a FIT image | `cx3576.full` |
-| `s905x5m` | Amlogic S7D (BM201) | bring-up; started by nothing automatic, and no supported way to install onto a blank board | none yet |
-| `mini-x64` | generic amd64, UEFI, 128 MB of flash | bring-up, QEMU; one product, `mini-x64.basic`, on OpenRC | `mini-x64.basic` |
-
-A product with no release yet has no image to download; build it from source
-([build guide](docs/start/build.md)).
-
-No board is qualified: no board page carries a dated physical qualification row,
-and no physical boot has an evidence row — a `cx3576` bench boot was reported
-on 2026-09-20 with no artefact, which moves nothing. The
-[support tiers](docs/hardware/README.md) page is the authoritative,
-up-to-date table and explains what each tier means; the Chinese
-[hardware list](docs/zh/hardware/README.md) covers the same ground per board.
+- The [board status table](docs/hardware/README.md#current-boards) is the one
+  place a board's state is recorded, with what each tier means.
+- The [download page](https://micaos.dev/download/) lists the products that
+  have a release. A product without one is built from source
+  ([build guide](docs/start/build.md)).
 
 ## Get started
 
@@ -83,7 +73,7 @@ up-to-date table and explains what each tier means; the Chinese
 |---|---|
 | **`mica`** (this one) | the product documentation: architecture, user and integrator guides, supported hardware, the product's design contracts and product decisions |
 | `mica-build` | the boards (BSPs, kernels, board packages) and the image assembly: composes, signs, verifies and tests a product image |
-| `mica-core` | the management plane (`micad`, `mica-apid`, the dashboard) and the on-device deployment client |
+| `mica-core` | the management plane (`micad`, `mica-apid`, the web console) and the on-device deployment client |
 | `mica-system-base` | the board-independent base system: the pinned Debian packages, the system policy, the floor root and the two inits |
 | `mica-podman` | the container engine package |
 | `mica-build-env` | the build environment images every repository builds in |
@@ -95,30 +85,11 @@ that produces it. Documents here cite code in the other repositories as
 
 ## Packages
 
-An image is composed from Debian packages. `mica-build` imports each one,
-pinned, from the repository that produces it, except the board packages, which
-it builds from its own `boards/` and `common/`. Every pin is its producer's
-latest release (`bin/mica-tools locks update`).
-
-| Repository | Packages |
-|---|---|
-| `mica-system-base` | `mica-system` (the system policy), `mica-busybox` (the floor's command set), `mica-ca-trust`, the inits `mica-systemd` and `mica-openrc` with `mica-mdev`, `mica-ssh`, `mica-tzdata`, the Wi-Fi packages `mica-wifi` and `mica-wifi-ap`, `mica-bluetooth`, `mica-systemd-boot` (the unsigned boot loader, signed by `mica-build`; never installed into a root) |
-| `mica-core` | the core components `micad` (with `mica-apid`) and `mica-apid-ui`, verity images composed over the root at boot; the packages `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy` and `mica-lifecycle` (the early-boot and shutdown executable; never installed into a root) |
-| `mica-build` | `mica-board-<board>` for each board, and s905x5m's component packages; kernels, U-Boot and firmware are published as separate board component artifacts, not packages |
-| `mica-podman` | `mica-podman` (the Podman container engine and `mica-containerd`, its supervisor) |
-
-Debian packages come from `mica-system-base` releases, which carry one
-`mica-system-base.lock` and its `SHA256SUMS`: the floor root and the pools by
-digest, the Base's own packages, the upstream Debian packages boards and
-products install on top (the init a product picks, Podman, the radios, one
-board) with the roots they are pinned for, and the one Debian archive any other package is
-resolved from. Consumers commit the lock unchanged as
-`locks/mica-system-base.lock` with its pin `locks/pins/mica-system-base.pin`
-([release lock](docs/reference/release-lock.md)) and follow the rules in the
-mica-system-base README, *Consuming a release*.
-There are no image profile packages: development and production images
-differ by the signed kernel command line parameter `mica.profile=dev|prod`
-([decision](docs/decisions/2026-09-14-no-image-profile-packages.md)).
+An image is composed from Debian packages and core components. `mica-build`
+takes each one, pinned at its producer's latest release, from the repository
+that produces it, and builds the board packages itself. What each repository
+produces, and how a consumer takes a release, is in that repository's README;
+the lock and pin rules are `mica-build-tools:docs/spec/release-lock.md`.
 
 ## How the project works
 

@@ -42,28 +42,13 @@ board on this page may be labelled mica-qualified until one exists.
 
 ### Boards
 
-Each row names the board, its architecture, its support level and its evidence
-board page. The board page — not this page — is where the claim lives; this table
-regenerates from the board pages per the [content contract](contract.md).
+Each row names the board, its architecture, its support level and its board
+page. The board page, not the site, is where the claim lives: the site renders
+the [board status table](../hardware/README.md#current-boards) and links each
+row to that board's page. No board is presented as mica-qualified, because no
+board page carries a dated physical qualification row.
 
-| Board | Architecture | Level | Board page |
-|-------|--------------|-------|------------------|
-| CX3576-Z (Rockchip RK3576) | arm64 | bring-up | [cx3576](../hardware/cx3576.md) |
-| Generic UEFI x86_64 | x86_64 | bring-up (QEMU/CI baseline) | `boards/uefi-x64/board.env` |
-
-The CX3576-Z has a full in-repository BSP — vendor kernel tree with recorded
-provenance, mainline U-Boot, Wi-Fi and Bluetooth — and is the board the
-U-Boot A/B boot-order handshake is built for. The uefi-x64 board is the QEMU and
-CI baseline: firmware boots it, so it has no BSP build.
-
-> status: shipped — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/cx3576/README.md`
-> status: shipped — evidence: `mica-build:boards/uefi-x64/board.env`
-
-Neither board carries a completed field-reliability qualification matrix — the
-cx3576 board page holds the matrix with every row at `not tested`, and the
-uefi-x64 baseline has no board page at all — so neither is presented as mica-qualified.
-
-> status: board-dependent — evidence: `docs/hardware/cx3576.md`
+> status: board-dependent — evidence: `docs/hardware/README.md`
 
 ### Bringing your own board
 
