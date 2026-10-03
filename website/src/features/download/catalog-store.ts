@@ -2,16 +2,15 @@ import type { Download } from './catalog'
 import { downloadsFromRes } from './res-catalog'
 
 /**
- * What the site stores for the download pages, and what publishing it means.
+ * What the Worker answers for the download pages.
  *
- * The catalogue is read from the update documents the resource service builds from the
- * releases posted to it, in CI, and written into KV from there; the Worker
- * only reads that key.
+ * The catalogue is read from the update documents the resource service builds
+ * from the releases posted to it, on request, and held in the edge cache.
  */
 
 export interface StoredCatalogue {
   downloads: Download[]
-  /** When this copy was built. */
+  /** When this copy was read. */
   refreshedAt: string
   /** Where it was read from. */
   source?: string
@@ -19,7 +18,7 @@ export interface StoredCatalogue {
 
 export interface RefreshStatus {
   lastAttemptAt?: string
-  /** What built the stored copy. */
+  /** What read the copy: `request`. */
   trigger?: string
   lastSuccessAt?: string
   /** Why the last attempt failed; null once one succeeds again. */
@@ -28,7 +27,7 @@ export interface RefreshStatus {
 
 /**
  * Releases that parse to nothing mean the shape moved under the parser, not
- * that everything was unpublished, so they are refused rather than published:
+ * that everything was unpublished, so they are refused rather than served:
  * an empty catalogue would blank every board page. No releases at all is an
  * honest empty catalogue: the manifest names no product.
  */

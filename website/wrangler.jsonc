@@ -7,12 +7,9 @@
   "assets": {
     "directory": "./dist"
   },
-  // The parsed catalogue lives in KV; the read path never calls GitHub.
-  "kv_namespaces": [
-    { "binding": "KV", "id": "c55809c8a72a4d1b9ac52c2484cc9c29" }
-  ],
-  // No cron: the catalogue is built and written by CI, which can read GitHub
-  // reliably. See website/README.md, "Where the rows come from".
+  // No binding and no cron: the Worker reads the resource service on request and
+  // holds the answer in the edge cache. See website/README.md, "Where the rows
+  // come from".
 
   // Both hostnames resolve to this Worker; the zone has to be on the same
   // Cloudflare account.

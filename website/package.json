@@ -21,8 +21,7 @@
     "docs:prepare": "bun run scripts/prepare-docs.ts",
     "dev:stop": "astro dev stop",
     "dev:logs": "astro dev logs --follow",
-    "check:catalog": "bun run scripts/check-catalog.ts",
-    "publish:catalog": "bun run scripts/publish-catalog.ts"
+    "check:catalog": "bun run scripts/check-catalog.ts"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.1",

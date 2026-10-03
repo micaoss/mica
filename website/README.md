@@ -58,7 +58,7 @@ mica-build ──posts each release──> the resource service (res.micaos.dev)
     <root>v2/manifest.json            every product and its latest release
     <root>v2/<product>/releases.json  that product's releases, newest first
     <release directory>/index.json    one release: its files, sizes and hashes
-        ──(CI: on push, hourly, on demand)──> KV ──> GET /api/catalog
+        ──(the Worker, on request; cached ten minutes)──> GET /api/catalog
 ```
 
 Every release is posted to the resource service as it is published
@@ -68,38 +68,36 @@ a file name (`src/features/download/res-catalog.ts`). A release's variant (`basi
 the page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which
 archive it is.
 
-**The catalogue is built in CI, not in the Worker.** The website workflow's `catalog` job
-reads the documents (`scripts/publish-catalog.ts`) and writes the result into KV with
-`wrangler kv key put`; the Worker only reads that key.
+**The Worker reads the documents on request.** `GET /api/catalog` reads them
+(`worker/index.ts`), parses them and holds the answer in the edge cache for ten minutes, so a
+release shows on the site within that window and nothing has to run for it. No CI job, no
+KV namespace and no clock are involved.
 
-A manifest that names no product is published as an **empty** catalogue: every board page
-then says nothing is published yet. A document that does not answer fails the job — an
-address that moved must never read as "nothing published", which is what happened on
-2026-10-02 when the documents moved and the site went on publishing an empty catalogue in
-green. A publish is also refused when releases exist and none of them parses.
-
-To refresh on demand, run the workflow: `gh workflow run website --repo micaoss/mica`.
+A manifest that names no product is an **empty** catalogue: every board page then says
+nothing is published yet. A document that does not answer is a failure, never "nothing
+published": the Worker answers the last catalogue that parsed, kept in the cache for a week,
+and asks again a minute later. Releases that exist and parse to nothing are a failure too.
 
 ### When the catalogue goes stale
 
-`GET /api/catalog` answers a `status` beside the rows — when the publish ran, what triggered
-it, when one last succeeded — so a stale catalogue says so rather than looking current.
+`GET /api/catalog` answers a `status` beside the rows — when the documents were last read,
+when a read last succeeded, and the error of the last one that failed — so a stale catalogue
+says so rather than looking current. A product published for a board the site has no page
+for is served, and named in that error.
 
 ### Checking the live catalogue
 
 `bun run check:catalog` reads what res serves and fails if a published product parses to no
-downloads, or if a product is published for a board the site has no page for. The `catalog`
-job runs it before every publish. The logic is `src/features/download/catalog-check.ts`,
-unit-tested; the script is the fetch around it.
+downloads, or if a product is published for a board the site has no page for. It is the
+same check the Worker reports in `status`, run by hand. The logic is
+`src/features/download/catalog-check.ts`, unit-tested; the script is the fetch around it.
 
 ### Setting it up
 
-The KV namespace is bound in `wrangler.jsonc` and CI publishes into it with the
-`CLOUDFLARE_API_TOKEN` the deploy already uses; that token needs **Workers KV Storage: Edit**
-as well as Workers Scripts: Edit. No GitHub token is involved.
-
-`CATALOG_ROOT` selects the update root the documents are read from, defaulting to
-`https://res.micaos.dev/update/`. Setting `CATALOG_DEMO=1` in `vars` puts the sample back in place of KV.
+Nothing beyond the deploy: the Worker needs no binding and no token. `CATALOG_ROOT` in
+`vars` selects the update root the documents are read from, defaulting to
+`https://res.micaos.dev/update/`. Setting `CATALOG_DEMO=1` puts the sample in place of the
+live catalogue.
 
 ### The sample
 

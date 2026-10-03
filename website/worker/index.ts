@@ -1,82 +1,147 @@
 import type { RefreshStatus, StoredCatalogue } from '../src/features/download/catalog-store'
+import boards from '../boards.json'
+import { checkCatalog } from '../src/features/download/catalog-check'
+import { storedCatalogue } from '../src/features/download/catalog-store'
+import { readCatalogue, RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
 
 /**
  * The site is static; this Worker exists for one route.
  *
- * `GET /api/catalog` answers what CI stored in KV and talks to nothing else.
- * The Worker used to refresh the catalogue itself, on a cron: that failed
- * continuously against GitHub — 403 from the API and 429 from the release
- * download — because Cloudflare's egress addresses are shared and heavily used
- * against GitHub, and neither an anonymous allowance nor a redirect around the
- * API survives that. The catalogue is built on a CI runner and written here
- * (`scripts/publish-catalog.ts`, the website workflow's `index` job).
+ * `GET /api/catalog` reads the update documents the resource service serves
+ * (the manifest, each product's history, each release's document), parses them
+ * into the download rows and answers them. The answer is held in the edge
+ * cache for ten minutes, so a release shows on the site within that window
+ * with nothing to run. A copy of the last answer that parsed is kept beside
+ * it, and is what a failing resource service is answered from.
  */
 
 export interface Env {
-  /** Holds the catalogue and the status of the job that wrote it. */
-  KV: KVNamespace
-  /** `1` answers a labelled sample instead of reading KV. */
+  /** `1` answers a labelled sample instead of reading the resource service. */
   CATALOG_DEMO?: string
+  /** The update root the documents are read from. */
+  CATALOG_ROOT?: string
 }
 
+/** The two calls made on the edge cache. */
+export interface CatalogueCache {
+  match: (key: string) => Promise<Response | undefined>
+  put: (key: string, response: Response) => Promise<void>
+}
+
+export interface Deps {
+  read: typeof readCatalogue
+  cache: CatalogueCache
+}
+
+interface Context {
+  waitUntil: (promise: Promise<unknown>) => void
+}
+
+type Answer = Omit<StoredCatalogue, 'refreshedAt'> & { refreshedAt: string | null, status: RefreshStatus }
+
 const CATALOG_PATH = '/api/catalog'
-const KEY = 'catalog'
-/** Written beside the catalogue, so a stale copy can say what happened. */
-const STATUS_KEY = 'catalog-status'
-/** Long enough to stay cheap, short enough that a publish surfaces quickly. */
-const CACHE_SECONDS = 300
+/** How long an answer read from the resource service is served. */
+const FRESH_SECONDS = 600
+/** How long a failure is served before the resource service is asked again. */
+const FAILURE_SECONDS = 60
+/** How long the last answer that parsed stays available as the fallback. */
+const LAST_GOOD_SECONDS = 7 * 24 * 60 * 60
+const SITE_BOARDS = boards.boards.map(row => row.board)
 
 /**
  * A sample, and labelled as one everywhere it surfaces. Nothing here is a
  * release; it exists so the filters and the history control can be seen working
- * where no catalogue is stored. Every row needs its own href: the table keys on
+ * where nothing is published. Every row needs its own href: the table keys on
  * it, and rows sharing one would reproduce the stale-list bug the key fixed.
  */
 const SAMPLE: StoredCatalogue['downloads'] = [
-  { board: 'uefi-x64', profile: 'dev', kind: 'image', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev', releasedAt: '2026-09-16', bytes: 82_000_000, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/user/download/#image', filename: 'mica-uefi-x64-dev-20260916-0845.img.gz' },
-  { board: 'uefi-x64', profile: 'dev', kind: 'update', variant: 'full', version: '20260916-0845', deploymentId: 'sample-uefi-x64-dev', releasedAt: '2026-09-16', bytes: 81_000_000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/user/download/#full', filename: 'mica-uefi-x64-dev-20260916-0845.micaupd' },
-  { board: 'cx3576', profile: 'prod', kind: 'image', version: '20260916-0847', deploymentId: 'sample-cx3576-prod', releasedAt: '2026-09-16', bytes: 86_000_000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/user/download/#cx-image', filename: 'mica-cx3576-prod-20260916-0847.img.gz' },
+  { board: 'uefi-x64', profile: 'basic', kind: 'image', version: '20260916-0845', deploymentId: 'sample-uefi-x64-basic', releasedAt: '2026-09-16', bytes: 82_000_000, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/start/download/#image', filename: 'mica-uefi-x64.basic-20260916-0845.img.gz' },
+  { board: 'uefi-x64', profile: 'basic', kind: 'update', variant: 'full', version: '20260916-0845', deploymentId: 'sample-uefi-x64-basic', releasedAt: '2026-09-16', bytes: 81_000_000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/start/download/#full', filename: 'mica-uefi-x64.basic-20260916-0845.micaupd' },
+  { board: 'cx3576', profile: 'full', kind: 'image', version: '20260916-0847', deploymentId: 'sample-cx3576-full', releasedAt: '2026-09-16', bytes: 86_000_000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/start/download/#cx-image', filename: 'mica-cx3576.full-20260916-0847.img.gz' },
 ]
 
 function json(body: unknown, seconds: number): Response {
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      // The browser holds it briefly; the edge holds it for the window a publish
-      // takes to matter. Without `cdn-cache-control` the zone's default browser
-      // TTL applies and a change takes hours to surface.
-      'cache-control': 'public, max-age=60',
-      'cdn-cache-control': `public, max-age=${seconds}`,
+      'cache-control': `public, max-age=${seconds}`,
     },
   })
 }
 
-async function catalogue(env: Env): Promise<Response> {
+/** What a browser gets: the body, held for a minute whatever the edge holds. */
+function reply(body: unknown): Response {
+  return json(body, 60)
+}
+
+/** Reads the resource service; a board the site has no page for is named in the status. */
+async function fromRes(root: string, read: Deps['read'], now: string): Promise<Answer> {
+  const { manifest, releases } = await read(root)
+  const catalogue = storedCatalogue(releases, `${root}v2/manifest.json`, now)
+  const problems = checkCatalog(manifest, releases, SITE_BOARDS)
+
+  return {
+    ...catalogue,
+    status: {
+      lastAttemptAt: now,
+      trigger: 'request',
+      lastSuccessAt: now,
+      lastError: problems.length > 0 ? { at: now, message: problems.join('; ') } : null,
+    },
+  }
+}
+
+async function catalogue(origin: string, env: Env, ctx: Context, { read, cache }: Deps): Promise<Response> {
   if (env.CATALOG_DEMO === '1')
-    return json({ downloads: SAMPLE, sample: true, refreshedAt: null }, CACHE_SECONDS)
+    return reply({ downloads: SAMPLE, sample: true, refreshedAt: null })
 
-  const [stored, status] = await Promise.all([
-    env.KV.get<StoredCatalogue>(KEY, 'json'),
-    env.KV.get<RefreshStatus>(STATUS_KEY, 'json'),
-  ])
+  // The page asks with its build id in the query; the cached answer is one.
+  const fresh = `${origin}${CATALOG_PATH}/fresh`
+  const lastGood = `${origin}${CATALOG_PATH}/last-good`
 
-  // Nothing stored yet means CI has not published since the namespace was made.
-  // The page shows its empty state, and the status says whether a publish tried.
-  if (!stored)
-    return json({ downloads: [], refreshedAt: null, status }, 60)
+  const held = await cache.match(fresh)
+  if (held)
+    return reply(await held.json())
 
-  return json({ ...stored, status }, CACHE_SECONDS)
+  const now = new Date().toISOString()
+  try {
+    const answer = await fromRes(env.CATALOG_ROOT ?? RES_UPDATE_ROOT, read, now)
+    ctx.waitUntil(Promise.all([
+      cache.put(fresh, json(answer, FRESH_SECONDS)),
+      cache.put(lastGood, json(answer, LAST_GOOD_SECONDS)),
+    ]))
+    return reply(answer)
+  }
+  catch (error) {
+    // A document that does not answer must not read as "nothing published":
+    // the last answer that parsed is served, and the status says what failed.
+    const lastError = { at: now, message: (error as Error).message }
+    const last = await cache.match(lastGood)
+    const previous = last ? await last.json() as Answer : null
+    const answer: Answer = previous
+      ? { ...previous, status: { ...previous.status, lastAttemptAt: now, lastError } }
+      : { downloads: [], refreshedAt: null, status: { lastAttemptAt: now, trigger: 'request', lastError } }
+
+    ctx.waitUntil(cache.put(fresh, json(answer, FAILURE_SECONDS)))
+    return reply(answer)
+  }
+}
+
+export async function handle(request: Request, env: Env, ctx: Context, deps: Deps): Promise<Response> {
+  const url = new URL(request.url)
+
+  if (url.pathname !== CATALOG_PATH)
+    return new Response('not found', { status: 404 })
+  if (request.method !== 'GET')
+    return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } })
+
+  return catalogue(url.origin, env, ctx, deps)
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url)
-
-    if (url.pathname !== CATALOG_PATH)
-      return new Response('not found', { status: 404 })
-    if (request.method !== 'GET')
-      return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } })
-
-    return catalogue(env)
+  fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    // The DOM's CacheStorage type has no `default`; the Workers runtime does.
+    const cache = (caches as unknown as { default: CatalogueCache }).default
+    return handle(request, env, ctx, { read: readCatalogue, cache })
   },
 }
