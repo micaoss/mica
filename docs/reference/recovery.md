@@ -40,7 +40,7 @@ documents not represented as modeled settings. Application reset removes unit
 enrollments together with their payloads. Configuration and full-factory reset
 mark provisioning pending so the normal initializer reestablishes defaults from
 the preserved device identity; there is no image profile to read
-(`docs/reference/access.md` §5.3).
+(`docs/reference/access.md` section 8).
 
 ### 2.2 Intent, execution and interruption
 

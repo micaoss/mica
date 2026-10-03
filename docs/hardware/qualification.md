@@ -78,7 +78,7 @@ without the hardware; nothing else may be dropped.
 section 1's combination; an installation is additionally exercised at one
 of the two images (`dev` or `prod`), because the image being written is one
 or the other; there is no profile package, and the two differ by the signed kernel
-command line parameter `mica.profile` (`docs/reference/access.md` §5.3). The evidence note names the profile, and a board
+command line parameter `mica.profile` (`docs/reference/access.md` section 8). The evidence note names the profile, and a board
 claiming both runs the row twice or says which one is unproven. The row also
 covers any offline provisioning document the procedure places on the medium:
 "first boot" means the unit came up in the state the procedure claims, not

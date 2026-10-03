@@ -117,7 +117,7 @@ current product only; history is in Git.
   - `api.md` — management API: ownership, authentication, tasks and isolated UI hosting
   - `boot.md` — U-Boot signed FIT selection, redundant native records and health confirmation
   - `diagnostics.md` — system information, observed network state, board telemetry and the bounded redacted support snapshot
-  - `management.md` — management plane: D-Bus contract, settings documents, reconcilers and bus surface
+  - `management.md` — management plane: what is fixed about micad and the API, and where each edge is specified
   - `manufacturing.md` — factory inputs, per-device result records, quarantine, RMA without identity cloning, debug and fuse policy
   - `recovery.md` — reset tiers, interrupted retry, credential and presence gates, shared-store recovery limits
   - `release-lock.md` — a pointer to the release lock's specification in `mica-build-tools`

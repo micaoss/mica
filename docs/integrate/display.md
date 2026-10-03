@@ -127,7 +127,7 @@ provide:
   compromise of the browser yields the same position as an unauthenticated
   LAN client of apid.
 - Physical HDMI/USB access already implies the physical-access tier of the
-  threat model (access.md §2 rescue/factory rows); kiosk does not weaken it.
+  threat model (access.md section 2 rescue/factory rows); kiosk does not weaken it.
 
 ## 7. Phasing
 

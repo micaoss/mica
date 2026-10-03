@@ -1,7 +1,7 @@
 # Design: Configuration Without a Network (Provisioning Model)
 
 > How the appliance obtains and changes its machine configuration when no
-> network can be assumed. Approved 2026-08-17. Companion to access.md §7 and
+> network can be assumed. Approved 2026-08-17. Companion to access.md section 3 and
 > wifi.md.
 >
 
@@ -26,7 +26,7 @@ on DATA/state, plus the two secret files described in §3:
 - **`provisioning.deviceId`** — 16 CSPRNG bytes as 32 lowercase hex characters;
 - **`access.device.passwordHash`** and `generation = 1`;
 - **`access.ssh.enabled`** seeded `false` on every image; there is no image
-  profile to read (access.md §5.3);
+  profile to read (access.md section 8);
 - **`provisioning.state = "complete"`**, `seededGeneration = 1`;
 - `network` **left empty**, and `wifi` left at its schema defaults.
 
@@ -105,7 +105,7 @@ are separate and predate this work: `mica-seed-state` generates them into
 
 ## 3. The credential model — stated once, here
 
-Three documents touch this (`access.md` §4, `wifi.md` §7, `ro-root.md` §4) and
+Three documents touch this (`access.md` section 5, `wifi.md` §7, `ro-root.md` §4) and
 all of them defer to this section. It is subtle in three places and each one has
 been "simplified" wrongly at least once already.
 
@@ -215,7 +215,7 @@ once), and the AP PSK has to be re-rendered into `hostapd.conf` verbatim on
 every boot.
 
 DATA/state is unencrypted flash. That is a smaller concession than it first looks,
-because access.md §7 already establishes the boundary: **physical possession of
+because access.md section 3 already establishes the boundary: **physical possession of
 the boot medium implies full control** — the preferred provisioning path is
 literally "edit a file on the SD card with any reader", and anyone holding the
 card can rewrite the rootfs regardless. A plaintext on DATA/state does not weaken a
@@ -264,7 +264,7 @@ caller outside its own tests.
 Both halves — the Argon2id hash in `access.device.passwordHash` and the
 plaintext at `/var/lib/mica/secrets/device-password` — are still minted at first
 boot and still persisted. **They are inert, and reserved** for a later
-support-side credential or the phase-2 PIN of `access.md` §4.3.
+support-side credential or the phase-2 PIN of `access.md` section 8.
 
 Recorded so the next reader finds a decision rather than an oversight, and so
 that "the device has a password" is not mistaken for "the device accepts a
@@ -273,7 +273,7 @@ password".
 ## 4. Layer 2 — local configuration channels
 
 All channels ultimately write settings through **the micad bus** — one trust
-path, ordered by preference (details in access.md §7):
+path, ordered by preference (details in access.md section 3):
 
 1. BOOT-partition provisioning file (offline pre-seed at factory or field);
 2. USB signed config drop (udev-triggered, vendor-key verified);
@@ -288,7 +288,7 @@ channel **5** does not exist.
 
 The invariant across all five: every channel converges on one validated write
 path — micad's D-Bus surface (`com.mica.micad1`) — and none of them edits a file
-behind the daemon's back. That is what `docs/reference/management.md` §1 describes. §4.1
+behind the daemon's back. That is what `mica-core:docs/mica-core.md` section 3 describes. §4.1
 holds that line from the inside rather than over the bus: it is micad itself
 reading the file, and every value it writes goes through the same typed settings
 tree and the same validators an API write goes through.
@@ -300,7 +300,7 @@ Wi-Fi networks, the ssh switch, the broker policy, the time settings and the
 update policy — lives in `/mica/config/` on DATA, **so that an integrator can
 flash a device, write the configuration onto it, and have it work with no
 provisioning ceremony between the two**. That is the *pour*, and it is the
-motivating case for the whole namespace. `docs/reference/management.md` §2.1a is the
+motivating case for the whole namespace. `mica-core:docs/mica-core.md` section 3.3 is the
 rule list; what belongs here is where it sits relative to the five channels
 above.
 
@@ -337,7 +337,7 @@ documents written into `/mica/config/` before micad exists are validated on the
 next boot exactly as micad validates its own output, and the addressed tree
 comes back carrying them. A document that does **not** parse refuses its own
 subsystem, names the file, and costs nothing else —
-`docs/reference/management.md` §2.1a is the rule and the per-document cover behind it.
+`mica-core:docs/mica-core.md` section 3.3 is the rule and the per-document cover behind it.
 
 **That last part is a change to previously shipped behaviour and is worth
 saying plainly.** Before F6g, a parse error in *any* document aborted the
@@ -537,7 +537,7 @@ on different authority:
   door of a house whose back door is the same partition.
 
 **The authority that bounds the pour is physical custody of the medium** —
-the same authority `docs/reference/access.md` §7 already gives possession of the
+the same authority `docs/reference/access.md` section 3 already gives possession of the
 boot medium and `docs/reference/recovery.md` gives the serial console. It is not
 a weaker bound than §4.1.4's; it is the bound §4.1.4's exists to *substitute
 for* when the device is running and nobody is holding it.
@@ -560,7 +560,7 @@ unreachable on any filesystem.
 | `media` | an attached removable block device — the kernel's own `removable` flag, so the internal eMMC or NVMe this device boots from is never a candidate — its partitions first, then the bare disk | only when `boot` carried nothing |
 
 The ESP medium wins because physical possession of it already implies full
-control of the device (`access.md` §7), so a document written there with any
+control of the device (`access.md` section 3), so a document written there with any
 card reader is the most authoritative one available and a stick left in a
 socket cannot displace it.
 
@@ -610,7 +610,7 @@ renamed and not rewritten. Three reasons, in order of weight:
   has to infer it can infer it wrong, and what they would be wrong about is
   whether a file on a stick is authenticated. Neither transport checks the
   document against any key. Authorisation is physical possession of the medium,
-  and §4.1.4's already-claimed rule is what bounds it. `access.md` §7 used to
+  and §4.1.4's already-claimed rule is what bounds it. `access.md` section 3 used to
   describe channel 2 as a *"signed config drop … vendor-key verified"*; it no
   longer does, and it now names this gap from its own side. A vendor-key check
   needs a trust root the image does not carry for this purpose, and adding one
@@ -672,9 +672,9 @@ fleet-wide credential can reach an artifact.
 - Provisioning channels never bypass config validation or the audit log.
   Validation is enforced — every write goes through the typed settings tree,
   and a rejected write leaves the tree untouched. apid keeps a bounded local audit ring
-  (access.md §6); there is no comprehensive provisioning or access audit trail.
+  (access.md section 4); there is no comprehensive provisioning or access audit trail.
 - Wiping DATA/state resets configuration but never clears DATA/meta lockdown
-  (access.md §5). **DATA/meta lockdown is not implemented**, so this invariant has
+  (access.md section 8). **DATA/meta lockdown is not implemented**, so this invariant has
   nothing to protect yet.
 - Factory reset (wiping DATA/state) returns the device to its unprovisioned state,
   and the next boot re-runs §2 — including minting a **new** device password

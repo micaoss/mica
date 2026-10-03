@@ -5,7 +5,7 @@
 #
 #   bash tools/docs/verify-coverage.sh          (or: make docs-verify)
 #
-# THE RULE (docs/contributing.md section 5, normative): English under
+# THE RULE (docs/contributing.md section 4, normative): English under
 # the gated trees is authoritative, a tracked Chinese set lives
 # under docs/zh/, and
 # docs/zh/README.md carries a per-page coverage table naming, for every page in

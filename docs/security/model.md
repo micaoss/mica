@@ -10,7 +10,7 @@
 
 ## 0. How to read the status markers
 
-The discipline is `docs/reference/access.md` §0's: a security control that exists
+The discipline is `docs/reference/access.md`: a security control that exists
 only as prose has no mechanism that will ever notice it is absent, so every
 mechanism below carries one of:
 
@@ -125,7 +125,7 @@ limit, explicitly:
   settings tree, 0600/0700 file modes asserted by tests, and the redaction
   rules of the management API.
 - A reflash does not erase: blocks beyond the flashed extent remain on the
-  medium, unreferenced (`docs/reference/access.md` §9.2). Disposal or handover
+  medium, unreferenced (`docs/reference/access.md` section 7). Disposal or handover
   of a device requires wiping the medium.
 
 This is consistent with §1's axiom rather than a contradiction of it.

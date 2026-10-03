@@ -31,9 +31,9 @@ and BT are the board layer's.
 
 ## 2. Settings model
 
-Both subtrees live in the micad settings tree (`docs/reference/management.md` §1) and are
+Both subtrees live in the micad settings tree (`mica-core:docs/mica-core.md` section 3) and are
 persisted in `/mica/config/wifi.json` on DATA, at that
-document's own schema version (`docs/reference/management.md` §2.1a). Both Wi-Fi
+document's own schema version (`mica-core:docs/mica-core.md` section 3.3). Both Wi-Fi
 reconcilers share the one document, because `wifiAp` declares the whole `wifi`
 subtree. The document is `0600` inside a `0700` directory: it carries the site's
 WPA2 pre-shared key, and the namespace's charter is that it is credential

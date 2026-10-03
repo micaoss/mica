@@ -1,8 +1,10 @@
-# Releasing Mica OS
+# How releases work
 
-For maintainers. A release is the only way an artifact leaves a repository:
-every consumer pins releases, never a branch. This page says how a release is
-cut, what it carries, and what decides whether a package is rebuilt.
+A release is the only way an artifact leaves a repository: every consumer pins
+releases, never a branch. This page says how a release is cut, what it
+carries, how it reaches the download page and devices, and what decides
+whether a package is rebuilt. Each repository's own procedure is in that
+repository.
 
 ## 1. Cutting a release
 
@@ -89,7 +91,7 @@ Packages are locked by their own declared version
 `mica-build` reuses a `kernel` or `uboot` component whose inputs equal the
 latest release that published it, in CI and at release, and publishes a
 `root` or `kernel` update archive only when the other component's identity is
-unchanged ([update packages](../operate/updates.md)).
+unchanged ([updates](../operate/updates.md)).
 
 > status: shipped — evidence: `mica-build-tools:docs/spec/package-versions.md`, `mica-build:docs/design/image.md`, `docs/decisions/2026-09-15-update-packages.md`
 

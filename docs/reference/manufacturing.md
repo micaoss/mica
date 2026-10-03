@@ -21,7 +21,7 @@ self-provisioning — the device mints its own `deviceId`, hostname and secrets
 on first boot, on the device, never in the image
 (`docs/integrate/provisioning.md` §2–3) **[implemented]** — and the SoC-loader
 whole-disk reflash as the flashing/recovery primitive
-(`docs/reference/access.md` §9.2) **[implemented]**. Everything that makes those
+(`docs/reference/access.md` section 7) **[implemented]**. Everything that makes those
 two into a *factory* — versioned inputs, injection verification, result
 records, quarantine, RMA linkage — is **[proposed]** unless marked
 otherwise. This document exists so that when factory work is built, it is
@@ -147,7 +147,7 @@ hardware. Concretely:
   fresh flash mints a fresh `deviceId` on first boot — the shipped design
   already guarantees this, since identity is CSPRNG-drawn on device and a
   reflash replaces DATA/state outright (`docs/integrate/provisioning.md` §2,
-  `docs/reference/access.md` §9.2). What manufacturing adds is the rule's
+  `docs/reference/access.md` section 7). What manufacturing adds is the rule's
   other half: nobody copies one device's DATA/state identity onto another to
   "preserve" its identity, serial-number continuity is handled in the
   record, not on the flash, and any future factory-injected identity
@@ -173,8 +173,8 @@ credentials and data; the boundary is
 
 | Port | Factory | Field (today, as shipped) |
 |---|---|---|
-| Serial console | open; stations may use it for provisioning witness | present, login prompt only, **no account accepts a credential** (`docs/reference/access.md` §2, §9.1) **[implemented]** |
-| SSH / management | station network, station credentials | off by default on both profiles; key-only persistent access, operator-enrolled (`docs/reference/access.md` §4.1) **[implemented]** |
+| Serial console | open; stations may use it for provisioning witness | present, login prompt only, **no account accepts a credential** (`docs/reference/access.md` section 2, §9.1) **[implemented]** |
+| SSH / management | station network, station credentials | off by default on both profiles; key-only persistent access, operator-enrolled (`docs/reference/access.md` section 5) **[implemented]** |
 | SoC loader / recovery (cx3576: rockusb) | the flashing primitive | open to physical access — this **is** the recovery path and the physical-access boundary; closing it is an I4-class decision (§7) |
 | JTAG/SWD | open on the bench | policy is **per board/revision** and recorded in the board's evidence (`mica-build:boards/README.md`); no Mica OS board today documents or enforces a closed state **[proposed]** |
 

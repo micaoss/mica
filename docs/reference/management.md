@@ -1,369 +1,51 @@
-# Design: micad (management plane)
+# Management plane
 
-`micad` is the single Rust service that owns appliance state: the settings
-documents, device-owned state on DATA/state, reconcilers that apply settings to
-the execution layer (systemd units, networkd, native deployments, Podman), and
-the D-Bus surface that `apid` and future remote channels consume.
+One daemon, `micad`, owns a device's configuration and turns it into running
+services; one API server, `mica-apid`, exposes it to operators and serves the
+web console. Both ship as a core component of the product's deployment, so a
+new management plane reaches a device without a new root. This page states
+what the rest of this documentation relies on; the design, the settings tree,
+the bus interface and every path are `mica-core:docs/mica-core.md`.
 
-## 1. Contract
+## What is fixed
 
-- **IPC is D-Bus through `zbus`.** micad must consume D-Bus anyway (systemd,
-  networkd, wpa_supplicant, BlueZ), so it exposes its own tree as
-  `com.mica.micad` on the system bus instead of running a second IPC stack.
-  `apid` calls micad's methods per request; there is no WebSocket, no long-lived
-  subscription and no generic HTTP-to-D-Bus passthrough. Remote bridges attach
-  at the edge, never in the core.
-- **Settings are a typed Rust tree** (serde), addressed by dot-paths such as
-  `network.eth0.dhcp` or `access.ssh.enabled`.
-- **Persistence is atomic per document** (write temporary file, set mode,
-  fsync, rename, fsync the directory). System configuration lives in
-  `/mica/config/` as one JSON document per reconciler (§2.1a); what the device
-  mints or observes about itself lives in `/var/lib/mica/settings.toml`, a bind
-  of `/mnt/data/state/mica`. Each document carries its own `schema_version`.
-- **Reconcilers** each watch one subtree and own rendering to their executor;
-  status is published onto a separate live-state tree.
+- **One owner of configuration.** Every read and change goes through micad.
+  The API holds no configuration of its own, and no other service writes
+  system configuration.
+- **Settings are one typed tree**, addressed by dot-paths such as
+  `network.eth0.dhcp`. A write is validated against the whole tree, journalled
+  and applied as a task; an unknown key or schema version is refused, never
+  converted.
+- **What an integrator sets lives on DATA** as one JSON document per concern
+  under `/mica/config/` ([configuration](../operate/configuration.md)). What the
+  device mints about itself (identity, credentials, provisioning state) lives
+  in its own state store. A configuration reset clears the first and keeps the
+  second ([recovery](recovery.md)).
+- **A reconciler per concern** converges the system to its subtree and reports
+  the applied state: hostname, network, SSH, Wi-Fi client and access point,
+  containers, MQTT, time, the web listener, Bluetooth.
+- **The product decides what exists.** `/usr/lib/mica/product.conf` in the
+  signed root names the product, its features and its init. A feature the
+  product does not carry has no reconciler, no bus member and no API route; its
+  routes answer 404.
+- **Either init.** A product runs systemd or OpenRC, chosen when its root is
+  composed; micad drives the same services through each. On OpenRC the network
+  reconciler supports DHCP and static addressing only.
+- **Fail closed on the medium.** micad refuses to start when the DATA medium
+  holding `/mica/config` is absent: a device that cannot read its
+  configuration must not render another.
 
-## 2. Current implementation
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad-settings/src/configuration.rs`, `mica-build:boards/products.md`
 
-### 2.1 The settings tree
+## Where the edges are
 
-Addressed by dot-path, and **stored in several documents** — §2.1a is where
-each key lives and why. `Settings::default()` serializes to exactly the tree
-below, which is also what a fresh device holds before first-boot provisioning
-seeds it. It is shown as one document because that is how every reader
-addresses it; it has no `schema_version` line because versions are per
-document (§2.2).
+| Edge | Contract |
+|---|---|
+| Operators and automation | the HTTP API and the console: [API](api.md), [console](../integrate/console.md) |
+| Shell access | [access](access.md) |
+| Updates | micad drives the deployment client and adds the operator's policy: [updates](updates.md) |
+| Applications | containers declared in the settings tree, and native packages: [containers](../integrate/containers.md), [native applications](../integrate/native-applications.md) |
+| Application data | the local bus and MQTT carry application data only, never configuration or credentials: [bus](../integrate/bus.md) |
+| First boot | identity and credentials are minted on the device: [provisioning](../integrate/provisioning.md) |
 
-```toml
-hostname = "mica"
-
-[network]                        # keyed by interface name, individually addressable
-
-[access.ssh]                     # see access.md §3
-enabled = false
-port = 22
-permitRootLogin = true
-passwordAuthentication = true
-listenAddresses = []             # empty = listen on ALL
-authorizedKeys = []              # v4 — array of tables; see access.md §3.1
-
-[access.console]                 # schema only, no reconciler consumes it yet
-shellEnabled = false
-
-[access.device]                  # credential metadata, never the credential
-generation = 0
-
-[provisioning]                   # see provisioning.md §2
-state = "pending"                # pending | complete
-seededGeneration = 0
-
-[wifi.client]                    # see wifi.md §3
-enabled = false
-interface = "wlan0"
-networks = []
-
-[wifi.ap]                        # see wifi.md §4
-mode = "off"                     # off | provisioning | always
-interface = "wlan0"
-channel = 6
-countryCode = "US"
-address = "192.168.4.1/24"
-holdDownSeconds = 120            # deliberately unconsumed — wifi.md §5
-graceSeconds = 60                # deliberately unconsumed — wifi.md §5
-```
-
-`access.webAdmin` is unchanged from v2 — same serialized path, same
-`password_hash` key — because apid already reads and writes it through the bus
-by that exact dot-path. It is absent above only because a fresh tree has no web
-admin yet.
-
-**Optional values are absent, not empty.** `access.device.passwordHash`,
-`provisioning.deviceId`, `wifi.ap.ssid`, `wifi.ap.psk` and a network's `psk` all
-carry `skip_serializing_if = "Option::is_none"`, so an unset secret is a missing
-key rather than an empty string. **No secret has a non-`None` default**, and that
-is load-bearing rather than tidy — see provisioning.md §3.1.
-
-`deny_unknown_fields` is on every struct, so a document carrying a key this
-version does not know fails to load rather than silently dropping it.
-
-### 2.1a `/mica/config/`: where system configuration lives, and the rules a subsystem inherits
-
-**System configuration lives in `/mica/config/` on DATA**, so that an integrator
-can flash a device, pour the configuration in, and have it work with no
-provisioning ceremony between the two. This section is the rule list a
-subsystem author meets.
-
-**Where each key lives.** The boundary is not a judgement, it is the tier-1
-reset partition (`docs/reference/recovery.md` §2.1): *`/mica/config/` holds what an
-integrator sets; the settings store on DATA/state holds what the device mints or
-observes about itself, the credential material derived from it, and the intents
-it is carrying out.* Tier 1 clears what an integrator set, so the set it clears
-**is** the set that lives here — and "is this a document or a settings key?"
-is answered by asking whether tier 1 clears it.
-
-| Document | Settings subtree it carries | Reconciler |
-|---|---|---|
-| `/mica/config/system.json` | `hostname`, `access.console` | hostname |
-| `/mica/config/network.json` | `network` | network |
-| `/mica/config/wifi.json` | `wifi` | wifiAp, wifiClient |
-| `/mica/config/ssh.json` | `access.ssh` | sshd |
-| `/mica/config/mqtt.json` | `mqtt` | mqtt |
-| `/mica/config/time.json` | `time` | time |
-| `/mica/config/container.json` | `container` | container |
-| `/var/lib/mica/settings.toml` | `provisioning`, `access.webAdmin`, `access.device`, `access.claim`, `access.apiTokens`, the staged `reset` intent | — |
-
-The unit is the subtree the apply engine already dispatches on, not the
-subsystem as a reader might name it, so a write's blast radius is one document
-and its apply is one reconciler run. `wifi.json` carries both Wi-Fi reconcilers
-because `wifiAp` declares the whole `wifi` subtree rather than `wifi.ap` — a
-narrowing that was tried, measured to hide a cross-subtree dependency from the
-overlap test, and reverted. Grouping by reconciler keeps that coupling inside
-one atomic write.
-
-**The staged `reset` intent stays on DATA/state and that is not a technicality.**
-Tiers 1 and 3 clear `/mica/config/`; put the record that asks for a reset inside
-it and the tier would clear the thing that tells it to run, halfway through
-running.
-
-**Addressing does not change.** `GET`/`PUT /api/v1/settings/<dot.path>` works
-exactly as before: the dot-path selects the document and then the key inside
-it. The six-entry write allowlist, the shape check behind it, the refusal
-sentence, the redactor, the subtree-overlap dispatch and the task queue all key
-on dot-paths and are untouched. Two consequences that are not free:
-
-- **`access` is split across the boundary**, so `GET /api/v1/settings/access`
-  no longer names one file — it composes the two stores, because the read
-  surface is addressing rather than storage.
-- **`schema_version` is no longer a key of the tree.** There is no tree-wide
-  version left; `GET /api/v1/meta`'s `settingsSchemaVersion` reports the DATA/state
-  document's.
-
-**The rules a later subsystem inherits.**
-
-- **Naming: `/mica/config/<document>.json`, one flat document per reconciler.**
-  A directory per subsystem is rejected: one document means one writer, one
-  atomic rename and one parse-error blast radius, while a directory invites
-  several files with **no transaction across them**, so a subsystem could
-  half-apply a change and have no way to say so. A flat listing of
-  `/mica/config/` is also the namespace's own index. A subsystem that genuinely
-  needs several documents may take a directory, at that stated cost.
-- **JSON.** These are machine-written documents and JSON is what a machine
-  writes without a round-trip formatting problem; a mixed-format namespace
-  means every reader guesses by extension.
-- **Machine-written, never hand-edited.** The writing daemon owns the file's
-  shape. A human edits it through an authenticated API; if a human edits it
-  with `vi`, the next write overwrites them and that is documented behaviour,
-  not a bug. The pour is the one exception and it is bounded: an integrator
-  writes these files onto a device that is **not running**, and micad validates
-  what it finds on the next boot exactly as it validates its own output. A pour
-  onto a running device is not supported, for the reason
-  `docs/integrate/provisioning.md` gives for having no udev trigger — inserting
-  media must not reconfigure a running appliance.
-- **Atomic: temp file, mode set before the rename, fsync, rename, directory
-  fsync.** An interrupted write leaves the previous document intact, never a
-  truncated one.
-- **Fail closed on a parse error, with no fallback — and what is refused is
-  the document's own subsystem, not the daemon.** A document that exists and
-  does not parse is never reverted to a schema default: a parse error is not
-  absence, and treating it as absence configures a device the way nobody
-  chose. *What* the refusal costs stopped being obvious the moment there were
-  two possible answers, so it is stated. The reconcilers that document
-  configures are **skipped**; the live-state tree carries the refusal in their
-  place, and at `configuration.refused` as well, which is the only form that
-  reports a document with no reconciler behind it; and the bytes on disk are
-  left alone, so a later write to an unrelated document does not overwrite
-  them. Every other subsystem runs. **The exact cover is `DOCUMENT_SUBTREES`**
-  (`micad-settings/src/documents.rs`), matched by dot-path *overlap* rather
-  than equality — which is what makes `wifi.json` gate `wifi.client` as well
-  as `wifi`, and a match by equality would have missed it. Before this rule,
-  any document's parse error aborted the load, so a mistyped `wifi.json` took
-  the network reconciler down with it.
-  **Two things still refuse to start**, because they are different rules and
-  not this one applied twice: **an absent document is a default; an absent
-  `/mica/config/` is not** — that is the medium being gone, and micad refuses to
-  start and names the mount (§2.2a) — and the **DATA/state** document, which is not
-  in this namespace, cannot be poured, and carries the device identity and the
-  administrator credential, so degrading it would let first-boot provisioning
-  mint fresh ones over real ones that merely failed to parse.
-- **A refusal an operator can read is not the parser's sentence.** A parser
-  echoes what it choked on: serde prints
-  `invalid type: string "…", expected a boolean` **with the value in it**. So
-  a refusal has two halves and only one of them may leave the device.
-  `message` names the file plus one of three closed classes — did not parse,
-  at a schema version this build has no migration for, could not be read — and
-  quotes nothing; it is what the live-state tree serves. `detail` is the
-  parser's own words and is **journal only**. This is the redactor rule below
-  meeting a field it did not anticipate: the redactor keys on *field names*
-  and has no reason to inspect one called `message`, so a poured `mqtt.json`
-  reading `"enabled": "<site secret>"` would otherwise have published that
-  secret through its own refusal. A subsystem author adding a refusal path
-  inherits the split; this bullet is the reason, so it does not have to be
-  rediscovered.
-- **`0700` on the directory, `0600` on every document, and the namespace is
-  credential material.** `mica-data-layout` establishes the mode;
-  `Store::save` sets each document's mode **before** the rename, so a document
-  is never reachable under its final name at a laxer mode. The failure this
-  prevents is concrete: an unprivileged local process reading
-  `/mica/config/wifi.json` and recovering the site's WPA2 pre-shared key, which
-  is offline-crackable from a captured handshake and is a credential the device
-  was *given* rather than one it minted. A directory an integrator copies onto
-  a device is credential material on the integrator's laptop too, and
-  `docs/integrate/provisioning.md` §4.1.6 already settled what the device owes
-  there: `0700`/`0600` on arrival, no read-back, and no value the document
-  carried copied into any served record — and nothing about the laptop, because
-  claiming that would buy the appearance of erasure.
-- **A secret-bearing key is spelled with a name the redactor already carries,
-  or the change that adds it adds the name.** The redactor
-  (`mica-core:crates/mica-apid/src/redact.rs`) is a denylist of field names and is
-  fail-open by design. The moved schema satisfies the rule with nothing added:
-  its only secret-bearing keys are `wifi.ap.psk` and
-  `wifi.client.networks[].psk`, both spelled `psk`. The rule exists because the
-  alternative is an author who picks `sharedSecret`, ships it, and finds out
-  from a support case.
-- **One version per document, additive bumps, and no migration that moves a key
-  between documents.** §2.2 below is the whole of it.
-- **One writer per document, and it is a daemon.** micad writes; apid holds the
-  authenticated route and **asks**. Two processes never write one document,
-  which no amount of atomic renaming makes safe.
-- **Reset disposition is the directory's.** Tiers 1 and 3 re-seed
-  `/mica/config/`, tier 2 leaves it alone, tier 4 clears it with everything else
-  (`docs/reference/recovery.md` §2.1).
-
-### 2.2 Schema versions, and what a rollback costs
-
-**One version per document, not one for the namespace.**
-A namespace-wide version is refused on a specific failure: a bump would rewrite
-every document, and several atomic renames have **no transaction across them**,
-so a power loss halfway would leave documents at mixed versions — a third
-state, which is exactly what the staged-intent design of `ResetSettings` exists
-to refuse. Per document, each migrates alone under its own rename, so a power
-loss leaves each document either old or new.
-
-Every document starts at **v1**, including the DATA/state remainder: it is a
-document too and is not exempt for being what is left over.
-
-No migration chain exists for older documents. Every schema change follows
-these rules:
-
-- a bump is **additive**, and `skip_serializing_if` keeps a new optional table
-  out of a document that does not use it, so two adjacent versions of one
-  document differ by the version integer alone;
-- every migration has a `down` as well as an `up`, and the `down` states what
-  it discards;
-- the reason for both is **A/B rollback survivability**: the running deployment can go
-  backwards and the configuration on DATA does not, so an older binary must be
-  able to read a newer document;
-- **no migration may move a key from one document to another**, because that is
-  the migration with no transaction. A key that has to move is a new key in the
-  destination and a deprecation in the source — two independent additive bumps,
-  either of which is survivable alone. The same constraint from the other side:
-  do not write a validation rule that spans two documents.
-
-**How a rollback is actually carried.** The costs above are not paid by down-migrations running on the
-device: a rolled-back-to binary cannot carry the down-step a future schema
-needs. What runs instead is the tolerant load. On a document whose
-`schema_version` is newer than this build writes, `Store::load_with_report`
-strips the keys this schema does not know — recursively, by the names serde's
-`deny_unknown_fields` rejections give — and parses the rest; the next save
-persists the stripped document at this build's version. A future schema that
-**reshapes** an existing key defeats stripping, and that document alone falls
-back to its schema default with an `error!`-level report naming it.
-
-**The blast radius of that loss is now one document**, which is the second
-thing the per-document version buys. Before the split, a reshaped key anywhere
-would abandon every setting including the admin credential. A reshaped `wifi.json` costs the Wi-Fi settings
-and leaves the network configuration, the ssh policy and the management
-credential alone. **The loss is still accepted in writing**, priced against the
-crash-loop alternative — refusing the document makes micad exit, and under
-`Restart=on-failure` the rolled-back-to deployment becomes a crash loop that also
-fails its health gate — and it still binds schema authors: prefer additive
-bumps; a reshaping bump forfeits its document's settings on rollback and must
-say so.
-
-### 2.2a Fail closed on the medium
-
-System configuration is on DATA, so **a device whose DATA pool does not mount
-has no configuration** — and it must not render a different one. DATA/state
-and `/mica/config` are namespaces of the same DATA partition, so a DATA fault is
-not an independent failure domain, and apid's
-unit already carries `RequiresMountsFor=/var/lib/mica /mica`. What a DATA fault
-already costs is the management API and the container and update workspaces;
-what the move would additionally cost is the configured network.
-
-The rule: **micad fails closed.** Its unit carries `RequiresMountsFor=/mica`, and
-`Store::load` refuses when `/mica/config/` is not there rather than composing a
-tree out of schema defaults — DHCP on every interface, sshd off — which would
-be unreachable by anyone relying on the static address they configured, while
-looking fine. The refusal names the mount, because that is the fact an operator
-at the serial console needs. The recovery route is
-`docs/reference/recovery.md`'s: the serial console and the reset tiers, not a
-silently degraded network.
-
-Note the asymmetry with the paragraph above it, and it is deliberate: **an
-absent document is a default, an absent namespace is a refusal.** A document
-that was never written is a subsystem that was never configured; a namespace
-that is not there is a medium that did not mount.
-
-The alternative — keeping `network` and `hostname` on DATA/state so a DATA fault
-leaves a device reachable on its configured address — is rejected because it
-re-creates two homes for configuration and makes "which tier does this
-subsystem take" a judgement call rather than a measured boundary. It is
-re-openable, and the thing that would re-open it is evidence that a DATA-only
-fault is a real failure mode on this hardware rather than a theoretical one.
-
-### 2.3 Reconcilers: the contract they answer to
-
-A reconciler owns one subtree and one executor. It renders, compares against what is on
-disk, writes only on a difference, sweeps what it no longer owns, and publishes the applied
-state under its own name on the live-state tree. Two rules bind every one of them:
-
-- **Render to `/run`, enable at runtime scope.** The root is read-only, so a persistent
-  enable would fail with EROFS on a device while passing on a developer's filesystem. The
-  whole tree is reconciled at every start, so a unit returns to its configured state on each
-  boot without a persisted symlink.
-- **Deleting a file is not deleting a device.** A reconciler that creates kernel objects —
-  virtual links are the case that exists — has to tear them down itself; removing the unit
-  file and reloading leaves the device behind.
-
-Which reconcilers exist, what each renders and drives, and the measured detail behind every
-cell are `mica-core`'s to state: [`mica-core:docs/mica-core.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
-§4. The settings a reconciler reads are §2.1 above; the rules its documents inherit are
-§2.1a.
-
-
-### 2.4 Bus surface: the boundary it draws
-
-`com.mica.micad` on the system bus, object `/com/mica/micad`, interface
-`com.mica.micad1`. Structured values cross as JSON strings. The member list and what each
-one does are `mica-core`'s to state:
-[`mica-core:docs/mica-core.md`](https://github.com/micaoss/mica-core/blob/main/docs/design/micad.md)
-§5.
-
-What this document owns is the boundary:
-
-- **Root-only, in both directions.** Non-root callers may neither call the interface nor
-  receive its signals, because `SettingsChanged` carries setting values — password hashes
-  among them. `mica-mqttd` has no exception.
-- **No `com.mica.Item1` façade on micad.** System settings, live state and actions stay on
-  the management interface and never become MQTT application data. The bridge gets its
-  already-provisioned topic identity as a one-purpose `/run` file, not as bus access
-  ([bus](../integrate/bus.md)).
-- **apid is a client, not a second authority.** It does not spawn processes, does not talk
-  to systemd and does not touch `/sbin/reboot`; every system action it offers is a call on
-  this interface, and it answers the operator only after micad has admitted the action.
-- **A power action is recorded before it is executed.** The caller and the action are
-  logged and written to live state *before* the call into systemd, because after the call
-  there may be no system left to log on. A power action is not a reconciler: it has no
-  subtree, nothing to converge, and it leaves the settings documents untouched.
-- **Secrets never round-trip through settings.** A transient root password and a WireGuard
-  private key are bus operations precisely because anything in the settings tree would be
-  persisted and served back out of it.
-
-
-### 2.5 Verification status
-
-Rust workspace checks cover the settings store, reconcilers and bus surface.
-Complete-image tests on uefi-x64 and uefi-arm64 cover the native deployment service,
-component updates, quota enforcement, health confirmation and fallback, and
-the API suite runs against the QEMU guest. Physical-board acceptance is tracked
-per board in [support tiers](../hardware/README.md#current-boards).
+> status: shipped — evidence: `mica-core:docs/mica-core.md`

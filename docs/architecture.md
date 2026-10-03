@@ -76,7 +76,7 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
   A removed virtual entry is torn down, not just unlinked, and a WireGuard
   tunnel's private key is drawn on the device into a `networkd-secrets/`
   directory beside the settings file, never into the settings tree
-  (`docs/reference/management.md` §2.3a).
+  (`mica-core:docs/mica-core.md` section 3.4).
 - **`mica-mqttd`** dynamically publishes only exact package-enrolled
   `com.mica.<class>[.<suffix>]` application item trees and, in full mode,
   applies writes to the exact application service. It has zero D-Bus access to
@@ -149,9 +149,9 @@ off. There is no image profile package or profile file
 (`docs/decisions/2026-09-14-no-image-profile-packages.md`): development and
 production images differ by the kernel command line parameter
 `mica.profile=dev|prod`, carried only in signed boot configuration; no
-difference is implemented yet (`docs/reference/access.md` §5.3). The one-way
+difference is implemented yet (`docs/reference/access.md` section 8). The one-way
 DATA/meta lockdown is designed, and marked not implemented
-(`docs/reference/access.md` §5.2).
+(`docs/reference/access.md` section 8).
 
 ## 6. Repository map
 

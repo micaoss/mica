@@ -11,7 +11,7 @@
 
 ## 0. Markers, and the owner roles
 
-Markers follow `docs/reference/access.md` §0's discipline, with this document's
+Markers follow `docs/reference/access.md` discipline, with this document's
 set (a lifecycle's sections are procedures, like
 `docs/security/signing.md`'s):
 
@@ -117,15 +117,15 @@ restating:
 - **apid webAdmin credential** — hash on DATA/state; set at setup through apid.
 - **SSH authorized keys** — the persistent access credential; rotation is
   editing the `access.ssh.authorizedKeys` list, and every key is a root key
-  (`docs/reference/access.md` §4.1).
+  (`docs/reference/access.md` section 5).
 - **Transient root password** — self-revoking by design: cleared by
   `mica-shadow-reconcile` on the next boot via the marker mechanism
-  (`docs/reference/access.md` §4.1, `mica-core:crates/micad/src/transient.rs`).
+  (`docs/reference/access.md` section 5, `mica-core:crates/micad/src/transient.rs`).
 
 **Recovery is deliberately absent**: an operator who loses the webAdmin
 credential and every key has no software path back in, and the recovery is a
 whole-disk reflash that costs everything on the device
-(`docs/reference/access.md` §9). Support procedures must state this up front
+(`docs/reference/access.md` section 7). Support procedures must state this up front
 rather than discover it on a call. The inert first-boot device password
 authenticates nothing (`docs/integrate/provisioning.md` §3.6) and must never be
 offered to a customer as a credential.
@@ -149,7 +149,7 @@ component update or development key generation.
 The rule, and its mechanisms: `meta/` and `mica-deploy:.devkeys/` are
 gitignored, both generators refuse to overwrite existing keys, the pack stage
 fails any build whose factory shadow carries a usable hash
-(`docs/reference/access.md` §5.3), and a first-boot settings tree is asserted to
+(`docs/reference/access.md` section 8), and a first-boot settings tree is asserted to
 contain no secret material (`docs/integrate/provisioning.md` §3.1). What no
 check can see — a production key pasted into an unrelated file — remains a
 custody rule owned by the release owner: production private material exists
@@ -239,7 +239,7 @@ fix ships or the reporter-agreed disclosure date arrives, whichever is first.
 | **low** | hardening gaps, defense-in-depth findings | 2 weeks | recorded; scheduled with related work |
 
 Severity is judged against the real model — e.g. "any SSH key is a root key"
-is documented behaviour (`docs/reference/access.md` §4.1), not a finding — and
+is documented behaviour (`docs/reference/access.md` section 5), not a finding — and
 against `docs/security/model.md`'s stated limits, so a report that
 restates a documented limit is answered with the document, not a patch.
 

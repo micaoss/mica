@@ -50,7 +50,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 
 ## 覆盖表
 
-按 [`contributing.md`](contributing.md) 第 5 节的规则，下表为 `docs/start/`、`docs/operate/`、
+按 [`contributing.md`](contributing.md) 第 4 节的规则，下表为 `docs/start/`、`docs/operate/`、
 `docs/integrate/`、`docs/hardware/`、`docs/security/`、`docs/releases/` 和 `docs/website/` 下的
 每一个英文页面各记录一行：源页面（相对本目录的路径）、翻译所依据的源版本（git 短提交号）、
 以及覆盖状态（`current` | `lagging` | `not-translated`）。`tools/docs/verify-coverage.sh`
