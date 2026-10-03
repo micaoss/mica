@@ -10,7 +10,7 @@ is built from them, and where the files are.
 The system map is [../architecture.md](../architecture.md). A system is built
 from source with [build](build.md), an image reaches a board through
 [flashing](flashing.md), updates are chosen with
-[update packages](../operate/update-packages.md), a maintainer cuts a release with
+[update packages](../operate/updates.md), a maintainer cuts a release with
 [releasing](../releases/how-releases-work.md), and a new board is brought up with
 [porting](https://github.com/micaoss/mica-build/blob/main/boards/README.md).
 
@@ -96,12 +96,12 @@ There are no minimal products
 Every board is a release target. That means its products are published; it is
 not a claim that the board boots on hardware — `uefi-arm64`'s qualification
 stays QEMU-only, and `s905x5m` stays at the bring-up tier with its physical
-rows untested ([support tiers](../hardware/support-tiers.md#current-boards)). It
+rows untested ([support tiers](../hardware/README.md#current-boards)). It
 is not even a claim that the image has been started by anything automatic: no
 suite boots a FIT image, so the `cx3576` and `s905x5m` products are started by
 nothing in this tree.
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/products.md`, `mica-build:boards/boards.tsv`
+> status: board-dependent — evidence: `docs/hardware/README.md`, `mica-build:boards/products.md`, `mica-build:boards/boards.tsv`
 
 ## 4. Where the files are
 

@@ -1,12 +1,8 @@
 # uefi-arm64：通用 arm64 UEFI 机器
 
 `uefi-arm64` 是 arm64 侧的**通用系统**：一份镜像服务于固件是 UEFI + ACPI 的 arm64
-机器。它自 2026-09-16 起是发布目标，并携带了 virtio 之外的通用硬件驱动——但它的全部
-证据仍然只有 QEMU aarch64 `virt`。**携带驱动不等于有证据证明某台机器能启动。**
-
-现状快照记于 2026-09-20。事实来自英文板卡档案
-[`docs/hardware/uefi-arm64-dossier.md`](../../hardware/uefi-arm64-dossier.md) 与
-`mica-build:boards/uefi-arm64/`；状态以[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
+机器。它携带了 virtio 之外的通用硬件驱动——但它的全部
+证据仍然只有 QEMU aarch64 `virt`。**携带驱动不等于有证据证明某台机器能启动。** 状态以[状态表](README.md#当前板卡)为准。
 
 ## 概况
 
@@ -16,8 +12,7 @@
 | 启动链 | UEFI 固件（注册了开发启动锚）→ 签名的 `EFI/BOOT/BOOTAA64.EFI` → 计数启动项 → 签名 UKI → 认证的 native init → SYSTEM → 签名的 verity root/support → systemd |
 | 固件形态 | `efi`（引导器在 ESP 内） |
 | 分区 | ESP / SYSTEM / DATA |
-| 内核 | 主线 stable，与 `uefi-x64` 固定同一个 tag（当前 `v6.12.107`），故首次启动失败时不会分不清是移植问题还是内核版本问题 |
-| 发布目标 | 是（自 2026-09-16） |
+| 内核 | 主线 stable，与 `uefi-x64` 固定同一个 tag，故首次启动失败时不会分不清是移植问题还是内核版本问题 |
 | 支持层级 | bring-up（QEMU 参考） |
 | 启动保证等级 | I1 |
 
@@ -43,7 +38,7 @@
 解析后的配置少一个就构建失败。代价也记着：内核模块从 71 个增加到 232 个，`Image`
 24.5 MB，CI 内核任务从 330 秒变成 718 秒。
 
-> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
+> status: board-dependent — evidence: `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
 
 ## 分区布局
 
@@ -101,7 +96,7 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 
 发布 `full`、`root`、`kernel` 三种归档。QEMU 里跑过 root-only、kernel-only 与组合
 更新，包括三次健康失败后退回保留部署、固件与身份不变。见
-[更新包](../operate/update-packages.md)、[更新与回滚](../operate/update-rollback.md)。
+[更新与回滚](../operate/updates.md)。
 
 ## 恢复
 
@@ -123,21 +118,27 @@ guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031
 - 开发用的 Secure Boot 注册只存在于一次性的 AAVMF 变量里，不为别的平台的固件或调试
   策略背书。
 
-## 验证记录
+## 认证结果
 
-来自英文档案的合格表（绑定条件：QEMU aarch64 `virt`、`-cpu max`、virtio-blk、
-实验室固定的 AAVMF 固件、新装配的三分区镜像）：
+**绑定**：QEMU aarch64 `virt`，`-cpu max`，virtio-blk，实验室固定的 AAVMF Secure Boot
+固件，以及一份新组装的三分区镜像；没有实体机器。
 
-| 项 | 结果 | 日期 |
-|---|---|---|
-| 出厂布局与 root 组成 | 通过 | 2026-09-09 |
-| 签名启动、运行时与干净关机 | 通过 | 2026-09-09 |
-| 完整 apid API 套件 | 通过 | 2026-09-09 |
-| root-only / kernel-only / 组合更新 | 通过 | 2026-09-09 |
-| 元数据拒绝与尝试耗尽 | 通过 | 2026-09-09 |
-| 网络 API | 通过 | 2026-09-09 |
-| 实体断电 | 不适用 | 模拟存储 |
-| 射频与现场总线 | 不适用 | 这块板不声明 |
-| 物理恢复动作 | 不适用 | 不存在物理在场断言 |
+**归属**：Mica OS 项目拥有该移植及其认证。没有厂商、没有 BSP 供应方，也没有在案的集成商。
 
-> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`
+模拟器的行是关于被模拟平台的证据，从不算作实机通过。
+
+| 行 | 结果 | 日期 | 证据 / 原因 |
+|---|---|---|---|
+| 出厂布局与根的组成 | pass | 2026-09-09 | QEMU `virt` 实验室运行 |
+| 签名启动、运行时与干净关机 | pass | 2026-09-09 | QEMU `virt` 实验室运行：认证的 root 与 support、身份、服务检查 |
+| 完整 API 套件 | pass | 2026-09-09 | QEMU `virt` 实验室运行 |
+| 仅 root、仅 kernel 与组合更新 | pass | 2026-09-09 | QEMU `virt` 实验室运行：三次健康试验失败后取用保留的回退，固件与身份不变 |
+| 元数据拒绝与尝试耗尽 | pass | 2026-09-09 | QEMU `virt` 实验室运行 |
+| 网络 API | pass | 2026-09-09 | QEMU `virt` 实验室运行 |
+| 安装与首次启动 | not tested | — | 没有实体机器 |
+| 冷启动与热启动 | not tested | — | 没有实体机器 |
+| 更新中断电 | N/A | — | 模拟存储；进程中断是另一类证据 |
+| 射频与现场总线 | N/A | — | 这块板没有声明 |
+| 物理恢复动作 | N/A | — | 没有物理在场断言 |
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`, `mica-build:README.md`

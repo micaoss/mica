@@ -11,14 +11,14 @@ procedure yet.
   [storage](../reference/storage.md).
 - After the board boots: [first run](first-run.md).
 - Replacing a running system instead of writing a whole image:
-  [update packages](../operate/update-packages.md).
+  [update packages](../operate/updates.md).
 
 **What is qualified, stated once.** Every boot anyone here has seen was QEMU.
 No Mica OS image written to a USB stick, a SATA disk, an NVMe drive or an
 eMMC is on record here, and no physical boot has an evidence row. The user
 reported on 2026-09-20 that a `cx3576` booted on hardware; it is a report with
 no artefact attached, so it is not a row and this page does not treat it as
-one ([support tiers](../hardware/support-tiers.md)). The QEMU sections below are
+one ([support tiers](../hardware/README.md)). The QEMU sections below are
 run; the hardware sections are read out of the repositories and are marked
 where they are not verified. Every amd64 product is booted automatically in
 its release run, while a `uefi-arm64` image is built and verified but started
@@ -26,7 +26,7 @@ by nothing automatic, and a `cx3576` or `s905x5m` image has never been started
 by anything automatic: no suite boots a FIT image — the FIT suite runs on the
 host and carries no QEMU ([download](download.md) section 1).
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/hardware/support-tiers.md`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/hardware/README.md`
 
 ## 1. Before you write
 
@@ -154,7 +154,7 @@ path with evidence behind it. Since 2026-09-16 that board is a release target
 and its kernel carries generic hardware drivers — AHCI, NVMe, USB storage over
 xHCI and EHCI, and the common NICs as modules — but **carrying a driver is not
 evidence that a machine boots**: the qualification is QEMU `virt` only, as it
-is for `uefi-x64` ([dossier](../hardware/uefi-arm64-dossier.md)).
+is for `uefi-x64` ([board page](../hardware/uefi-arm64.md)).
 
 Firmware files, as the acceptance lab uses them:
 
@@ -221,7 +221,7 @@ is one target in `mica-build`:
 make lifecycle-uefi PRODUCT=uefi-arm64.dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/hardware/uefi-arm64-dossier.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/hardware/uefi-arm64.md`
 
 A stock release image boots to its login prompt and its services. The
 `FILE_AB_*` markers the acceptance console prints come from the suite's own
@@ -266,7 +266,7 @@ Operator prerequisites: `rkdeveloptool` on `PATH` and USB access to the
 device. On macOS build it natively at the pinned upstream commit with the two
 patches kept in [`docs/hardware/cx3576/rkdeveloptool`](../hardware/cx3576/rkdeveloptool/README.md).
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/hardware/cx3576/rkdeveloptool/README.md`, `docs/hardware/cx3576-dossier.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/hardware/cx3576/rkdeveloptool/README.md`, `docs/hardware/cx3576.md`
 
 > status: unsupported
 
@@ -343,6 +343,6 @@ been run on hardware. The device-side half of this section is read out of
   is no "other slot" to flash ([updates](../reference/updates.md)).
 - **No upgrade by re-flashing.** Writing an image wipes DATA. To move a
   running device to a newer release, take an update archive
-  ([update packages](../operate/update-packages.md)).
+  ([update packages](../operate/updates.md)).
 
-> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/reference/updates.md`, `docs/operate/update-packages.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/reference/updates.md`, `docs/operate/updates.md`

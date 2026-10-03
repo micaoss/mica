@@ -198,7 +198,7 @@ The current boards are `uefi-x64`, `uefi-arm64` and `mini-x64` (UEFI, signed UKI
 and `cx3576` and `s905x5m` (U-Boot, signed FIT). Each has the product
 `<board>.basic`, and all but `mini-x64` also `<board>.full` and the local-only
 `<board>.dev` (`mica-build:boards/products.md`). Their build, acceptance and support tier
-are kept in one table: [support tiers](hardware/support-tiers.md#current-boards).
+are kept in one table: [support tiers](hardware/README.md#current-boards).
 
 A board produces artifacts and the OS build consumes artifacts; neither side
 reaches into the other's build. Kernel configs must satisfy the shared

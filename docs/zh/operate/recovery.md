@@ -112,7 +112,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 **如果你只想把地址要回来，不必动用这一层。**用
 `POST /api/v1/update/config` 发 `{"source": {"url": null}}`，那一个键就回到内置
 默认值，其余配置原封不动——一次复位是拿全部设置去换回一个。见
-[update-rollback.md](update-rollback.md)。
+[updates.md](updates.md)。
 
 ### 第 4 步——应用数据重置——不可逆
 

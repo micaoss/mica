@@ -79,8 +79,8 @@ make product-verify PRODUCT=uefi-x64.dev
 ## 6. 继续
 
 - [刷写](../../start/flashing.md)——按板卡把镜像写进设备。
-- [更新与回滚](../operate/update-rollback.md)和[更新包](../../operate/update-packages.md)——让
+- [更新与回滚](../operate/updates.md)和[更新包](../../operate/updates.md)——让
   运行中的设备前进。
 - [应用](../integrate/applications.md)——负载与持久数据。
 
-> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/update-packages.md`, `docs/integrate/applications.md`
+> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/updates.md`, `docs/integrate/applications.md`

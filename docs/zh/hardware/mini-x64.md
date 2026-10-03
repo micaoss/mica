@@ -2,15 +2,9 @@
 
 `mini-x64` 和 [`uefi-x64`](uefi-x64.md) 一样是一个**通用系统**——一份镜像服务于固件是
 UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己的基于 `tinyconfig` 的
-内核、xz 压缩的根，以及唯一的产品 `mini-x64.basic`，它运行 OpenRC，带管理面、SSH 与容器。
+内核、xz 压缩的根，以及唯一的产品 `mini-x64.basic`，它运行 OpenRC，带管理面、SSH 与容器。状态以[状态表](README.md#当前板卡)为准。
 
-现状快照记于 2026-10-01。状态以英文的
-[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
-
-**它没有板卡档案。**以下内容读自 `mica-build:boards/mini-x64/board.env`、它的
-`layout.tsv`、`evidence.json` 与内核配置，以及[刷写](../start/flashing.md)页。
-
-## 一览
+## 概况
 
 | | |
 |---|---|
@@ -19,7 +13,6 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 | 固件形态 | `efi`——引导器在 ESP 里 |
 | 分区 | ESP / SYSTEM / DATA |
 | 体积预算 | 130 MB（`BOARD_SIZE_BUDGET_MB`）；根是 xz squashfs |
-| 发布目标 | 是 |
 | 支持层级 | bring-up（QEMU） |
 | 启动保证等级 | I1 |
 
@@ -68,11 +61,22 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 
 > status: unsupported
 
-## 更新与恢复
+## 首次启动
 
-与 [`uefi-x64`](uefi-x64.md) 相同：`full`、`root`、`kernel` 三种更新归档，带健康确认与
-回滚的 A/B 切换，恢复的兜底是整盘重刷。在 OpenRC 下，micad 驱动的是各个包为这种 init
-提供的服务（`mica-core:docs/mica-core.md` 第 3.8 节）。
+与 [`uefi-x64`](uefi-x64.md) 相同：DATA 扩展到介质大小，镜像带有两份签名部署，健康门
+确认启动起来的那一份。根的 init 是 OpenRC，micad 驱动的是各个包为这种 init 提供的服务
+（`mica-core:docs/mica-core.md` 第 3.8 节）。
+
+## 更新
+
+`full`、`root` 与 `kernel` 归档，core 发布时还有 `core`，带有每块板都有的 A/B 切换、健康
+确认与回滚。见[更新与回滚](../operate/updates.md)。
+
+## 恢复
+
+与 [`uefi-x64`](uefi-x64.md) 相同：只读诊断、手动回滚、配置重置与应用数据重置可用；
+凭据恢复与恢复出厂被拒绝，因为这块板没有声明物理恢复动作；兜底是整盘重刷，代价是所有
+分区和设备身份。见[恢复](../operate/recovery.md)。
 
 ## 已知限制
 
@@ -80,12 +84,24 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 - 完全没有 USB：需要从 USB 介质启动或安装的机器用不了这份镜像。
 - 没有 Web 控制台，也没有 MQTT：`mini-x64.basic` 只带管理面、SSH 与容器。
 
-## 验证记录
+## 认证结果
 
-| 项目 | 结果 | 说明 |
-|---|---|---|
-| QEMU 运行、组件更新、试运行回退、故障恢复 | 通过 | `evidence.json` |
-| 每次发布时自动启动 | 是 | amd64 产品跑一轮 UEFI lifecycle 的运行阶段 |
-| 实机冷启动、写盘、恢复 | 未测试 | 没有硬件 |
+**绑定**：QEMU `q35`，OVMF Secure Boot 固件与 virtio-blk，运行 `mini-x64.basic`；没有
+实体机器。
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`
+**归属**：Mica OS 项目拥有该移植及其认证。没有厂商，也没有在案的集成商。
+
+模拟器的行是关于被模拟平台的证据，从不算作实机通过。该产品的每次发布运行都会在 QEMU 下启动它一次。
+
+| 行 | 结果 | 日期 | 证据 / 原因 |
+|---|---|---|---|
+| QEMU 运行时、组件更新、试验回退、故障恢复 | pass | 2026-09-30 | `mini-x64.basic` 上的 UEFI 生命周期套件，`mica-build:tests/suites/lifecycle-uefi` |
+| 安装与首次启动 | not tested | — | 没有实体机器 |
+| 冷启动与热启动 | not tested | — | 没有实体机器 |
+| A/B 切换与更新 | not tested | — | 没有实体机器 |
+| 更新中断电 | not tested | — | 没有实体机器 |
+| 存储扩展 / 健康 | not tested | — | 没有实体机器；闪存寿命未认证 |
+| 恢复 | not tested | — | 没有实体机器 |
+| 射频与现场总线 | N/A | — | 这块板没有声明 |
+
+> status: board-dependent — evidence: `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

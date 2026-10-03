@@ -216,7 +216,7 @@ expect_fail "a website README entry whose document is gone" 1 \
 
 FIX="${WORK}/unindexed-hardware-document"
 new_fixture "${FIX}"
-cp "${FIX}/docs/hardware/support-tiers.md" "${FIX}/docs/hardware/unlisted.md"
+cp "${FIX}/docs/hardware/qualification.md" "${FIX}/docs/hardware/unlisted.md"
 expect_fail "a hardware document with no README row" 1 \
     "docs/hardware/unlisted.md exists but is not indexed in docs/README.md"
 

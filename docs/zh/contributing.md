@@ -36,7 +36,7 @@ Mica OS 是嵌入式一体机操作系统。用户文档服务三类读者，按
 | [integrate/manufacturing.md](integrate/manufacturing.md) | 批量装机：身份与凭据的归属、工厂记录、隔离 |
 | [operate/configuration.md](operate/configuration.md) | 配置模型与改变设置的每种受支持方式 |
 | [integrate/applications.md](integrate/applications.md) | 交付与运行应用：原生软件包与容器 |
-| [operate/update-rollback.md](operate/update-rollback.md) | A/B 更新路径、健康确认与回滚 |
+| [operate/updates.md](operate/updates.md) | A/B 更新路径、健康确认与回滚 |
 | [operate/recovery.md](operate/recovery.md) | 设备无法启动时怎么办，以及恢复的代价 |
 | [operate/storage.md](operate/storage.md) | 存储层级、什么在什么之后幸存、数据属于哪里 |
 | [operate/troubleshooting.md](operate/troubleshooting.md) | 诊断：访问通道、要读的证据、要解读的拒绝 |

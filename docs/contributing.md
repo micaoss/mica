@@ -41,7 +41,7 @@ from everywhere else.
 | [integrate/manufacturing.md](integrate/manufacturing.md) | putting Mica OS on units at volume: identity and credential ownership, factory records, quarantine |
 | [operate/configuration.md](operate/configuration.md) | the configuration model and every supported way to change settings |
 | [integrate/applications.md](integrate/applications.md) | delivering and running applications: native packages and containers |
-| [operate/update-rollback.md](operate/update-rollback.md) | the A/B update path, health confirmation and rollback |
+| [operate/updates.md](operate/updates.md) | the A/B update path, health confirmation and rollback |
 | [operate/recovery.md](operate/recovery.md) | what to do when a device does not boot, and what recovery costs |
 | [operate/storage.md](operate/storage.md) | the storage tiers, what survives what, and where data belongs |
 | [operate/troubleshooting.md](operate/troubleshooting.md) | diagnosis: access channels, evidence to read, refusals to interpret |

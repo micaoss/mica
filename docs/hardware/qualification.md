@@ -2,15 +2,15 @@
 
 Qualification is how a board earns claims: a fixed matrix of
 reliability-relevant behaviors, each proven on real hardware (or honestly
-left unproven), recorded with dates and evidence in the board dossier's
+left unproven), recorded with dates and evidence in the board page's
 Qualification results section. It is what separates "an image that boots"
-from a supported product — the distinction [support-tiers.md](support-tiers.md)
+from a supported product — the distinction [the support tiers](README.md#support-tiers)
 is built on. What follows is the process and the row grammar; the results are
-a board fact recorded in each dossier; [support-tiers.md](support-tiers.md#current-boards)
+a board fact recorded in each board page; [the board status table](README.md#current-boards)
 lists which boards have physical rows on file.
 
-> status: shipped — evidence: `docs/hardware/dossier-template.md`
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
+> status: shipped — evidence: `docs/hardware/board-template.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`, `mica-build:boards/cx3576/evidence.json`
 
 ## 1. The named-revision rule
 
@@ -25,8 +25,8 @@ Results bind to exactly one combination of:
 A result is **never generalized** to another revision, storage part, radio
 module, thermal solution or vendor BSP. A new combination gets a new matrix;
 the old one stays on file for the units that shipped with it. This rule is
-why the dossier's Supported revisions section must list uncovered revisions
-explicitly.
+why a board page's Qualification results section names its binding and the
+variants it does not cover.
 
 ## 2. Row grammar
 
@@ -45,7 +45,7 @@ Every row is one of exactly four results:
   reason. This is the honest default for every row until someone runs it.
 
 **Never implicitly green.** A missing row, an empty cell, or an undated
-`pass` is a defect in the dossier, not evidence. Document authors without
+`pass` is a defect in the board page, not evidence. Document authors without
 hardware cannot close an evidence row, and do not.
 
 Recommended table shape:
@@ -71,7 +71,7 @@ without the hardware; nothing else may be dropped.
 | 9 | Thermal/throttling | sustained load stays inside the thermal envelope; throttling degrades, not crashes |
 | 10 | Watchdog/reset cause | a hung system is reset by the watchdog; the reset cause is readable afterwards |
 | 11 | Offline service | the device is fully operable and configurable with no network, per the provisioning model |
-| 12 | Recovery | every recovery path in the dossier's Recovery method section actually restores a unit from the state it claims to handle |
+| 12 | Recovery | every recovery path in the board page's Recovery section actually restores a unit from the state it claims to handle |
 | 13 | Installation and first boot | the documented flash procedure puts an image on a blank unit over the board's own transport, and that unit reaches its first boot and a claimable state |
 
 **Row 13 binds a profile as well as a revision.** The other twelve bind to
@@ -109,12 +109,12 @@ A matrix goes stale — its rows revert to `not tested` for the new
 combination — when any binding element changes: a BSP sync to a new upstream
 commit, a kernel or bootloader bump, a new storage part or radio SKU, a new
 board revision. Rows whose subject is untouched by the change may be carried
-forward only as an explicit dated decision in the dossier ("carried from
+forward only as an explicit dated decision in the board page ("carried from
 <date> run; change judged irrelevant because ..."), never silently.
 
 ## 6. Who runs it
 
-Per [support-tiers.md](support-tiers.md): for a mica-qualified board, Mica OS owns
+Per [the support tiers](README.md#support-tiers): for a mica-qualified board, Mica OS owns
 the run and the evidence; for an integrator-qualified board, the integrating
 customer owns both and Mica OS's claims are correspondingly narrower. In both
 cases the grammar and the matrix are this document's — comparable evidence

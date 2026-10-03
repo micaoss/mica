@@ -148,7 +148,7 @@ DATA/state 镜像到另一台上以"保住"它的身份；序列号的连续性�
 5. 自己保存第 1 到 4 步的记录。Mica OS 不提供记录格式、不提供工位工具、不提供
    池管理，在第 3、4 节的工作被建出来之前也不会有。
 
-这条流程从本仓库出发没有任何一步在物理硬件上执行过；板卡档案里每一条依赖
+这条流程从本仓库出发没有任何一步在物理硬件上执行过；板卡页里每一条依赖
 硬件的行都是 `not tested`。
 
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`, `docs/hardware/qualification.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`, `docs/hardware/qualification.md`

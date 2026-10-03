@@ -74,7 +74,7 @@ lock 用摘要指名每一个产物，所以校验了 `SHA256SUMS` 和 lock 的�
 
 `mica-build` 复用输入与最近一次发布它的 release 相同的 `kernel` 或 `uboot` 组件，CI 和发布时
 都如此；`mica-build` 只有在另一个组件标识未变时才发布 `root` 或 `kernel` 更新归档
-（[更新包](../operate/update-packages.md)）。
+（[更新包](../operate/updates.md)）。
 
 > status: shipped — evidence: `mica-build-tools:docs/spec/package-versions.md`, `mica-build:docs/design/image.md`, `docs/decisions/2026-09-15-update-packages.md`
 

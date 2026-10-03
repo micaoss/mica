@@ -34,20 +34,20 @@ Support ownership follows the board support taxonomy on the
 
 - For **mica-qualified** boards, the Mica OS project is the named lifecycle owner
   of the OS on that board: the BSP, the update path and the recovery
-  procedures its dossier claims.
+  procedures its board page claims.
 - For **integrator-qualified / bring-up** boards, the integrator owns the
   board's qualification and lifecycle; Mica OS supplies the board contract,
   guidance and the shared OS core. Support cases about board-specific
-  behaviour route to the board's owner named in its evidence dossier.
+  behaviour route to the board's owner named in its board page.
 - For **unsupported** hardware, no support claim exists.
 
 The taxonomy and its ownership split are defined; which tier a board holds is
-a separate question its dossier answers. No board holds the mica-qualified tier
+a separate question its board page answers. No board holds the mica-qualified tier
 today — no board has a dated physical qualification row — so the first bullet describes the ownership that tier would
 carry, not a board the site can point at.
 
-> status: shipped — evidence: `docs/hardware/support-tiers.md`
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
+> status: shipped — evidence: `docs/hardware/README.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`
 
 ### Lifecycle and support windows
 

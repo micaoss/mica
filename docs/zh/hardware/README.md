@@ -1,87 +1,96 @@
-# 支持硬件列表
+# 支持的硬件
 
-这里按板卡回答四个问题：**这块板能不能跑 Mica OS、跑到什么程度、镜像怎么进去、
-出问题怎么回来。**每块板一页，章节顺序相同，可以直接对照着看。
+每块板一页，每次都按同样的顺序回答四个问题：**这块板能不能跑 Mica OS、证明到了哪一步、
+镜像怎么写进去、出了问题怎么回来。** 本页给出板卡状态表，以及状态表使用的支持层级。
+英文页 [`docs/hardware/README.md`](../../hardware/README.md) 是权威。
 
-本页是**给中文读者的现状快照，记于 2026-10-01**。板卡状态的权威表是英文的
-[`docs/hardware/support-tiers.md`](../../hardware/support-tiers.md#current-boards)——
-两边不一致时以英文为准，这里按缺陷处理。
+## 当前板卡
 
-## 板卡一览
+这张表是板卡状态的唯一来源；其他文档链接到这里，而不是重述它。
 
-| 板卡 | 硬件 | 架构 | 启动方式 | 发布目标 | 支持层级 | 实机验证 |
+| 板卡 | 硬件 | 架构 | 启动 | 磁盘布局 | 在案证据 | 层级 |
 |---|---|---|---|---|---|---|
-| [`uefi-x64`](uefi-x64.md) | 通用 amd64 机器（UEFI + ACPI） | amd64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU 基线） | 无 |
-| [`uefi-arm64`](uefi-arm64.md) | 通用 arm64 机器（UEFI + ACPI） | arm64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU 参考） | 无 |
-| [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot，签名 FIT | 是 | bring-up | 有一条用户报告，无证据行 |
-| [`s905x5m`](s905x5m.md) | BM201 / Amlogic S905X5M（S7D） | arm64 | U-Boot，签名 FIT，从 SD 启动 | 是 | bring-up | 无 |
-| [`mini-x64`](mini-x64.md) | 小型 amd64 机器（UEFI），128 MB 闪存 | amd64 | systemd-boot，签名 UKI | 是 | bring-up（QEMU） | 无 |
+| [`uefi-x64`](uefi-x64.md) | 通用 amd64 机器（UEFI + ACPI） | amd64 | systemd-boot，签名 UKI | ESP / SYSTEM / DATA | QEMU 生命周期：API、电源动作、运行时、更新、故障与重置 | bring-up（QEMU 基线） |
+| [`uefi-arm64`](uefi-arm64.md) | 通用 arm64 机器（UEFI + ACPI） | arm64 | systemd-boot，签名 UKI | ESP / SYSTEM / DATA | QEMU `virt`：API、更新、故障与重启各行 | bring-up（QEMU 参考） |
+| [`mini-x64`](mini-x64.md) | 带 128 MB 闪存的小型 amd64 机器（UEFI） | amd64 | systemd-boot，签名 UKI | ESP / SYSTEM / DATA | `mini-x64.basic` 上的 QEMU 生命周期 | bring-up（QEMU） |
+| [`cx3576`](cx3576.md) | CX3576-Z / Rockchip RK3576 | arm64 | U-Boot，签名 FIT | FIRMWARE / SYSTEM / DATA | 静态验证；一次实机观察，没有认证行 | bring-up |
+| [`s905x5m`](s905x5m.md) | BM201 / Amlogic S905X5M（S7D） | arm64 | U-Boot，签名 FIT | FIRMWARE / SYSTEM / DATA，在 SD 或 eMMC 上 | 静态验证与夹具；没有实机行 | bring-up |
 
-没有任何板卡达到 `mica-qualified`：没有任何板卡档案里有一条注明日期的实机合格行。
-层级的定义见[支持层级](../../hardware/support-tiers.md)，共三级：`mica-qualified`
-（Mica OS 自己跑完并拥有合格矩阵）、`integrator-qualified / bring-up`（合约满足，
-现场证据由集成商持有或仍在积累）、`unsupported`（没有档案，不做任何声明）。
+没有任何板卡是 `mica-qualified`：没有哪一页带有带日期的实机认证行。
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`, `mica-build:boards/mini-x64/board.env`
+`uefi-x64`、`uefi-arm64` 和 `mini-x64` 是**通用系统**，按启动它们的固件类命名；`cx3576`
+和 `s905x5m` 是**硬件板**，按产品命名
+（[决策](../../decisions/2026-09-16-generic-systems-named-by-firmware.md)，英文）。
 
-## 现在到底是什么状态（2026-10-01）
+> status: board-dependent — evidence: `mica-build:boards/boards.tsv`, `mica-build:boards/uefi-x64/evidence.json`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:boards/cx3576/evidence.json`, `mica-build:boards/s905x5m/evidence.json`
 
-**每块板都是发布目标**，它的每个产品各自发布：每块板都有默认的 `<board>.basic`，除
-`mini-x64` 外还有带容器引擎的 `<board>.full`。**九个产品里目前只有两个有发布**：
-`cx3576.full` 与 `mini-x64.basic`。其余产品还没有发布，没有镜像可下载，需要从源码构建
-（[构建指南](../../start/build.md)）。
+## 这张表声明了什么，没有声明什么
 
-**“是发布目标”不等于“能在实机上跑”。**它只说明镜像被发布了。今天的实际验证情况
-分成三档：
+**每块板都是发布目标**（其 `board.env` 里的 `BOARD_RELEASE_TARGET`）：它的产品都会被
+构建，并且可以各自独立发布，名为 `<board>.<variant>`。`basic` 是每块板的默认产品；
+`full` 在除 `mini-x64` 之外的每块板上加入容器引擎，`mini-x64` 的 `basic` 已经带了它；
+`s905x5m` 还有按它的 eMMC 布局的 `emmc-full`。`dev` 产品只在本地构建，从不发布。哪些
+产品有可下载的发布见[下载页](https://micaos.dev/download/)；没有发布的产品从源码构建
+（[构建](../start/build.md)）。
 
-| 验证档位 | 板卡 | 含义 |
+**是发布目标不等于对硬件的声明。** 真正启动过镜像的情况分三种：
+
+| 启动到什么程度 | 板卡 | 含义 |
 |---|---|---|
-| 每次发布时自动启动 | `uefi-x64`、`mini-x64` | 每个 amd64 产品在 QEMU 里跑一轮 UEFI lifecycle 的运行阶段 |
-| 只构建与静态校验，有过手工 QEMU 记录 | `uefi-arm64` | 自动启动步骤只跑 amd64，所以它没有自动启动记录；已有的 QEMU 证据早于板卡改名 |
-| 没有任何自动流程会启动 | `cx3576`、`s905x5m` | 没有任何套件会启动 FIT 镜像——FIT 那套跑在宿主机上、不带 QEMU，两套会启动 guest 的套件按名字拒绝 FIT 板卡 |
+| 每次发布运行都启动 | `uefi-x64`、`mini-x64` | 每个 amd64 产品在 QEMU 下启动 UEFI 生命周期的一个运行时阶段 |
+| 构建并静态验证；QEMU 按需运行 | `uefi-arm64` | 发布运行的启动步骤只针对 amd64 |
+| 这些仓库里没有任何东西启动它 | `cx3576`、`s905x5m` | 没有套件启动 FIT 镜像；FIT 套件在主机上运行，不用 QEMU |
 
-**没有任何实机启动拥有证据行。**也没有任何把 Mica OS 镜像写进 U 盘、SATA、NVMe 或
-eMMC 的记录。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动成功——那是一条报告，
-没有附带产物，因此不是合格行，层级表里也没有任何一行因此移动
-（[支持层级](../../hardware/support-tiers.md)）。凡是本目录里写到实机步骤的地方，
-都标了“未验证”。
+已发布的镜像不等于已启动的镜像，模拟器证据也不是现场证据。板卡页上的每一个实机步骤，
+在出现带日期的行之前都标为未验证。
 
-> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `docs/start/download.md`
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-build:README.md`, `mica-build:.github/workflows/release-product.yml`
 
-## 怎么选
+## 支持层级
 
-- **只想先看看这套系统长什么样** → [`uefi-x64`](uefi-x64.md)，在 QEMU 里跑，
-  这是有自动启动证据的基线。
-- **要装进 128 MB 闪存** → [`mini-x64`](mini-x64.md)：OpenRC、管理面、SSH 与
-  容器，没有 USB。
-- **想在通用 arm64 机器上试** → [`uefi-arm64`](uefi-arm64.md)。它携带了通用硬件
-  驱动（AHCI、NVMe、USB 存储、常见网卡），但**携带驱动不等于有证据证明某台机器
-  能启动**，并且完全没有 MMC 驱动。
-- **做 RK3576 产品** → [`cx3576`](cx3576.md)。它是仓库里的移植参考板，刷写流程
-  （`rkdeveloptool`，带回读校验）已经实现并在打桩测试下验证过控制流程，但从未面对
-  过真实硬件。
-- **手上是 BM201 / S905X5M** → [`s905x5m`](s905x5m.md)。**今天没有任何受支持的办法
-  把 Mica OS 装进一块空板**：它的 U-Boot 从 eMMC boot0 执行，而发布的磁盘镜像只覆盖
-  SD 介质，不装引导器。
-- **要上一块全新的板** → 英文的[板卡合约](https://github.com/micaoss/mica-build/blob/main/boards/README.md)与[移植指南](https://github.com/micaoss/mica-build/blob/main/boards/README.md)。
+层级是关于证据与归属的声明，而不是关于镜像能否启动。通常由 Mica OS 提供契约与指导，
+由集成客户选择并集成板卡，所以用层级避免三种不同的情形被混成一个词“支持”。
 
-## 不按板卡分、按主题看的页面
+| | `mica-qualified` | `integrator-qualified` / bring-up | `unsupported` |
+|---|---|---|---|
+| 含义 | Mica OS 拥有该移植及其证据 | 移植存在且满足契约；现场证据属于集成商，或仍在积累 | 其他一切 |
+| 证据 | 完整的板卡页，以及由 Mica OS 在指名的版本上跑过的[认证矩阵](../../hardware/qualification.md)，冷/热启动、更新、更新中断电、恢复各行为带日期的 `pass` | 同样的页面与矩阵，各行由集成商填写，或如实写 `not tested` | 不要求 |
+| 生命周期归属 | Mica OS：BSP 同步、CVE 响应、变更后重新认证 | 集成商，Mica OS 提供契约与模板；板卡页写明谁负责什么 | 无人 |
+| 允许的说法 | 在指名的版本上“支持”，并给出有证据的[保证等级](../../hardware/assurance.md)，不得更高 | “能构建并通过仓库的门禁”；不指明是谁的认证就不得说“支持”或“已认证” | 无；只能作为不支持提及 |
 
-| 想知道 | 读 |
+“能启动”不会让一块板离开 `unsupported`：现场可靠性、恢复、更新与生命周期归属，正是一份
+能启动的镜像没有证明的东西。
+
+层级按板卡**与版本组合**指定。向上移动需要证据而不是意图：集成商的各行有了日期，
+bring-up 才成为 integrator-qualified；只有 Mica OS 自己运行并拥有矩阵，才成为
+mica-qualified。向下移动是自动的：重新认证的触发条件
+（[认证](../../hardware/qualification.md)第 5 节）让各行对新的组合回到 `not tested`，
+层级的说法随之失效。
+
+> status: shipped — evidence: `docs/hardware/qualification.md`, `docs/hardware/board-template.md`, `docs/hardware/assurance.md`
+
+## 选哪块板
+
+- **想看这个系统是什么**：QEMU 下的 [`uefi-x64`](uefi-x64.md)，有自动启动证据的基线。
+- **要放进 128 MB 闪存**：[`mini-x64`](mini-x64.md)。OpenRC、管理面、SSH 与容器；没有 USB。
+- **想试一台通用 arm64 机器**：[`uefi-arm64`](uefi-arm64.md)。它带有通用硬件驱动（AHCI、
+  NVMe、USB 存储、常见网卡），但携带驱动不等于有证据证明某台机器能启动，而且它没有
+  MMC 支持。
+- **要做 RK3576 产品**：[`cx3576`](cx3576.md)，仓库里的移植参考板。
+- **要用 BM201 / S905X5M**：[`s905x5m`](s905x5m.md)。
+- **要引入一块新板**：板卡契约与移植指南 `mica-build:boards/README.md`，以及
+  [板卡页模板](../../hardware/board-template.md)（英文）。
+
+## 同样的内容，按主题
+
+| 想了解 | 读 |
 |---|---|
-| 一个发布由什么构成、怎么校验 | [获取发布版](../start/download.md) |
-| 刷写的完整说明（含 QEMU 命令行） | [刷写](../start/flashing.md) |
-| 更新归档怎么选、设备怎么接收 | [更新包](../operate/update-packages.md)、[更新与回滚](../operate/update-rollback.md) |
-| 恢复阶梯：哪些步骤今天真能走 | [恢复](../operate/recovery.md) |
-| 分区、数据归属 | [存储](../operate/storage.md) |
-| 整个系统怎么拼起来 | [一页读懂](../start/overview.md)、[架构](../../architecture.md) |
+| 一次发布包含什么、怎么校验 | [下载](../start/download.md) |
+| 完整的刷写流程，包括 QEMU 命令行 | [刷写](../start/flashing.md) |
+| 该用哪个更新归档、设备怎么接收 | [更新与回滚](../operate/updates.md) |
+| 恢复阶梯 | [恢复](../operate/recovery.md) |
+| 分区与数据该放在哪里 | [存储](../operate/storage.md) |
+| 整个系统如何拼在一起 | [总览](../start/overview.md)、[架构](../../architecture.md)（英文） |
 
-各板页面里的“刷机 / 更新 / 恢复”是这些主题页的板卡视角摘要，细节以主题页为准。
-
-## 这些页面的来源
-
-每页的事实来自三处：英文板卡档案（`docs/hardware/<board>-dossier.md`）、
-`mica-build:boards/<board>/` 里该板的 `board.env` 与 `evidence.json`、以及中文用户文档。
-`uefi-x64` 与 `mini-x64` 没有板卡档案，它们那页会逐条注明来源。
-
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`, `docs/hardware/s905x5m-dossier.md`, `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards`
+每个板卡页从该板的角度概述刷写、更新与恢复；细节归主题页。板卡的工程内容（内核、
+加载器、软件包及其来源）在 `mica-build:boards/<board>/`。

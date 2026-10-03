@@ -10,7 +10,7 @@
 # a rendering fact, not a filesystem fact, and validating one would mean
 # reimplementing each renderer's slug rules. The remaining path is resolved
 # against the linking file's own directory and must exist; a link out of
-# docs/ into the source tree (a dossier citing `boards/cx3576/board.env`) is
+# docs/ into the source tree (a board page citing `boards/cx3576/board.env`) is
 # resolved the same way and asserted the same way. No network is touched.
 #
 # SCOPE. Every Markdown file under docs/ except `docs/plan/index.md` and

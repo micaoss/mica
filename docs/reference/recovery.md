@@ -137,4 +137,4 @@ cx3576 has offline image/FIT verification and firmware-policy tests. Its
 physical startup, watchdog handoff, recovery and power-cut behavior require the
 [bench runbook](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/cx3576-bench.md). Boot assurance and recovery capability
 are separate claims. Pending per-board checks are in
-[support tiers](../hardware/support-tiers.md#current-boards).
+[support tiers](../hardware/README.md#current-boards).

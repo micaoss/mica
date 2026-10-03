@@ -54,11 +54,11 @@ check() { # <name> <expected exit> <claims body>
 }
 
 tab=$'\t'
-ok_row="release-target.present${tab}line${tab}r/x:boards/present/board.env${tab}BOARD_RELEASE_TARGET=1${tab}docs/boards/support-tiers.md"
-bad_row="release-target.absent${tab}line${tab}r/x:boards/absent/board.env${tab}BOARD_RELEASE_TARGET=1${tab}docs/boards/support-tiers.md"
+ok_row="release-target.present${tab}line${tab}r/x:boards/present/board.env${tab}BOARD_RELEASE_TARGET=1${tab}docs/hardware/README.md"
+bad_row="release-target.absent${tab}line${tab}r/x:boards/absent/board.env${tab}BOARD_RELEASE_TARGET=1${tab}docs/hardware/README.md"
 tag_ok="index-tag-form${tab}newest-tag${tab}r/x:mica${tab}^mica[.][0-9]{8}-[0-9]{4}\$${tab}docs/design/release-artifacts.md"
 tag_bad="index-tag-form${tab}newest-tag${tab}r/x:mica${tab}^mica/${tab}docs/design/release-artifacts.md"
-no_line_ok="no-such-line${tab}no-line${tab}r/x:boards/present/board.env${tab}BOARD_RELEASE_TARGET=0${tab}docs/boards/support-tiers.md"
+no_line_ok="no-such-line${tab}no-line${tab}r/x:boards/present/board.env${tab}BOARD_RELEASE_TARGET=0${tab}docs/hardware/README.md"
 
 no_path_ok="absent-check${tab}no-path${tab}r/x:verify/src/checks-kernel.ts${tab}absent${tab}docs/design/containers.md"
 no_path_bad="present-check${tab}no-path${tab}r/x:verify/src/checks-root.ts${tab}absent${tab}docs/design/containers.md"

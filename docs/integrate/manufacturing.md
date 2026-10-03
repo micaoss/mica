@@ -188,6 +188,6 @@ Assembled from the sections above, with nothing designed counted as available:
    sections 3 and 4 is built.
 
 Nothing in this sequence has been executed on physical hardware from this
-tree; the board dossier carries every hardware-dependent row as `not tested`.
+tree; the board page carries every hardware-dependent row as `not tested`.
 
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`, `docs/hardware/qualification.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`, `docs/hardware/qualification.md`

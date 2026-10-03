@@ -114,5 +114,5 @@ fact and is not in yet: no board has a dated physical qualification row, and lon
 the tier definitions rather than written up as a procedure.
 
 > status: shipped — evidence: `mica-build:boards/cx3576/README.md`
-> status: shipped — evidence: `mica-build:boards/README.md`, `docs/hardware/qualification.md`, `docs/hardware/support-tiers.md`
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
+> status: shipped — evidence: `mica-build:boards/README.md`, `docs/hardware/qualification.md`, `docs/hardware/README.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`

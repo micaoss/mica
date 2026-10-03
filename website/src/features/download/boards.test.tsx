@@ -15,8 +15,8 @@ describe('per-board guides', () => {
   })
 
   it('keeps an external target as given', () => {
-    const dossier = boardGuides(zh, 'zh', 'cx3576').find(guide => guide.href.startsWith('http'))
-    expect(dossier?.href).toContain('micaoss/mica')
+    const source = boardGuides(zh, 'zh', 'cx3576').find(guide => guide.href.startsWith('http'))
+    expect(source?.href).toContain('micaoss/mica')
   })
 
   it('gives every configured guide wording in both locales', () => {

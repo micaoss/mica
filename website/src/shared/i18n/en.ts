@@ -129,8 +129,8 @@ export const en: typeof zh = {
       update: { title: 'Updates and rollback', body: 'Signed A/B deployments, the health gate, and falling back when one fails.' },
       recovery: { title: 'Recovery', body: 'What to do when a device does not boot, and what recovery costs.' },
       trouble: { title: 'When something goes wrong', body: 'How to get in, what evidence to read, and how to interpret a refusal.' },
-      dossier: { title: 'Board dossier', body: 'The board\'s hardware, acceptance boundary and evidence, in the repository.' },
-      bench: { title: 'Bench session', body: 'The board\'s bench procedure and the evidence it collected, in the repository.' },
+      board: { title: 'Board page', body: 'The board\'s hardware, flashing and recovery routes, and what has been proven about it.' },
+      source: { title: 'Board source', body: 'The board\'s kernel, loader and packages, in mica-build.' },
     },
     obtain: {
       heading: 'How to get an image',

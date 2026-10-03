@@ -67,7 +67,7 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
 它们自己的文档 `/mica/config/updates.json` 里，与上面那些并列，而不在设置 schema
 之内。它们有自己的路由——`POST /api/v1/update/config`，只收你要改的那些键——内置
 UI 的自动更新面板就是驱动它的。
-[update-rollback.md](update-rollback.md) 讲每一项各自做什么。
+[updates.md](updates.md) 讲每一项各自做什么。
 
 权威清单是 API 契约，不是这段散文：`mica-core:crates/mica-apid/openapi.json` 接受什么，
 设备就支持什么。

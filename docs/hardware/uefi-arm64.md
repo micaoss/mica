@@ -1,15 +1,11 @@
 # uefi-arm64: generic arm64 UEFI machines
 
 `uefi-arm64` is the arm64 **generic system**: one image for machines whose
-firmware is UEFI with ACPI. It has been a release target since 2026-09-16 and
+firmware is UEFI with ACPI. It
 carries a hardware driver set beyond virtio — while all of its evidence is
 still the QEMU aarch64 `virt` machine. **Carrying a driver is not evidence that
-a machine boots.**
-
-Snapshot written 2026-09-20, from the dossier
-[`docs/hardware/uefi-arm64-dossier.md`](uefi-arm64-dossier.md) and
-`mica-build:boards/uefi-arm64/`; status is owned by the
-[tiers table](support-tiers.md#current-boards).
+a machine boots.** Status is owned by the
+[status table](README.md#current-boards).
 
 ## At a glance
 
@@ -19,8 +15,7 @@ Snapshot written 2026-09-20, from the dossier
 | Boot chain | UEFI firmware with an enrolled development anchor → signed `EFI/BOOT/BOOTAA64.EFI` → counted entry → signed UKI → authenticated native init → SYSTEM → signed verity root/support → systemd |
 | Firmware form | `efi` — the boot loader lives inside the ESP |
 | Partitions | ESP / SYSTEM / DATA |
-| Kernel | mainline stable, pinned to the same tag as `uefi-x64` (currently `v6.12.107`), so a first-boot failure is never ambiguous between the port and the kernel version |
-| Release target | yes, since 2026-09-16 |
+| Kernel | mainline stable, pinned to the same tag as `uefi-x64`, so a first-boot failure is never ambiguous between the port and the kernel version |
 | Tier | bring-up (QEMU reference) |
 | Boot assurance | I1 |
 
@@ -49,7 +44,7 @@ the resolved configuration drops one. The measured cost is recorded too — 232
 kernel modules instead of 71, a 24.5 MB `Image`, and a CI kernel job that goes
 from 330 s to 718 s.
 
-> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
+> status: board-dependent — evidence: `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:boards/uefi-arm64/board.env`, `mica-build:boards/uefi-arm64/kernel/config`
 
 ## Partition layout
 
@@ -112,8 +107,7 @@ counted three attempts deep, and the health gate confirms. See
 `full`, `root` and `kernel` archives are published. Root-only, kernel-only and
 combined updates have run under QEMU, including three failed health trials with
 the retained fallback taken and firmware and identity unchanged. See
-[update packages](../operate/update-packages.md) and
-[update and rollback](../operate/update-rollback.md).
+[updates and rollback](../operate/updates.md).
 
 ## Recovery
 
@@ -134,25 +128,33 @@ See [recovery](../operate/recovery.md).
 - The generic hardware drivers are **carried, not qualified**: no AHCI, NVMe,
   USB or NIC above has been exercised on a physical machine.
 - The gate's boot step is amd64-only, so this board carries **no automatic
-  boot**; its QEMU evidence predates the 2026-09-16 rename.
+  boot**.
 - Development Secure Boot enrolment lives in disposable AAVMF variables and
   qualifies no other platform's firmware or debug policy.
 
-## Verification record
+## Qualification results
 
-Binding: QEMU aarch64 `virt`, `-cpu max`, virtio-blk, the lab's pinned AAVMF
-firmware, and a freshly assembled three-partition image.
+**Binding**: QEMU aarch64 `virt`, `-cpu max`, virtio-blk, the lab's pinned AAVMF
+Secure Boot firmware and a freshly assembled three-partition image; no
+physical machine.
 
-| Item | Result | Date |
-|---|---|---|
-| Factory layout and root composition | pass | 2026-09-09 |
-| Signed boot, runtime and clean shutdown | pass | 2026-09-09 |
-| Full apid API suite | pass | 2026-09-09 |
-| Root-only, kernel-only and combined update | pass | 2026-09-09 |
-| Metadata refusal and exhausted attempts | pass | 2026-09-09 |
-| Network API | pass | 2026-09-09 |
-| Physical power-cut | N/A | emulated storage |
-| Radios and fieldbus | N/A | this board declares none |
-| Physical recovery action | N/A | no physical presence assertion |
+**Owners**: the Mica OS project owns the port and its qualification. There is
+no vendor, no BSP supplier and no integrator of record.
 
-> status: board-dependent — evidence: `docs/hardware/uefi-arm64-dossier.md`, `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:README.md`
+Emulator rows are evidence about the emulated platform, never a hardware pass.
+
+| Row | Result | Date | Evidence / reason |
+|---|---|---|---|
+| Factory layout and root composition | pass | 2026-09-09 | QEMU `virt` lab run |
+| Signed boot, runtime and clean shutdown | pass | 2026-09-09 | QEMU `virt` lab run: authenticated root and support, identity, service checks |
+| Full API suite | pass | 2026-09-09 | QEMU `virt` lab run |
+| Root-only, kernel-only and combined update | pass | 2026-09-09 | QEMU `virt` lab run: three failed health trials, the retained fallback taken, firmware and identity unchanged |
+| Metadata refusal and exhausted attempts | pass | 2026-09-09 | QEMU `virt` lab run |
+| Network API | pass | 2026-09-09 | QEMU `virt` lab run |
+| Installation and first boot | not tested | — | no physical machine |
+| Cold boot and warm boot | not tested | — | no physical machine |
+| Power-cut during update | N/A | — | emulated storage; process interruption is separate evidence |
+| Radios and fieldbus | N/A | — | the board declares none |
+| Physical recovery action | N/A | — | no physical presence assertion |
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-arm64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/updates.sh`, `mica-build:README.md`

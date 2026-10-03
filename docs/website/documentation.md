@@ -41,7 +41,7 @@ because the corresponding user page exists.
   Wi-Fi, SSH, time, and how settings persist.
 - [Applications](../integrate/applications.md) — native packages and containers:
   the two supported delivery paths.
-- [Update and rollback](../operate/update-rollback.md) — A/B updates, health
+- [Update and rollback](../operate/updates.md) — A/B updates, health
   gates, and going back.
 - [Storage](../operate/storage.md) — the storage tiers and what happens if each
   is lost.

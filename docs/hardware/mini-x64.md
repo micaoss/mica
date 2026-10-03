@@ -4,14 +4,7 @@
 for amd64 machines whose firmware is UEFI — cut down to run from 128 MB of
 flash: its own `tinyconfig`-based kernel, an xz root, and one product,
 `mini-x64.basic`, which runs OpenRC with the management plane, SSH and
-containers.
-
-Snapshot written 2026-10-01; status is owned by the
-[tiers table](support-tiers.md#current-boards).
-
-**It has no board dossier.** What follows is read from
-`mica-build:boards/mini-x64/board.env`, its `layout.tsv`, `evidence.json` and
-kernel configuration, and the [flashing](../start/flashing.md) page.
+containers. Status is owned by the [status table](README.md#current-boards).
 
 ## At a glance
 
@@ -22,7 +15,6 @@ kernel configuration, and the [flashing](../start/flashing.md) page.
 | Firmware form | `efi` — the boot loader lives inside the ESP |
 | Partitions | ESP / SYSTEM / DATA |
 | Size budget | 130 MB (`BOARD_SIZE_BUDGET_MB`); the root is xz squashfs |
-| Release target | yes |
 | Tier | bring-up (QEMU) |
 | Boot assurance | I1 |
 
@@ -76,13 +68,27 @@ partition, then `sync` and read back to compare
 
 > status: unsupported
 
-## Updates and recovery
+## First boot
 
-As for [`uefi-x64`](uefi-x64.md#updates): `full`, `root` and `kernel` update
-archives, the A/B switch with health confirmation and rollback, and a
-whole-disk reflash as the floor of recovery. Under OpenRC, micad drives the
-services each package ships for that init
-(`mica-core:docs/mica-core.md` section 3.8).
+As on [`uefi-x64`](uefi-x64.md#first-boot): DATA grows to the medium, the image
+carries two signed deployments, and the health gate confirms the one that
+booted. The root's init is OpenRC, and micad drives the services each package
+ships for that init (`mica-core:docs/mica-core.md` section 3.8).
+
+## Updates
+
+`full`, `root` and `kernel` archives, and `core` for a core release, with the
+A/B switch, health confirmation and rollback of every board. See
+[updates and rollback](../operate/updates.md).
+
+## Recovery
+
+As for [`uefi-x64`](uefi-x64.md#recovery): read-only diagnosis, manual
+rollback, configuration reset and application-data reset are available;
+credential recovery and full-factory reset are refused, because the board
+declares no physical recovery action; the floor is a whole-disk reflash, which
+costs every partition and the device identity. See
+[recovery](../operate/recovery.md).
 
 ## Known limitations
 
@@ -92,12 +98,26 @@ services each package ships for that init
 - No web console and no MQTT: `mini-x64.basic` carries the management plane,
   SSH and containers only.
 
-## Verification record
+## Qualification results
 
-| Item | Result | Note |
-|---|---|---|
-| QEMU runtime, component updates, trial fallback, fault recovery | pass | `evidence.json` |
-| Automatic boot in each release run | yes | amd64 products boot one runtime stage of the UEFI lifecycle |
-| Physical cold boot, write, recovery | not tested | no hardware |
+**Binding**: QEMU `q35` with OVMF Secure Boot firmware and virtio-blk, over
+`mini-x64.basic`; no physical machine.
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`
+**Owners**: the Mica OS project owns the port and its qualification. There is
+no vendor and no integrator of record.
+
+Emulator rows are evidence about the emulated platform, never a hardware pass.
+Each release run of the product boots it once under QEMU.
+
+| Row | Result | Date | Evidence / reason |
+|---|---|---|---|
+| QEMU runtime, component updates, trial fallback, fault recovery | pass | 2026-09-30 | the UEFI lifecycle suite over `mini-x64.basic`, `mica-build:tests/suites/lifecycle-uefi` |
+| Installation and first boot | not tested | — | no physical machine |
+| Cold boot and warm boot | not tested | — | no physical machine |
+| A/B switch and update | not tested | — | no physical machine |
+| Power-cut during update | not tested | — | no physical machine |
+| Storage growth/health | not tested | — | no physical machine; flash endurance is unqualified |
+| Recovery | not tested | — | no physical machine |
+| Radios and fieldbus | N/A | — | the board declares none |
+
+> status: board-dependent — evidence: `mica-build:boards/mini-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

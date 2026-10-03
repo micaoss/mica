@@ -27,7 +27,7 @@
       "docs": [
         { "name": "configuration", "dir": "operate" },
         { "name": "applications", "dir": "integrate" },
-        { "name": "update-rollback", "dir": "operate" },
+        { "name": "updates", "dir": "operate" },
         { "name": "storage", "dir": "operate" }
       ]
     },

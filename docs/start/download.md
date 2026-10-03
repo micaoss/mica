@@ -38,12 +38,12 @@ locally and never released; there are no minimal products
 `cx3576.basic`, `cx3576.full`, `s905x5m.basic`, `s905x5m.full` — are started by
 nothing automatic, because no suite boots a FIT image. (A hardware boot of
 `cx3576` was reported by the user on 2026-09-20; it is a report, not a
-qualification row — [support tiers](../hardware/support-tiers.md).) Every amd64
+qualification row — [support tiers](../hardware/README.md).) Every amd64
 product (`uefi-x64.*`, `mini-x64.basic`) is booted in its release run, and the
 `uefi-arm64` ones carry hand-run QEMU rows ([harness](https://github.com/micaoss/mica-build/blob/main/README.md)
 section 4). Being a release target means the images are built and published;
 it is not a claim about hardware
-([support tiers](../hardware/support-tiers.md)).
+([support tiers](../hardware/README.md)).
 
 A release carries:
 
@@ -53,10 +53,10 @@ A release carries:
 - `.root.micaupd` and `.kernel.micaupd` — the partial archives, when the
   component they omit is unchanged since the product's previous release, and
   `.core.micaupd`, the core components alone
-  ([update packages](../operate/update-packages.md)).
+  ([update packages](../operate/updates.md)).
 - `mica-build.lock` and `SHA256SUMS`, which lists the lock.
 
-> status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/hardware/support-tiers.md`
+> status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/hardware/README.md`
 
 ## 2. Find a product's newest release
 
@@ -135,8 +135,8 @@ half.
 ## 6. Next
 
 - Write the image to a board: [flashing](flashing.md).
-- Update a running device instead: [update packages](../operate/update-packages.md).
+- Update a running device instead: [update packages](../operate/updates.md).
 - Build the same artifacts yourself: [build guide](build.md).
 - How a release is cut and what decides a rebuild: [releasing](../releases/how-releases-work.md).
 
-> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/update-packages.md`, `docs/start/build.md`, `docs/releases/how-releases-work.md`
+> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/updates.md`, `docs/start/build.md`, `docs/releases/how-releases-work.md`

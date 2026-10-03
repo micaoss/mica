@@ -80,7 +80,7 @@ change that publishes the claim — never before.
 Site facts **regenerate from release facts; they are never hand-copied.**
 Release identity, artifact names, digests and per-board compatibility come from
 the machine-readable release manifest each release directory carries, and
-per-board evidence from the board dossiers, so a new release updates the site by
+per-board evidence from the board pages, so a new release updates the site by
 regeneration rather than by editing prose.
 
 > status: shipped — evidence: `mica-build:README.md`, `docs/hardware/qualification.md`

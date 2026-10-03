@@ -201,8 +201,8 @@ Device access is systemd's, with nothing mica-specific over it:
   should fail it — and only the second should fail the health gate in
   section 6.
 
-Device names are board facts. Take them from the board's dossier under
-[../hardware/cx3576-dossier.md](../hardware/cx3576-dossier.md) rather than from another board's unit;
+Device names are board facts. Take them from the board's page under
+[cx3576](../hardware/cx3576.md) rather than from another board's unit;
 `mica-build:boards/cx3576/package/hwinit/` (`mica-build:boards/cx3576/package/hwinit`) is where the shipped
 board-specific units live.
 
@@ -229,7 +229,7 @@ A native application updates when the image does: the new deployment is installe
 beside the current one, the boot records select it, and the binary, the unit and the
 OS move together or not at all. Rollback is the same edge in reverse, and it
 is automatic on a boot that fails the health gate
-([../operate/update-rollback.md](../operate/update-rollback.md)).
+([../operate/updates.md](../operate/updates.md)).
 
 **The code rolls back. The data does not.** DATA/state and the other DATA namespaces are outside the
 deployments by design — that is what makes them survive an update — so an

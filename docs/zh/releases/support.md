@@ -10,22 +10,22 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 层级词汇，与板卡资格认证计划对齐：
 
 - **mica-qualified**——由 Mica OS 项目自身认证的板卡修订版，附带一份带日期的
-  硬件在环档案（启动、A/B 更新、断电、存储扩展、恢复、以及适用的外设），
+  硬件在环板卡页（启动、A/B 更新、断电、存储扩展、恢复、以及适用的外设），
   其中每一行都是 pass、fail、N/A 或 not-tested——绝不隐式为绿。
 - **integrator-qualified / bring-up**——集成商按已发布契约移植并认证的
   板卡；Mica OS 支持契约，集成商拥有板卡证据。
 - **unsupported**——其余一切，包括内核低于支持底线的板卡。
 
 层级定义、认证矩阵与准入评估标准已随 BSP 文档发布：层级在
-[../../hardware/support-tiers.md](../../hardware/support-tiers.md)，矩阵及其行语法在
+[../../hardware/support-tiers.md](../../hardware/README.md)，矩阵及其行语法在
 [../../hardware/qualification.md](../../hardware/qualification.md)，厂商准入评估标准在
 [`intake.md`](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md)。词汇存在不等于某块板卡挣得了
-层级：今天没有任何板卡是 mica-qualified，因为在档的唯一一份档案里，每一行
+层级：今天没有任何板卡是 mica-qualified，因为在案的每一份板卡页里，每一行
 认证结果都是 `not tested`——今天的板卡凭本仓库中的证据持有其地位，而不是
-凭一份完成的档案。
+凭一份完成的板卡页。
 
-> status: shipped — evidence: `docs/hardware/support-tiers.md`, `docs/hardware/qualification.md`
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
+> status: shipped — evidence: `docs/hardware/README.md`, `docs/hardware/qualification.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`
 
 ## 2. 当前硬件地位
 

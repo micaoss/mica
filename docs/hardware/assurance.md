@@ -2,7 +2,7 @@
 
 The I1–I4 ladder in [the security model](../security/model.md) separates
 content integrity, authenticated updates, authenticated boot executables and
-hardware-rooted boot. A board's dossier records the actual evidence and its
+hardware-rooted boot. A board's page records the actual evidence and its
 limits. A software mechanism and a qualified physical device are separate facts.
 
 ## I1 — verified content reads
@@ -49,13 +49,13 @@ and qualified for a named physical board before that claim can be made.
 
 ## Recording a claim
 
-A dossier names the board revision, exact firmware/kernel/root identities,
+A board page names the board revision, exact firmware/kernel/root identities,
 trusted public-key set and evidence. Development keys and disposable enrollment
 remain labelled as such. A physical cx3576 result requires its actual storage,
 serial trace, watchdog/reset cause and power-cut observations. Sandbox execution
 and process-kill tests cannot be relabelled as eMMC power-loss results.
 
-Use the [board template](dossier-template.md), the [qualification matrix](qualification.md)
-and the [current board status](support-tiers.md#current-boards).
+Use the [board template](board-template.md), the [qualification matrix](qualification.md)
+and the [current board status](README.md#current-boards).
 
-> status: shipped — evidence: `docs/hardware/dossier-template.md`, `tools/docs/verify-board.sh`
+> status: shipped — evidence: `docs/hardware/board-template.md`, `tools/docs/verify-board.sh`

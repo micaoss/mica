@@ -87,8 +87,7 @@ network at all is claimed by a `mica-provisioning.toml` document instead; see
 ## 6. Next steps
 
 - [Flashing](flashing.md) — writing an image to a board, per board.
-- [Update and rollback](../operate/update-rollback.md) and
-  [update packages](../operate/update-packages.md) — moving a running device forward.
+- [Updates and rollback](../operate/updates.md) — moving a running device forward.
 - [Applications](../integrate/applications.md) — workloads and persistent data.
 
-> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/update-packages.md`, `docs/integrate/applications.md`
+> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/updates.md`, `docs/integrate/applications.md`

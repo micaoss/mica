@@ -133,5 +133,5 @@ install, confirmation and GC on both boot backends. Firmware signing and
 maintenance have separate [trust evidence](../security/signing.md).
 
 Per-board results and unresolved gates, including physical cx3576
-watchdog/power-cut tests, are in [support tiers](../hardware/support-tiers.md#current-boards). Process interruption and
+watchdog/power-cut tests, are in [support tiers](../hardware/README.md#current-boards). Process interruption and
 VM shutdown cannot establish physical eMMC power-loss durability.

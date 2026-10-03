@@ -139,7 +139,7 @@ validators and the status route are covered by tests. The *transports* are
 not: no test and no bench run has staged a real boot partition or a real USB
 stick into a booting device, and the boot-partition transport in particular
 has never run on a physical board. The mechanism ships; the procedure is
-unproven, and a board dossier is where a run of it gets recorded
+unproven, and a board page is where a run of it gets recorded
 ([../hardware/qualification.md](../hardware/qualification.md)).
 
 > status: shipped — evidence: `mica-system:overlay/usr/lib/mica/mica-provisioning-import`, `docs/integrate/provisioning.md`

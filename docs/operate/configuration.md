@@ -86,7 +86,7 @@ address, maintenance windows and network mode live in their own document,
 settings schema. They have their own route —
 `POST /api/v1/update/config`, which takes only the keys you are changing —
 and the built-in UI's automatic-updates panel drives it.
-[update-rollback.md](update-rollback.md) is what each one does.
+[updates.md](updates.md) is what each one does.
 
 The authoritative list is the API contract, not this prose: what
 `mica-core:crates/mica-apid/openapi.json` accepts is what the device supports.

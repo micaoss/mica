@@ -7,7 +7,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 
 系统地图是 [../../architecture.md](../../architecture.md)。从源码构建系统见
 [构建指南](../../start/build.md)，镜像进入板卡见[刷写](flashing.md)，选更新见
-[更新包](../operate/update-packages.md)，维护者切发布见[发布](../../releases/how-releases-work.md)，
+[更新包](../operate/updates.md)，维护者切发布见[发布](../../releases/how-releases-work.md)，
 新板卡的引入见[移植](https://github.com/micaoss/mica-build/blob/main/boards/README.md)。
 
 ## 1. 仓库
@@ -78,11 +78,11 @@ SSH 与容器；其它每个产品运行 systemd。没有 minimal 产品
 
 每一块板都是发布目标。**这意味着它的产品会被发布；它不是“这块板能在实机上启动”的
 断言**——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行
-未测（[支持层级](../../hardware/support-tiers.md#current-boards)）。它甚至不是“这个镜像
+未测（[支持层级](../../hardware/README.md#current-boards)）。它甚至不是“这个镜像
 被启动过”的断言：没有任何套件会启动 FIT 镜像，所以 `cx3576` 与 `s905x5m` 的产品在这棵
 树里没有任何东西会启动它们。
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:boards/products.md`, `mica-build:boards/boards.tsv`
+> status: board-dependent — evidence: `docs/hardware/README.md`, `mica-build:boards/products.md`, `mica-build:boards/boards.tsv`
 
 ## 4. 文件都在哪里
 

@@ -4,7 +4,7 @@ Installation is a whole-image write: a complete factory image replaces the
 target medium. There is no conversion or upgrade path from an earlier
 partition layout, and nothing inside the written extent survives. A device
 already running Mica OS moves forward with an update archive instead
-([update packages](../operate/update-packages.md)).
+([update packages](../operate/updates.md)).
 
 This page is the order of operations. The per-board write procedure — and
 which boards have one — is [flashing](flashing.md).

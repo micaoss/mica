@@ -6,7 +6,7 @@ Mica OS is an embedded Linux operating system for industrial devices: a signed
 dm-verity root, independently signed kernel, support and core components,
 file-based A/B deployments managed by `mica-deploy`, and a local management API
 and console. The [architecture](architecture.md) maps the components; current
-board status is in [support tiers](hardware/support-tiers.md#current-boards).
+board status is in [support tiers](hardware/README.md#current-boards).
 
 ## Start with a task
 
@@ -15,11 +15,11 @@ board status is in [support tiers](hardware/support-tiers.md#current-boards).
 | Understand the whole system quickly | [Overview](start/overview.md) |
 | Get an image and boot a device | [Quickstart](start/quickstart.md), [download](start/download.md), [flashing](start/flashing.md), [installation](start/install.md) |
 | Build a product from source | [Build guide](start/build.md) |
-| Understand upgrade and rollback | [Operator guide](operate/update-rollback.md), [update packages](operate/update-packages.md), [deployment lifecycle](reference/updates.md), [trust](security/signing.md) |
+| Understand upgrade and rollback | [Updates and rollback](operate/updates.md), [deployment lifecycle](reference/updates.md), [trust](security/signing.md) |
 | Understand disk layout and recovery | [Storage](reference/storage.md), [immutable root](reference/ro-root.md), [reset/recovery](reference/recovery.md) |
 | Develop against the API or the console | [API contract](reference/api.md), [console](integrate/console.md), OpenAPI (`mica-core:crates/mica-apid/openapi.json`) |
 | Integrate an application | [Native applications](integrate/native-applications.md), [containers](integrate/containers.md), [bus](integrate/bus.md) |
-| See what a board does today, and how to flash it | [Supported hardware](hardware/README.md), [support tiers](hardware/support-tiers.md) |
+| See what a board does today, and how to flash it | [Supported hardware](hardware/README.md), [support tiers](hardware/README.md) |
 | Understand how releases are identified | [Release notes](releases/release-notes.md), [releasing](releases/how-releases-work.md), [release lock](reference/release-lock.md) |
 | Find a product decision | [Decisions](decisions/README.md) |
 
@@ -61,7 +61,7 @@ restating it.
 | `security/` | the security posture, the threat model, the lifecycle and the trust chain | the formats, which are `mica-core`'s |
 | `reference/` | the contracts of the product's behaviour on a device; unimplemented parts are labelled | build engineering, chronology, test transcripts, wire formats |
 | `releases/` | how a release is identified, made, distributed and supported | each repository's own release procedure |
-| `hardware/` | the per-board reader's view (feature and verification state, flashing, update and recovery route), the support tiers, the boot-assurance ladder, the qualification matrix and the dossiers | the board contract and porting, which are `mica-build`'s |
+| `hardware/` | the per-board reader's view (feature and verification state, flashing, update and recovery route), the support tiers, the boot-assurance ladder, the qualification matrix and the board page template | the board contract and porting, which are `mica-build`'s |
 | `website/` | publication copy for micaos.dev and its claim limits | anything not yet evidenced |
 | `decisions/` | dated product decisions with a sunset | design detail, engineering decisions of a module |
 | `zh/` | Chinese user guides, the Chinese hardware list under `zh/hardware/`, and explicitly requested Chinese briefs | engineering translations |
@@ -82,8 +82,7 @@ current product only; history is in Git.
   - `build.md` — building a product image from source, online from the pinned releases or offline from the checkouts
 - `operate/` — running a device: configuration, updates, recovery, storage, the API
   - `configuration.md` — the configuration model and every supported way to change settings
-  - `update-rollback.md` — the A/B update path, health confirmation and rollback
-  - `update-packages.md` — which update archive applies to a device, how it is taken, and how to pick it from a product's releases
+  - `updates.md` — which update archive applies, online and offline updates, confirmation, rollback and every refusal
   - `recovery.md` — what to do when a device does not boot, and what recovery costs
   - `storage.md` — partitions, what survives what, and where data belongs
   - `troubleshooting.md` — diagnosis: access channels, evidence to read, refusals to interpret
@@ -98,9 +97,8 @@ current product only; history is in Git.
   - `manufacturing.md` — putting Mica OS on units at volume: identity, first credential, factory record and quarantine
   - `native-applications.md` — integrator's guide to native `.deb` applications: units, accounts, writable state, the health gate, devices, ceilings and rollback limits
   - `provisioning.md` — configuration without a network: first-boot identity, provisioning documents and credentials
-- `hardware/` — the supported boards: one page per board, the support tiers, assurance, qualification and the dossiers
+- `hardware/` — the supported boards: one page per board, the status table and support tiers, assurance and qualification
   - `README.md` — the board list, a dated state snapshot and the route into each board's page
-  - `support-tiers.md` — board support tiers and the current board status table
   - `uefi-x64.md` — generic amd64 UEFI machines: the baseline, booted in every release run
   - `uefi-arm64.md` — generic arm64 UEFI machines: the carried driver set, and why carrying is not qualifying
   - `cx3576.md` — CX3576-Z / RK3576: features, the rockusb flashing path and what a reported bench boot does not establish
@@ -108,10 +106,7 @@ current product only; history is in Git.
   - `mini-x64.md` — small amd64 UEFI machines with 128 MB of flash: one OpenRC product with containers, no USB
   - `assurance.md` — boot assurance ladder (I1–I4) and what each level requires
   - `qualification.md` — field-reliability qualification: the matrix and its binding rules
-  - `dossier-template.md` — board dossier template: the thirteen validated sections
-  - `cx3576-dossier.md` — board dossier: CX3576-Z / RK3576
-  - `s905x5m-dossier.md` — board dossier: BM201 / S905X5M mainline adaptation and qualification boundary
-  - `uefi-arm64-dossier.md` — board dossier: the generic arm64 UEFI system and its evidence boundary
+  - `board-template.md` — the board page template: the eleven validated sections
 - `security/` — the security posture, the model, the lifecycle and the trust chain
   - `lifecycle.md` — key and credential lifecycles, owner roles, release channels, support windows and security response
   - `model.md` — threat and physical-access boundaries, the I1–I4 boot-assurance ladder and honest limits
@@ -152,7 +147,7 @@ current product only; history is in Git.
   `security/`, `releases/`. English is authoritative; `zh/README.md` carries the coverage table.
 
 `make docs-verify` checks catalog membership in both directions, internal
-links, truth-status evidence, board dossiers and Chinese coverage;
+links, truth-status evidence, board pages and Chinese coverage;
 `make docs-verify-world` checks the claims these documents make about other
 repositories, and that every `<repository>:<path>` citation resolves. A
 records change runs as one gated sequence,

@@ -2,14 +2,7 @@
 
 `uefi-x64` 不是一块板，而是一个**通用系统**：一份镜像服务于固件是 UEFI 的
 amd64 机器，按启动它的固件类命名，而不是按某台机器命名。它也是这个项目的基线，
-它的产品在每次发布时都会被自动启动。
-
-现状快照记于 2026-09-29。状态以英文的
-[支持层级表](../../hardware/support-tiers.md#current-boards)为准。
-
-**它没有板卡档案。**`docs/hardware/` 下有 `cx3576`、`s905x5m` 和 `uefi-arm64` 的
-档案，没有这一块。本页的事实来自 `mica-build:boards/uefi-x64/board.env`、
-`evidence.json`、内核配置，以及中文[刷写](../start/flashing.md)页。
+它的产品在每次发布时都会被自动启动。状态以[状态表](README.md#当前板卡)为准。
 
 ## 概况
 
@@ -19,7 +12,6 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 | 启动链 | UEFI 固件 → 签名的 `EFI/BOOT/BOOTX64.EFI`（systemd-boot）→ 计数启动项 → 签名 UKI → 认证的 native init → SYSTEM → 签名的 verity root/support → systemd |
 | 固件形态 | `efi`（引导器在 ESP 内） |
 | 分区 | ESP / SYSTEM / DATA |
-| 发布目标 | 是 |
 | 支持层级 | bring-up（QEMU 基线） |
 | 启动保证等级 | I1 |
 
@@ -87,8 +79,8 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 ## 更新
 
 通过更新归档升级，不要靠重刷（重刷会抹掉 DATA）。这块板发布 `full`、`root`、
-`kernel` 三种归档，选哪个见[更新包](../operate/update-packages.md)；A/B 切换、健康确认
-与回滚见[更新与回滚](../operate/update-rollback.md)。QEMU 里跑过完整的更新、故障与
+`kernel` 三种归档，选哪个见[更新包](../operate/updates.md)；A/B 切换、健康确认
+与回滚见[更新与回滚](../operate/updates.md)。QEMU 里跑过完整的更新、故障与
 回退验收。
 
 ## 恢复
@@ -105,15 +97,27 @@ DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 �
 
 - 全部证据都是 QEMU 证据，不是现场证据。
 - 没有任何实体 amd64 机器被验证过：USB、SATA、NVMe 这几条路都只是“内核带着驱动”。
-- 没有板卡档案，因此也没有合格矩阵；这块板的结论都散在别处。
 - 没有 MMC 驱动：从平台 MMC 控制器启动的机器属于另一块硬件板。
 
-## 验证记录
+## 认证结果
 
-| 项 | 结果 | 说明 |
-|---|---|---|
-| QEMU 生命周期（API、电源动作、重启、运行时、更新、重置） | 通过 | 支持层级表记录的验收列 |
-| 每次发布时自动启动 | 是 | amd64 产品跑一轮 UEFI lifecycle 的运行阶段 |
-| 实体机器冷启动 / 写入 / 恢复 | 未测试 | 没有实机 |
+**绑定**：QEMU `q35`，OVMF Secure Boot 固件与 virtio-blk；没有实体机器。
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`
+**归属**：Mica OS 项目拥有该移植及其认证。没有厂商，也没有在案的集成商。
+
+模拟器的行是关于被模拟平台的证据，从不算作实机通过。每次 amd64 产品的发布运行都会在 QEMU 下启动它一次。
+
+| 行 | 结果 | 日期 | 证据 / 原因 |
+|---|---|---|---|
+| QEMU 生命周期：API、电源动作、重启、运行时、更新、故障、重置 | pass | 2026-09-09 | UEFI 生命周期套件，`mica-build:tests/suites/lifecycle-uefi` |
+| 安装与首次启动 | not tested | — | 没有实体机器 |
+| 冷启动与热启动 | not tested | — | 没有实体机器 |
+| A/B 切换与更新 | not tested | — | 没有实体机器 |
+| 更新中断电 | not tested | — | 没有实体机器；QEMU 下的进程中断是另一类证据 |
+| 存储扩展 / 健康 | not tested | — | 没有实体机器 |
+| 网络 | not tested | — | 没有实体机器 |
+| 看门狗 / 复位原因 | not tested | — | 没有实体机器 |
+| 恢复 | not tested | — | 没有实体机器 |
+| 射频与现场总线 | N/A | — | 这块板没有声明 |
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

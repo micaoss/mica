@@ -6,11 +6,11 @@
 #   bash tools/docs/verify-board-test.sh          (or: make docs-verify-test)
 #
 # HOW. The REAL tools/docs/verify-board.sh is run, once per case, over a COPY
-# of the real template and dossier with one mutation applied -- the approach
+# of the real template and board page with one mutation applied -- the approach
 # verify-index-test.sh established. The verifier resolves its own directory
 # from ${BASH_SOURCE}, so a copy at ${case}/tools/docs/verify-board.sh reads
 # ${case}/docs/hardware, and unlike the link and status gates this one's inputs
-# live entirely inside docs/hardware/, so the SHIPPED template and dossier are the
+# live entirely inside docs/hardware/, so the SHIPPED template and board page are the
 # baseline, copied verbatim -- a fixture this script had authored would prove
 # only that the script can spell.
 #
@@ -19,8 +19,8 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERIFIER="${HERE}/verify-board.sh"
-TEMPLATE="${HERE}/../../docs/hardware/dossier-template.md"
-DOSSIER="${HERE}/../../docs/hardware/cx3576-dossier.md"
+TEMPLATE="${HERE}/../../docs/hardware/board-template.md"
+DOSSIER="${HERE}/../../docs/hardware/cx3576.md"
 
 for required in "${VERIFIER}" "${TEMPLATE}" "${DOSSIER}"; do
     [ -e "${required}" ] || { echo "error: ${required} not found" >&2; exit 1; }
@@ -108,36 +108,36 @@ echo
 # --- 0. positive control ----------------------------------------------------
 FIX="${WORK}/baseline"
 new_fixture "${FIX}"
-expect_all_pass "baseline: the shipped template and dossier, copied verbatim"
+expect_all_pass "baseline: the shipped template and board page, copied verbatim"
 
-# --- 1. a required heading missing from the dossier --------------------------
+# --- 1. a required heading missing from the page --------------------------
 FIX="${WORK}/missing-heading"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/hardware/cx3576-dossier.md" '## Console' ''
-expect_fail "a dossier without the Console section" 1 \
-    "cx3576-dossier.md is missing the required heading '## Console'"
+replace_line "${FIX}/docs/hardware/cx3576.md" '## Console' ''
+expect_fail "a board page without the Console section" 1 \
+    "cx3576.md is missing the required heading '## Console'"
 
 # --- 2. an H2 the template does not name -------------------------------------
 FIX="${WORK}/extra-heading"
 new_fixture "${FIX}"
-printf '\n## Bench notes\n\nScratch.\n' >>"${FIX}/docs/hardware/cx3576-dossier.md"
-expect_fail "a dossier with a heading outside the template list" 1 \
+printf '\n## Bench notes\n\nScratch.\n' >>"${FIX}/docs/hardware/cx3576.md"
+expect_fail "a board page with a heading outside the template list" 1 \
     "carries the heading '## Bench notes', which is outside the template's section list"
 
 # --- 3. every heading present, two of them swapped ---------------------------
 FIX="${WORK}/swapped-headings"
 new_fixture "${FIX}"
 # One sed pass: the Console line falls through both later substitutions and
-# lands as Peripherals; the Peripherals line becomes Console.
-sed -i 's/^## Console$/## Peripherals/; t; s/^## Peripherals$/## Console/' \
-    "${FIX}/docs/hardware/cx3576-dossier.md"
-expect_fail "a dossier with Console and Peripherals swapped" 1 \
+# lands as Flashing; the Flashing line becomes Console.
+sed -i 's/^## Console$/## Flashing/; t; s/^## Flashing$/## Console/' \
+    "${FIX}/docs/hardware/cx3576.md"
+expect_fail "a board page with Console and Flashing swapped" 1 \
     "carries every required heading but not in the template's order"
 
 # --- 4. a qualification result outside the vocabulary ------------------------
 FIX="${WORK}/bad-result-cell"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/hardware/cx3576-dossier.md" \
+replace_line "${FIX}/docs/hardware/cx3576.md" \
     '| Warm boot | not tested | — | needs bench hardware |' \
     '| Warm boot | untested | — | needs bench hardware |'
 expect_fail "a result cell saying 'untested'" 1 \
@@ -146,7 +146,7 @@ expect_fail "a result cell saying 'untested'" 1 \
 # --- 5. a pass row without an ISO date ---------------------------------------
 FIX="${WORK}/pass-without-date"
 new_fixture "${FIX}"
-replace_line "${FIX}/docs/hardware/cx3576-dossier.md" \
+replace_line "${FIX}/docs/hardware/cx3576.md" \
     '| Cold boot | not tested | — | needs bench hardware |' \
     '| Cold boot | pass | — | claimed without a run on record |'
 expect_fail "a pass row with no date" 1 \
@@ -156,23 +156,23 @@ expect_fail "a pass row with no date" 1 \
 # The vacuity guard: zero required headings must never validate anything.
 FIX="${WORK}/empty-template-list"
 new_fixture "${FIX}"
-sed -i '/^[0-9][0-9]*\. `## /d' "${FIX}/docs/hardware/dossier-template.md"
+sed -i '/^[0-9][0-9]*\. `## /d' "${FIX}/docs/hardware/board-template.md"
 expect_fail "a template yielding zero required headings" 1 \
-    "yields zero required H2 headings; every dossier would pass vacuously"
+    "yields zero required H2 headings; every board page would pass vacuously"
 
-# --- 7. no dossier instance at all -------------------------------------------
-FIX="${WORK}/no-dossier"
+# --- 7. no board page at all -------------------------------------------------
+FIX="${WORK}/no-board-page"
 new_fixture "${FIX}"
-rm "${FIX}/docs/hardware/cx3576-dossier.md"
-expect_fail "a tree with no dossier to validate" 1 \
-    "no dossier instance found"
+rm "${FIX}/docs/hardware/cx3576.md"
+expect_fail "a tree with no board page to validate" 1 \
+    "no board page found"
 
-# --- 8. a dossier whose qualification table is empty -------------------------
+# --- 8. a board page whose qualification table is empty ----------------------
 FIX="${WORK}/no-qualification-rows"
 new_fixture "${FIX}"
 sed -i '/^## Qualification results$/,$ { /^|/d }' \
-    "${FIX}/docs/hardware/cx3576-dossier.md"
-expect_fail "a dossier with zero qualification rows" 1 \
+    "${FIX}/docs/hardware/cx3576.md"
+expect_fail "a board page with zero qualification rows" 1 \
     "has zero qualification rows; 'never implicitly green' would pass vacuously"
 
 echo

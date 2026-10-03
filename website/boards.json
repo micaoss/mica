@@ -7,7 +7,7 @@
         { "id": "install", "doc": "start/install" },
         { "id": "flashing", "doc": "start/flashing" },
         { "id": "firstRun", "doc": "start/first-run" },
-        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "update", "doc": "operate/updates" },
         { "id": "trouble", "doc": "operate/troubleshooting" }
       ]
     },
@@ -17,8 +17,8 @@
         { "id": "quickstart", "doc": "start/quickstart" },
         { "id": "install", "doc": "start/install" },
         { "id": "flashing", "doc": "start/flashing" },
-        { "id": "update", "doc": "operate/update-rollback" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/uefi-arm64-dossier.md" }
+        { "id": "update", "doc": "operate/updates" },
+        { "id": "board", "doc": "hardware/uefi-arm64" }
       ]
     },
     {
@@ -26,11 +26,11 @@
       "guides": [
         { "id": "install", "doc": "start/install" },
         { "id": "flashing", "doc": "start/flashing" },
-        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "update", "doc": "operate/updates" },
         { "id": "recovery", "doc": "operate/recovery" },
         { "id": "trouble", "doc": "operate/troubleshooting" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/cx3576-dossier.md" },
-        { "id": "bench", "url": "https://github.com/micaoss/mica/blob/9dd6302/docs/boards/cx3576-bench.md" }
+        { "id": "board", "doc": "hardware/cx3576" },
+        { "id": "source", "url": "https://github.com/micaoss/mica-build/tree/main/boards/cx3576" }
       ]
     },
     {
@@ -38,9 +38,9 @@
       "guides": [
         { "id": "install", "doc": "start/install" },
         { "id": "flashing", "doc": "start/flashing" },
-        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "update", "doc": "operate/updates" },
         { "id": "trouble", "doc": "operate/troubleshooting" },
-        { "id": "dossier", "url": "https://github.com/micaoss/mica/blob/main/docs/hardware/s905x5m-dossier.md" }
+        { "id": "board", "doc": "hardware/s905x5m" }
       ]
     },
     {
@@ -49,7 +49,7 @@
         { "id": "install", "doc": "start/install" },
         { "id": "flashing", "doc": "start/flashing" },
         { "id": "firstRun", "doc": "start/first-run" },
-        { "id": "update", "doc": "operate/update-rollback" },
+        { "id": "update", "doc": "operate/updates" },
         { "id": "trouble", "doc": "operate/troubleshooting" }
       ]
     }

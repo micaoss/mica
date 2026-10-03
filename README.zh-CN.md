@@ -45,7 +45,7 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 还没有发布的产品没有镜像可下载，请从源码构建（[构建指南](docs/start/build.md)）。
 
 尚无板卡完成认证：没有任何板卡档案里有注明日期的实机合格行，也没有任何实机启动拥有
-证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/hardware/support-tiers.md)是权威且最新的表，并说明每个等级的
+证据行（2026-09-20 有一条 `cx3576` 的实机启动报告，未附产物，不移动任何一行）。[支持等级表](docs/hardware/README.md)是权威且最新的表，并说明每个等级的
 含义；中文的[支持硬件列表](docs/zh/hardware/README.md)按板卡讲同一件事。
 
 ## 从这里开始
@@ -54,7 +54,7 @@ Mica OS 处于活跃开发中。下面每块板都是发布目标：它的每个
 |---|---|
 | 了解系统如何拼在一起 | [架构](docs/architecture.md) |
 | 构建一份镜像并启动它 | [快速上手](docs/zh/start/quickstart.md)、[构建指南](docs/start/build.md)、[安装](docs/zh/start/install.md) |
-| 配置与运维一台设备 | [首次配置](docs/zh/start/first-run.md)、[配置](docs/zh/operate/configuration.md)、[更新与回滚](docs/zh/operate/update-rollback.md) |
+| 配置与运维一台设备 | [首次配置](docs/zh/start/first-run.md)、[配置](docs/zh/operate/configuration.md)、[更新与回滚](docs/zh/operate/updates.md) |
 | 把我的应用跑上去 | [应用](docs/zh/integrate/applications.md)、[容器](docs/integrate/containers.md) |
 | 看某块板卡的现状与刷机步骤 | [支持硬件列表](docs/zh/hardware/README.md) |
 | 上一块新板子 | [`mica-build:boards/`](https://github.com/micaoss/mica-build/blob/main/boards/README.md)，每块板卡在那里带着自己的完整构建 |

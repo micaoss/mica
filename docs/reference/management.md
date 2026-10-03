@@ -366,4 +366,4 @@ Rust workspace checks cover the settings store, reconcilers and bus surface.
 Complete-image tests on uefi-x64 and uefi-arm64 cover the native deployment service,
 component updates, quota enforcement, health confirmation and fallback, and
 the API suite runs against the QEMU guest. Physical-board acceptance is tracked
-per board in [support tiers](../hardware/support-tiers.md#current-boards).
+per board in [support tiers](../hardware/README.md#current-boards).

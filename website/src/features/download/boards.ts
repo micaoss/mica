@@ -4,7 +4,7 @@ import config from '../../../boards.json'
 
 /**
  * Per-board configuration, read from `boards.json`. Which documents a board's
- * page links to is data: a board with a bench session or its own dossier lists
+ * page links to is data: a board with its own page or source tree lists
  * them, a board without one does not.
  */
 

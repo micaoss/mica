@@ -58,10 +58,10 @@ of its own — which says nothing about whether the board boots on hardware.
 A product with no release yet has no image to download; build it from source
 ([build guide](docs/start/build.md)).
 
-No board is qualified: no dossier carries a dated physical qualification row,
+No board is qualified: no board page carries a dated physical qualification row,
 and no physical boot has an evidence row — a `cx3576` bench boot was reported
 on 2026-09-20 with no artefact, which moves nothing. The
-[support tiers](docs/hardware/support-tiers.md) page is the authoritative,
+[support tiers](docs/hardware/README.md) page is the authoritative,
 up-to-date table and explains what each tier means; the Chinese
 [hardware list](docs/zh/hardware/README.md) covers the same ground per board.
 
@@ -71,7 +71,7 @@ up-to-date table and explains what each tier means; the Chinese
 |---|---|
 | Understand how the system fits together | [Architecture](docs/architecture.md) |
 | Build an image and boot it | [Quickstart](docs/start/quickstart.md), [build guide](docs/start/build.md), [installation](docs/start/install.md) |
-| Configure and operate a device | [First run](docs/start/first-run.md), [configuration](docs/operate/configuration.md), [updates and rollback](docs/operate/update-rollback.md) |
+| Configure and operate a device | [First run](docs/start/first-run.md), [configuration](docs/operate/configuration.md), [updates and rollback](docs/operate/updates.md) |
 | Run my application on it | [Applications](docs/integrate/applications.md), [containers](docs/integrate/containers.md) |
 | Bring up a new board | [`mica-build:boards/`](https://github.com/micaoss/mica-build/blob/main/boards/README.md), where each board carries its whole build |
 | Review the security posture | [Security](docs/security/overview.md), [security model](docs/security/model.md) |

@@ -167,4 +167,4 @@ evidence stays absent; no member is manufactured.
 
 PTP, NTS, user-configurable polling periods and any NTP pause switch.
 Per-board RTC backup-power validation is hardware qualification work recorded
-in each board dossier.
+in each board page.

@@ -1,6 +1,6 @@
 import type { LocaleCode } from '@/shared/i18n'
 
-export const SUPPORT_TIERS_URL = 'https://github.com/micaoss/mica/blob/main/docs/hardware/support-tiers.md'
+export const SUPPORT_TIERS_URL = 'https://github.com/micaoss/mica/blob/main/docs/hardware/README.md'
 export const NEW_ISSUE_URL = 'https://github.com/micaoss/mica/issues/new'
 export const GITHUB_ORG_URL = 'https://github.com/micaoss'
 

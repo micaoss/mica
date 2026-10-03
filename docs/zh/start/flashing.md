@@ -7,20 +7,20 @@
 - 选发布、核对摘要：[获取发布版](download.md)。
 - 镜像里有什么、每个分区多大：[存储](../../reference/storage.md)。
 - 板子起来之后：[首次启动](first-run.md)。
-- 不整盘重写、而是替换运行中的系统：[更新包](../../operate/update-packages.md)。
+- 不整盘重写、而是替换运行中的系统：[更新包](../../operate/updates.md)。
 
 **已合格到什么程度，这里只说一次。** 这里记录在案的每一次启动都是 QEMU：没有任何
 把 Mica OS 镜像写进 U 盘、SATA 硬盘、NVMe 或 eMMC 的记录，也没有任何实机启动拥有
 证据行。用户于 2026-09-20 报告一块 `cx3576` 在实机上启动成功；那条报告没有附带
 产物，因此不是证据行，本页也不当它是
-（[支持层级](../../hardware/support-tiers.md)）。
+（[支持层级](../../hardware/README.md)）。
 下面的 QEMU 小节是实际跑过的；硬件小节是从仓库里读出来的，未验证之处都有标注。
 每个 amd64 产品都会在它的发布流程里被自动启动，而 `uefi-arm64` 镜像只被构建和校验、
 没有自动流程启动它，
 `cx3576` 与 `s905x5m` 的镜像则没有任何自动流程会启动：没有任何套件会启动 FIT 镜像——
 FIT 那套跑在宿主机上，里面没有 QEMU（[获取发布版](download.md) 第 1 节）。
 
-> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/hardware/support-tiers.md`
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/hardware/README.md`
 
 ## 1. 写入之前
 
@@ -135,7 +135,7 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 2026-09-16 起该板卡是发布目标，其内核携带通用硬件驱动——AHCI、NVMe、经 xHCI 与 EHCI
 的 USB 存储，以及作为模块的常见网卡——但**携带驱动不等于有证据证明某台机器能启动**：
 它的合格范围仍只有 QEMU `virt`，与 `uefi-x64` 相同
-（[板卡档案](../../hardware/uefi-arm64-dossier.md)）。
+（[板卡页](../hardware/uefi-arm64.md)）。
 
 验收实验室使用的固件文件：
 
@@ -197,7 +197,7 @@ mica-deploy import /run/mica/import/update.micaupd
 make lifecycle-uefi PRODUCT=uefi-arm64.dev
 ```
 
-> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/hardware/uefi-arm64-dossier.md`
+> status: shipped — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:make lifecycle-uefi`, `mica-build:boards/uefi-arm64/kernel/config`, `docs/hardware/uefi-arm64.md`
 
 普通的发布镜像启动到登录提示符并拉起它的服务。验收控制台上打印的 `FILE_AB_*`
 标记来自套件自己塞进镜像的脚本，不是出厂镜像的行为；在设备上不要指望看到它们。
@@ -236,7 +236,7 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 [`docs/hardware/cx3576/rkdeveloptool`](../../hardware/cx3576/rkdeveloptool/README.md) 在固定的
 上游提交上用两个补丁原生构建。
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/hardware/cx3576/rkdeveloptool/README.md`, `docs/hardware/cx3576-dossier.md`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/loader/MiniLoaderAll.bin.sha256`, `docs/hardware/cx3576/rkdeveloptool/README.md`, `docs/hardware/cx3576.md`
 
 > status: unsupported
 
@@ -298,6 +298,6 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 - **没有分区级 A/B。** 两个部署都是 SYSTEM 上的文件，所以不存在“另一个槽”可刷
   （[更新](../../reference/updates.md)）。
 - **不能靠重刷来升级。** 写镜像会抹掉 DATA。要把运行中的设备带到新发布，用更新归档
-  （[更新包](../../operate/update-packages.md)）。
+  （[更新包](../../operate/updates.md)）。
 
-> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/reference/updates.md`, `docs/operate/update-packages.md`
+> status: shipped — evidence: `mica-build:boards/uefi-x64/images.tsv`, `docs/reference/updates.md`, `docs/operate/updates.md`

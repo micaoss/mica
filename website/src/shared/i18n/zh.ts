@@ -139,8 +139,8 @@ export const zh = {
       update: { title: '升级与回滚', body: '签名的 A/B 部署、健康确认，以及失败时退回上一份。' },
       recovery: { title: '恢复', body: '设备起不来时怎么办，以及恢复的代价。' },
       trouble: { title: '出问题的时候', body: '怎么接进去、该读哪些证据、系统的拒绝信息怎么解读。' },
-      dossier: { title: '板卡档案', body: '这块板卡的硬件、验收边界与证据，在仓库里。' },
-      bench: { title: '实机测试记录', body: '这块板卡的台架流程与采集到的证据，在仓库里。' },
+      board: { title: '板卡页', body: '这块板卡的硬件、刷写与恢复途径，以及已经证明了什么。' },
+      source: { title: '板卡源码', body: '这块板卡的内核、加载器与软件包，在 mica-build 里。' },
     },
     obtain: {
       heading: '怎么拿到镜像',

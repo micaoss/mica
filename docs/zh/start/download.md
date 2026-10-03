@@ -30,21 +30,21 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 **发布了的镜像不等于被启动过的镜像。**九个产品中有四个——`cx3576.basic`、
 `cx3576.full`、`s905x5m.basic`、`s905x5m.full`——没有任何自动流程会启动它们，因为
 没有任何套件会启动 FIT 镜像。（用户于 2026-09-20 报告过一次 `cx3576` 的实机启动；
-那是一条报告，不是合格行——[支持层级](../../hardware/support-tiers.md)。）每个 amd64
+那是一条报告，不是合格行——[支持层级](../../hardware/README.md)。）每个 amd64
 产品（`uefi-x64.*`、`mini-x64.basic`）都会在它的发布流程里被启动，`uefi-arm64` 的
 产品有手工跑的 QEMU 记录（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md)第 4 节）。是发布
 目标只意味着镜像被构建并发布，不是对硬件的断言
-（[支持层级](../../hardware/support-tiers.md)）。
+（[支持层级](../../hardware/README.md)）。
 
 一个发布携带：
 
 - `mica-<board>.<variant>-<stamp>.img.gz`——出厂磁盘镜像，gzip 压缩。不上传裸 `.img`。
 - `mica-<board>.<variant>-<stamp>.micaupd`——完整更新归档，总是有。
 - `.root.micaupd` 与 `.kernel.micaupd`——部分更新归档，当它们省略的组件自该产品上一个
-  发布以来没有变化时才有；以及只携带 core 组件的 `.core.micaupd`（[更新包](../operate/update-packages.md)）。
+  发布以来没有变化时才有；以及只携带 core 组件的 `.core.micaupd`（[更新包](../operate/updates.md)）。
 - `mica-build.lock` 与列出它的 `SHA256SUMS`。
 
-> status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/hardware/support-tiers.md`
+> status: shipped — evidence: `docs/decisions/2026-09-15-release-images-and-products.md`, `docs/decisions/2026-09-15-update-packages.md`, `docs/hardware/README.md`
 
 ## 2. 找到一个产品的最新发布
 
@@ -116,8 +116,8 @@ lock 是一份 `mica-lock v1` 文件，写明发布的提交，以及进入它�
 ## 6. 下一步
 
 - 把镜像写进板卡：[刷写](flashing.md)。
-- 改为更新一台正在运行的设备：[更新包](../operate/update-packages.md)。
+- 改为更新一台正在运行的设备：[更新包](../operate/updates.md)。
 - 自己构建同样的产物：[构建指南](../../start/build.md)。
 - 发布怎么切、什么决定重建：[发布](../../releases/how-releases-work.md)。
 
-> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/update-packages.md`, `docs/start/build.md`, `docs/releases/how-releases-work.md`
+> status: shipped — evidence: `docs/start/flashing.md`, `docs/operate/updates.md`, `docs/start/build.md`, `docs/releases/how-releases-work.md`

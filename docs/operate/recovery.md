@@ -139,7 +139,7 @@ application-data reset leaves the update configuration alone.
 `POST /api/v1/update/config` with `{"source": {"url": null}}` returns that one
 key to the built-in default and leaves everything else configured — a reset
 spends every setting to recover one. See
-[update-rollback.md](update-rollback.md).
+[updates.md](updates.md).
 
 ### Step 4 — Application-data reset — IRREVERSIBLE
 

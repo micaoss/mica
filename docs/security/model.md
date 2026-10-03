@@ -90,7 +90,7 @@ Boot-key, content-key and metadata-key overlap/removal are separate operations.
 Firmware maintenance is an authenticated offline workflow with a recovery artifact
 and readback. Ordinary root/kernel updates do not write loader firmware. No OTP
 or fuse change is part of current acceptance. Per-board evidence and limitations are in
-[support tiers](../hardware/support-tiers.md#current-boards).
+[support tiers](../hardware/README.md#current-boards).
 
 ## 5. The I1–I4 boot-assurance ladder
 
@@ -108,7 +108,7 @@ physical evidence. Mechanism-level software proofs are listed separately:
 The current code implements the I1–I3 mechanisms and tests them in development
 QEMU/sandbox environments. Board evidence remains conservative; physical cx3576
 qualification is pending. No I4 claim is made. The [BSP assurance page](../hardware/assurance.md)
-applies this distinction to dossiers and release wording.
+applies this distinction to board pages and release wording.
 
 ## 6. Boundary (d): data confidentiality at rest — **[proposed]**
 

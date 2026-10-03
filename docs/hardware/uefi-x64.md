@@ -3,15 +3,8 @@
 `uefi-x64` is not a board but a **generic system**: one image for amd64
 machines whose firmware is UEFI, named for the firmware class that starts it
 rather than for a machine. It is also this project's baseline, booted
-automatically in every release run of its products.
-
-Snapshot written 2026-09-29; status is owned by the
-[tiers table](support-tiers.md#current-boards).
-
-**It has no board dossier.** `docs/hardware/` holds dossiers for `cx3576`,
-`s905x5m` and `uefi-arm64`, not for this one. What follows is read from
-`mica-build:boards/uefi-x64/board.env`, its `evidence.json`, its kernel
-configuration, and the [flashing](../start/flashing.md) page.
+automatically in every release run of its products. Status is owned by the
+[status table](README.md#current-boards).
 
 ## At a glance
 
@@ -21,7 +14,6 @@ configuration, and the [flashing](../start/flashing.md) page.
 | Boot chain | UEFI firmware → signed `EFI/BOOT/BOOTX64.EFI` (systemd-boot) → counted entry → signed UKI → authenticated native init → SYSTEM → signed verity root/support → systemd |
 | Firmware form | `efi` — the boot loader lives inside the ESP |
 | Partitions | ESP / SYSTEM / DATA |
-| Release target | yes |
 | Tier | bring-up (QEMU baseline) |
 | Boot assurance | I1 |
 
@@ -99,8 +91,8 @@ three attempts, blessed once the health gate passes. See
 
 Upgrade with an update archive, not by reflashing — a reflash erases DATA.
 This board publishes `full`, `root` and `kernel` archives; which one applies is
-[update packages](../operate/update-packages.md), and the A/B switch, health
-confirmation and rollback are [update and rollback](../operate/update-rollback.md).
+[update packages](../operate/updates.md), and the A/B switch, health
+confirmation and rollback are [update and rollback](../operate/updates.md).
 The full update, fault and fallback acceptance runs under QEMU.
 
 ## Recovery
@@ -123,17 +115,31 @@ The full ladder and the cost of each step is [recovery](../operate/recovery.md).
 - All evidence is emulator evidence, not field evidence.
 - No physical amd64 machine has been verified: USB, SATA and NVMe are "the
   kernel carries the driver" and nothing more.
-- No dossier exists, so there is no qualification matrix for this board; its
-  results live in the tiers table and in the acceptance suites.
 - No MMC driver: a machine that boots from a platform MMC controller is a
   hardware board of its own, not this image.
 
-## Verification record
+## Qualification results
 
-| Item | Result | Note |
-|---|---|---|
-| QEMU lifecycle: API, power actions, reboot, runtime, updates, reset | pass | the acceptance column of the tiers table |
-| Automatic boot in each release run | yes | amd64 products boot one runtime stage of the UEFI lifecycle |
-| Physical cold boot, write, recovery | not tested | no hardware |
+**Binding**: QEMU `q35` with OVMF Secure Boot firmware and virtio-blk; no
+physical machine.
 
-> status: board-dependent — evidence: `docs/hardware/support-tiers.md`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`
+**Owners**: the Mica OS project owns the port and its qualification. There is
+no vendor and no integrator of record.
+
+Emulator rows are evidence about the emulated platform, never a hardware pass.
+Each release run of an amd64 product boots it once under QEMU.
+
+| Row | Result | Date | Evidence / reason |
+|---|---|---|---|
+| QEMU lifecycle: API, power actions, reboot, runtime, updates, faults, reset | pass | 2026-09-09 | the UEFI lifecycle suite, `mica-build:tests/suites/lifecycle-uefi` |
+| Installation and first boot | not tested | — | no physical machine |
+| Cold boot and warm boot | not tested | — | no physical machine |
+| A/B switch and update | not tested | — | no physical machine |
+| Power-cut during update | not tested | — | no physical machine; process interruption under QEMU is separate evidence |
+| Storage growth/health | not tested | — | no physical machine |
+| Network | not tested | — | no physical machine |
+| Watchdog/reset cause | not tested | — | no physical machine |
+| Recovery | not tested | — | no physical machine |
+| Radios and fieldbus | N/A | — | the board declares none |
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/evidence.json`, `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `mica-build:README.md`

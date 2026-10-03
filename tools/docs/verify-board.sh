@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
-# Asserts that every board dossier under docs/hardware/ carries the section list
-# dossier-template.md mandates, and that its qualification matrix rows are
+# Asserts that every board page under docs/hardware/ carries the section list
+# board-template.md mandates, and that its qualification matrix rows are
 # honest. Read-only: it opens files and prints, and changes nothing.
 #
 #   bash tools/docs/verify-board.sh          (or: make docs-verify)
 #
 # THE REQUIRED HEADINGS ARE PARSED FROM THE TEMPLATE, not hardcoded here: the
 # template's numbered section list (`1. \`## Identity\`` ...) is the one
-# normative statement of the thirteen H2s, and a copy of that list in this
+# normative statement of the required H2s, and a copy of that list in this
 # script would be a second statement free to drift from the first. The
 # template says "spelled exactly and in this order, with no H2 heading
 # outside this list", so all three are asserted: presence, absence of
 # extras, and order.
 #
-# A DOSSIER IS DISCOVERED, NOT NAMED. The template fixes the instance shape
-# ("Board dossier: <board>" as the H1), so every docs/hardware/*.md whose H1 starts `# Board dossier:` is
-# validated. A new board's dossier is gated the day it lands, with no edit
-# here.
+# A BOARD PAGE IS DISCOVERED, NOT NAMED. The template fixes the instance shape
+# (`# <board>: <hardware>` as the H1 of <board>.md), so every docs/hardware/*.md
+# whose H1 starts with its own file name and a colon is validated. A new
+# board's page is gated the day it lands, with no edit here.
 #
 # QUALIFICATION ROWS (template: "never implicitly green"): every result cell
 # is exactly pass | fail | N/A | not tested, and pass/fail rows carry an ISO
@@ -27,7 +27,7 @@ set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../docs/hardware" && pwd)"
 
-TEMPLATE=dossier-template.md
+TEMPLATE=board-template.md
 FAIL=0
 CHECKS=0
 
@@ -38,36 +38,36 @@ ok()   { CHECKS=$((CHECKS + 1)); }
 mapfile -t required < <(sed -n 's/^[0-9][0-9]*\. `\(## .*\)`$/\1/p' "$TEMPLATE")
 
 if [ "${#required[@]}" -eq 0 ]; then
-    fail "$TEMPLATE yields zero required H2 headings; every dossier would pass vacuously"
+    fail "$TEMPLATE yields zero required H2 headings; every board page would pass vacuously"
 else
     ok
 fi
 
-# --- the dossier instances, discovered by their H1 --------------------------
-dossiers=()
+# --- the board pages, discovered by their H1 --------------------------------
+pages=()
 for f in ./*.md; do
     f=${f#./}
     h1=$(grep -m1 '^# ' "$f" || true)
-    case "$h1" in "# Board dossier:"*) dossiers+=("$f") ;; esac
+    case "$h1" in "# ${f%.md}:"*) pages+=("$f") ;; esac
 done
 
-if [ "${#dossiers[@]}" -eq 0 ]; then
-    fail "no dossier instance found (no docs/hardware/*.md with an H1 starting '# Board dossier:'); nothing would be asserted"
+if [ "${#pages[@]}" -eq 0 ]; then
+    fail "no board page found (no docs/hardware/<board>.md with an H1 starting '# <board>:'); nothing would be asserted"
 else
     ok
 fi
 
-echo "tools/docs/verify-board.sh: ${#dossiers[@]} dossier(s) against $TEMPLATE (${#required[@]} required headings)"
+echo "tools/docs/verify-board.sh: ${#pages[@]} board page(s) against $TEMPLATE (${#required[@]} required headings)"
 
 # With either set empty there is nothing meaningful left to assert -- every
-# dossier H2 would count as "outside" an empty list -- so the guards' verdict
+# board page H2 would count as "outside" an empty list -- so the guards' verdict
 # is the verdict.
 if [ "$FAIL" -ne 0 ]; then
     echo "tools/docs/verify-board.sh: $FAIL FAILED, $CHECKS passed" >&2
     exit 1
 fi
 
-check_dossier() {
+check_page() {
     local f=$1 h ordered=1
     mapfile -t have < <(grep -E '^## ' "$f" || true)
 
@@ -138,8 +138,8 @@ check_dossier() {
     fi
 }
 
-for f in "${dossiers[@]}"; do
-    check_dossier "$f"
+for f in "${pages[@]}"; do
+    check_page "$f"
 done
 
 # --- verdict ---------------------------------------------------------------

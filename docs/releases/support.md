@@ -12,7 +12,7 @@ tiered, and what a support case needs to contain to be actionable.
 The tier vocabulary, aligned with the board qualification plan:
 
 - **mica-qualified** — a board revision qualified by the Mica OS project itself,
-  with a dated hardware-in-the-loop dossier (boot, A/B update, power-cut,
+  with a dated hardware-in-the-loop board page (boot, A/B update, power-cut,
   storage growth, recovery, peripherals as applicable) in which every row is
   pass, fail, N/A or not-tested — never implicitly green.
 - **integrator-qualified / bring-up** — a board an integrator has ported and
@@ -23,16 +23,16 @@ The tier vocabulary, aligned with the board qualification plan:
 
 The tier definitions, the qualification matrix and the intake rubric are
 published with the BSP documentation: the tiers in
-[../hardware/support-tiers.md](../hardware/support-tiers.md), the matrix and its row
+[the support tiers](../hardware/README.md#support-tiers), the matrix and its row
 grammar in [../hardware/qualification.md](../hardware/qualification.md), the vendor
 rubric in [`intake.md`](https://github.com/micaoss/mica/blob/9dd6302/docs/boards/intake.md). The vocabulary existing is not
 a board having earned a tier: no board is mica-qualified today, because the one
-dossier on file carries every qualification row as `not tested`, so today's
+board page on file carries every qualification row as `not tested`, so today's
 boards hold their standing by the evidence in this repository rather than by a
-completed dossier.
+completed board page.
 
-> status: shipped — evidence: `docs/hardware/support-tiers.md`, `docs/hardware/qualification.md`
-> status: board-dependent — evidence: `docs/hardware/cx3576-dossier.md`
+> status: shipped — evidence: `docs/hardware/README.md`, `docs/hardware/qualification.md`
+> status: board-dependent — evidence: `docs/hardware/cx3576.md`
 
 ## 2. Current hardware standing
 
