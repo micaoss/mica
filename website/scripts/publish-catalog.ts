@@ -1,5 +1,5 @@
 /**
- * Builds the download catalogue from the update documents `mica-res` builds
+ * Builds the download catalogue from the update documents the resource service builds
  * from the releases posted to it, and writes it as the two files the workflow
  * puts into KV. The Worker only reads that key.
  *

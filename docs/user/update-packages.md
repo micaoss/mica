@@ -270,44 +270,41 @@ The checks are [download](download.md#4-which-digest-at-which-step).
 
 ## 10. Online updates: what the device demands of a server
 
-`check` and `fetch` are given an origin, not a path, and the device enforces
-the whole contract:
+The device is configured with an **update root**, a URL ending in `/` such
+as `https://res.micaos.dev/update/`, and reads three unsigned documents under
+it, each only when it needs it (`mica-core:docs/mica-core.md` section 6.2):
 
-- the source resolves to exactly `http(s)://<host>/v1/manifest.json`, with no
-  query, fragment or credentials;
-- that document is a `mica/catalog/v3` catalog: **unsigned** canonical JSON
-  (sorted keys, no whitespace — the device re-serializes it and refuses a
-  document that does not come back byte for byte), at most 128 releases and
-  heads, with one head per **board and product** and a monotonic `revision`;
-  there is no channel and no expiry, so a withheld catalog reads as "nothing
-  newer";
-- its objects name a digest and a length, and the device fetches
-  `<origin>/v1/objects/<sha256>`; transfers are resumable by range and are
-  abandoned below 1 KiB/s;
-- trust comes from each release's own signed descriptor: the device takes
-  only its own board, architecture and product, only a generation above the
-  one it runs, and only the objects that descriptor names.
+- **the manifest**: one line per board and product, naming the current
+  release, its generation and where its document is. A device that is current
+  reads nothing more;
+- **the release's document**: the descriptor and each object, by digest,
+  length and path;
+- **the signed descriptor**, which must match that digest and authenticate.
+
+Trust comes from the signed descriptor, not from an address: the device takes
+only its own board, architecture and product, only a generation above the one
+it runs, and checks every byte against what the descriptor names. There is no
+channel and no expiry, so a withheld manifest reads as "nothing newer".
+Transfers are resumable by range and are abandoned below 1 KiB/s.
 
 What the device dials is the operator's to set; what it will accept is not.
-The baked `mica/meta/v2` manifest in the image carries `update.source`,
+The update configuration baked into the image carries `update.source`,
 `policy` (`off`, `check`, `auto`) and `checkIntervalMinutes`, and
-`/mica/config/updates.json` on DATA (`mica/update-config/v2`) may override
-**those keys only**. The v1 documents that carried a channel are refused, and
-a document that names a trust anchor is refused: the anchors are inside the
+`/mica/config/updates.json` on DATA may override **those keys only**. A
+document that names a trust anchor is refused: the anchors are inside the
 signed image.
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy/src/catalog.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `docs/design/remote-management.md`
 
 ## 11. The update server
 
-`mica-res` is the update plane devices are meant to read: `res.micaos.dev/v1`
-serves the catalog of section 10, offering the current release of each
-product, and redirects `/v1/objects/<sha256>` to its download host
-(`mica-res:docs/modules/resource.md`). It holds no key; a device trusts the
-release's own signed descriptor. **Releases are not posted to it yet**, so
-today a device's source has to point at a server the operator runs that
-implements section 10 over the archives of section 1. The `update-server/` of
-`mica-build` that once stood in for one was removed on 2026-09-21.
+The project's update root is `https://res.micaos.dev/update/`. The release run
+of `mica-build` posts each release to the resource service behind it
+(`mica-build:README.md`), which serves the documents of section 10 for the
+current release of each product and the files from `dl.res.micaos.dev`. It
+holds no key; a device trusts the release's own signed descriptor. An
+integrator who runs a server of their own serves the same three documents
+from another root and points `update.source` at it.
 
 > status: unsupported
 

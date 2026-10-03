@@ -11,13 +11,13 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 `<board>.<variant>.` 开头的最新标签。旧方案里的版本索引（`mica.<stamp>`、
 `mica-index.json`）已不再切出，旧产品名下的发布已于 2026-09-28 删除。
 
-**发布今后的去处。**每个发布都应在发布时推送到 `mica-res`：res 保存完整的版本历史，从
-`https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>` 提供文件，生成
-`catalog/products.json`（每个产品及其最新发布），并在 `https://res.micaos.dev/v1` 提供
-设备更新平面（`mica-res:docs/spec/release-publishing.md`）。`mica-build` 还没有推送它的
-发布，所以今天下面的 GitHub release 是唯一来源。
+**同样的文件也在资源服务上。**发布流程会把每个发布推送过去（`mica-build:README.md`）：
+文件在 `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>`，旁边是这个发布
+自己的 `index.json`，列出每个文件的大小与摘要；
+`https://res.micaos.dev/update/v2/manifest.json` 给出每个产品的当前发布。官网下载页和设备
+读的就是这些；被管理员在那里删除的发布，两边都不再有。
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`, `mica-res:docs/spec/release-publishing.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`
 
 ## 1. 有哪些东西可下载
 

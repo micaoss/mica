@@ -23,9 +23,10 @@ gh workflow run release.yml -R micaoss/mica-build -f product=<board>.<variant> -
 发布 `full` 与 `core` 两个更新包，设备因此可以单独换上新的管理面。上一个 root 的接口等级
 超出某个组件的支持范围时，改为整体构建该产品。
 
-每个发布之后应推送到 `mica-res`（`mica-res:docs/spec/release-publishing.md`）：把文件暂存并
-发布到 `mica/<board>.<variant>/<stamp>/` 下，再提交发布记录，之后由 res 向官网和设备提供。
-`mica-build` 还没有做这一步。
+GitHub release 挂好之后，同一次运行会把发布推送到资源服务（`mica-build:README.md`）：
+文件放到 `dl.res.micaos.dev` 的 `mica/<board>.<variant>/<stamp>/` 下，再提交发布记录，之后
+`https://res.micaos.dev/update/` 向官网和设备提供它。已经发布过的版本用 `publish-res.yml`
+补推。
 
 任何仓库的 `ci.yml` 都什么都不发布。
 

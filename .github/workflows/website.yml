@@ -13,7 +13,7 @@ on:
       - '.github/workflows/website.yml'
   # Publishing is deliberately manual: run this workflow from the Actions tab.
   workflow_dispatch:
-  # Releases are posted to mica-res on mica-build's own schedule and nothing
+  # Releases are posted to the resource service on mica-build's own schedule and nothing
   # there triggers a build here, so the catalogue is refreshed on a clock too.
   schedule:
     - cron: '17 * * * *'
@@ -38,7 +38,7 @@ jobs:
       # The build reads ../docs, so a documentation change rebuilds the site.
       - run: bun run build
 
-  # Reads the update documents mica-res builds from the posted releases (the
+  # Reads the update documents the resource service builds from the posted releases (the
   # manifest, each product's history, each release's document), checks them
   # against the site's boards, and publishes the download catalogue into KV. A
   # manifest with no products publishes an empty catalogue; a document that

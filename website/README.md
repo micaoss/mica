@@ -54,16 +54,15 @@ control loads the earlier ones.
 ### Where the rows come from
 
 ```
-mica-build ──posts each release──> mica-res
+mica-build ──posts each release──> the resource service (res.micaos.dev)
     <root>v2/manifest.json            every product and its latest release
     <root>v2/<product>/releases.json  that product's releases, newest first
     <release directory>/index.json    one release: its files, sizes and hashes
         ──(CI: on push, hourly, on demand)──> KV ──> GET /api/catalog
 ```
 
-Every release is posted to `mica-res` as it is published
-(`mica-res:docs/spec/release-publishing.md`), and res builds the update documents from its
-registry (`mica-res:docs/modules/resource.md`). The root is `https://res.micaos.dev/update/`,
+Every release is posted to the resource service as it is published
+(`mica-build:README.md`), and the service builds the update documents from its registry. The root is `https://res.micaos.dev/update/`,
 the one a device is configured with. Nothing is read from GitHub and nothing is inferred from
 a file name (`src/features/download/res-catalog.ts`). A release's variant (`basic`, `full`) is
 the page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which

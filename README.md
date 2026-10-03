@@ -88,7 +88,6 @@ up-to-date table and explains what each tier means; the Chinese
 | `mica-podman` | the container engine package |
 | `mica-build-env` | the build environment images every repository builds in |
 | `mica-build-tools` | the one implementation of the release-lock and build rules every repository runs |
-| `mica-res` | the resource publishing service behind `res.micaos.dev`: the download mirror and the brand assets |
 
 Product documentation lives here; each module's documentation lives in the repository
 that produces it. Documents here cite code in the other repositories as

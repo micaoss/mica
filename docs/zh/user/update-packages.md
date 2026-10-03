@@ -219,35 +219,32 @@ awk -F'\t' '$1 == "product" {print $2, $5, $6}' mica-build.lock   # 产品、代
 
 ## 10. 在线更新：设备对服务器的要求
 
-`check` 和 `fetch` 拿到的是一个 origin，不是一个路径，设备会强制整份契约：
+设备配置的是一个**更新根地址**，以 `/` 结尾的 URL，例如 `https://res.micaos.dev/update/`。
+它在这个地址下读三份不签名的文档，每一份都只在需要时才读
+（`mica-core:docs/mica-core.md` 第 6.2 节）：
 
-- 来源解析后恰好是 `http(s)://<host>/v1/manifest.json`，没有 query、fragment 或
-  凭据；
-- 该文档是 `mica/catalog/v3` 目录：**不签名**的规范 JSON（键排序、无空白——设备会把它
-  重新序列化，不能逐字节还原的文档会被拒绝），最多 128 个 release 与 head，每个**板卡与
-  产品**一个 head，带单调递增的 `revision`；没有 channel，也没有过期时间，所以被扣下的
-  目录读起来就是“没有更新的”；
-- 对象只写摘要与长度，设备从 `<origin>/v1/objects/<sha256>` 获取；传输支持按 range 续传，
-  速率低于 1 KiB/s 时放弃；
-- 信任来自每个发布自己的签名描述符：设备只取自己的板卡、架构与产品，只取比当前运行的
-  代次更高的代次，也只取那份描述符点名的对象。
+- **清单**：每个板卡与产品一行，写明当前发布、它的代次，以及它的文档在哪。已经是最新的
+  设备不再读别的；
+- **发布的文档**：描述符和每个对象的摘要、长度与路径；
+- **签名的描述符**：必须与那个摘要一致，并且通过认证。
 
-设备去拨哪个地址由操作者决定，它会接受什么则不由操作者决定。镜像里烧进去的
-`mica/meta/v2` 清单携带 `update.source`、`policy`（`off`、`check`、`auto`）和
-`checkIntervalMinutes`，DATA 上的 `/mica/config/updates.json`（`mica/update-config/v2`）
-**只能**覆盖这些键。带 channel 的 v1 文档会被拒绝，声明信任锚的文档也会被拒绝：信任锚
-在签名镜像内部。
+信任来自签名的描述符，而不是地址：设备只取自己的板卡、架构与产品，只取比当前运行的代次
+更高的代次，并按描述符核对每一个字节。没有 channel，也没有过期时间，所以被扣下的清单读
+起来就是“没有更新的”。传输支持按 range 续传，速率低于 1 KiB/s 时放弃。
+
+设备去拨哪个地址由操作者决定，它会接受什么则不由操作者决定。镜像里烧进去的更新配置携带
+`update.source`、`policy`（`off`、`check`、`auto`）和 `checkIntervalMinutes`，DATA 上的
+`/mica/config/updates.json` **只能**覆盖这些键。声明信任锚的文档会被拒绝：信任锚在签名
+镜像内部。
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy/src/catalog.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `docs/design/remote-management.md`
 
 ## 11. 更新服务器
 
-`mica-res` 是设备应当读取的更新平面：`res.micaos.dev/v1` 提供第 10 节的目录，只给出每个
-产品的当前发布，并把 `/v1/objects/<sha256>` 重定向到它的下载站
-（`mica-res:docs/modules/resource.md`）。它不持有任何密钥；设备信任的是发布自己的签名
-描述符。**发布还没有推送到它**，所以今天设备的来源要指向操作者自己运行、实现了第 10 节的
-服务器，内容就是第 1 节的归档。曾经代替它的 `mica-build` 的 `update-server/` 已于
-2026-09-21 移除。
+项目的更新根地址是 `https://res.micaos.dev/update/`。`mica-build` 的发布流程把每个发布
+推送到它背后的资源服务（`mica-build:README.md`），由它为每个产品的当前发布提供第 10 节的
+文档，文件则来自 `dl.res.micaos.dev`。它不持有任何密钥；设备信任的是发布自己的签名描述符。
+自己运行服务器的集成商，在另一个根地址下提供同样的三份文档，再把 `update.source` 指过去。
 
 > status: unsupported
 

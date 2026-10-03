@@ -1,5 +1,5 @@
 /**
- * Reads what `mica-res` serves and checks it against this site. The logic is
+ * Reads what the resource service serves and checks it against this site. The logic is
  * `src/features/download/catalog-check.ts`, unit-tested; this is the network
  * around it. Exits non-zero on any problem.
  */

@@ -19,7 +19,6 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 | `mica-system-base` | 与板卡无关的基础系统：固定版本的 Debian 包、Base 自己的包（系统策略、busybox、两种 init `mica-systemd` 与 `mica-openrc`、SSH、Wi-Fi、蓝牙、时区）以及不带 init 的基础根 |
 | `mica-core` | core 组件 `micad`（含 `mica-apid`）与控制台 `mica-apid-ui`——启动时叠加在 root 上的 verity 镜像，不换 root 就能更新——以及 MQTT、SFTP、`mica-deploy` 与 lifecycle 二进制的软件包，每个都为两种 init 带上自己的服务 |
 | `mica-podman` | 容器引擎包 `mica-podman` 及其监管进程 `mica-containerd`，两种 init 都支持 |
-| `mica-res` | `res.micaos.dev` 背后的资源服务：下载站、发布目录与设备更新平面 |
 | `mica-build` | 板卡（按板卡：内核、U-Boot、固件、板卡元数据以及板卡包）与组装：组合每个产品的根、给组件签名，并发布镜像和更新归档 |
 | `mica` | 本仓库：设计契约、决策和指南 |
 
@@ -48,14 +47,14 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
   没有发布索引；一个产品的最新 release 就是要取的那个。`dev` 产品从不发布。*core 发布*
   沿用上一个发布的 kernel 与 root、换上新的 core 组件，所以 `mica-core` 的发布不换 root
   就能到达设备。
-- 每个发布都应推送到 `mica-res`：它保存完整历史，从 `dl.res.micaos.dev` 提供文件，生成
-  官网读取的目录，并在 `res.micaos.dev/v1` 提供设备更新平面
-  （`mica-res:docs/spec/release-publishing.md`）。`mica-build` 还没有推送它的发布；在那之前，
-  文件仍在 `mica-build` 的 GitHub release 里。
+- 发布流程随后把这个发布推送到资源服务（`mica-build:README.md`）：文件由
+  `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/` 提供，
+  `https://res.micaos.dev/update/` 是设备配置的更新根地址，官网下载页读的也是它。
+  `mica-build` 的 GitHub release 里有同样的文件。
 - 每个仓库的历史与发布都保持精简：仓库可能被压缩成一个提交、被取代的发布会被删除，
   所以文档只在某个发布是当前发布时才点名它。
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build-tools:README.md`, `mica-res:docs/spec/release-publishing.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build-tools:README.md`
 
 ## 3. 产品与板卡
 
@@ -110,6 +109,6 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 - 没有任何东西会启动 FIT 镜像：不存在能启动它的套件，所以 `cx3576` 与 `s905x5m` 的
   产品被发布、却从未被启动（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md) 第 4 节）。FIT 启动
   套件将是一套**新**套件；它没有被估过工，是一个用户决定。
-- 发布还没有推送到 `mica-res`，所以它的下载站和设备更新平面今天都还不提供 Mica OS 的发布。
+- 大多数产品还没有发布，所以下载站和更新根地址都还没有它们的内容。
 
 > status: unsupported

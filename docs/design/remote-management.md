@@ -66,23 +66,20 @@ exposes the lifecycle over D-Bus; apid and the console show the candidate,
 current and fallback identities and the acquisition, installation, reboot and
 confirmation states.
 
-The server catalog, `mica/catalog/v3` at `<source>/v1/manifest.json`, is
-**unsigned** canonical JSON listing releases and one head per board and
-product. Trust comes from each release's own signed descriptor: a device takes
-only its own board, architecture and product, only a generation above the one
-it runs, and only the objects that descriptor names, fetched from
-`<source>/v1/objects/<sha256>`. There is no channel and no expiry; a withheld
-catalog reads as "nothing newer". The source is an operator setting
-(`/mica/config/updates.json`, `mica/update-config/v2`), seeded from the baked
-`mica/meta/v2` defaults (`source`, `policy`, `checkIntervalMinutes`); changing
-it cannot change the anchors embedded in the signed boot policy. Offline
-`.micaupd` import converges on the same verified workspace
-(`mica-core:docs/mica-core.md` section 6.2).
+The source is an update root, such as `https://res.micaos.dev/update/`:
+an unsigned manifest of each product's current release, that release's
+document, and its signed descriptor. Trust comes from the descriptor: a device
+takes only its own board, architecture and product, only a generation above
+the one it runs, and only the objects the descriptor names. There is no
+channel and no expiry; a withheld manifest reads as "nothing newer". The
+source is an operator setting (`/mica/config/updates.json`), seeded from the
+defaults baked into the image; changing it cannot change the anchors embedded
+in the signed boot policy. Offline `.micaupd` import converges on the same
+verified workspace (`mica-core:docs/mica-core.md` section 6.2).
 
-The update plane devices are meant to read is `mica-res`'s `res.micaos.dev/v1`
-(`mica-res:docs/modules/resource.md`): the producer posts each release there and
-res serves the current release of each product. Releases are not posted there
-yet, so a device's source has to be set to a server the operator runs.
+The release run of `mica-build` posts each release to the resource service
+behind that root (`mica-build:README.md`), which offers the current release of
+each product.
 
 Automatic policy uses the device's configured schedule, maintenance window and
 reboot policy. Reboot gating prevents an unrelated reboot from discarding an

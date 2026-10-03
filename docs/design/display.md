@@ -56,8 +56,7 @@ the screen at an application UI (served by an app container) instead of apid.
 ## 4. Boot experience & tty policy
 
 The current CX3576 image shows the **Mica OS** icon above its wordmark
-(`mica-res:mica/brand/logo/mica-os-icon-dark.svg` and
-`mica-os-wordmark-dark.svg`), centered over a soft blue/teal gradient that
+(the brand assets `mica-os-icon-dark.svg` and `mica-os-wordmark-dark.svg`), centered over a soft blue/teal gradient that
 fades to black around it. The authoritative bitmap
 is `mica-build:common/kernel/splash.png`, shared by every board. The kernel build converts it to
 a deterministic 720×405 CLUT224 logo, fitting modes from 800×600 upward. Its

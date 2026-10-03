@@ -169,7 +169,6 @@ build tree — and every pin is its producer's latest release, moved with
 | `mica-core` | the management plane: the core components `micad` (with `mica-apid`) and `mica-apid-ui`, and the packages `mica-mqttd`, `mica-mqtt-broker`, `mica-sftp-server`, `mica-deploy`, `mica-lifecycle` | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
 | `mica-podman` | `mica-podman`, the container engine and its supervisor `mica-containerd`, from pinned upstream source | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
 | `mica-build` | per board: kernel, device tree, loader, firmware and the board package (`boards/`); and the products `<board>.<variant>`, each released on its own: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
-| `mica-res` | the resource publishing service behind `res.micaos.dev`: the download mirror and the brand assets | the releases it mirrors |
 
 The interfaces between them are files, not directories:
 

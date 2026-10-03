@@ -1,8 +1,8 @@
 import type { Download, DownloadKind, DownloadVariant } from './catalog'
 
 /**
- * Reads the update documents `mica-res` builds from the releases posted to it
- * (`mica-res:docs/modules/resource.md`):
+ * Reads the update documents the resource service builds from the releases posted to it
+ * (the resource service behind `res.micaos.dev`):
  *
  *   <root>v2/manifest.json            every product and its latest release
  *   <root>v2/<product>/releases.json  that product's releases, newest first

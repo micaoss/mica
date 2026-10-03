@@ -4,7 +4,7 @@ import { downloadsFromRes } from './res-catalog'
 /**
  * What the site stores for the download pages, and what publishing it means.
  *
- * The catalogue is read from the update documents `mica-res` builds from the
+ * The catalogue is read from the update documents the resource service builds from the
  * releases posted to it, in CI, and written into KV from there; the Worker
  * only reads that key.
  */

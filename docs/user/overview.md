@@ -23,7 +23,6 @@ from source with [build](build.md), an image reaches a board through
 | `mica-system-base` | the board-independent base: the pinned Debian packages, the Base's own packages (the system policy, busybox, the two inits `mica-systemd` and `mica-openrc`, SSH, Wi-Fi, Bluetooth, time zones) and the floor root, which carries no init |
 | `mica-core` | the core components `micad` (with `mica-apid`) and the console `mica-apid-ui` — verity images composed over the root at boot, so they update without a new root — and the packages for MQTT, SFTP, `mica-deploy` and the lifecycle binary, each with its services for both inits |
 | `mica-podman` | the container engine package `mica-podman`, with its supervisor `mica-containerd`, on either init |
-| `mica-res` | the resource service behind `res.micaos.dev`: the download host, the release catalogue and the device update plane |
 | `mica-build` | the boards (per board: the kernel, U-Boot, firmware, board metadata and the board package) and the assembly: it composes each product's root, signs the components, and publishes the images and the update archives |
 | `mica` | this repository: the design contracts, the decisions and the guides |
 
@@ -58,17 +57,17 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
   released. A *core release* carries the previous release's kernel and root
   with new core components, so a `mica-core` release reaches devices without a
   new root.
-- Each release is meant to be posted to `mica-res`, which keeps the complete
-  history, serves the files from `dl.res.micaos.dev`, derives the catalogue the
-  website reads and serves the device update plane at `res.micaos.dev/v1`
-  (`mica-res:docs/spec/release-publishing.md`). `mica-build` does not post its
-  releases yet; until it does, the GitHub releases of `mica-build` are where
-  the files are.
+- The release run then posts the release to the resource service
+  (`mica-build:README.md`): the files are served from
+  `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/`, and
+  `https://res.micaos.dev/update/` is the update root a device is configured
+  with and the website's download pages read. The GitHub release of
+  `mica-build` carries the same files.
 - Every repository's history and releases are kept short: a repository may be
   squashed to one commit and its superseded releases deleted, so a document
   names a release only where it is the current one.
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build-tools:README.md`, `mica-res:docs/spec/release-publishing.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build-tools:README.md`
 
 ## 3. Products and boards
 
@@ -133,7 +132,7 @@ checked before and after decompressing.
   `cx3576` and `s905x5m` products are published and never started
   ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4). A FIT boot suite would be
   a new suite; it is unscoped and is a user decision.
-- Releases are not posted to `mica-res` yet, so neither its download host nor
-  its device update plane serves a Mica OS release today.
+- Most products have no release yet, so neither the download host nor the
+  update root offers anything for them.
 
 > status: unsupported

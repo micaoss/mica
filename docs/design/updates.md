@@ -30,17 +30,16 @@ content from untrusted root metadata or an editable version label.
 
 ## Acquisition and installation
 
-The catalog source is an explicit `/v1/manifest.json` URL. The catalog,
-`mica/catalog/v3`, is **unsigned** canonical JSON listing releases and one head
-per board and product; its objects name a digest and a length and are fetched
-from `<origin>/v1/objects/<sha256>`. Trust comes from each release's own
-signed descriptor: the client takes only its own board, architecture and
-product, only a generation above the one it runs and only the objects that
-descriptor names. The revision is checkpointed as a consistency check against
-a confused mirror; there is no channel and no expiry, so a withheld catalog
-reads as "nothing newer" (`mica-core:docs/mica-core.md` section 6.2). The
-server devices are meant to read is `res.micaos.dev/v1` of `mica-res`, which
-offers the current release of each product.
+The source is an **update root**, a URL ending in `/` such as
+`https://res.micaos.dev/update/`. Under it the client reads an unsigned
+manifest naming each product's current release, then that release's document,
+then its signed descriptor, each only when it needs it. Trust comes from the
+descriptor: the client takes only its own board, architecture and product,
+only a generation above the one it runs and only the objects the descriptor
+names. The manifest's revision is checkpointed as a consistency check against
+a confused mirror; there is no channel and no expiry, so a withheld manifest
+reads as "nothing newer". The formats and their compatibility rule are
+`mica-core:docs/mica-core.md` section 6.2.
 
 Files live under `/mica/updates/{staging,downloads,verified}` on physical DATA.
 The workspace probe checks mount identity, writability, free space and bounded

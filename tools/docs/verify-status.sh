@@ -116,7 +116,7 @@ check_status_line() {
         # A citation into another Mica OS repository (`<repository>:<path>` or
         # `<repository>:make <target>`): the code lives there, not here, so the
         # reference is accepted by shape; that repository's own gates prove it.
-        if [[ $ref =~ ^(mica-build|mica-build-env|mica-build-tools|mica-debian|mica-boot|mica-boards|mica-core|mica-deploy|mica-podman|mica-res|mica-system|mica-system-base):.+$ ]]; then
+        if [[ $ref =~ ^(mica-build|mica-build-env|mica-build-tools|mica-debian|mica-boot|mica-boards|mica-core|mica-deploy|mica-podman|mica-system|mica-system-base):.+$ ]]; then
             ok; continue
         fi
         if ref_exists "$ref"; then

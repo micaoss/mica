@@ -2,7 +2,7 @@ import type { ResManifest } from './res-catalog'
 import { downloadsFromRes } from './res-catalog'
 
 /**
- * Checks what `mica-res` serves against what this site can read and what it
+ * Checks what the resource service serves against what this site can read and what it
  * lists. The faults it names have each happened once with the earlier source
  * and passed every unit test, because the fixtures were written in the shape
  * the parser expected; run against the live documents, they fail loudly.

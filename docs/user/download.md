@@ -13,15 +13,15 @@ product's newest release is the newest tag that starts with
 `mica-index.json`) is no longer cut, and the releases published under the
 earlier product names were deleted on 2026-09-28.
 
-**Where releases are going.** Each release is meant to be posted to `mica-res`
-as it is published: res keeps the complete version history, serves the files
-from `https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>`, derives
-`catalog/products.json` (every product and its newest release) and serves the
-device update plane at `https://res.micaos.dev/v1`
-(`mica-res:docs/spec/release-publishing.md`). `mica-build` does not post its
-releases yet, so today the GitHub releases below are the only source.
+**The same files are on the resource service.** The release run posts each
+release there (`mica-build:README.md`): the files are at
+`https://dl.res.micaos.dev/mica/<board>.<variant>/<stamp>/<asset>`, beside the
+release's own `index.json`, which lists them with their sizes and digests, and
+`https://res.micaos.dev/update/v2/manifest.json` names every product's current
+release. That is what the website's download pages and a device read; a
+release an administrator deleted there is gone from both.
 
-> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`, `mica-res:docs/spec/release-publishing.md`
+> status: shipped — evidence: `docs/design/release-lock.md`, `mica-build:README.md`, `mica-build:boards/products.md`
 
 ## 1. What exists to download
 

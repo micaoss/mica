@@ -28,11 +28,11 @@ and a `core` update package, so a device takes the new management plane
 alone. When the previous root's interface level is outside a component's
 range, the product is built whole instead.
 
-Each published release is then meant to be posted to `mica-res`
-(`mica-res:docs/spec/release-publishing.md`): its files staged and published
-under `mica/<board>.<variant>/<stamp>/`, and its record posted, after which res
-serves it to the website and to devices. `mica-build` does not do this step
-yet.
+After the GitHub release is attached, the same run posts the release to the
+resource service (`mica-build:README.md`): its files under
+`mica/<board>.<variant>/<stamp>/` on `dl.res.micaos.dev`, and its record, after
+which `https://res.micaos.dev/update/` offers it to the website and to
+devices. `publish-res.yml` posts a release that is already published.
 
 `ci.yml` publishes nothing anywhere.
 

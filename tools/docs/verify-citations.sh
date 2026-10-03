@@ -23,7 +23,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DOCS="${MICA_CITE_DOCS:-$ROOT}"
-REPOS='mica-core|mica-build|mica-build-env|mica-build-tools|mica-system-base|mica-podman|mica-res'
+REPOS='mica-core|mica-build|mica-build-env|mica-build-tools|mica-system-base|mica-podman'
 TREES="$(mktemp -d)"
 trap 'rm -rf "${TREES}"' EXIT
 
