@@ -39,16 +39,20 @@ function shortId(id: string | undefined): string {
 }
 
 /**
- * What a row's variant reads as: an update's or an image's own wording where
- * the page has one, and the form as the catalogue names it where it does not,
- * so a board's new image kind shows under its own name rather than as a
- * second plain image.
+ * What a row is called. An update is an update of some variant. An image is
+ * named by its form alone, because the forms are different things — a disk
+ * image and a boot loader package are not two kinds of "system image" — and a
+ * form the page has no wording for shows under its own name.
  */
-function variantLabel(copy: Copy, download: Download): string | undefined {
+function formLabel(copy: Copy, download: Download): { name: string, detail?: string } {
+  const { kinds, images, variants } = copy.download
   if (!download.variant)
-    return undefined
-  const words: Record<string, string> = download.kind === 'image' ? copy.download.images : copy.download.variants
-  return words[download.variant] ?? download.variant
+    return { name: kinds[download.kind] }
+  if (download.kind === 'image') {
+    const name = (images as Record<string, string>)[download.variant]
+    return name ? { name } : { name: kinds.image, detail: download.variant }
+  }
+  return { name: kinds[download.kind], detail: (variants as Record<string, string>)[download.variant] ?? download.variant }
 }
 
 interface FacetProps {
@@ -191,13 +195,13 @@ export function DownloadExplorer({
                           archives share its id, its form and its version, so
                           keying on those gave three rows one key and React
                           reused the wrong nodes when the filters changed. */}
-                      {rows.map(download => (
+                      {rows.map(download => ({ download, label: formLabel(copy, download) })).map(({ download, label }) => (
                         <TableRow key={download.href}>
                           <TableCell className="px-5 text-[15px]">
-                            {kinds[download.kind]}
-                            {download.variant && (
+                            {label.name}
+                            {label.detail && (
                               <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
-                                {variantLabel(copy, download)}
+                                {label.detail}
                               </span>
                             )}
                           </TableCell>

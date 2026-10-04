@@ -87,13 +87,15 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
 }
 
 /**
- * Newest first, and one row per file unless `history` asks for the rest.
+ * Newest first, and only each product's newest release unless `history` asks
+ * for the rest.
  *
- * A file is identified by board, profile, form **and variant**: the update
- * archives of one deployment — `full`, `root`, `kernel` — and the images of
- * one release — `disk`, `sd-boot` — are different files
- * with different uses, not versions of each other. Leaving the variant out of
- * the key hid two of the three behind the history control.
+ * The files of one release belong together: its update archives — `full`,
+ * `root`, `kernel` — and its images — a disk image beside a boot loader
+ * package — are different files with different uses, not versions of each
+ * other, so all of them show. A file an earlier release carried and the newest
+ * does not is history: a product that stopped publishing its disk image must
+ * not go on offering the last one as current.
  */
 export function selectVersions(all: Download[], history: boolean): Download[] {
   const ordered = [...all].sort((a, b) =>
@@ -102,14 +104,14 @@ export function selectVersions(all: Download[], history: boolean): Download[] {
   if (history)
     return ordered
 
-  const seen = new Set<string>()
-  return ordered.filter((download) => {
-    const key = `${download.board}/${download.profile}/${download.kind}/${download.variant ?? ''}`
-    if (seen.has(key))
-      return false
-    seen.add(key)
-    return true
-  })
+  // Ordered newest first, so the first row of a product names its newest release.
+  const newest = new Map<string, string>()
+  for (const download of ordered) {
+    const product = `${download.board}/${download.profile}`
+    if (!newest.has(product))
+      newest.set(product, download.version)
+  }
+  return ordered.filter(download => newest.get(`${download.board}/${download.profile}`) === download.version)
 }
 
 /** How many rows `history` would add, so the control can say whether it is worth using. */

@@ -24,7 +24,8 @@ function download(partial: Partial<Download>): Download {
 
 const NEWEST = download({ version: '2026.09-2', deploymentId: 'dep-new', releasedAt: '2026-09-10', href: 'https://example.invalid/new.img' })
 const OLDER = download({ version: '2026.08-1', deploymentId: 'dep-old', releasedAt: '2026-08-01', href: 'https://example.invalid/old.img' })
-const UPDATE = download({ kind: 'update', variant: 'full', deploymentId: 'dep-upd', releasedAt: '2026-09-08', filename: 'x64.micaupd', href: 'https://example.invalid/x64.micaupd' })
+// The update archive of the same release as NEWEST.
+const UPDATE = download({ kind: 'update', variant: 'full', version: '2026.09-2', deploymentId: 'dep-upd', releasedAt: '2026-09-10', filename: 'x64.micaupd', href: 'https://example.invalid/x64.micaupd' })
 const OTHER_BOARD = download({ board: 'cx3576', profile: 'prod', deploymentId: 'dep-cx', releasedAt: '2026-09-05', href: 'https://example.invalid/cx.img' })
 const SAMPLE = [OLDER, NEWEST, UPDATE, OTHER_BOARD]
 
@@ -50,7 +51,7 @@ describe('selectVersions', () => {
     expect(historyCount(deployment)).toBe(0)
   })
 
-  it('opens on the newest of each board, profile and form', () => {
+  it('opens on the newest release of each board and profile', () => {
     expect(selectVersions(SAMPLE, false)).toEqual([NEWEST, UPDATE, OTHER_BOARD])
   })
 
@@ -73,7 +74,7 @@ describe('the published catalogue', () => {
 })
 
 describe('downloadExplorer', () => {
-  it('shows only its own board, newest of each form', () => {
+  it('shows only its own board, at its newest release', () => {
     render(<DownloadExplorer copy={zh} board="x64" downloads={SAMPLE} />)
 
     expect(screen.getByText('dep-new')).toBeInTheDocument()
@@ -144,6 +145,33 @@ describe('downloadExplorer', () => {
     render(<DownloadExplorer copy={en} board="x64" downloads={[]} />)
 
     expect(screen.getByText(en.download.empty)).toBeInTheDocument()
+  })
+})
+
+describe('the newest release of a product', () => {
+  const older = { version: '20261003-1942', releasedAt: '2026-10-03' }
+  const newer = { version: '20261004-1511', releasedAt: '2026-10-04' }
+  const rows = [
+    download({ ...older, variant: 'disk', href: 'https://example.invalid/old.img.gz' }),
+    download({ ...older, variant: 'usb-burn', href: 'https://example.invalid/old.burn.img.gz' }),
+    download({ ...newer, variant: 'usb-burn', href: 'https://example.invalid/new.burn.img.gz' }),
+    download({ ...newer, kind: 'update', variant: 'full', href: 'https://example.invalid/new.micaupd' }),
+  ]
+
+  it('shows only what that release carries: a form it dropped is history', () => {
+    const latest = selectVersions(rows, false)
+
+    expect(latest.map(row => row.href)).toEqual([
+      'https://example.invalid/new.burn.img.gz',
+      'https://example.invalid/new.micaupd',
+    ])
+    expect(historyCount(rows)).toBe(2)
+  })
+
+  it('keeps each product at its own newest release', () => {
+    const other = download({ ...older, profile: 'sd-full', variant: 'disk', href: 'https://example.invalid/sd.img.gz' })
+
+    expect(selectVersions([...rows, other], false).map(row => row.profile)).toEqual(['dev', 'dev', 'sd-full'])
   })
 })
 
@@ -241,5 +269,12 @@ describe('the catalogue endpoint', () => {
     expect(screen.getByText(zh.download.images.disk)).toBeInTheDocument()
     expect(screen.getByText(zh.download.images['sd-boot'])).toBeInTheDocument()
     expect(screen.getByText('nand-raw')).toBeInTheDocument()
+  })
+
+  it('does not call a boot loader package a system image', () => {
+    render(<DownloadExplorer copy={zh} board="x64" downloads={[download({ variant: 'sd-boot' })]} />)
+
+    const cell = screen.getByText(zh.download.images['sd-boot'])
+    expect(cell.textContent).not.toContain(zh.download.kinds.image)
   })
 })

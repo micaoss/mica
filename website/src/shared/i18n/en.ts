@@ -104,9 +104,9 @@ export const en: typeof zh = {
       core: 'core only',
     },
     images: {
-      'disk': 'disk image',
-      'usb-burn': 'USB burning package',
-      'sd-boot': 'boot loader (USB burning package)',
+      'disk': 'System image (whole disk)',
+      'usb-burn': 'System image (USB burning package)',
+      'sd-boot': 'Boot loader (USB burning package)',
     },
     cols: {
       board: 'Board',

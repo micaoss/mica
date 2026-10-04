@@ -114,8 +114,8 @@ export const zh = {
       core: '仅 core 组件',
     },
     images: {
-      'disk': '整盘镜像',
-      'usb-burn': 'USB 烧录包',
+      'disk': '系统镜像（整盘）',
+      'usb-burn': '系统镜像（USB 烧录包）',
       'sd-boot': '引导加载器（USB 烧录包）',
     },
     cols: {

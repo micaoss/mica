@@ -48,7 +48,7 @@ work, internal decisions and board dossiers that would mislead a visitor.
 `/download/` lists the boards; each board's page (`/download/<board>/`) carries what can be
 obtained for it, in three forms: **system image**, **update package**, **firmware package**.
 The components inside a deployment — kernel, root, support — are not downloads; they arrive
-through an update. A board page opens on the newest version of each form and product, and a
+through an update. A board page opens on the newest release of each product, with every file that release carries, and a
 control loads the earlier ones.
 
 ### Where the rows come from
