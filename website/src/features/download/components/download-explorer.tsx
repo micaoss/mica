@@ -1,4 +1,4 @@
-import type { Download, DownloadKind } from '../catalog'
+import type { Download } from '../catalog'
 import type { Copy } from '@/shared/i18n'
 import { useMemo, useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
@@ -20,12 +20,12 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 import {
-  DOWNLOAD_KINDS,
   filterDownloads,
   formatBytes,
   historyCount,
   selectVersions,
 } from '../catalog'
+import { categoriesOf, categoryOf, describeFile, productNote } from '../download-map'
 import { useCatalogue } from '../use-catalogue'
 
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
@@ -36,23 +36,6 @@ function shortId(id: string | undefined): string {
   if (!id)
     return '—'
   return id.length > 16 ? `${id.slice(0, 12)}…` : id
-}
-
-/**
- * What a row is called. An update is an update of some variant. An image is
- * named by its form alone, because the forms are different things — a disk
- * image and a boot loader package are not two kinds of "system image" — and a
- * form the page has no wording for shows under its own name.
- */
-function formLabel(copy: Copy, download: Download): { name: string, detail?: string } {
-  const { kinds, images, variants } = copy.download
-  if (!download.variant)
-    return { name: kinds[download.kind] }
-  if (download.kind === 'image') {
-    const name = (images as Record<string, string>)[download.variant]
-    return name ? { name } : { name: kinds.image, detail: download.variant }
-  }
-  return { name: kinds[download.kind], detail: (variants as Record<string, string>)[download.variant] ?? download.variant }
 }
 
 interface FacetProps {
@@ -116,22 +99,22 @@ export function DownloadExplorer({
     [catalogue],
   )
 
-  // Only the forms this board actually publishes: offering "firmware" where no
-  // firmware exists is a filter that can only answer an empty table.
-  const forms = useMemo(
-    () => DOWNLOAD_KINDS.filter(value => catalogue.some(download => download.kind === value)),
-    [catalogue],
-  )
+  // Only the categories this board actually publishes: offering "firmware"
+  // where no firmware exists is a filter that can only answer an empty table.
+  const categories = useMemo(() => categoriesOf(catalogue, copy.locale), [catalogue, copy.locale])
 
   const matching = filterDownloads(catalogue, {
     profile: profile === ALL ? undefined : profile,
-    kind: kind === ALL ? undefined : (kind as DownloadKind),
     query,
-  })
+  }).filter(download => kind === ALL || categoryOf(download) === kind)
   const rows = selectVersions(matching, history)
   const earlier = historyCount(matching)
 
-  const { filters, cols, kinds } = copy.download
+  const { filters, cols } = copy.download
+  const noted = (variant: string): string => {
+    const note = productNote(board, variant, copy.locale)
+    return note ? `${variant} · ${note}` : variant
+  }
 
   return (
     <div>
@@ -141,14 +124,14 @@ export function DownloadExplorer({
           allLabel={filters.all}
           value={profile}
           onChange={setProfile}
-          options={profiles.map(value => ({ value, label: value }))}
+          options={profiles.map(value => ({ value, label: noted(value) }))}
         />
         <Facet
           label={cols.kind}
           allLabel={filters.all}
           value={kind}
           onChange={setKind}
-          options={forms.map(value => ({ value, label: kinds[value] }))}
+          options={categories.map(category => ({ value: category.id, label: category.label }))}
         />
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
@@ -195,17 +178,19 @@ export function DownloadExplorer({
                           archives share its id, its form and its version, so
                           keying on those gave three rows one key and React
                           reused the wrong nodes when the filters changed. */}
-                      {rows.map(download => ({ download, label: formLabel(copy, download) })).map(({ download, label }) => (
+                      {rows.map(download => ({ download, label: describeFile(download, copy.locale) })).map(({ download, label }) => (
                         <TableRow key={download.href}>
                           <TableCell className="px-5 text-[15px]">
-                            {label.name}
+                            {label.category}
                             {label.detail && (
                               <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
                                 {label.detail}
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="font-mono text-[13px]">{download.profile}</TableCell>
+                          <TableCell className="font-mono text-[13px]" title={productNote(board, download.profile, copy.locale)}>
+                            {download.profile}
+                          </TableCell>
                           <TableCell className="font-mono text-[13px]">{download.version}</TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
                             {download.releasedAt}

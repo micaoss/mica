@@ -86,9 +86,20 @@ nothing is published yet. A document that does not answer is a failure, never "n
 published": the Worker goes on answering the last catalogue that parsed and asks again a
 minute later. Releases that exist and parse to nothing are a failure too.
 
-An image's `form` (`disk`, and whatever a board's packers add, such as `usb-burn` and
-`sd-boot`) is shown beside the row like an update's, so the images of one release are told
-apart; a form the page has no wording for shows under its own name.
+### The mapping table
+
+`download-map.json` is the one place that says what the site calls what the resource service
+names (`src/features/download/download-map.ts` reads it):
+
+- `categories`: the groups a file is listed and filtered under, in order;
+- `files`: a file's `kind` and `form`, as a release document states them, to its category and
+  to the wording beside it. This is where `image`/`sd-boot` becomes a boot loader rather than
+  a system image;
+- `products`: what a product variant means, for every board or for one.
+
+Both languages are in the table. A kind, form or variant with no row is shown under its own
+name, so a board's new image kind or product appears on the site before it is worded; adding
+the row is the whole change.
 
 ### When the catalogue goes stale
 

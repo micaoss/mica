@@ -1,0 +1,27 @@
+{
+  "$comment": "The mapping table of the download pages: what the resource service names, and what the site calls it. `categories` are the groups a file is listed and filtered under, in order. `files` maps a file's `kind` and `form`, as a release document states them, to its category and to the wording shown beside it. `products` words a product variant; a row with a `board` applies to that board only and wins over the row without one. A kind, form or variant with no row here is shown under its own name.",
+  "categories": [
+    { "id": "image", "zh": "系统镜像", "en": "System image" },
+    { "id": "bootloader", "zh": "引导加载器", "en": "Boot loader" },
+    { "id": "update", "zh": "升级包", "en": "Update package" },
+    { "id": "firmware", "zh": "固件包", "en": "Firmware package" }
+  ],
+  "files": [
+    { "kind": "image", "form": "disk", "category": "image", "zh": "整盘镜像", "en": "whole disk" },
+    { "kind": "image", "form": "usb-burn", "category": "image", "zh": "USB 烧录包", "en": "USB burning package" },
+    { "kind": "image", "form": "sd-boot", "category": "bootloader", "zh": "USB 烧录包", "en": "USB burning package" },
+    { "kind": "update", "form": "full", "category": "update", "zh": "完整", "en": "full" },
+    { "kind": "update", "form": "root", "category": "update", "zh": "仅 root", "en": "root only" },
+    { "kind": "update", "form": "kernel", "category": "update", "zh": "仅 kernel", "en": "kernel only" },
+    { "kind": "update", "form": "core", "category": "update", "zh": "仅 core 组件", "en": "core only" }
+  ],
+  "products": [
+    { "variant": "basic", "zh": "基础系统", "en": "base system" },
+    { "variant": "full", "zh": "带容器引擎", "en": "with the container engine" },
+    { "board": "mini-x64", "variant": "basic", "zh": "OpenRC，带容器引擎", "en": "OpenRC, with the container engine" },
+    { "board": "s905x5m", "variant": "basic", "zh": "eMMC，基础系统", "en": "eMMC, base system" },
+    { "board": "s905x5m", "variant": "emmc-full", "zh": "eMMC，带容器引擎", "en": "eMMC, with the container engine" },
+    { "board": "s905x5m", "variant": "sd-full", "zh": "SD 卡，带容器引擎", "en": "SD card, with the container engine" },
+    { "board": "s905x5m", "variant": "full", "zh": "旧名，已改为 sd-full", "en": "earlier name of sd-full" }
+  ]
+}

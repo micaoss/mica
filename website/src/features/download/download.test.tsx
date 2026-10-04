@@ -86,7 +86,7 @@ describe('downloadExplorer', () => {
   it('names the form of each row and the file it downloads', () => {
     render(<DownloadExplorer copy={zh} board="x64" downloads={[UPDATE]} />)
 
-    expect(screen.getByText(zh.download.kinds.update)).toBeInTheDocument()
+    expect(screen.getByText('升级包')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'x64.micaupd' })).toHaveAttribute('href', UPDATE.href)
   })
 
@@ -131,7 +131,7 @@ describe('downloadExplorer', () => {
     trigger.click()
 
     const options = (await screen.findAllByRole('option')).map(option => option.textContent)
-    expect(options).toEqual([zh.download.filters.all, zh.download.kinds.image, zh.download.kinds.update])
+    expect(options).toEqual([zh.download.filters.all, '系统镜像', '升级包'])
   })
 
   it('explains an empty catalogue instead of showing an empty table', () => {
@@ -257,7 +257,7 @@ describe('the catalogue endpoint', () => {
     expect(fetchMock.mock.calls[1][1]).toMatchObject({ cache: 'reload' })
   })
 
-  it('names an image by its form, and an unknown form by its own name', () => {
+  it('names a row from the mapping table, and an unknown form by its own name', () => {
     const images = [
       download({ variant: 'disk', href: 'https://example.invalid/a.img.gz' }),
       download({ variant: 'sd-boot', href: 'https://example.invalid/a.sd-boot.img.gz' }),
@@ -266,15 +266,31 @@ describe('the catalogue endpoint', () => {
 
     render(<DownloadExplorer copy={zh} board="x64" downloads={images} />)
 
-    expect(screen.getByText(zh.download.images.disk)).toBeInTheDocument()
-    expect(screen.getByText(zh.download.images['sd-boot'])).toBeInTheDocument()
+    expect(screen.getByText('整盘镜像')).toBeInTheDocument()
+    expect(screen.getByText('引导加载器')).toBeInTheDocument()
     expect(screen.getByText('nand-raw')).toBeInTheDocument()
   })
 
-  it('does not call a boot loader package a system image', () => {
-    render(<DownloadExplorer copy={zh} board="x64" downloads={[download({ variant: 'sd-boot' })]} />)
+  it('filters a boot loader package apart from the system images', async () => {
+    const images = [
+      download({ variant: 'disk', deploymentId: 'dep-disk', href: 'https://example.invalid/a.img.gz' }),
+      download({ variant: 'sd-boot', deploymentId: 'dep-loader', href: 'https://example.invalid/a.sd-boot.img.gz' }),
+    ]
+    const { container } = render(<DownloadExplorer copy={zh} board="x64" downloads={images} />)
 
-    const cell = screen.getByText(zh.download.images['sd-boot'])
-    expect(cell.textContent).not.toContain(zh.download.kinds.image)
+    container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[1].click()
+    ;(await screen.findByRole('option', { name: '引导加载器' })).click()
+
+    expect(await screen.findByText('dep-loader')).toBeInTheDocument()
+    expect(screen.queryByText('dep-disk')).not.toBeInTheDocument()
+  })
+
+  it('says what a product variant is, from the mapping table', async () => {
+    const rows = [download({ board: 's905x5m', profile: 'sd-full', variant: 'disk' })]
+    const { container } = render(<DownloadExplorer copy={zh} board="s905x5m" downloads={rows} />)
+
+    container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[0].click()
+
+    expect(await screen.findByRole('option', { name: 'sd-full · SD 卡，带容器引擎' })).toBeInTheDocument()
   })
 })

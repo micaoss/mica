@@ -13,6 +13,8 @@ export interface ArchLayer {
 }
 
 export const zh = {
+  /** The locale this dictionary is, for wording kept in data files. */
+  locale: 'zh' as 'zh' | 'en',
   label: '中文',
   meta: {
     htmlLang: 'zh-CN',
@@ -95,28 +97,12 @@ export const zh = {
     boardsHeading: '选择板卡',
     boardHref: '查看下载',
     backToBoards: '全部板卡',
-    boardLead: '这块板卡的系统镜像、升级包与固件包，默认是每种形态的最新版本。',
-    kinds: {
-      image: '系统镜像',
-      update: '升级包',
-      firmware: '固件包',
-    },
+    boardLead: '这块板卡的系统镜像、引导加载器与升级包，默认显示每个产品最新一次发布的文件。',
     filters: {
       board: '板卡',
       profile: '变体',
       query: '版本或部署 ID',
       all: '全部',
-    },
-    variants: {
-      full: '完整',
-      root: '仅 root',
-      kernel: '仅 kernel',
-      core: '仅 core 组件',
-    },
-    images: {
-      'disk': '系统镜像（整盘）',
-      'usb-burn': '系统镜像（USB 烧录包）',
-      'sd-boot': '引导加载器（USB 烧录包）',
     },
     cols: {
       board: '板卡',

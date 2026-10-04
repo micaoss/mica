@@ -3,6 +3,8 @@
 import type { zh } from './zh'
 
 export const en: typeof zh = {
+  /** The locale this dictionary is, for wording kept in data files. */
+  locale: 'en' as 'zh' | 'en',
   label: 'English',
   meta: {
     htmlLang: 'en',
@@ -85,28 +87,12 @@ export const en: typeof zh = {
     boardsHeading: 'Choose a board',
     boardHref: 'Downloads',
     backToBoards: 'All boards',
-    boardLead: 'The system images, update packages and firmware packages for this board, newest of each form first.',
-    kinds: {
-      image: 'System image',
-      update: 'Update package',
-      firmware: 'Firmware package',
-    },
+    boardLead: 'The system images, boot loaders and update packages for this board: the files of each product\'s newest release.',
     filters: {
       board: 'Board',
       profile: 'Variant',
       query: 'Version or deployment ID',
       all: 'All',
-    },
-    variants: {
-      full: 'full',
-      root: 'root only',
-      kernel: 'kernel only',
-      core: 'core only',
-    },
-    images: {
-      'disk': 'System image (whole disk)',
-      'usb-burn': 'System image (USB burning package)',
-      'sd-boot': 'Boot loader (USB burning package)',
     },
     cols: {
       board: 'Board',
