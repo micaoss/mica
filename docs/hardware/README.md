@@ -32,9 +32,10 @@ boards**, named for the product
 
 **Every board is a release target** (`BOARD_RELEASE_TARGET` in its
 `board.env`): its products are built and can be released, each on its own, as
-`<board>.<variant>`. `basic` is every board's default product; `full` adds the
-container engine on every board but `mini-x64`, whose `basic` already carries
-it; `s905x5m` also has `emmc-full`, laid out for its eMMC. A `dev` product is
+`<board>.<variant>`. `basic` is every board's default product, and `full` adds the
+container engine on `uefi-x64`, `uefi-arm64` and `cx3576`; `mini-x64` has
+`basic` alone, which already carries it. `s905x5m` names its products by
+storage: `basic` and `emmc-full` for its eMMC, `sd-full` for an SD card. A `dev` product is
 built locally and never released. Which products have a release to download is
 on the [download page](https://micaos.dev/download/); a product without one is
 built from source ([build](../start/build.md)).

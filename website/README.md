@@ -73,10 +73,22 @@ archive it is.
 release shows on the site within that window and nothing has to run for it. No CI job, no
 KV namespace and no clock are involved.
 
+**Nobody waits for the resource service.** The Worker keeps the last answer that parsed for
+a week. Once the ten minutes are over it answers that copy at once, marked `refreshing`, and
+reads the documents again behind the response. The page does the same on its side
+(`src/features/download/use-catalogue.ts`): it shows the catalogue this browser kept from its
+last visit, then the endpoint's answer, and asks once more a few seconds after a `refreshing`
+answer. Only a first visit to a Worker that has never read the documents waits, and says it
+is reading rather than that nothing is published.
+
 A manifest that names no product is an **empty** catalogue: every board page then says
 nothing is published yet. A document that does not answer is a failure, never "nothing
-published": the Worker answers the last catalogue that parsed, kept in the cache for a week,
-and asks again a minute later. Releases that exist and parse to nothing are a failure too.
+published": the Worker goes on answering the last catalogue that parsed and asks again a
+minute later. Releases that exist and parse to nothing are a failure too.
+
+An image's `form` (`disk`, and whatever a board's packers add, such as `usb-burn` and
+`sd-boot`) is shown beside the row like an update's, so the images of one release are told
+apart; a form the page has no wording for shows under its own name.
 
 ### When the catalogue goes stale
 

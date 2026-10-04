@@ -113,6 +113,11 @@ export const zh = {
       kernel: '仅 kernel',
       core: '仅 core 组件',
     },
+    images: {
+      'disk': '整盘镜像',
+      'usb-burn': 'USB 烧录包',
+      'sd-boot': '引导加载器（USB 烧录包）',
+    },
     cols: {
       board: '板卡',
       profile: '变体',
@@ -124,6 +129,7 @@ export const zh = {
       download: '下载',
     },
     empty: '这块板卡当前没有已发布的下载。镜像从源码构建，或向集成方索取。',
+    loading: '正在读取发布目录……',
     history: '显示历史版本',
     historyHide: '只看最新版本',
     sample: '以下为示例数据，用于展示筛选，不是真实发布。',

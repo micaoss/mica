@@ -25,8 +25,9 @@ release an administrator deleted there is gone from both.
 
 Every board is a release target. Its products are `<board>.basic`, the
 default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m` and `mini-x64`;
-`<board>.full`, which adds the container engine, on all but `mini-x64`; and
-`s905x5m.emmc-full`, laid out for that board's eMMC. **Which of them have a
+`<board>.full`, which adds the container engine, on `uefi-x64`, `uefi-arm64`
+and `cx3576`; and `s905x5m.emmc-full` and `s905x5m.sd-full`, that board's
+container products for its eMMC and for an SD card. **Which of them have a
 release is on the [download page](https://micaos.dev/download/)**; a product
 without one has nothing to download and is built from source
 ([build guide](build.md)). A `dev` product is built

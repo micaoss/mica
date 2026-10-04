@@ -49,15 +49,15 @@ sha256sum disk.img                                   # 与层注解 mica.uncompr
 
 ## 2. 各板卡的镜像里有什么
 
-每块板都声明镜像类型 `disk`，即裸磁盘镜像；`s905x5m` 还声明 `usb-burn`，即它的 eMMC
-产品的 USB 烧录包。区别在于引导器放在哪里。
+每块板都声明镜像类型 `disk`，即裸磁盘镜像；`s905x5m` 还声明 `usb-burn`（它的 eMMC
+产品的 USB 烧录包）和 `sd-boot`（它的引导加载器包）。区别在于引导器放在哪里。
 
 | 板卡 | 固件形态 | 裸镜像能启动一块空板吗？ | 状态 |
 |---|---|---|---|
 | `uefi-x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI` | 仅在 QEMU 下合格 |
 | `uefi-arm64` | `efi`（systemd-boot 在 ESP 里） | 能，只要带 ACPI 的 UEFI 启动 `EFI/BOOT/BOOTAA64.EFI` | 仅在 QEMU 下合格 |
 | `cx3576` | `rockchip-loader` | 能——U-Boot 就写在镜像的第 64 扇区 | 未在实机上验证 |
-| `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在磁盘镜像之外；`s905x5m.emmc-full` 的 USB 烧录包带着它 | 未在实机上验证 |
+| `s905x5m` | `amlogic-boot0` | **不能**——U-Boot 从 eMMC boot0 运行，在磁盘镜像之外；eMMC 产品的 USB 烧录包带着它 | 未在实机上验证 |
 | `mini-x64` | `efi`（systemd-boot 在 ESP 里） | 能，只要 UEFI 启动 `EFI/BOOT/BOOTX64.EFI`；没有 USB 驱动，所以不能从 USB 介质启动 | 仅在 QEMU 下合格 |
 
 没有可选的 A/B 分区对，也没有从旧布局的转换：写入就是整盘写入。
@@ -239,17 +239,18 @@ cx3576 上镜像就是整个介质，并且自带引导器：GPT 里有 `FIRMWAR
 
 下面两条途径都没有在实机上跑过。
 
-**eMMC 产品 `s905x5m.emmc-full`。** 它的发布带有一个 USB 烧录包：给厂商 USB Burning Tool
+**eMMC 产品 `s905x5m.basic` 与 `s905x5m.emmc-full`。** 发布带有一个 USB 烧录包，不带磁盘镜像：给厂商 USB Burning Tool
 用的 Amlogic v2 烧录镜像，由该产品的磁盘镜像和板卡的 bootloader 包生成。它写入分区表、
 两个 bootloader 目标、厂商设备树和 Mica OS 的三个分区，不动厂商的其他分区。上电时按住
 恢复键，板子进入 USB 烧录模式。构建会解包自己生成的每一个烧录包，并证明每个载荷都与其
 来源一致。
 
-**SD 产品 `s905x5m.basic` 与 `s905x5m.full`。** Mica OS 的 U-Boot 从 eMMC boot0 区域
+**SD 产品 `s905x5m.sd-full`。** Mica OS 的 U-Boot 从 eMMC boot0 区域
 执行；当来源不是 boot0 时，loader 拒绝自动启动。磁盘镜像只覆盖 SD 介质——第 64 扇区的
 `FIRMWARE`、`SYSTEM`、`DATA`——所以把它写到卡上不会装上任何引导器，只有 boot0 里已经带着
-匹配的 Mica OS U-Boot 的板卡才能从它启动。这个 U-Boot 由板卡的 bootloader 包经同一种
-USB 烧录模式安装（`mica-build:boards/s905x5m/loader/README.md`）。
+匹配的 Mica OS U-Boot 的板卡才能从它启动。这个 U-Boot 就是发布里磁盘镜像旁边的引导
+加载器包（`.sd-boot.img.gz`），经同一种 USB 烧录模式安装
+（`mica-build:boards/s905x5m/loader/README.md`）。
 
 > status: unsupported
 
@@ -283,8 +284,8 @@ USB 烧录模式安装（`mica-build:boards/s905x5m/loader/README.md`）。
 
 ## 8. 刷写不负责的事
 
-- **只有一种厂商镜像类型。** 一个发布携带裸磁盘镜像和更新归档；唯一的厂商格式是
-  `s905x5m.emmc-full` 的 USB 烧录包。
+- **只有一种厂商格式。** 一个发布携带它的镜像和更新归档；唯一的厂商格式是 Amlogic USB
+  烧录包，`s905x5m` 用它发布 eMMC 产品和引导加载器。
 - **没有分区级 A/B。** 两个部署都是 SYSTEM 上的文件，所以不存在“另一个槽”可刷
   （[更新](../../reference/updates.md)）。
 - **不能靠重刷来升级。** 写镜像会抹掉 DATA。要把运行中的设备带到新发布，用更新归档

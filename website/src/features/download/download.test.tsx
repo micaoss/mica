@@ -1,6 +1,6 @@
 import type { Download } from './catalog'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { en } from '@/shared/i18n/en'
 import { zh } from '@/shared/i18n/zh'
 import { DOWNLOADS, filterDownloads, historyCount, selectVersions } from './catalog'
@@ -148,6 +148,12 @@ describe('downloadExplorer', () => {
 })
 
 describe('the catalogue endpoint', () => {
+  beforeEach(() => localStorage.clear())
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
   it('renders what /api/catalog answers, for this board', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({ downloads: SAMPLE })))
     vi.stubGlobal('fetch', fetchMock)
@@ -157,7 +163,6 @@ describe('the catalogue endpoint', () => {
     expect(await screen.findByText('dep-cx')).toBeInTheDocument()
     expect(screen.queryByText('dep-new')).not.toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/api/catalog'), expect.anything())
-    vi.unstubAllGlobals()
   })
 
   it('shows the empty state when the endpoint is unreachable', async () => {
@@ -168,6 +173,73 @@ describe('the catalogue endpoint', () => {
     render(<DownloadExplorer copy={zh} board="x64" />)
 
     expect(await screen.findByText(zh.download.empty)).toBeInTheDocument()
-    vi.unstubAllGlobals()
+  })
+
+  it('says it is reading, not that nothing is published, until the endpoint answers', () => {
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})))
+
+    render(<DownloadExplorer copy={zh} board="x64" />)
+
+    expect(screen.getByText(zh.download.loading)).toBeInTheDocument()
+    expect(screen.queryByText(zh.download.empty)).not.toBeInTheDocument()
+  })
+
+  it('shows the catalogue this browser kept before the endpoint answers', async () => {
+    localStorage.setItem('mica.catalogue', JSON.stringify({ downloads: SAMPLE }))
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})))
+
+    render(<DownloadExplorer copy={zh} board="cx3576" />)
+
+    expect(await screen.findByText('dep-cx')).toBeInTheDocument()
+  })
+
+  it('keeps what the endpoint answered for the next visit', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ downloads: SAMPLE }))))
+
+    render(<DownloadExplorer copy={zh} board="cx3576" />)
+    await screen.findByText('dep-cx')
+
+    expect(JSON.parse(localStorage.getItem('mica.catalogue') ?? 'null').downloads).toHaveLength(SAMPLE.length)
+  })
+
+  it('keeps showing the kept catalogue when the endpoint is unreachable', async () => {
+    localStorage.setItem('mica.catalogue', JSON.stringify({ downloads: SAMPLE }))
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    render(<DownloadExplorer copy={zh} board="cx3576" />)
+
+    expect(await screen.findByText('dep-cx')).toBeInTheDocument()
+  })
+
+  it('asks again for the new catalogue when the answer says one is being read', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ downloads: [], refreshing: true })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ downloads: SAMPLE })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<DownloadExplorer copy={zh} board="cx3576" />)
+    await screen.findByText(zh.download.empty)
+    await vi.advanceTimersByTimeAsync(4000)
+
+    expect(await screen.findByText('dep-cx')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock.mock.calls[1][1]).toMatchObject({ cache: 'reload' })
+  })
+
+  it('names an image by its form, and an unknown form by its own name', () => {
+    const images = [
+      download({ variant: 'disk', href: 'https://example.invalid/a.img.gz' }),
+      download({ variant: 'sd-boot', href: 'https://example.invalid/a.sd-boot.img.gz' }),
+      download({ variant: 'nand-raw', href: 'https://example.invalid/a.nand.img.gz' }),
+    ]
+
+    render(<DownloadExplorer copy={zh} board="x64" downloads={images} />)
+
+    expect(screen.getByText(zh.download.images.disk)).toBeInTheDocument()
+    expect(screen.getByText(zh.download.images['sd-boot'])).toBeInTheDocument()
+    expect(screen.getByText('nand-raw')).toBeInTheDocument()
   })
 })

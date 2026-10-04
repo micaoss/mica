@@ -104,7 +104,7 @@ OCI 产物；两者都是公开的，不需要 token 就能读。
 
 ## 5. 还没有的东西
 
-- 唯一的板卡专用刷写格式是 `s905x5m.emmc-full` 的 USB 烧录包；其他产品都只发布裸磁盘
+- 唯一的板卡专用刷写格式是 `s905x5m` 的 Amlogic USB 烧录包；其他板卡都只发布裸磁盘
   镜像。
 - 没有任何东西会启动 FIT 镜像：不存在能启动它的套件，所以 `cx3576` 与 `s905x5m` 的
   产品被发布、却从未被启动（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md) 第 4 节）。

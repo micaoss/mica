@@ -1,4 +1,4 @@
-import type { Download, DownloadKind, DownloadVariant } from './catalog'
+import type { Download, DownloadKind } from './catalog'
 import { DOWNLOAD_KINDS } from './catalog'
 
 /**
@@ -21,9 +21,8 @@ function readDownload(value: unknown): Download | null {
     return null
   if (!DOWNLOAD_KINDS.includes(entry.kind as DownloadKind))
     return null
-  const variants: DownloadVariant[] = ['full', 'root', 'kernel', 'core']
-  const variant = variants.includes(entry.variant as DownloadVariant)
-    ? (entry.variant as DownloadVariant)
+  const variant = typeof entry.variant === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(entry.variant)
+    ? entry.variant
     : undefined
 
   return {

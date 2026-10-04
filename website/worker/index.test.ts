@@ -50,6 +50,7 @@ interface Body {
   source?: string
   sample?: boolean
   status: { trigger: string, lastError: { message: string } | null }
+  refreshing?: boolean
 }
 
 describe('gET /api/catalog', () => {
@@ -88,7 +89,28 @@ describe('gET /api/catalog', () => {
     expect(read).toHaveBeenCalledTimes(1)
   })
 
-  it('answers the last good catalogue, with the error, when the resource service fails', async () => {
+  it('answers the last good catalogue at once when the ten minutes are over, and reads again behind it', async () => {
+    const { cache, store } = fakeCache()
+    await get({ read: published(), cache })
+    store.delete('https://micaos.dev/api/catalog/fresh')
+
+    const newer = { ...RELEASE, id: 'mini-x64.basic.20261002-0900', files: [...RELEASE.files, { kind: 'update', form: 'full', path: 'a.micaupd', sha256: 'b'.repeat(64), size: 2 }] }
+    const read = published(MANIFEST, [newer])
+    const stale = await get({ read, cache })
+    const body = await stale.json() as Body
+
+    expect(body.refreshing).toBe(true)
+    expect(body.downloads).toHaveLength(1)
+    expect(stale.headers.get('cache-control')).toBe('no-store')
+    expect(read).toHaveBeenCalledTimes(1)
+
+    const next = await (await get({ read, cache })).json() as Body
+    expect(next.refreshing).toBeUndefined()
+    expect(next.downloads).toHaveLength(2)
+    expect(read).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps answering the last good catalogue, with the error, when the resource service fails', async () => {
     const { cache, store } = fakeCache()
     await get({ read: published(), cache })
     store.delete('https://micaos.dev/api/catalog/fresh')
@@ -96,10 +118,12 @@ describe('gET /api/catalog', () => {
     const failing = vi.fn(async () => {
       throw new Error('https://res.test/update/v2/manifest.json answered 503')
     }) as never
+    await get({ read: failing, cache })
     const body = await (await get({ read: failing, cache })).json() as Body
 
     expect(body.downloads).toHaveLength(1)
     expect(body.status.lastError?.message).toContain('answered 503')
+    expect(store.get('https://micaos.dev/api/catalog/fresh')?.headers.get('cache-control')).toBe('public, max-age=60')
   })
 
   it('answers an empty catalogue and the error when nothing was ever read', async () => {

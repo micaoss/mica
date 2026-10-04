@@ -59,6 +59,8 @@ export interface ResHistory {
 
 const UPDATE_FORMS: DownloadVariant[] = ['full', 'root', 'kernel', 'core']
 const KINDS: DownloadKind[] = ['image', 'update', 'firmware']
+/** A form as the resource service writes one. */
+const FORM = /^[a-z0-9][a-z0-9-]*$/
 
 /** The UTC-minute stamp a release id ends with: `mini-x64.basic.20261001-2113` -> `20261001-2113`. */
 function stampOf(id: string): string | null {
@@ -82,7 +84,9 @@ function row(release: ResRelease, file: ResFile, stamp: string): Download | null
   // this page does not know is skipped rather than shown as a plain update.
   if (kind === 'update' && !UPDATE_FORMS.includes(file.form as DownloadVariant))
     return null
-  const variant = kind === 'update' ? (file.form as DownloadVariant) : undefined
+  // An image's form says which image it is: a product may publish its disk
+  // image beside a boot loader image, or a vendor burning package alone.
+  const variant = FORM.test(file.form ?? '') ? file.form : undefined
 
   return {
     board: release.board,
@@ -137,13 +141,12 @@ export async function readCatalogue(root: string, get: typeof fetch = fetch): Pr
   if (!Array.isArray(manifest?.products))
     throw new Error(`${root}v2/manifest.json names no products list`)
 
-  const releases: ResRelease[] = []
-  for (const product of manifest.products) {
+  // Read side by side, kept in the manifest's order: a visitor may be waiting.
+  const perProduct = await Promise.all(manifest.products.map(async (product) => {
     const history = await readJson(`${root}v2/${encodeURIComponent(product.product)}/releases.json`, get) as ResHistory
     if (!history?.baseUrl?.endsWith('/') || !Array.isArray(history.releases))
       throw new Error(`the history of ${product.product} carries no baseUrl or no releases`)
-    for (const entry of history.releases)
-      releases.push(await readJson(`${history.baseUrl}${entry.path}`, get) as ResRelease)
-  }
-  return { manifest, releases }
+    return Promise.all(history.releases.map(entry => readJson(`${history.baseUrl}${entry.path}`, get) as Promise<ResRelease>))
+  }))
+  return { manifest, releases: perProduct.flat() }
 }

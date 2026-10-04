@@ -60,7 +60,8 @@ Then know three things about the write:
 ## 2. What the image carries, per board
 
 Every board declares the image kind `disk`, the raw disk image; `s905x5m` also
-declares `usb-burn`, the USB burning package of its eMMC product. What differs
+declares `usb-burn`, the USB burning package of its eMMC products, and
+`sd-boot`, its boot loader package. What differs
 is where the bootloader lives.
 
 | Board | Firmware format | Does the raw image boot a blank board? | State |
@@ -68,7 +69,7 @@ is where the bootloader lives.
 | `uefi-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI` | qualified under QEMU only |
 | `uefi-arm64` | `efi` (systemd-boot in the ESP) | yes, where UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` | qualified under QEMU only |
 | `cx3576` | `rockchip-loader` | yes — U-Boot is written inside the image at sector 64 | not verified on hardware |
-| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the disk image; the USB burning package of `s905x5m.emmc-full` carries it | not verified on hardware |
+| `s905x5m` | `amlogic-boot0` | **no** — U-Boot runs from eMMC boot0, outside the disk image; the USB burning package of an eMMC product carries it | not verified on hardware |
 | `mini-x64` | `efi` (systemd-boot in the ESP) | yes, where UEFI starts `EFI/BOOT/BOOTX64.EFI`; no USB driver, so not from USB media | qualified under QEMU only |
 
 There is no A/B partition pair to choose between and no conversion from an
@@ -269,22 +270,22 @@ patches kept in [`docs/hardware/cx3576/rkdeveloptool`](../hardware/cx3576/rkdeve
 
 Neither route below has been run on a unit.
 
-**The eMMC product, `s905x5m.emmc-full`.** Its release carries a USB burning
-package: an Amlogic v2 burning image for the vendor USB Burning Tool, built
+**The eMMC products, `s905x5m.basic` and `s905x5m.emmc-full`.** A release
+carries a USB burning package and no disk image: an Amlogic v2 burning image for the vendor USB Burning Tool, built
 from the product's disk image and the board's bootloader package. It writes
 the partition table, both bootloader targets, the vendor device tree and the
 three Mica OS partitions, and leaves the vendor's other partitions alone.
 Holding the recovery key at power-on puts the board into USB burning mode. The
 build unpacks every package it makes and proves each payload is its source.
 
-**The SD products, `s905x5m.basic` and `s905x5m.full`.** Mica OS U-Boot
+**The SD product, `s905x5m.sd-full`.** Mica OS U-Boot
 executes from the eMMC boot0 area, and the loader refuses an automatic boot
 when its source is not boot0. The disk image covers the SD medium only —
 `FIRMWARE` at sector 64, `SYSTEM`, `DATA` — so writing it to a card installs no
 bootloader, and only a board whose boot0 already carries the matching Mica OS
-U-Boot boots from it. That U-Boot is installed with the board's bootloader
-package over the same USB burning mode
-(`mica-build:boards/s905x5m/loader/README.md`).
+U-Boot boots from it. That U-Boot is the boot loader package the release
+carries beside the disk image (`.sd-boot.img.gz`), installed over the same USB
+burning mode (`mica-build:boards/s905x5m/loader/README.md`).
 
 > status: unsupported
 
@@ -326,9 +327,9 @@ been run on hardware. The device-side half of this section is read out of
 
 ## 8. What flashing does not cover
 
-- **One vendor image kind.** A release carries the raw disk image and the
-  update archives; the only vendor format is the USB burning package of
-  `s905x5m.emmc-full`.
+- **One vendor format.** A release carries its images and its update
+  archives; the only vendor format is the Amlogic USB burning package, which
+  `s905x5m` uses for its eMMC products and for its boot loader.
 - **No partition-level A/B.** Both deployments are files on SYSTEM, so there
   is no "other slot" to flash ([updates](../reference/updates.md)).
 - **No upgrade by re-flashing.** Writing an image wipes DATA. To move a

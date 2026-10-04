@@ -11,8 +11,13 @@ import { readCatalogue, RES_UPDATE_ROOT } from '../src/features/download/res-cat
  * (the manifest, each product's history, each release's document), parses them
  * into the download rows and answers them. The answer is held in the edge
  * cache for ten minutes, so a release shows on the site within that window
- * with nothing to run. A copy of the last answer that parsed is kept beside
- * it, and is what a failing resource service is answered from.
+ * with nothing to run.
+ *
+ * A copy of the last answer that parsed is kept beside it. Once the ten minutes
+ * are over that copy is answered at once, marked `refreshing`, while the
+ * documents are read again behind the response: a visitor never waits for the
+ * resource service unless nothing was ever read. The same copy is what a
+ * failing resource service is answered from.
  */
 
 export interface Env {
@@ -37,7 +42,12 @@ interface Context {
   waitUntil: (promise: Promise<unknown>) => void
 }
 
-type Answer = Omit<StoredCatalogue, 'refreshedAt'> & { refreshedAt: string | null, status: RefreshStatus }
+type Answer = Omit<StoredCatalogue, 'refreshedAt'> & {
+  refreshedAt: string | null
+  status: RefreshStatus
+  /** Set on an answer served from the last good copy while a new one is read. */
+  refreshing?: true
+}
 
 const CATALOG_PATH = '/api/catalog'
 /** How long an answer read from the resource service is served. */
@@ -74,6 +84,13 @@ function reply(body: unknown): Response {
   return json(body, 60)
 }
 
+/** An answer that is about to be replaced is not for a browser to keep. */
+function replyStale(answer: Answer): Response {
+  return new Response(JSON.stringify({ ...answer, refreshing: true }), {
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+  })
+}
+
 /** Reads the resource service; a board the site has no page for is named in the status. */
 async function fromRes(root: string, read: Deps['read'], now: string): Promise<Answer> {
   const { manifest, releases } = await read(root)
@@ -91,40 +108,53 @@ async function fromRes(root: string, read: Deps['read'], now: string): Promise<A
   }
 }
 
-async function catalogue(origin: string, env: Env, ctx: Context, { read, cache }: Deps): Promise<Response> {
-  if (env.CATALOG_DEMO === '1')
-    return reply({ downloads: SAMPLE, sample: true, refreshedAt: null })
-
-  // The page asks with its build id in the query; the cached answer is one.
-  const fresh = `${origin}${CATALOG_PATH}/fresh`
-  const lastGood = `${origin}${CATALOG_PATH}/last-good`
-
-  const held = await cache.match(fresh)
-  if (held)
-    return reply(await held.json())
-
+/**
+ * Reads the documents and stores the answer. A document that does not answer
+ * must not read as "nothing published": the last answer that parsed is kept,
+ * with what failed in its status, and the resource service is asked again a
+ * minute later.
+ */
+async function refresh(root: string, keys: { fresh: string, lastGood: string }, previous: Answer | null, { read, cache }: Deps): Promise<Answer> {
   const now = new Date().toISOString()
   try {
-    const answer = await fromRes(env.CATALOG_ROOT ?? RES_UPDATE_ROOT, read, now)
-    ctx.waitUntil(Promise.all([
-      cache.put(fresh, json(answer, FRESH_SECONDS)),
-      cache.put(lastGood, json(answer, LAST_GOOD_SECONDS)),
-    ]))
-    return reply(answer)
+    const answer = await fromRes(root, read, now)
+    await Promise.all([
+      cache.put(keys.fresh, json(answer, FRESH_SECONDS)),
+      cache.put(keys.lastGood, json(answer, LAST_GOOD_SECONDS)),
+    ])
+    return answer
   }
   catch (error) {
-    // A document that does not answer must not read as "nothing published":
-    // the last answer that parsed is served, and the status says what failed.
     const lastError = { at: now, message: (error as Error).message }
-    const last = await cache.match(lastGood)
-    const previous = last ? await last.json() as Answer : null
     const answer: Answer = previous
       ? { ...previous, status: { ...previous.status, lastAttemptAt: now, lastError } }
       : { downloads: [], refreshedAt: null, status: { lastAttemptAt: now, trigger: 'request', lastError } }
 
-    ctx.waitUntil(cache.put(fresh, json(answer, FAILURE_SECONDS)))
-    return reply(answer)
+    await cache.put(keys.fresh, json(answer, FAILURE_SECONDS))
+    return answer
   }
+}
+
+async function catalogue(origin: string, env: Env, ctx: Context, deps: Deps): Promise<Response> {
+  if (env.CATALOG_DEMO === '1')
+    return reply({ downloads: SAMPLE, sample: true, refreshedAt: null })
+
+  // The page asks with its build id in the query; the cached answer is one.
+  const keys = { fresh: `${origin}${CATALOG_PATH}/fresh`, lastGood: `${origin}${CATALOG_PATH}/last-good` }
+  const root = env.CATALOG_ROOT ?? RES_UPDATE_ROOT
+
+  const held = await deps.cache.match(keys.fresh)
+  if (held)
+    return reply(await held.json())
+
+  const last = await deps.cache.match(keys.lastGood)
+  if (last) {
+    const previous = await last.json() as Answer
+    ctx.waitUntil(refresh(root, keys, previous, deps))
+    return replyStale(previous)
+  }
+
+  return reply(await refresh(root, keys, null, deps))
 }
 
 export async function handle(request: Request, env: Env, ctx: Context, deps: Deps): Promise<Response> {

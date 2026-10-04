@@ -1,5 +1,6 @@
 import type { ResRelease } from './res-catalog'
 import { describe, expect, it } from 'vitest'
+import { selectVersions } from './catalog'
 import { downloadsFromRes, readCatalogue } from './res-catalog'
 
 const SHA = (c: string) => c.repeat(64)
@@ -22,6 +23,24 @@ const RELEASE: ResRelease = {
 }
 
 describe('downloadsFromRes', () => {
+  it('tells the images of one release apart by their form', () => {
+    const release = {
+      ...RELEASE,
+      id: 's905x5m.sd-full.20261004-1510',
+      board: 's905x5m',
+      variant: 'sd-full',
+      files: [
+        { kind: 'image', form: 'disk', sha256: SHA('a'), size: 1, path: 'mica-s905x5m.sd-full-20261004-1510.img.gz' },
+        { kind: 'image', form: 'sd-boot', sha256: SHA('b'), size: 2, path: 'mica-s905x5m.sd-full-20261004-1510.sd-boot.img.gz' },
+      ],
+    }
+    const rows = downloadsFromRes([release])
+
+    expect(rows.map(row => row.variant)).toEqual(['disk', 'sd-boot'])
+    // Both are the newest of their own form, so neither hides behind the other.
+    expect(selectVersions(rows, false)).toHaveLength(2)
+  })
+
   it('reads every file of a release, under the release\'s own baseUrl', () => {
     const rows = downloadsFromRes([RELEASE])
 

@@ -27,9 +27,10 @@
 ## 这张表声明了什么，没有声明什么
 
 **每块板都是发布目标**（其 `board.env` 里的 `BOARD_RELEASE_TARGET`）：它的产品都会被
-构建，并且可以各自独立发布，名为 `<board>.<variant>`。`basic` 是每块板的默认产品；
-`full` 在除 `mini-x64` 之外的每块板上加入容器引擎，`mini-x64` 的 `basic` 已经带了它；
-`s905x5m` 还有按它的 eMMC 布局的 `emmc-full`。`dev` 产品只在本地构建，从不发布。哪些
+构建，并且可以各自独立发布，名为 `<board>.<variant>`。`basic` 是每块板的默认产品，
+`full` 在 `uefi-x64`、`uefi-arm64` 与 `cx3576` 上加入容器引擎；`mini-x64` 只有 `basic`，它
+已经带了容器引擎。`s905x5m` 按存储命名产品：eMMC 上的 `basic` 与 `emmc-full`，SD 卡上的
+`sd-full`。`dev` 产品只在本地构建，从不发布。哪些
 产品有可下载的发布见[下载页](https://micaos.dev/download/)；没有发布的产品从源码构建
 （[构建](../start/build.md)）。
 

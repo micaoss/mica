@@ -1,6 +1,6 @@
 import type { Download, DownloadKind } from '../catalog'
 import type { Copy } from '@/shared/i18n'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
 import { Input } from '@/shared/components/ui/input'
@@ -21,13 +21,12 @@ import {
 } from '@/shared/components/ui/table'
 import {
   DOWNLOAD_KINDS,
-  DOWNLOADS,
   filterDownloads,
   formatBytes,
   historyCount,
   selectVersions,
 } from '../catalog'
-import { isSample, parseCatalog } from '../catalog-schema'
+import { useCatalogue } from '../use-catalogue'
 
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
 const ALL = 'all'
@@ -39,13 +38,18 @@ function shortId(id: string | undefined): string {
   return id.length > 16 ? `${id.slice(0, 12)}…` : id
 }
 
-declare const __BUILD_ID__: string | undefined
-
 /**
- * Where the Worker answers the catalogue. The build stamp is the cache key: a
- * deploy asks for a fresh answer, and within one deploy the edge serves one.
+ * What a row's variant reads as: an update's or an image's own wording where
+ * the page has one, and the form as the catalogue names it where it does not,
+ * so a board's new image kind shows under its own name rather than as a
+ * second plain image.
  */
-const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
+function variantLabel(copy: Copy, download: Download): string | undefined {
+  if (!download.variant)
+    return undefined
+  const words: Record<string, string> = download.kind === 'image' ? copy.download.images : copy.download.variants
+  return words[download.variant] ?? download.variant
+}
 
 interface FacetProps {
   label: string
@@ -92,35 +96,15 @@ export function DownloadExplorer({
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
   downloads?: Download[]
 }) {
-  const [fetched, setFetched] = useState<Download[]>(DOWNLOADS)
-  const [sample, setSample] = useState(false)
+  const { downloads: all, sample, loading } = useCatalogue(downloads)
   const [profile, setProfile] = useState(ALL)
   const [kind, setKind] = useState(ALL)
   const [query, setQuery] = useState('')
   const [history, setHistory] = useState(false)
 
-  useEffect(() => {
-    if (downloads)
-      return
-    const cancel = new AbortController()
-    // A failed or unreadable catalogue leaves the empty state standing: the page
-    // says there is nothing published rather than showing a broken table.
-    fetch(CATALOG_ENDPOINT, { signal: cancel.signal })
-      .then(async (response) => {
-        if (!response.ok)
-          return []
-        const payload: unknown = await response.json()
-        setSample(isSample(payload))
-        return parseCatalog(payload)
-      })
-      .then(setFetched)
-      .catch(() => {})
-    return () => cancel.abort()
-  }, [downloads])
-
   const catalogue = useMemo(
-    () => (downloads ?? fetched).filter(download => download.board === board),
-    [downloads, fetched, board],
+    () => all.filter(download => download.board === board),
+    [all, board],
   )
 
   const profiles = useMemo(
@@ -178,7 +162,7 @@ export function DownloadExplorer({
       {rows.length === 0
         ? (
             <p className="mt-8 mb-0 text-[15px] leading-7 text-muted-foreground">
-              {copy.download.empty}
+              {loading ? copy.download.loading : copy.download.empty}
             </p>
           )
         : (
@@ -213,7 +197,7 @@ export function DownloadExplorer({
                             {kinds[download.kind]}
                             {download.variant && (
                               <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
-                                {copy.download.variants[download.variant]}
+                                {variantLabel(copy, download)}
                               </span>
                             )}
                           </TableCell>

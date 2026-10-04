@@ -28,7 +28,14 @@ export const DOWNLOAD_KINDS: DownloadKind[] = ['image', 'update', 'firmware']
  * `kernel` when the rootfs is, `core` for the core components alone — and they
  * are not interchangeable, so the row says which one it is.
  */
-export type DownloadVariant = 'full' | 'root' | 'kernel' | 'core'
+export type UpdateVariant = 'full' | 'root' | 'kernel' | 'core'
+
+/**
+ * An image has a form as well: `disk`, the raw disk image, and whatever a
+ * board's packers add (`usb-burn`, `sd-boot`). Not a fixed set: a board
+ * declares its image kinds, and the page shows what the catalogue names.
+ */
+export type DownloadVariant = UpdateVariant | (string & {})
 
 export interface Download {
   /** Board identifier, as `mica-build` names it. */
@@ -82,8 +89,9 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
 /**
  * Newest first, and one row per file unless `history` asks for the rest.
  *
- * A file is identified by board, profile, form **and variant**: the three update
- * archives of one deployment — `full`, `root`, `kernel` — are different files
+ * A file is identified by board, profile, form **and variant**: the update
+ * archives of one deployment — `full`, `root`, `kernel` — and the images of
+ * one release — `disk`, `sd-boot` — are different files
  * with different uses, not versions of each other. Leaving the variant out of
  * the key hid two of the three behind the history control.
  */

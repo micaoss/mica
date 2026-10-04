@@ -1,13 +1,8 @@
 import type { Download } from '../catalog'
 import type { Copy } from '@/shared/i18n'
-import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/shared/components/ui/card'
-import { DOWNLOADS, selectVersions } from '../catalog'
-import { parseCatalog } from '../catalog-schema'
-
-declare const __BUILD_ID__: string | undefined
-
-const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
+import { selectVersions } from '../catalog'
+import { useCatalogue } from '../use-catalogue'
 
 export interface BoardCard {
   board: string
@@ -31,20 +26,7 @@ export function BoardIndex({
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
   downloads?: Download[]
 }) {
-  const [fetched, setFetched] = useState<Download[]>(DOWNLOADS)
-
-  useEffect(() => {
-    if (downloads)
-      return
-    const cancel = new AbortController()
-    fetch(CATALOG_ENDPOINT, { signal: cancel.signal })
-      .then(async response => (response.ok ? parseCatalog(await response.json()) : []))
-      .then(setFetched)
-      .catch(() => {})
-    return () => cancel.abort()
-  }, [downloads])
-
-  const catalogue = downloads ?? fetched
+  const { downloads: catalogue, loading } = useCatalogue(downloads)
   const known = new Set(boards.map(board => board.board))
   // A catalogue entry for a board this site has no page for would otherwise be
   // invisible: the row exists upstream and nothing here would ever show it.
@@ -73,7 +55,7 @@ export function BoardIndex({
                     {board.status}
                   </p>
                   <span className="mt-4 inline-block font-mono text-[13px] text-brand-strong">
-                    {latest ? `${copy.download.latest} ${latest.version}` : copy.download.nothingYet}
+                    {latest ? `${copy.download.latest} ${latest.version}` : loading ? copy.download.loading : copy.download.nothingYet}
                   </span>
                 </CardContent>
               </Card>

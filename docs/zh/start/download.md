@@ -21,8 +21,8 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 ## 1. 有哪些东西可下载
 
 每块板都是发布目标。它的产品有：`uefi-x64`、`uefi-arm64`、`cx3576`、`s905x5m` 与
-`mini-x64` 上默认的 `<board>.basic`；除 `mini-x64` 外带容器引擎的 `<board>.full`；以及按
-该板 eMMC 布局的 `s905x5m.emmc-full`。**其中哪些有发布，见
+`mini-x64` 上默认的 `<board>.basic`；`uefi-x64`、`uefi-arm64` 与 `cx3576` 上带容器引擎的 `<board>.full`；以及
+`s905x5m.emmc-full` 与 `s905x5m.sd-full`，该板分别用于 eMMC 和 SD 卡的带容器产品。**其中哪些有发布，见
 [下载页](https://micaos.dev/download/)**；没有发布的产品没有可下载的东西，需要从源码构建
 （[构建指南](../start/build.md)）。`dev` 产品只在本地
 构建、从不发布；没有 minimal 产品（[决策](../../decisions/2026-09-16-minimal-products-removed.md)）。

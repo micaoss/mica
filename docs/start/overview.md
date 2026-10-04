@@ -125,8 +125,8 @@ checked before and after decompressing.
 
 ## 5. What is not here yet
 
-- The only board-specific flashing format is the USB burning package of
-  `s905x5m.emmc-full`; every other product publishes the raw disk image alone.
+- The only board-specific flashing format is the Amlogic USB burning package
+  of `s905x5m`; every other board publishes the raw disk image alone.
 - Nothing starts a FIT image: there is no suite that boots one, so the
   `cx3576` and `s905x5m` products are published and never started
   ([harness](https://github.com/micaoss/mica-build/blob/main/README.md) section 4).
