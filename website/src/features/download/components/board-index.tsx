@@ -13,7 +13,7 @@ export interface BoardCard {
 
 /** The newest version published for a board, or nothing if it has none. */
 function latestFor(downloads: Download[], board: string): Download | undefined {
-  return selectVersions(downloads.filter(download => download.board === board), false)[0]
+  return selectVersions(downloads.filter(download => download.board === board), true)[0]
 }
 
 export function BoardIndex({

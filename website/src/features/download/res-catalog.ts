@@ -1,12 +1,15 @@
 import type { Download, DownloadKind, DownloadVariant } from './catalog'
 
 /**
- * Reads the update documents the resource service builds from the releases posted to it
- * (the resource service behind `res.micaos.dev`):
+ * Reads the release documents the resource service builds from the releases
+ * posted to it (the resource service behind `res.micaos.dev`):
  *
- *   <root>v2/manifest.json            every product and its latest release
  *   <root>v2/<product>/releases.json  that product's releases, newest first
  *   <baseUrl><path>                   one release, complete: its files
+ *
+ * The page's own document is the product catalogue (`products-catalog.ts`),
+ * which carries each product's newest release in this same shape; these two
+ * are read for a product's history.
  *
  * Every document that links to others carries a `baseUrl` and names each link
  * as a `path` relative to it. Every field shown comes from a release the
@@ -39,14 +42,6 @@ export interface ResRelease {
   generation?: number
   publishedAt?: string
   files?: ResFile[]
-}
-
-/** `mica/catalog/v2`: the manifest. */
-export interface ResManifest {
-  schema?: string
-  revision?: number
-  baseUrl?: string
-  products?: { product: string, board: string, variant: string, latest?: { id: string, generation?: number, path: string } }[]
 }
 
 /** `mica/releases/v1`: a product's history. */
@@ -122,31 +117,10 @@ export function downloadsFromRes(releases: unknown[]): Download[] {
   return downloads
 }
 
-async function readJson(url: string, get: typeof fetch): Promise<unknown> {
+/** One document; anything but an answer is thrown, never read as empty. */
+export async function readJson(url: string, get: typeof fetch): Promise<unknown> {
   const response = await get(url, { headers: { accept: 'application/json' } })
   if (!response.ok)
     throw new Error(`${url} answered ${response.status}`)
   return response.json()
-}
-
-/**
- * The manifest and every release document of every product it names.
- *
- * Nothing here reads as "nothing published": before the first release res
- * answers a manifest with no products, so a missing document is a fault -- an
- * address that moved, or a release whose document is gone -- and is thrown.
- */
-export async function readCatalogue(root: string, get: typeof fetch = fetch): Promise<{ manifest: ResManifest, releases: ResRelease[] }> {
-  const manifest = await readJson(`${root}v2/manifest.json`, get) as ResManifest
-  if (!Array.isArray(manifest?.products))
-    throw new Error(`${root}v2/manifest.json names no products list`)
-
-  // Read side by side, kept in the manifest's order: a visitor may be waiting.
-  const perProduct = await Promise.all(manifest.products.map(async (product) => {
-    const history = await readJson(`${root}v2/${encodeURIComponent(product.product)}/releases.json`, get) as ResHistory
-    if (!history?.baseUrl?.endsWith('/') || !Array.isArray(history.releases))
-      throw new Error(`the history of ${product.product} carries no baseUrl or no releases`)
-    return Promise.all(history.releases.map(entry => readJson(`${history.baseUrl}${entry.path}`, get) as Promise<ResRelease>))
-  }))
-  return { manifest, releases: perProduct.flat() }
 }

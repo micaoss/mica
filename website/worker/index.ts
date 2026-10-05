@@ -1,21 +1,23 @@
-import type { RefreshStatus, StoredCatalogue } from '../src/features/download/catalog-store'
+import type { Download } from '../src/features/download/catalog'
+import type { Catalogue } from '../src/features/download/products-catalog'
 import boards from '../boards.json'
 import { checkCatalog } from '../src/features/download/catalog-check'
-import { storedCatalogue } from '../src/features/download/catalog-store'
-import { readCatalogue, RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
+import { CATALOGUE_VERSION, catalogueFrom, NO_WORDS, productsUrl, readProducts } from '../src/features/download/products-catalog'
+import { RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
 
 /**
  * The site is static; this Worker exists for one route.
  *
- * `GET /api/catalog` reads the update documents the resource service serves
- * (the manifest, each product's history, each release's document), parses them
- * into the download rows and answers them. The answer is held in the edge
- * cache for ten minutes, so a release shows on the site within that window
- * with nothing to run.
+ * `GET /api/catalog` reads the product catalogue the resource service serves
+ * for the website (one document: the listed boards and products, each
+ * product's newest release, and the words they are called by), parses it into
+ * the download rows and answers both. The answer is held in the edge cache for
+ * ten minutes, so a release, or a word an admin changed, shows on the site
+ * within that window with nothing to run.
  *
  * A copy of the last answer that parsed is kept beside it. Once the ten minutes
  * are over that copy is answered at once, marked `refreshing`, while the
- * documents are read again behind the response: a visitor never waits for the
+ * document is read again behind the response: a visitor never waits for the
  * resource service unless nothing was ever read. The same copy is what a
  * failing resource service is answered from.
  */
@@ -23,7 +25,7 @@ import { readCatalogue, RES_UPDATE_ROOT } from '../src/features/download/res-cat
 export interface Env {
   /** `1` answers a labelled sample instead of reading the resource service. */
   CATALOG_DEMO?: string
-  /** The update root the documents are read from. */
+  /** The update root the document is read under. */
   CATALOG_ROOT?: string
 }
 
@@ -34,7 +36,7 @@ export interface CatalogueCache {
 }
 
 export interface Deps {
-  read: typeof readCatalogue
+  read: typeof readProducts
   cache: CatalogueCache
 }
 
@@ -42,8 +44,19 @@ interface Context {
   waitUntil: (promise: Promise<unknown>) => void
 }
 
-type Answer = Omit<StoredCatalogue, 'refreshedAt'> & {
+/** How the last read went, beside the rows, so a stale answer says so. */
+export interface RefreshStatus {
+  lastAttemptAt?: string
+  /** What read the copy: `request`. */
+  trigger?: string
+  lastSuccessAt?: string
+  /** Why the last attempt failed; null once one succeeds again. */
+  lastError?: { at: string, message: string } | null
+}
+
+type Answer = Omit<Catalogue, 'refreshedAt' | 'source'> & {
   refreshedAt: string | null
+  source?: string
   status: RefreshStatus
   /** Set on an answer served from the last good copy while a new one is read. */
   refreshing?: true
@@ -60,14 +73,14 @@ const SITE_BOARDS = boards.boards.map(row => row.board)
 
 /**
  * A sample, and labelled as one everywhere it surfaces. Nothing here is a
- * release; it exists so the filters and the history control can be seen working
- * where nothing is published. Every row needs its own href: the table keys on
- * it, and rows sharing one would reproduce the stale-list bug the key fixed.
+ * release; it exists so the filters can be seen working where nothing is
+ * published. Every row needs its own href: the table keys on it, and rows
+ * sharing one would reproduce the stale-list bug the key fixed.
  */
-const SAMPLE: StoredCatalogue['downloads'] = [
-  { board: 'uefi-x64', profile: 'basic', kind: 'image', version: '20260916-0845', deploymentId: 'sample-uefi-x64-basic', releasedAt: '2026-09-16', bytes: 82_000_000, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/start/download/#image', filename: 'mica-uefi-x64.basic-20260916-0845.img.gz' },
+const SAMPLE: Download[] = [
+  { board: 'uefi-x64', profile: 'basic', kind: 'image', variant: 'disk', version: '20260916-0845', deploymentId: 'sample-uefi-x64-basic', releasedAt: '2026-09-16', bytes: 82_000_000, digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000', href: 'https://micaos.dev/docs/start/download/#image', filename: 'mica-uefi-x64.basic-20260916-0845.img.gz' },
   { board: 'uefi-x64', profile: 'basic', kind: 'update', variant: 'full', version: '20260916-0845', deploymentId: 'sample-uefi-x64-basic', releasedAt: '2026-09-16', bytes: 81_000_000, digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111', href: 'https://micaos.dev/docs/start/download/#full', filename: 'mica-uefi-x64.basic-20260916-0845.micaupd' },
-  { board: 'cx3576', profile: 'full', kind: 'image', version: '20260916-0847', deploymentId: 'sample-cx3576-full', releasedAt: '2026-09-16', bytes: 86_000_000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/start/download/#cx-image', filename: 'mica-cx3576.full-20260916-0847.img.gz' },
+  { board: 'cx3576', profile: 'full', kind: 'image', variant: 'disk', version: '20260916-0847', deploymentId: 'sample-cx3576-full', releasedAt: '2026-09-16', bytes: 86_000_000, digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', href: 'https://micaos.dev/docs/start/download/#cx-image', filename: 'mica-cx3576.full-20260916-0847.img.gz' },
 ]
 
 function json(body: unknown, seconds: number): Response {
@@ -93,9 +106,9 @@ function replyStale(answer: Answer): Response {
 
 /** Reads the resource service; a board the site has no page for is named in the status. */
 async function fromRes(root: string, read: Deps['read'], now: string): Promise<Answer> {
-  const { manifest, releases } = await read(root)
-  const catalogue = storedCatalogue(releases, `${root}v2/manifest.json`, now)
-  const problems = checkCatalog(manifest, releases, SITE_BOARDS)
+  const document = await read(root)
+  const catalogue = catalogueFrom(document, productsUrl(root), now)
+  const problems = checkCatalog(document, catalogue.downloads, SITE_BOARDS)
 
   return {
     ...catalogue,
@@ -109,7 +122,7 @@ async function fromRes(root: string, read: Deps['read'], now: string): Promise<A
 }
 
 /**
- * Reads the documents and stores the answer. A document that does not answer
+ * Reads the document and stores the answer. A document that does not answer
  * must not read as "nothing published": the last answer that parsed is kept,
  * with what failed in its status, and the resource service is asked again a
  * minute later.
@@ -128,7 +141,7 @@ async function refresh(root: string, keys: { fresh: string, lastGood: string }, 
     const lastError = { at: now, message: (error as Error).message }
     const answer: Answer = previous
       ? { ...previous, status: { ...previous.status, lastAttemptAt: now, lastError } }
-      : { downloads: [], refreshedAt: null, status: { lastAttemptAt: now, trigger: 'request', lastError } }
+      : { version: CATALOGUE_VERSION, downloads: [], ...NO_WORDS, refreshedAt: null, status: { lastAttemptAt: now, trigger: 'request', lastError } }
 
     await cache.put(keys.fresh, json(answer, FAILURE_SECONDS))
     return answer
@@ -137,10 +150,14 @@ async function refresh(root: string, keys: { fresh: string, lastGood: string }, 
 
 async function catalogue(origin: string, env: Env, ctx: Context, deps: Deps): Promise<Response> {
   if (env.CATALOG_DEMO === '1')
-    return reply({ downloads: SAMPLE, sample: true, refreshedAt: null })
+    return reply({ version: CATALOGUE_VERSION, downloads: SAMPLE, ...NO_WORDS, sample: true, refreshedAt: null })
 
   // The page asks with its build id in the query; the cached answer is one.
-  const keys = { fresh: `${origin}${CATALOG_PATH}/fresh`, lastGood: `${origin}${CATALOG_PATH}/last-good` }
+  // The shape's version is in the key, so a copy of another shape is never read.
+  const keys = {
+    fresh: `${origin}${CATALOG_PATH}/v${CATALOGUE_VERSION}/fresh`,
+    lastGood: `${origin}${CATALOG_PATH}/v${CATALOGUE_VERSION}/last-good`,
+  }
   const root = env.CATALOG_ROOT ?? RES_UPDATE_ROOT
 
   const held = await deps.cache.match(keys.fresh)
@@ -172,6 +189,6 @@ export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // The DOM's CacheStorage type has no `default`; the Workers runtime does.
     const cache = (caches as unknown as { default: CatalogueCache }).default
-    return handle(request, env, ctx, { read: readCatalogue, cache })
+    return handle(request, env, ctx, { read: readProducts, cache })
   },
 }

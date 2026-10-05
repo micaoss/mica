@@ -1,7 +1,9 @@
 import type { Download } from './catalog'
+import type { CatalogueWords } from './products-catalog'
 import { useEffect, useState } from 'react'
 import { DOWNLOADS } from './catalog'
-import { isSample, parseCatalog } from './catalog-schema'
+import { isSample, parseCatalog, parseWords } from './catalog-schema'
+import { CATALOGUE_VERSION, NO_WORDS } from './products-catalog'
 
 declare const __BUILD_ID__: string | undefined
 
@@ -10,13 +12,18 @@ declare const __BUILD_ID__: string | undefined
  * deploy's requests from another's; the Worker holds one answer for all.
  */
 const CATALOG_ENDPOINT = `/api/catalog?v=${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}`
-/** The last catalogue this browser was answered, shown while the next is read. */
-const STORAGE_KEY = 'mica.catalogue'
+/**
+ * The last catalogue this browser was answered, shown while the next is read.
+ * The shape's version is in the key, so a copy of another shape is never read.
+ */
+const STORAGE_KEY = `mica.catalogue.v${CATALOGUE_VERSION}`
 /** How long after a `refreshing` answer the new one is asked for. */
 const REFRESH_DELAY_MS = 4000
 
-export interface Catalogue {
+export interface CatalogueState {
   downloads: Download[]
+  /** What the resource service calls boards, products and file types. */
+  words: CatalogueWords
   /** The rows are the labelled sample, not a release. */
   sample: boolean
   /** Nothing is known yet: no kept copy, and the endpoint has not answered. */
@@ -47,10 +54,11 @@ function keep(payload: unknown): void {
  * `refreshing` is its last good copy, served while it reads the resource
  * service again, so the endpoint is asked once more for the new one.
  *
- * A failed or unreadable answer leaves what is shown standing.
+ * A failed or unreadable answer leaves what is shown standing. Rows and words
+ * given by a test are used as they are, and nothing is read.
  */
-export function useCatalogue(given?: Download[]): Catalogue {
-  const [state, setState] = useState<Catalogue>({ downloads: DOWNLOADS, sample: false, loading: !given })
+export function useCatalogue(given?: Download[], givenWords: CatalogueWords = NO_WORDS): CatalogueState {
+  const [state, setState] = useState<CatalogueState>({ downloads: DOWNLOADS, words: NO_WORDS, sample: false, loading: !given })
 
   useEffect(() => {
     if (given)
@@ -62,7 +70,7 @@ export function useCatalogue(given?: Download[]): Catalogue {
     // kept copy is shown on mount, ahead of the request, through this same call.
     const show = (payload: unknown): void =>
       // eslint-disable-next-line react/set-state-in-effect
-      setState({ downloads: parseCatalog(payload), sample: isSample(payload), loading: false })
+      setState({ downloads: parseCatalog(payload), words: parseWords(payload), sample: isSample(payload), loading: false })
 
     const before = kept()
     if (before)
@@ -93,5 +101,5 @@ export function useCatalogue(given?: Download[]): Catalogue {
     }
   }, [given])
 
-  return given ? { downloads: given, sample: false, loading: false } : state
+  return given ? { downloads: given, words: givenWords, sample: false, loading: false } : state
 }

@@ -116,6 +116,7 @@ export const zh = {
     },
     empty: '这块板卡当前没有已发布的下载。镜像从源码构建，或向集成方索取。',
     loading: '正在读取发布目录……',
+    recommended: '推荐',
     history: '显示历史版本',
     historyHide: '只看最新版本',
     sample: '以下为示例数据，用于展示筛选，不是真实发布。',

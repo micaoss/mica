@@ -86,9 +86,14 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
   })
 }
 
+/** Newest first: by publication date, then by version. */
+function newestFirst(a: Download, b: Download): number {
+  return b.releasedAt.localeCompare(a.releasedAt) || b.version.localeCompare(a.version)
+}
+
 /**
- * Newest first, and only each product's newest release unless `history` asks
- * for the rest.
+ * Each product's newest release, in the order given, unless `history` asks for
+ * every release, newest first.
  *
  * The files of one release belong together: its update archives — `full`,
  * `root`, `kernel` — and its images — a disk image beside a boot loader
@@ -96,22 +101,21 @@ export function filterDownloads(all: Download[], query: DownloadQuery): Download
  * other, so all of them show. A file an earlier release carried and the newest
  * does not is history: a product that stopped publishing its disk image must
  * not go on offering the last one as current.
+ *
+ * The order given is the catalogue's, which an admin sets; it is kept.
  */
 export function selectVersions(all: Download[], history: boolean): Download[] {
-  const ordered = [...all].sort((a, b) =>
-    b.releasedAt.localeCompare(a.releasedAt) || b.version.localeCompare(a.version),
-  )
   if (history)
-    return ordered
+    return [...all].sort(newestFirst)
 
-  // Ordered newest first, so the first row of a product names its newest release.
-  const newest = new Map<string, string>()
-  for (const download of ordered) {
+  const newest = new Map<string, Download>()
+  for (const download of all) {
     const product = `${download.board}/${download.profile}`
-    if (!newest.has(product))
-      newest.set(product, download.version)
+    const held = newest.get(product)
+    if (!held || newestFirst(download, held) < 0)
+      newest.set(product, download)
   }
-  return ordered.filter(download => newest.get(`${download.board}/${download.profile}`) === download.version)
+  return all.filter(download => newest.get(`${download.board}/${download.profile}`)?.version === download.version)
 }
 
 /** How many rows `history` would add, so the control can say whether it is worth using. */

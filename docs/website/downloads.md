@@ -30,9 +30,9 @@ or historical update compatibility is offered.
 A product release (`<board>.<variant>.<YYYYMMDD-HHMM>`) publishes the signed
 archives and images as release assets, and a product's newest release is the
 one to take; there is no index. A release is not a physical-board
-qualification. The download list is generated from the documents the resource
-service builds from the posted releases (the manifest under
-`https://res.micaos.dev/update/` and each release's document),
+qualification. The download list, and what a board, a product and a
+file type are called on it, come from the product catalogue the resource
+service serves under `https://res.micaos.dev/update/`,
 and is empty while no release is posted there;
 do not hand-write release identities or claim absent evidence.
 

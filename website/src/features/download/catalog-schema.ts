@@ -1,4 +1,5 @@
 import type { Download, DownloadKind } from './catalog'
+import type { CatalogueWords } from './products-catalog'
 import { DOWNLOAD_KINDS } from './catalog'
 
 /**
@@ -63,4 +64,17 @@ export function parseCatalog(payload: unknown): Download[] {
     return []
 
   return list.map(readDownload).filter((entry): entry is Download => entry !== null)
+}
+
+/** The words beside the rows; a list that is absent or not a list reads as empty. */
+export function parseWords(payload: unknown): CatalogueWords {
+  const entry = (typeof payload === 'object' && payload !== null ? payload : {}) as Record<string, unknown>
+  const list = <T>(value: unknown): T[] => (Array.isArray(value) ? value.filter(item => typeof item === 'object' && item !== null) as T[] : [])
+
+  return {
+    categories: list(entry.categories),
+    fileTypes: list(entry.fileTypes),
+    boards: list(entry.boards),
+    products: list(entry.products),
+  }
 }

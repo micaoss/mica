@@ -106,6 +106,7 @@ export const en: typeof zh = {
     },
     empty: 'Nothing published for this board yet. Build an image from source, or ask your integrator for one.',
     loading: 'Reading the release catalogue…',
+    recommended: 'Recommended',
     history: 'Show earlier versions',
     historyHide: 'Latest only',
     sample: 'The rows below are sample data shown to demonstrate filtering. They are not a release.',

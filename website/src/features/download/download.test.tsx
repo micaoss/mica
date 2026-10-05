@@ -5,6 +5,11 @@ import { en } from '@/shared/i18n/en'
 import { zh } from '@/shared/i18n/zh'
 import { DOWNLOADS, filterDownloads, historyCount, selectVersions } from './catalog'
 import { DownloadExplorer } from './components/download-explorer'
+import { catalogueFrom } from './products-catalog'
+import { DOCUMENT } from './products-catalog.test'
+
+/** The words of a catalogue document, as the endpoint answers them. */
+const WORDS = catalogueFrom(DOCUMENT, 'src', 'now')
 
 function download(partial: Partial<Download>): Download {
   return {
@@ -84,7 +89,7 @@ describe('downloadExplorer', () => {
   })
 
   it('names the form of each row and the file it downloads', () => {
-    render(<DownloadExplorer copy={zh} board="x64" downloads={[UPDATE]} />)
+    render(<DownloadExplorer copy={zh} board="x64" downloads={[UPDATE]} words={WORDS} />)
 
     expect(screen.getByText('升级包')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'x64.micaupd' })).toHaveAttribute('href', UPDATE.href)
@@ -125,7 +130,7 @@ describe('downloadExplorer', () => {
 
   it('offers only the forms the board publishes', async () => {
     const { container } = render(
-      <DownloadExplorer copy={zh} board="x64" downloads={[NEWEST, UPDATE]} />,
+      <DownloadExplorer copy={zh} board="x64" downloads={[NEWEST, UPDATE]} words={WORDS} />,
     )
     const trigger = container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[1]
     trigger.click()
@@ -213,7 +218,7 @@ describe('the catalogue endpoint', () => {
   })
 
   it('shows the catalogue this browser kept before the endpoint answers', async () => {
-    localStorage.setItem('mica.catalogue', JSON.stringify({ downloads: SAMPLE }))
+    localStorage.setItem('mica.catalogue.v2', JSON.stringify({ version: 2, downloads: SAMPLE }))
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})))
 
     render(<DownloadExplorer copy={zh} board="cx3576" />)
@@ -227,11 +232,11 @@ describe('the catalogue endpoint', () => {
     render(<DownloadExplorer copy={zh} board="cx3576" />)
     await screen.findByText('dep-cx')
 
-    expect(JSON.parse(localStorage.getItem('mica.catalogue') ?? 'null').downloads).toHaveLength(SAMPLE.length)
+    expect(JSON.parse(localStorage.getItem('mica.catalogue.v2') ?? 'null').downloads).toHaveLength(SAMPLE.length)
   })
 
   it('keeps showing the kept catalogue when the endpoint is unreachable', async () => {
-    localStorage.setItem('mica.catalogue', JSON.stringify({ downloads: SAMPLE }))
+    localStorage.setItem('mica.catalogue.v2', JSON.stringify({ version: 2, downloads: SAMPLE }))
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
     }))
@@ -257,18 +262,25 @@ describe('the catalogue endpoint', () => {
     expect(fetchMock.mock.calls[1][1]).toMatchObject({ cache: 'reload' })
   })
 
-  it('names a row from the mapping table, and an unknown form by its own name', () => {
+  it('names a row by the catalogue\'s words, and an unknown form by its own name', () => {
     const images = [
       download({ variant: 'disk', href: 'https://example.invalid/a.img.gz' }),
       download({ variant: 'sd-boot', href: 'https://example.invalid/a.sd-boot.img.gz' }),
       download({ variant: 'nand-raw', href: 'https://example.invalid/a.nand.img.gz' }),
     ]
 
-    render(<DownloadExplorer copy={zh} board="x64" downloads={images} />)
+    render(<DownloadExplorer copy={zh} board="x64" downloads={images} words={WORDS} />)
 
     expect(screen.getByText('整盘镜像')).toBeInTheDocument()
     expect(screen.getByText('引导加载器')).toBeInTheDocument()
     expect(screen.getByText('nand-raw')).toBeInTheDocument()
+  })
+
+  it('shows a row under its own names where the catalogue has no words', () => {
+    render(<DownloadExplorer copy={zh} board="x64" downloads={[download({ variant: 'disk' })]} />)
+
+    expect(screen.getByText('image')).toBeInTheDocument()
+    expect(screen.getByText('disk')).toBeInTheDocument()
   })
 
   it('filters a boot loader package apart from the system images', async () => {
@@ -276,7 +288,7 @@ describe('the catalogue endpoint', () => {
       download({ variant: 'disk', deploymentId: 'dep-disk', href: 'https://example.invalid/a.img.gz' }),
       download({ variant: 'sd-boot', deploymentId: 'dep-loader', href: 'https://example.invalid/a.sd-boot.img.gz' }),
     ]
-    const { container } = render(<DownloadExplorer copy={zh} board="x64" downloads={images} />)
+    const { container } = render(<DownloadExplorer copy={zh} board="x64" downloads={images} words={WORDS} />)
 
     container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[1].click()
     ;(await screen.findByRole('option', { name: '引导加载器' })).click()
@@ -285,12 +297,41 @@ describe('the catalogue endpoint', () => {
     expect(screen.queryByText('dep-disk')).not.toBeInTheDocument()
   })
 
-  it('says what a product variant is, from the mapping table', async () => {
+  it('says what a product is and marks the recommended one, in the catalogue\'s words', async () => {
     const rows = [download({ board: 's905x5m', profile: 'sd-full', variant: 'disk' })]
-    const { container } = render(<DownloadExplorer copy={zh} board="s905x5m" downloads={rows} />)
+    const { container } = render(<DownloadExplorer copy={zh} board="s905x5m" downloads={rows} words={WORDS} />)
 
+    expect(screen.getByText(zh.download.recommended)).toBeInTheDocument()
     container.querySelectorAll<HTMLElement>('[data-slot="select-trigger"]')[0].click()
-
     expect(await screen.findByRole('option', { name: 'sd-full · SD 卡，带容器引擎' })).toBeInTheDocument()
+  })
+
+  it('reads a product\'s earlier releases only when the visitor asks for them', async () => {
+    const latest = download({ board: 's905x5m', profile: 'sd-full', variant: 'disk', version: '20261004-1510', releasedAt: '2026-10-04', deploymentId: 'dep-latest', href: 'https://dl.test/new.img.gz' })
+    const earlier = {
+      baseUrl: 'https://dl.test/mica/s905x5m.sd-full/20261003-1942/',
+      id: 's905x5m.sd-full.20261003-1942',
+      product: 's905x5m.sd-full',
+      board: 's905x5m',
+      variant: 'sd-full',
+      files: [{ kind: 'image', form: 'disk', path: 'old.img.gz', sha256: 'a'.repeat(64), size: 1 }],
+    }
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input)
+      if (url === 'https://res.test/update/v2/s905x5m.sd-full/releases.json')
+        return new Response(JSON.stringify({ baseUrl: 'https://dl.test/mica/', releases: [{ id: earlier.id, path: 'old/index.json' }] }))
+      if (url === 'https://dl.test/mica/old/index.json')
+        return new Response(JSON.stringify(earlier))
+      return new Response('missing', { status: 404 })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<DownloadExplorer copy={zh} board="s905x5m" downloads={[latest]} words={WORDS} />)
+    expect(fetchMock).not.toHaveBeenCalled()
+    screen.getByRole('button', { name: zh.download.history }).click()
+
+    expect(await screen.findByRole('link', { name: 'old.img.gz' })).toBeInTheDocument()
+    expect(screen.getByText('dep-latest')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 })

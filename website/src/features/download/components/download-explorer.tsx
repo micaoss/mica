@@ -1,4 +1,5 @@
 import type { Download } from '../catalog'
+import type { CatalogueWords } from '../products-catalog'
 import type { Copy } from '@/shared/i18n'
 import { useMemo, useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
@@ -25,7 +26,8 @@ import {
   historyCount,
   selectVersions,
 } from '../catalog'
-import { categoriesOf, categoryOf, describeFile, productNote } from '../download-map'
+import { categoriesOf, categoryOf, describeFile, productNote, productOf } from '../download-map'
+import { readHistory } from '../products-catalog'
 import { useCatalogue } from '../use-catalogue'
 
 /** The primitive needs a real value, so "no constraint" gets a sentinel. */
@@ -76,43 +78,74 @@ export function DownloadExplorer({
   copy,
   board,
   downloads,
+  words: givenWords,
 }: {
   copy: Copy
   /** The board whose page this is; its rows are the only ones shown. */
   board: string
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
   downloads?: Download[]
+  /** Given in tests beside the rows. */
+  words?: CatalogueWords
 }) {
-  const { downloads: all, sample, loading } = useCatalogue(downloads)
+  const { downloads: all, words, sample, loading } = useCatalogue(downloads, givenWords)
   const [profile, setProfile] = useState(ALL)
   const [kind, setKind] = useState(ALL)
   const [query, setQuery] = useState('')
   const [history, setHistory] = useState(false)
+  // The earlier releases of this board's products: read when a visitor asks.
+  const [earlierRows, setEarlierRows] = useState<Download[] | null>(null)
+  const [reading, setReading] = useState(false)
 
-  const catalogue = useMemo(
-    () => all.filter(download => download.board === board),
-    [all, board],
+  const histories = useMemo(
+    () => words.products.filter(product => product.board === board && product.releases).map(product => product.releases),
+    [words, board],
   )
 
+  const catalogue = useMemo(() => {
+    const latest = all.filter(download => download.board === board)
+    const shown = new Set(latest.map(download => download.href))
+    return [...latest, ...(earlierRows ?? []).filter(download => !shown.has(download.href))]
+  }, [all, board, earlierRows])
+
+  // In the catalogue's order, which an admin sets.
   const profiles = useMemo(
-    () => [...new Set(catalogue.map(download => download.profile))].sort(),
+    () => [...new Set(catalogue.map(download => download.profile))],
     [catalogue],
   )
 
+  const toggleHistory = async (): Promise<void> => {
+    if (history || earlierRows || histories.length === 0) {
+      setHistory(!history)
+      return
+    }
+    setReading(true)
+    try {
+      setEarlierRows((await Promise.all(histories.map(url => readHistory(url)))).flat())
+      setHistory(true)
+    }
+    catch {
+      // A history that does not answer leaves the newest releases standing.
+    }
+    finally {
+      setReading(false)
+    }
+  }
+
   // Only the categories this board actually publishes: offering "firmware"
   // where no firmware exists is a filter that can only answer an empty table.
-  const categories = useMemo(() => categoriesOf(catalogue, copy.locale), [catalogue, copy.locale])
+  const categories = useMemo(() => categoriesOf(words, catalogue, copy.locale), [words, catalogue, copy.locale])
 
   const matching = filterDownloads(catalogue, {
     profile: profile === ALL ? undefined : profile,
     query,
-  }).filter(download => kind === ALL || categoryOf(download) === kind)
+  }).filter(download => kind === ALL || categoryOf(words, download) === kind)
   const rows = selectVersions(matching, history)
   const earlier = historyCount(matching)
 
   const { filters, cols } = copy.download
   const noted = (variant: string): string => {
-    const note = productNote(board, variant, copy.locale)
+    const note = productNote(words, board, variant, copy.locale)
     return note ? `${variant} · ${note}` : variant
   }
 
@@ -178,9 +211,9 @@ export function DownloadExplorer({
                           archives share its id, its form and its version, so
                           keying on those gave three rows one key and React
                           reused the wrong nodes when the filters changed. */}
-                      {rows.map(download => ({ download, label: describeFile(download, copy.locale) })).map(({ download, label }) => (
+                      {rows.map(download => ({ download, label: describeFile(words, download, copy.locale) })).map(({ download, label }) => (
                         <TableRow key={download.href}>
-                          <TableCell className="px-5 text-[15px]">
+                          <TableCell className="px-5 text-[15px]" title={label.description}>
                             {label.category}
                             {label.detail && (
                               <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
@@ -188,8 +221,13 @@ export function DownloadExplorer({
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="font-mono text-[13px]" title={productNote(board, download.profile, copy.locale)}>
+                          <TableCell className="font-mono text-[13px]" title={productNote(words, board, download.profile, copy.locale)}>
                             {download.profile}
+                            {productOf(words, board, download.profile)?.recommended && (
+                              <span className="ml-1.5 rounded border border-border px-1.5 py-0.5 font-sans text-[11px] text-brand-strong">
+                                {copy.download.recommended}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className="font-mono text-[13px]">{download.version}</TableCell>
                           <TableCell className="font-mono text-[13px] text-muted-foreground">
@@ -218,13 +256,18 @@ export function DownloadExplorer({
                 </div>
               </Card>
 
-              {(earlier > 0 || history) && (
+              {(earlier > 0 || history || (!earlierRows && histories.length > 0)) && (
                 <Button
                   variant="secondary"
                   className="mt-4"
-                  onClick={() => setHistory(!history)}
+                  disabled={reading}
+                  onClick={() => void toggleHistory()}
                 >
-                  {history ? copy.download.historyHide : `${copy.download.history} (${earlier})`}
+                  {reading
+                    ? copy.download.loading
+                    : history
+                      ? copy.download.historyHide
+                      : earlier > 0 ? `${copy.download.history} (${earlier})` : copy.download.history}
                 </Button>
               )}
             </>

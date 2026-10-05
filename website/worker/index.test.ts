@@ -3,15 +3,28 @@ import { describe, expect, it, vi } from 'vitest'
 import { handle } from './index'
 
 const ROOT = 'https://res.test/update/'
-const RELEASE = {
-  baseUrl: 'https://dl.test/mica/mini-x64.basic/20261001-2113/',
-  id: 'mini-x64.basic.20261001-2113',
-  product: 'mini-x64.basic',
-  board: 'mini-x64',
-  variant: 'basic',
-  files: [{ kind: 'image', path: 'a.img.gz', sha256: 'a'.repeat(64), size: 1 }],
+const FILE = { kind: 'image', form: 'disk', path: 'mica/mini-x64.basic/20261001-2113/a.img.gz', sha256: 'a'.repeat(64), size: 1 }
+
+/** The product catalogue: one board, one product, its newest release. */
+function document(board = 'mini-x64', files: unknown[] = [FILE]) {
+  return {
+    schema: 'mica/products/v1',
+    baseUrl: 'https://dl.test/',
+    categories: [{ id: 'image', title: { zh: '系统镜像', en: 'System image' } }],
+    fileTypes: [{ kind: 'image', form: 'disk', category: 'image', title: { zh: '整盘镜像', en: 'whole disk' } }],
+    boards: [{ board, title: { zh: board, en: board }, hardware: { zh: '小型 amd64', en: 'Small amd64' }, status: { zh: 'QEMU', en: 'QEMU' } }],
+    products: [{
+      product: `${board}.basic`,
+      board,
+      variant: 'basic',
+      title: { zh: '基础系统', en: 'base system' },
+      summary: { zh: '', en: '' },
+      recommended: false,
+      latest: { id: `${board}.basic.20261001-2113`, version: '20261001-2113', publishedAt: '2026-10-01T21:13:00.000Z', files },
+      releases: `https://res.test/update/v2/${board}.basic/releases.json`,
+    }],
+  }
 }
-const MANIFEST = { products: [{ product: 'mini-x64.basic', board: 'mini-x64', variant: 'basic' }] }
 
 /** An in-memory cache with the two calls the Worker makes. */
 function fakeCache() {
@@ -28,8 +41,8 @@ function fakeCache() {
 }
 
 /** What the resource service answers: one product with one release. */
-function published(manifest: unknown = MANIFEST, releases: unknown[] = [RELEASE]) {
-  return vi.fn(async () => ({ manifest, releases })) as never
+function published(answer: unknown = document()) {
+  return vi.fn(async () => answer) as never
 }
 
 async function get(deps: { read: never, cache: CatalogueCache }, env: { CATALOG_DEMO?: string } = {}, path = '/api/catalog') {
@@ -51,6 +64,10 @@ interface Body {
   sample?: boolean
   status: { trigger: string, lastError: { message: string } | null }
   refreshing?: boolean
+  version?: number
+  products?: { product: string, title: { zh: string } }[]
+  boards?: { board: string }[]
+  fileTypes?: unknown[]
 }
 
 describe('gET /api/catalog', () => {
@@ -62,9 +79,20 @@ describe('gET /api/catalog', () => {
     expect(response.status).toBe(200)
     expect(read).toHaveBeenCalledWith(ROOT)
     expect(body.downloads).toHaveLength(1)
-    expect(body.source).toBe(`${ROOT}v2/manifest.json`)
+    expect(body.source).toBe(`${ROOT}products/v1.json`)
     expect(body.status.trigger).toBe('request')
     expect(body.status.lastError).toBeNull()
+  })
+
+  it('answers the words beside the rows: the site keeps no copy of them', async () => {
+    const body = await (await get({ read: published(), cache: fakeCache().cache })).json() as Body
+
+    expect(body.version).toBe(2)
+    expect(body.products).toEqual([expect.objectContaining({ product: 'mini-x64.basic', title: { zh: '基础系统', en: 'base system' } })])
+    expect(body.boards?.map(board => board.board)).toEqual(['mini-x64'])
+    expect(body.fileTypes).toHaveLength(1)
+    // A product's files are the rows; they are not answered twice.
+    expect(body.products?.[0]).not.toHaveProperty('latest')
   })
 
   it('reads the resource service once while its answer is cached, for ten minutes', async () => {
@@ -76,7 +104,7 @@ describe('gET /api/catalog', () => {
 
     expect(read).toHaveBeenCalledTimes(1)
     expect((await second.json() as Body).downloads).toHaveLength(1)
-    expect(store.get('https://micaos.dev/api/catalog/fresh')?.headers.get('cache-control')).toBe('public, max-age=600')
+    expect(store.get('https://micaos.dev/api/catalog/v2/fresh')?.headers.get('cache-control')).toBe('public, max-age=600')
   })
 
   it('ignores the query, so every build of the page shares one cached answer', async () => {
@@ -92,10 +120,9 @@ describe('gET /api/catalog', () => {
   it('answers the last good catalogue at once when the ten minutes are over, and reads again behind it', async () => {
     const { cache, store } = fakeCache()
     await get({ read: published(), cache })
-    store.delete('https://micaos.dev/api/catalog/fresh')
+    store.delete('https://micaos.dev/api/catalog/v2/fresh')
 
-    const newer = { ...RELEASE, id: 'mini-x64.basic.20261002-0900', files: [...RELEASE.files, { kind: 'update', form: 'full', path: 'a.micaupd', sha256: 'b'.repeat(64), size: 2 }] }
-    const read = published(MANIFEST, [newer])
+    const read = published(document('mini-x64', [FILE, { kind: 'update', form: 'full', path: 'a.micaupd', sha256: 'b'.repeat(64), size: 2 }]))
     const stale = await get({ read, cache })
     const body = await stale.json() as Body
 
@@ -113,7 +140,7 @@ describe('gET /api/catalog', () => {
   it('keeps answering the last good catalogue, with the error, when the resource service fails', async () => {
     const { cache, store } = fakeCache()
     await get({ read: published(), cache })
-    store.delete('https://micaos.dev/api/catalog/fresh')
+    store.delete('https://micaos.dev/api/catalog/v2/fresh')
 
     const failing = vi.fn(async () => {
       throw new Error('https://res.test/update/v2/manifest.json answered 503')
@@ -123,7 +150,7 @@ describe('gET /api/catalog', () => {
 
     expect(body.downloads).toHaveLength(1)
     expect(body.status.lastError?.message).toContain('answered 503')
-    expect(store.get('https://micaos.dev/api/catalog/fresh')?.headers.get('cache-control')).toBe('public, max-age=60')
+    expect(store.get('https://micaos.dev/api/catalog/v2/fresh')?.headers.get('cache-control')).toBe('public, max-age=60')
   })
 
   it('answers an empty catalogue and the error when nothing was ever read', async () => {
@@ -145,14 +172,12 @@ describe('gET /api/catalog', () => {
 
     await get({ read: failing, cache })
 
-    expect(store.get('https://micaos.dev/api/catalog/fresh')?.headers.get('cache-control')).toBe('public, max-age=60')
-    expect(store.has('https://micaos.dev/api/catalog/last-good')).toBe(false)
+    expect(store.get('https://micaos.dev/api/catalog/v2/fresh')?.headers.get('cache-control')).toBe('public, max-age=60')
+    expect(store.has('https://micaos.dev/api/catalog/v2/last-good')).toBe(false)
   })
 
   it('serves the rows and names a product published for a board the site has no page for', async () => {
-    const manifest = { products: [{ product: 'ghost.basic', board: 'ghost', variant: 'basic' }] }
-    const release = { ...RELEASE, id: 'ghost.basic.20261001-2113', product: 'ghost.basic', board: 'ghost' }
-    const body = await (await get({ read: published(manifest, [release]), cache: fakeCache().cache })).json() as Body
+    const body = await (await get({ read: published(document('ghost')), cache: fakeCache().cache })).json() as Body
 
     expect(body.downloads).toHaveLength(1)
     expect(body.status.lastError?.message).toContain('which the site lists no page for')

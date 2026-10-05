@@ -55,51 +55,54 @@ control loads the earlier ones.
 
 ```
 mica-build ──posts each release──> the resource service (res.micaos.dev)
-    <root>v2/manifest.json            every product and its latest release
+    <root>products/v1.json            the listed boards and products, each product's newest
+                                      release with its files, and what they are called
+        ──(the Worker, on request; cached ten minutes)──> GET /api/catalog
     <root>v2/<product>/releases.json  that product's releases, newest first
     <release directory>/index.json    one release: its files, sizes and hashes
-        ──(the Worker, on request; cached ten minutes)──> GET /api/catalog
+        ──(the browser, when a visitor opens the history)
 ```
 
-Every release is posted to the resource service as it is published
-(`mica-build:README.md`), and the service builds the update documents from its registry. The root is `https://res.micaos.dev/update/`,
-the one a device is configured with. Nothing is read from GitHub and nothing is inferred from
-a file name (`src/features/download/res-catalog.ts`). A release's variant (`basic`, `full`) is
-the page's *Variant* column, and an update's form (`full`, `root`, `kernel`, `core`) says which
-archive it is.
+Every release is posted to the resource service as it is published (`mica-build:README.md`).
+The root is `https://res.micaos.dev/update/`, the one a device is configured with. Nothing is
+read from GitHub and nothing is inferred from a file name.
 
-**The Worker reads the documents on request.** `GET /api/catalog` reads them
-(`worker/index.ts`), parses them and holds the answer in the edge cache for ten minutes, so a
-release shows on the site within that window and nothing has to run for it. No CI job, no
-KV namespace and no clock are involved.
+**The resource service is the only source of product data.** The product catalogue
+(`mica/products/v1`) says which boards and products are listed, in what order, and what a
+board, a product and a file type are called in both languages; an admin edits it in the
+resource service's console, and this site keeps no copy of any of it
+(`src/features/download/products-catalog.ts`). What stays here is the page copy and
+`boards.json`, the links from a board to this site's documentation.
+
+**The Worker reads the one document on request.** `GET /api/catalog` reads it
+(`worker/index.ts`), parses each product's newest release into the download rows and answers
+them with the words. The answer is held in the edge cache for ten minutes, so a release, or a
+word an admin changed, shows on the site within that window and nothing has to run for it.
 
 **Nobody waits for the resource service.** The Worker keeps the last answer that parsed for
 a week. Once the ten minutes are over it answers that copy at once, marked `refreshing`, and
-reads the documents again behind the response. The page does the same on its side
+reads the document again behind the response. The page does the same on its side
 (`src/features/download/use-catalogue.ts`): it shows the catalogue this browser kept from its
 last visit, then the endpoint's answer, and asks once more a few seconds after a `refreshing`
-answer. Only a first visit to a Worker that has never read the documents waits, and says it
+answer. Only a first visit to a Worker that has never read the document waits, and says it
 is reading rather than that nothing is published.
 
-A manifest that names no product is an **empty** catalogue: every board page then says
+**A board page opens on each product's newest release**, in the catalogue's order. A
+product's earlier releases are not in the catalogue: they are read by the browser, from the
+history the product names, when a visitor asks for them.
+
+A catalogue that lists no product is an **empty** catalogue: every board page then says
 nothing is published yet. A document that does not answer is a failure, never "nothing
 published": the Worker goes on answering the last catalogue that parsed and asks again a
-minute later. Releases that exist and parse to nothing are a failure too.
+minute later. Files that exist and parse to nothing are a failure too.
 
-### The mapping table
+### What things are called
 
-`download-map.json` is the one place that says what the site calls what the resource service
-names (`src/features/download/download-map.ts` reads it):
-
-- `categories`: the groups a file is listed and filtered under, in order;
-- `files`: a file's `kind` and `form`, as a release document states them, to its category and
-  to the wording beside it. This is where `image`/`sd-boot` becomes a boot loader rather than
-  a system image;
-- `products`: what a product variant means, for every board or for one.
-
-Both languages are in the table. A kind, form or variant with no row is shown under its own
-name, so a board's new image kind or product appears on the site before it is worded; adding
-the row is the whole change.
+`src/features/download/download-map.ts` reads the catalogue's words with the fallbacks its
+contract states (`mica-res:docs/spec/product-catalogue.md`): a file's category and form from
+`categories` and `fileTypes`, a product from `products`. An unfilled language falls back to
+the other; a kind, form or product the catalogue has no words for is shown under its own
+name, so a board's new image kind or product appears on the site before an admin words it.
 
 ### When the catalogue goes stale
 
@@ -111,7 +114,7 @@ for is served, and named in that error.
 ### Checking the live catalogue
 
 `bun run check:catalog` reads what res serves and fails if a published product parses to no
-downloads, or if a product is published for a board the site has no page for. It is the
+downloads, or if a product is listed for a board the site has no page for. It is the
 same check the Worker reports in `status`, run by hand. The logic is
 `src/features/download/catalog-check.ts`, unit-tested; the script is the fetch around it.
 
