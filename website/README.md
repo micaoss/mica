@@ -104,6 +104,27 @@ contract states (`mica-res:docs/spec/product-catalogue.md`): a file's category a
 the other; a kind, form or product the catalogue has no words for is shown under its own
 name, so a board's new image kind or product appears on the site before an admin words it.
 
+### Board wording in the pages
+
+A board's hardware and status are the resource service's too, and they are in the HTML of
+the landing page's board table and of each board's download page, where a visitor and a
+crawler read them before any script runs. A build cannot bake them in, since an admin
+changes them without a deploy, so the built pages carry fill points and the Worker fills
+them from its copy of the catalogue when a page is requested (`worker/pages.ts`;
+`run_worker_first` in `wrangler.jsonc` names the routes):
+
+- the board table's rows become the catalogue's boards, in its order, including boards with
+  no release and boards this site has no page for;
+- a board's download page gets that board's hardware and status.
+
+Whatever fails on that path, the page is served as built: the table then lists the boards
+this site has pages for, under their identifiers. The board cards of `/download/` are filled
+in the browser, from the same catalogue.
+
+Which boards have a page is this site's: `boards.json`, with the guides each page links to.
+A board there that the catalogue does not list, and a product listed for a board with no
+page, are both named in the endpoint's `status`.
+
 ### When the catalogue goes stale
 
 `GET /api/catalog` answers a `status` beside the rows — when the documents were last read,

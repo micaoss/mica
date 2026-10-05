@@ -3,6 +3,7 @@ import type { LocaleCode } from '@/shared/i18n'
 import SiteHeader from '@/components/SiteHeader.astro'
 import { BoardIndex } from '@/features/download/components/board-index'
 import { SiteFooter } from '@/features/landing/components/site-footer'
+import { CONFIGURED_BOARDS } from '@/features/download/boards'
 import { boardDownloadHref, docsHref, docsPageHref, homeHref } from '@/features/landing/links'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { Card, CardContent } from '@/shared/components/ui/card'
@@ -14,12 +15,7 @@ interface Props {
 
 const { locale } = Astro.props
 const copy = copyFor(locale)
-const boards = copy.boards.rows.map(row => ({
-  board: row.board,
-  hardware: row.hw,
-  status: row.status,
-  href: boardDownloadHref(locale, row.board),
-}))
+const boards = CONFIGURED_BOARDS.map(board => ({ board, href: boardDownloadHref(locale, board) }))
 const quickstart = docsPageHref(locale, 'start/quickstart')
 const identify = docsPageHref(locale, 'start/download')
 ---

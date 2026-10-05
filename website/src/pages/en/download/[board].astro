@@ -1,16 +1,14 @@
 ---
 import BoardDownloadPage from '@/components/BoardDownloadPage.astro'
-import { en } from '@/shared/i18n/en'
+import { CONFIGURED_BOARDS } from '@/features/download/boards'
 
+// A board has a page when `boards.json` configures it; what it is called is
+// the resource service's, filled in when the page is requested.
 export function getStaticPaths() {
-  return en.boards.rows.map(row => ({
-    params: { board: row.board },
-    props: { hardware: row.hw, status: row.status },
-  }))
+  return CONFIGURED_BOARDS.map(board => ({ params: { board } }))
 }
 
 const { board } = Astro.params
-const { hardware, status } = Astro.props
 ---
 
-<BoardDownloadPage locale="en" board={board!} hardware={hardware} status={status} />
+<BoardDownloadPage locale="en" board={board!} />

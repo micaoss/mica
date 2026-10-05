@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { CONFIGURED_BOARDS } from '@/features/download/boards'
 import { en } from '@/shared/i18n/en'
 import { zh } from '@/shared/i18n/zh'
 import { ArchitectureSection } from './components/architecture-section'
@@ -50,15 +51,22 @@ describe('landing sections', () => {
     }
   })
 
-  it('lists every board of the support table', () => {
-    render(<BoardsSection copy={zh} />)
+  it('lists the boards it is given, and those the site has pages for when given none', () => {
+    const rows = [{ board: 'uefi-x64', hw: '通用 amd64', status: 'QEMU 基线' }]
+    const { unmount } = render(<BoardsSection copy={zh} rows={rows} />)
+    expect(screen.getByRole('cell', { name: '通用 amd64' })).toBeInTheDocument()
+    unmount()
 
-    for (const row of zh.boards.rows) {
-      expect(screen.getByRole('cell', { name: row.board })).toBeInTheDocument()
-      expect(screen.getByRole('cell', { name: row.hw })).toBeInTheDocument()
-      // Two boards genuinely share a status, so this one is not unique.
-      expect(screen.getAllByRole('cell', { name: row.status }).length).toBeGreaterThan(0)
-    }
+    render(<BoardsSection copy={zh} />)
+    for (const board of CONFIGURED_BOARDS)
+      expect(screen.getByRole('cell', { name: board })).toBeInTheDocument()
+  })
+
+  it('carries one row\'s markup as the template the Worker fills, identical to a rendered row', () => {
+    const { container } = render(<BoardsSection copy={en} rows={[{ board: '{board}', hw: '{hardware}', status: '{status}' }]} />)
+    const body = container.querySelector('tbody[data-res-boards="en"]')!
+
+    expect(body.getAttribute('data-res-row')).toBe(body.innerHTML)
   })
 
   it('walks through every workflow step', () => {

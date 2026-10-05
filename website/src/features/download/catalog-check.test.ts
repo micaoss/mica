@@ -16,8 +16,10 @@ function product(board: string, variant: string, stamp = '20261001-2113') {
   }
 }
 
-function check(products: ReturnType<typeof product>[], siteBoards: string[]): string[] {
-  const document: ProductsDocument = { baseUrl: 'https://dl.test/', products }
+function check(products: ReturnType<typeof product>[], siteBoards: string[], listed: string[] = siteBoards): string[] {
+  const title = { zh: '', en: '' }
+  const boards = [...new Set(products.map(entry => entry.board)), ...listed].map(board => ({ board, title, hardware: title, status: title }))
+  const document: ProductsDocument = { baseUrl: 'https://dl.test/', boards, products }
   return checkCatalog(document, catalogueFrom(document, 'src', 'now').downloads, siteBoards)
 }
 
@@ -38,5 +40,10 @@ describe('checkCatalog', () => {
   it('fails when a product is published for a board the site has no page for', () => {
     expect(check([product('rk3588', 'basic')], ['mini-x64']))
       .toEqual(['rk3588.basic is published for rk3588, which the site lists no page for'])
+  })
+
+  it('names a board the site has a page for and the catalogue does not list', () => {
+    expect(check([], ['mini-x64', 'uefi-x64'], ['mini-x64']))
+      .toEqual(['uefi-x64 has a page on the site and is not listed in the catalogue'])
   })
 })

@@ -24,5 +24,13 @@ export function checkCatalog(document: ProductsDocument, downloads: Download[], 
       problems.push(`${product.product} is published for ${product.board}, which the site lists no page for`)
   }
 
+  // The other way round: a board with a page here that the catalogue does not
+  // list is a page whose board has no words and whose guides nobody is led to.
+  const listed = new Set((document.boards ?? []).map(board => board.board))
+  for (const board of siteBoards) {
+    if (!listed.has(board))
+      problems.push(`${board} has a page on the site and is not listed in the catalogue`)
+  }
+
   return problems
 }

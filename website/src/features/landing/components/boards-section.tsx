@@ -1,4 +1,6 @@
 import type { Copy } from '@/shared/i18n'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { CONFIGURED_BOARDS } from '@/features/download/boards'
 import { ButtonLink } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
 import {
@@ -12,8 +14,28 @@ import {
 import { NEW_ISSUE_URL, SUPPORT_TIERS_URL } from '../links'
 import { SectionHeading } from './section-heading'
 
-export function BoardsSection({ copy }: { copy: Copy }) {
-  const rows = copy.boards.rows
+export interface BoardRow { board: string, hw: string, status: string }
+
+function Row({ board, hw, status }: BoardRow) {
+  return (
+    <TableRow>
+      <TableCell className="px-5 font-mono text-[13px]">{board}</TableCell>
+      <TableCell className="text-[15px]">{hw}</TableCell>
+      <TableCell className="pr-5 text-[15px] text-muted-foreground">{status}</TableCell>
+    </TableRow>
+  )
+}
+
+/**
+ * The board table. What a board is called, its hardware and its status are the
+ * resource service's, so the built page carries the boards this site has pages
+ * for, under their identifiers, and one row's markup as a template; the Worker
+ * replaces the rows with the catalogue's boards when the page is requested
+ * (`worker/pages.ts`).
+ */
+export function BoardsSection({ copy, rows }: { copy: Copy, rows?: BoardRow[] }) {
+  const shown = rows ?? CONFIGURED_BOARDS.map(board => ({ board, hw: '', status: '' }))
+  const template = renderToStaticMarkup(<Row board="{board}" hw="{hardware}" status="{status}" />)
 
   return (
     <section className="py-16">
@@ -31,16 +53,8 @@ export function BoardsSection({ copy }: { copy: Copy }) {
                 <TableHead className="pr-5">{copy.boards.cols.status}</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {rows.map(row => (
-                <TableRow key={row.board}>
-                  <TableCell className="px-5 font-mono text-[13px]">{row.board}</TableCell>
-                  <TableCell className="text-[15px]">{row.hw}</TableCell>
-                  <TableCell className="pr-5 text-[15px] text-muted-foreground">
-                    {row.status}
-                  </TableCell>
-                </TableRow>
-              ))}
+            <TableBody data-res-boards={copy.locale} data-res-row={template}>
+              {shown.map(row => <Row key={row.board} {...row} />)}
             </TableBody>
           </Table>
         </div>

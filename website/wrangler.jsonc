@@ -5,7 +5,11 @@
   "compatibility_date": "2026-09-15",
   "main": "./worker/index.ts",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // The pages whose HTML carries board wording, which is the resource
+    // service's: the Worker fills it in when the page is requested.
+    "run_worker_first": ["/", "/en/", "/download/*", "/en/download/*", "/api/*"]
   },
   // No binding and no cron: the Worker reads the resource service on request and
   // holds the answer in the edge cache. See website/README.md, "Where the rows

@@ -1,5 +1,6 @@
 import type { CatalogueCache } from './index'
 import { describe, expect, it, vi } from 'vitest'
+import site from '../boards.json'
 import { handle } from './index'
 
 const ROOT = 'https://res.test/update/'
@@ -12,7 +13,8 @@ function document(board = 'mini-x64', files: unknown[] = [FILE]) {
     baseUrl: 'https://dl.test/',
     categories: [{ id: 'image', title: { zh: '系统镜像', en: 'System image' } }],
     fileTypes: [{ kind: 'image', form: 'disk', category: 'image', title: { zh: '整盘镜像', en: 'whole disk' } }],
-    boards: [{ board, title: { zh: board, en: board }, hardware: { zh: '小型 amd64', en: 'Small amd64' }, status: { zh: 'QEMU', en: 'QEMU' } }],
+    // Every board the site has a page for, and the one the product is for.
+    boards: [...new Set([...site.boards.map(row => row.board), board])].map(name => ({ board: name, title: { zh: name, en: name }, hardware: { zh: '小型 amd64', en: 'Small amd64' }, status: { zh: 'QEMU', en: 'QEMU' } })),
     products: [{
       product: `${board}.basic`,
       board,
@@ -89,7 +91,7 @@ describe('gET /api/catalog', () => {
 
     expect(body.version).toBe(2)
     expect(body.products).toEqual([expect.objectContaining({ product: 'mini-x64.basic', title: { zh: '基础系统', en: 'base system' } })])
-    expect(body.boards?.map(board => board.board)).toEqual(['mini-x64'])
+    expect(body.boards?.map(board => board.board)).toContain('mini-x64')
     expect(body.fileTypes).toHaveLength(1)
     // A product's files are the rows; they are not answered twice.
     expect(body.products?.[0]).not.toHaveProperty('latest')
@@ -199,5 +201,91 @@ describe('gET /api/catalog', () => {
     expect((await get(deps, {}, '/api/other')).status).toBe(404)
     const post = await handle(new Request('https://micaos.dev/api/catalog', { method: 'POST' }), {}, { waitUntil: () => {} }, deps)
     expect(post.status).toBe(405)
+  })
+
+  it('names a board the site has a page for and the catalogue does not list', async () => {
+    const answer = { ...document(), boards: [] }
+    const body = await (await get({ read: published(answer), cache: fakeCache().cache })).json() as Body
+
+    expect(body.status.lastError?.message).toContain('has a page on the site and is not listed in the catalogue')
+  })
+})
+
+describe('a page with board wording', () => {
+  /** A rewriter that says which words it was asked to fill a page with. */
+  function rewriter() {
+    const selectors: string[] = []
+    const made = {
+      on(selector: string) {
+        selectors.push(selector)
+        return made
+      },
+      transform: (response: Response) => new Response('filled', response),
+    }
+    return { make: () => made, selectors }
+  }
+
+  function assets(body = '<html>', headers: Record<string, string> = { 'content-type': 'text/html; charset=utf-8', 'etag': '"built"' }, status = 200) {
+    const seen: Request[] = []
+    return { seen, fetch: async (request: Request) => {
+      seen.push(request)
+      return new Response(body, { status, headers })
+    } }
+  }
+
+  async function page(deps: { read: never, cache: CatalogueCache, rewriter?: () => never }, built: ReturnType<typeof assets>, path = '/', headers: Record<string, string> = {}) {
+    const pending: Promise<unknown>[] = []
+    const response = await handle(
+      new Request(`https://micaos.dev${path}`, { headers }),
+      { CATALOG_ROOT: ROOT, ASSETS: built },
+      { waitUntil: promise => void pending.push(promise) },
+      deps,
+    )
+    await Promise.all(pending)
+    return response
+  }
+
+  it('is the built page with its fill points filled, and is not kept by a browser as it is', async () => {
+    const fill = rewriter()
+    const response = await page({ read: published(), cache: fakeCache().cache, rewriter: fill.make as never }, assets())
+
+    expect(await response.text()).toBe('filled')
+    expect(fill.selectors).toEqual(['[data-res-boards]', '[data-res-board]'])
+    expect(response.headers.get('etag')).toBeNull()
+    expect(response.headers.get('cache-control')).toBe('public, max-age=0, must-revalidate')
+  })
+
+  it('asks for the built page whole, so a filled page is never revalidated into keeping old words', async () => {
+    const built = assets()
+    await page({ read: published(), cache: fakeCache().cache, rewriter: rewriter().make as never }, built, '/', { 'if-none-match': '"built"' })
+
+    expect(built.seen[0].headers.get('if-none-match')).toBeNull()
+  })
+
+  it('is served as built when the resource service cannot be read and nothing is held', async () => {
+    const failing = vi.fn(async () => {
+      throw new Error('unreachable')
+    }) as never
+    const response = await page({ read: failing, cache: fakeCache().cache, rewriter: rewriter().make as never }, assets('<html>built'))
+
+    expect(await response.text()).toBe('<html>built')
+  })
+
+  it('is served as built when filling it throws', async () => {
+    const broken = () => {
+      throw new Error('no rewriter')
+    }
+    const response = await page({ read: published(), cache: fakeCache().cache, rewriter: broken as never }, assets('<html>built'))
+
+    expect(await response.text()).toBe('<html>built')
+  })
+
+  it('passes anything that is not a built HTML page through untouched', async () => {
+    const fill = rewriter()
+    const deps = { read: published(), cache: fakeCache().cache, rewriter: fill.make as never }
+
+    expect(await (await page(deps, assets('{}', { 'content-type': 'application/json' }), '/download/x.json')).text()).toBe('{}')
+    expect((await page(deps, assets('missing', { 'content-type': 'text/html' }, 404), '/download/nothing/')).status).toBe(404)
+    expect(fill.selectors).toEqual([])
   })
 })

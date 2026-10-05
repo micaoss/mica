@@ -1,13 +1,14 @@
 import type { Download } from '../catalog'
+import type { CatalogueWords } from '../products-catalog'
 import type { Copy } from '@/shared/i18n'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { selectVersions } from '../catalog'
+import { boardWords } from '../download-map'
 import { useCatalogue } from '../use-catalogue'
 
+/** A board with a page on this site; what it is called comes from the catalogue. */
 export interface BoardCard {
   board: string
-  hardware: string
-  status: string
   href: string
 }
 
@@ -20,13 +21,16 @@ export function BoardIndex({
   copy,
   boards,
   downloads,
+  words: givenWords,
 }: {
   copy: Copy
   boards: BoardCard[]
   /** Given in tests; in the page the catalogue is fetched from the endpoint. */
   downloads?: Download[]
+  /** Given in tests beside the rows. */
+  words?: CatalogueWords
 }) {
-  const { downloads: catalogue, loading } = useCatalogue(downloads)
+  const { downloads: catalogue, words, loading } = useCatalogue(downloads, givenWords)
   const known = new Set(boards.map(board => board.board))
   // A catalogue entry for a board this site has no page for would otherwise be
   // invisible: the row exists upstream and nothing here would ever show it.
@@ -39,6 +43,7 @@ export function BoardIndex({
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
         {boards.map((board) => {
           const latest = latestFor(catalogue, board.board)
+          const { hardware, status } = boardWords(words, board.board, copy.locale)
           return (
             <a
               key={board.board}
@@ -49,10 +54,10 @@ export function BoardIndex({
                 <CardContent className="p-0">
                   <h2 className="m-0 font-mono text-lg leading-6 font-semibold">{board.board}</h2>
                   <p className="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">
-                    {board.hardware}
+                    {hardware}
                   </p>
                   <p className="mt-1 mb-0 text-[13px] leading-6 text-muted-foreground">
-                    {board.status}
+                    {status}
                   </p>
                   <span className="mt-4 inline-block font-mono text-[13px] text-brand-strong">
                     {latest ? `${copy.download.latest} ${latest.version}` : loading ? copy.download.loading : copy.download.nothingYet}

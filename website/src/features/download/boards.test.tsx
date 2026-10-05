@@ -4,8 +4,10 @@ import { zh } from '@/shared/i18n/zh'
 import { boardGuides, CONFIGURED_BOARDS } from './boards'
 
 describe('per-board guides', () => {
-  it('configures every board the site publishes a page for', () => {
-    expect([...CONFIGURED_BOARDS].sort()).toEqual(zh.boards.rows.map(row => row.board).sort())
+  it('gives every board an identifier usable as a URL segment, once', () => {
+    for (const board of CONFIGURED_BOARDS)
+      expect(board).toMatch(/^[a-z0-9][a-z0-9-]*$/)
+    expect(new Set(CONFIGURED_BOARDS).size).toBe(CONFIGURED_BOARDS.length)
   })
 
   it('resolves a documentation slug against the locale', () => {
@@ -43,7 +45,7 @@ describe('the board index', () => {
     const { render, screen } = await import('@testing-library/react')
     const { BoardIndex } = await import('./components/board-index')
 
-    const boards = [{ board: 'x64', hardware: 'x86_64', status: 'bring-up', href: '/download/x64/' }]
+    const boards = [{ board: 'x64', href: '/download/x64/' }]
     const downloads = [{
       board: 'rk3588',
       profile: 'dev' as const,
@@ -61,5 +63,17 @@ describe('the board index', () => {
 
     expect(screen.getByText(zh.download.nothingYet)).toBeInTheDocument()
     expect(screen.getByText('rk3588')).toBeInTheDocument()
+  })
+
+  it('words a board from the catalogue', async () => {
+    const { render, screen } = await import('@testing-library/react')
+    const { BoardIndex } = await import('./components/board-index')
+    const title = { zh: '', en: '' }
+    const words = { categories: [], fileTypes: [], products: [], boards: [{ board: 'x64', title, hardware: { zh: '通用 amd64', en: '' }, status: { zh: 'QEMU 基线', en: '' } }] }
+
+    render(<BoardIndex copy={zh} boards={[{ board: 'x64', href: '/download/x64/' }]} downloads={[]} words={words} />)
+
+    expect(screen.getByText('通用 amd64')).toBeInTheDocument()
+    expect(screen.getByText('QEMU 基线')).toBeInTheDocument()
   })
 })

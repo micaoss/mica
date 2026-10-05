@@ -1,12 +1,14 @@
 import type { Download } from '../src/features/download/catalog'
 import type { Catalogue } from '../src/features/download/products-catalog'
+import type { Rewriter } from './pages'
 import boards from '../boards.json'
 import { checkCatalog } from '../src/features/download/catalog-check'
 import { CATALOGUE_VERSION, catalogueFrom, NO_WORDS, productsUrl, readProducts } from '../src/features/download/products-catalog'
 import { RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
+import { fillBoards } from './pages'
 
 /**
- * The site is static; this Worker exists for one route.
+ * The site is static; this Worker exists for what the resource service owns.
  *
  * `GET /api/catalog` reads the product catalogue the resource service serves
  * for the website (one document: the listed boards and products, each
@@ -20,6 +22,11 @@ import { RES_UPDATE_ROOT } from '../src/features/download/res-catalog'
  * document is read again behind the response: a visitor never waits for the
  * resource service unless nothing was ever read. The same copy is what a
  * failing resource service is answered from.
+ *
+ * The pages that show board wording in their HTML are served through here as
+ * well (`run_worker_first` in `wrangler.jsonc`): the built page is fetched and
+ * its fill points are filled from the same copy (`pages.ts`). Whatever goes
+ * wrong on that path, the page is served as built.
  */
 
 export interface Env {
@@ -27,6 +34,8 @@ export interface Env {
   CATALOG_DEMO?: string
   /** The update root the document is read under. */
   CATALOG_ROOT?: string
+  /** The built site. */
+  ASSETS?: { fetch: (request: Request) => Promise<Response> }
 }
 
 /** The two calls made on the edge cache. */
@@ -38,6 +47,8 @@ export interface CatalogueCache {
 export interface Deps {
   read: typeof readProducts
   cache: CatalogueCache
+  /** A new HTMLRewriter; absent where pages are not rewritten. */
+  rewriter?: () => Rewriter
 }
 
 interface Context {
@@ -148,10 +159,11 @@ async function refresh(root: string, keys: { fresh: string, lastGood: string }, 
   }
 }
 
-async function catalogue(origin: string, env: Env, ctx: Context, deps: Deps): Promise<Response> {
-  if (env.CATALOG_DEMO === '1')
-    return reply({ version: CATALOGUE_VERSION, downloads: SAMPLE, ...NO_WORDS, sample: true, refreshedAt: null })
-
+/**
+ * The catalogue as it is held: the fresh answer, else the last good one while
+ * a new one is read behind the response, else a first read.
+ */
+async function held(origin: string, env: Env, ctx: Context, deps: Deps): Promise<{ answer: Answer, stale: boolean }> {
   // The page asks with its build id in the query; the cached answer is one.
   // The shape's version is in the key, so a copy of another shape is never read.
   const keys = {
@@ -160,25 +172,63 @@ async function catalogue(origin: string, env: Env, ctx: Context, deps: Deps): Pr
   }
   const root = env.CATALOG_ROOT ?? RES_UPDATE_ROOT
 
-  const held = await deps.cache.match(keys.fresh)
-  if (held)
-    return reply(await held.json())
+  const fresh = await deps.cache.match(keys.fresh)
+  if (fresh)
+    return { answer: await fresh.json() as Answer, stale: false }
 
   const last = await deps.cache.match(keys.lastGood)
   if (last) {
     const previous = await last.json() as Answer
     ctx.waitUntil(refresh(root, keys, previous, deps))
-    return replyStale(previous)
+    return { answer: previous, stale: true }
   }
 
-  return reply(await refresh(root, keys, null, deps))
+  return { answer: await refresh(root, keys, null, deps), stale: false }
+}
+
+async function catalogue(origin: string, env: Env, ctx: Context, deps: Deps): Promise<Response> {
+  if (env.CATALOG_DEMO === '1')
+    return reply({ version: CATALOGUE_VERSION, downloads: SAMPLE, ...NO_WORDS, sample: true, refreshedAt: null })
+
+  const { answer, stale } = await held(origin, env, ctx, deps)
+  return stale ? replyStale(answer) : reply(answer)
+}
+
+/**
+ * A built page, its board wording filled from the held catalogue. The page is
+ * asked for whole, so a browser never revalidates a filled page into keeping
+ * old words, and is served as built when anything on the way fails.
+ */
+async function page(request: Request, origin: string, env: Env, ctx: Context, deps: Deps): Promise<Response> {
+  const headers = new Headers(request.headers)
+  headers.delete('if-none-match')
+  headers.delete('if-modified-since')
+  const built = await env.ASSETS!.fetch(new Request(request.url, { method: request.method, headers }))
+
+  if (!deps.rewriter || request.method !== 'GET' || built.status !== 200 || !built.headers.get('content-type')?.includes('text/html'))
+    return built
+
+  try {
+    const { answer } = await held(origin, env, ctx, deps)
+    const filled = fillBoards(built, answer, deps.rewriter())
+    if (filled === built)
+      return built
+    const out = new Response(filled.body, filled)
+    out.headers.delete('etag')
+    out.headers.delete('last-modified')
+    out.headers.set('cache-control', 'public, max-age=0, must-revalidate')
+    return out
+  }
+  catch {
+    return built
+  }
 }
 
 export async function handle(request: Request, env: Env, ctx: Context, deps: Deps): Promise<Response> {
   const url = new URL(request.url)
 
   if (url.pathname !== CATALOG_PATH)
-    return new Response('not found', { status: 404 })
+    return env.ASSETS ? page(request, url.origin, env, ctx, deps) : new Response('not found', { status: 404 })
   if (request.method !== 'GET')
     return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } })
 
@@ -189,6 +239,6 @@ export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // The DOM's CacheStorage type has no `default`; the Workers runtime does.
     const cache = (caches as unknown as { default: CatalogueCache }).default
-    return handle(request, env, ctx, { read: readProducts, cache })
+    return handle(request, env, ctx, { read: readProducts, cache, rewriter: () => new HTMLRewriter() as unknown as Rewriter })
   },
 }
