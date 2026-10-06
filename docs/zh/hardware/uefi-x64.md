@@ -56,25 +56,55 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 刷机
 
-**在 QEMU 里跑**（这是唯一被实际执行过的路径）：先用 `virt-fw-vars` 把发布的启动
-证书注册进 OVMF 变量存储，再以 `qemu-system-x86_64 -machine q35` 启动解压后的镜像。
-完整命令行见[刷写](../start/flashing.md) 第 4 节。
+**在 QEMU 里。** 把镜像解压为 `disk.img` 然后启动，不需要别的：
 
-**写到实体机器上（未验证）**：整盘 `dd` 写入，不要写某个分区；写完 `sync` 并回读
-比较。没有人在这个项目里做过一次实体写入，具体命令与告诫见[刷写](../start/flashing.md)
-第 3 节。
+```sh
+cp /usr/share/OVMF/OVMF_VARS_4M.fd vars.fd
+qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
+  -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
+  -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.secboot.fd \
+  -drive if=pflash,format=raw,unit=1,file=vars.fd \
+  -drive if=none,id=disk0,format=raw,file=disk.img \
+  -device virtio-blk-pci,drive=disk0,bootindex=0
+```
 
-**Secure Boot（未验证）**：机器必须把该发布的启动证书注册进固件的 `db`，或者关掉
-Secure Boot。关掉它不削弱 root——签名的内核命令行里仍带
-`dm_verity.require_signatures=1`。
+看门狗设备和带 `secboot` 的固件都是必需的；原样复制的变量存储让 Secure Boot 保持关闭。
+取镜像、开启 Secure Boot、每个选项的用处，见[刷写](../start/flashing.md)第 4 节，那里的
+步骤是对一个已发布的 amd64 镜像从头到尾跑过的。
+
+**写到实体机器上（未验证）。** 把整个镜像写入 U 盘、SATA 硬盘或 NVMe，不要写某个分区，
+写完 `sync` 并回读比较：
+
+```sh
+gzip -dc mica-uefi-x64.<variant>-<stamp>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+```
+
+本项目没有做过任何一次实体写入；怎样确认目标设备、回读与各项告诫见
+[刷写](../start/flashing.md)第 3 节。
+
+**Secure Boot（未在实机验证）。** 机器必须把该发布的启动证书注册进固件的 `db`，或者关掉
+Secure Boot。关掉它不削弱根——签名的内核命令行里仍带
+`dm_verity.require_signatures=1`——但固件必须具备 Secure Boot 功能：固件没有
+`SecureBoot` 变量时，启动会被拒绝。
 
 > status: unsupported
 
 ## 首次启动
 
-DATA 扩展到介质大小；镜像出厂就带两份签名部署（代次 g-1 和 g），所以更新不会让设备
-失去可启动的回退；loader 每份部署一个启动项，三次尝试，健康门通过后 bless。
-详见[刷写](../start/flashing.md) 第 7 节与[首次启动](../start/first-run.md)。
+加载器启动最新的部署，早期 init 验证它并挂载签名的根，DATA 扩展到介质末尾。控制台的
+最后是健康门确认该部署：
+
+```
+mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)
+```
+
+设备在有线网口上通过 DHCP 取得地址，在 8080 端口提供 Web 控制台和 API（用上面的 QEMU
+命令时是 `http://127.0.0.1:8080/`）。在控制台的第一个页面或 `POST /api/v1/setup` 设置
+管理员密码之前，它处于未认领状态（[首次启动](../start/first-run.md)）。
+
+出厂镜像带两份签名部署，所以更新不会让设备失去可启动的回退；加载器为每份部署保留一个
+启动项，各三次尝试（[刷写](../start/flashing.md)第 7 节）。
 
 ## 更新
 

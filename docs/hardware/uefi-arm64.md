@@ -72,35 +72,40 @@ the image `mica-uefi-arm64.<variant>-<YYYYMMDD-HHMM>.img.gz`.
 
 ## Flashing
 
-**Under QEMU** — the only path with evidence. Write the release's boot
-certificate into an AAVMF variable store with `virt-fw-vars`, then:
+**Under QEMU.** Decompress the image to `disk.img` and start it:
 
 ```sh
+cp /usr/share/AAVMF/AAVMF_VARS.fd vars.fd
 qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot \
   -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
   -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.secboot.fd \
   -drive if=pflash,format=raw,unit=1,file=vars.fd \
   -drive if=none,id=disk0,format=raw,file=disk.img \
   -device virtio-blk-pci,drive=disk0,bootindex=0
 ```
 
-The guest has to provide a PL011 console and only one, the i6300esb watchdog,
-an RTC through PL031 or EFI, and an enabled ACPI button so that a host's
-graceful shutdown request reaches the guest. The whole acceptance run is one
-target, `make lifecycle-uefi PRODUCT=uefi-arm64.dev`; importing an offline
-update over 9p is in [flashing](../start/flashing.md) section 4.
+The guest has a PL011 console and only one, needs the i6300esb watchdog, and
+takes its RTC from PL031 or EFI. On an amd64 host every instruction is
+emulated, so the boot takes minutes. The acceptance suite runs this line with
+the release's certificate enrolled and Secure Boot on; with the plain variable
+store, as here, it has not been run, because no `uefi-arm64` product has a
+release yet. Getting the image, Secure Boot on and troubleshooting are in
+[flashing](../start/flashing.md) section 4.
 
-**Onto a physical arm64 machine (unverified)**: as for `uefi-x64` — a
-whole-device write, and the machine must trust the release's boot certificate.
-No physical arm64 machine has been verified.
+**Onto a physical arm64 machine (unverified).** As for `uefi-x64`: a
+whole-device write, on a machine whose firmware is UEFI with ACPI and either
+trusts the release's boot certificate or has Secure Boot off. No physical
+arm64 machine has been verified.
 
 > status: unsupported
 
 ## First boot
 
-As on `uefi-x64`: DATA grows, the image ships two deployments, entries are
-counted three attempts deep, and the health gate confirms. See
-[flashing](../start/flashing.md) section 7.
+As on [`uefi-x64`](uefi-x64.md#first-boot): the early init verifies the
+deployment, DATA grows, the health gate confirms, and the device serves the
+web console and the API on port 8080, unclaimed until somebody sets the
+administrator password ([first run](../start/first-run.md)).
 
 ## Updates
 

@@ -62,30 +62,65 @@ image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
 
 ## Flashing
 
-**Under QEMU** — the only path anyone here has executed: enrol the release's
-boot certificate into an OVMF variable store with `virt-fw-vars`, then start
-the decompressed image with `qemu-system-x86_64 -machine q35`. The command
-lines are in [flashing](../start/flashing.md) section 4.
+**Under QEMU.** Decompress the image to `disk.img` and start it; nothing else
+is needed:
 
-**Onto a physical machine (unverified)**: write the whole device, never a
-partition, then `sync` and read back to compare. No physical write has been
-performed by this project; the commands and their warnings are in
-[flashing](../start/flashing.md) section 3.
+```sh
+cp /usr/share/OVMF/OVMF_VARS_4M.fd vars.fd
+qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
+  -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
+  -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.secboot.fd \
+  -drive if=pflash,format=raw,unit=1,file=vars.fd \
+  -drive if=none,id=disk0,format=raw,file=disk.img \
+  -device virtio-blk-pci,drive=disk0,bootindex=0
+```
 
-**Secure Boot (unverified)**: the machine must carry the release's boot
-certificate in its firmware `db`, or Secure Boot must be off. Turning it off
-does not weaken the root — the signed kernel command line still carries
-`dm_verity.require_signatures=1`.
+The watchdog device and the `secboot` firmware build are both required, and
+the plain copy of the variable store leaves Secure Boot off. Getting the
+image, Secure Boot on, and what each option is for are in
+[flashing](../start/flashing.md) section 4, which was run end to end against a
+published amd64 image.
+
+**Onto a physical machine (unverified).** Write the whole image to a USB
+stick, a SATA disk or an NVMe drive, never to a partition, then `sync` and
+read back to compare:
+
+```sh
+gzip -dc mica-uefi-x64.<variant>-<stamp>.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+```
+
+No physical write has been performed by this project; identifying the target,
+the read-back and the warnings are in [flashing](../start/flashing.md)
+section 3.
+
+**Secure Boot (unverified on hardware).** The machine must carry the release's
+boot certificate in its firmware `db`, or Secure Boot must be off. Turning it
+off does not weaken the root — the signed kernel command line still carries
+`dm_verity.require_signatures=1` — but the firmware must have Secure Boot at
+all: a firmware with no `SecureBoot` variable is refused at boot.
 
 > status: unsupported
 
 ## First boot
 
-DATA grows to the medium; the factory image already carries two signed
-deployments (generations g-1 and g), so an update never leaves the device
-without a bootable fallback; the loader carries one entry per deployment with
-three attempts, blessed once the health gate passes. See
-[flashing](../start/flashing.md) section 7 and [first run](../start/first-run.md).
+The loader starts the newest deployment, the early init verifies it and mounts
+the signed root, and DATA grows to the end of the medium. The console ends
+with the health gate confirming the deployment:
+
+```
+mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)
+```
+
+The device takes an address by DHCP on its wired interface and serves the web
+console and the API on port 8080 (`http://127.0.0.1:8080/` under the QEMU
+line above). It is unclaimed until the console's first page, or
+`POST /api/v1/setup`, sets the administrator password
+([first run](../start/first-run.md)).
+
+The factory image carries two signed deployments, so an update never leaves
+the device without a bootable fallback; the loader keeps one entry per
+deployment with three attempts ([flashing](../start/flashing.md) section 7).
 
 ## Updates
 

@@ -65,32 +65,36 @@ aarch64 `virt` 没有 VGA 也没有 framebuffer，写 `console=tty0` 就是给�
 
 ## 刷机
 
-**在 QEMU 里跑**（唯一有证据的路径）：用 `virt-fw-vars` 把发布的启动证书写进 AAVMF
-变量存储，然后
+**在 QEMU 里。** 把镜像解压为 `disk.img` 然后启动：
 
 ```sh
+cp /usr/share/AAVMF/AAVMF_VARS.fd vars.fd
 qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot \
   -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
   -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.secboot.fd \
   -drive if=pflash,format=raw,unit=1,file=vars.fd \
   -drive if=none,id=disk0,format=raw,file=disk.img \
   -device virtio-blk-pci,drive=disk0,bootindex=0
 ```
 
-guest 必须提供：PL011 控制台且只有一个、i6300esb 看门狗、PL031 或 EFI 的 RTC、
-打开的 ACPI button（否则宿主请求的优雅关机传不进去）。完整说明、9p 导入离线更新的
-做法，以及 `make lifecycle-uefi PRODUCT=uefi-arm64.dev` 这一整套验收，见
-[刷写](../start/flashing.md) 第 4 节。
+guest 的控制台是 PL011 且只有这一个，需要 i6300esb 看门狗，RTC 来自 PL031 或 EFI。在
+amd64 宿主机上每条指令都是模拟执行的，启动要按分钟计。验收套件是在注册了发布证书、开启
+Secure Boot 的情况下运行这条命令的；像这里这样用原样的变量存储还没有跑过，因为
+`uefi-arm64` 还没有任何产品发布。取镜像、开启 Secure Boot 与排障见
+[刷写](../start/flashing.md)第 4 节。
 
-**写到实体 arm64 机器上（未验证）**：与 `uefi-x64` 同理，整盘写入，机器需信任该发布
-的启动证书。没有任何实体 arm64 机器被验证过。
+**写到实体 arm64 机器上（未验证）。** 与 `uefi-x64` 同理：整盘写入，机器的固件须是带 ACPI
+的 UEFI，并且要么信任该发布的启动证书，要么关闭 Secure Boot。没有任何实体 arm64 机器被
+验证过。
 
 > status: unsupported
 
 ## 首次启动
 
-与 `uefi-x64` 相同：DATA 扩容、出厂两份部署、三次尝试的计数启动项、健康门确认。
-见[刷写](../start/flashing.md) 第 7 节。
+与 [`uefi-x64`](uefi-x64.md) 相同：早期 init 验证部署，DATA 扩容，健康门确认，设备在
+8080 端口提供 Web 控制台和 API，在有人设置管理员密码之前处于未认领状态
+（[首次启动](../start/first-run.md)）。
 
 ## 更新
 

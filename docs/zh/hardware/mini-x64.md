@@ -52,20 +52,42 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 
 ## 刷机
 
-**在 QEMU 里**——与 `uefi-x64` 相同：用 `virt-fw-vars` 把发布的启动证书写进 OVMF
-变量库，再用 `qemu-system-x86_64 -machine q35` 启动解压后的镜像。命令行见
-[刷写](../start/flashing.md)第 4 节。
+**在 QEMU 里。** 把镜像解压为 `disk.img` 然后启动；[刷写](../start/flashing.md)第 4 节
+记录的就是对已发布的 `mini-x64.basic` 的这次运行：
 
-**写进实体机器（未验证）**：写整个设备，不要只写一个分区，然后 `sync` 并回读比对
-（[刷写](../start/flashing.md)第 3 节）。
+```sh
+cp /usr/share/OVMF/OVMF_VARS_4M.fd vars.fd
+qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
+  -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
+  -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.secboot.fd \
+  -drive if=pflash,format=raw,unit=1,file=vars.fd \
+  -drive if=none,id=disk0,format=raw,file=disk.img \
+  -device virtio-blk-pci,drive=disk0,bootindex=0
+```
+
+镜像是 128 MiB；第一次启动前 `truncate -s 1G disk.img`，给 DATA 留出扩展空间。看门狗设备
+和带 `secboot` 的固件都是必需的。
+
+**写进实体机器（未验证）。** 把整个镜像写入机器的 SATA、NVMe、SD 或 eMMC 介质，不要只写
+一个分区，然后 `sync` 并回读比对（[刷写](../start/flashing.md)第 3 节）。内核没有 USB
+驱动，所以机器不能从 U 盘启动这个镜像：介质要在另一个系统上写好。
 
 > status: unsupported
 
 ## 首次启动
 
-与 [`uefi-x64`](uefi-x64.md) 相同：DATA 扩展到介质大小，镜像带有两份签名部署，健康门
-确认启动起来的那一份。根的 init 是 OpenRC，micad 驱动的是各个包为这种 init 提供的服务
+与 [`uefi-x64`](uefi-x64.md) 相同：早期 init 验证部署，DATA 扩展到介质末尾，健康门确认
+启动起来的那一份。根的 init 是 OpenRC，micad 驱动的是各个包为这种 init 提供的服务
 （`mica-core:docs/mica-core.md` 第 3.8 节）。
+
+`mini-x64.basic` 不带 Web 控制台。它在 8080 端口提供 API，并在那里认领：
+
+```sh
+curl http://127.0.0.1:8080/api/v1/session        # {"state":"setup"}
+curl -X POST -H 'content-type: application/json' \
+  -d '{"password":"at-least-eight-bytes"}' http://127.0.0.1:8080/api/v1/setup
+```
 
 ## 更新
 

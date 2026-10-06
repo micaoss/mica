@@ -152,7 +152,7 @@ exists. Exactly two channels can create the first one:
 
 1. **Setup** — the first visit to `/_ui/`, or `POST /api/v1/setup` for API
    clients. You choose the administrator password; the route establishes a
-   browser session and mints a one-time bearer token for automation. A second
+   browser session and mints no API token. A second
    setup call on a claimed device is refused with `already_configured` and
    writes nothing.
 2. **A provisioning document** — section 3. The password came off the medium.

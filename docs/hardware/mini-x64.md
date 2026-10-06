@@ -57,23 +57,49 @@ The product is `mini-x64.basic`, released as
 
 ## Flashing
 
-**Under QEMU** — as for `uefi-x64`: enrol the release's boot certificate into an
-OVMF variable store with `virt-fw-vars`, then start the decompressed image with
-`qemu-system-x86_64 -machine q35`. The command lines are in
-[flashing](../start/flashing.md) section 4.
+**Under QEMU.** Decompress the image to `disk.img` and start it; this is the
+run [flashing](../start/flashing.md) section 4 records, against the published
+`mini-x64.basic`:
 
-**Onto a physical machine (unverified)**: write the whole device, never a
-partition, then `sync` and read back to compare
-([flashing](../start/flashing.md) section 3).
+```sh
+cp /usr/share/OVMF/OVMF_VARS_4M.fd vars.fd
+qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
+  -device i6300esb -watchdog-action reset \
+  -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-pci,netdev=net0 \
+  -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.secboot.fd \
+  -drive if=pflash,format=raw,unit=1,file=vars.fd \
+  -drive if=none,id=disk0,format=raw,file=disk.img \
+  -device virtio-blk-pci,drive=disk0,bootindex=0
+```
+
+The image is 128 MiB; `truncate -s 1G disk.img` before the first start gives
+DATA room to grow. The watchdog device and the `secboot` firmware build are
+both required.
+
+**Onto a physical machine (unverified).** Write the whole image to the
+machine's SATA, NVMe, SD or eMMC medium, never to a partition, then `sync` and
+read back to compare ([flashing](../start/flashing.md) section 3). The kernel
+has no USB driver, so the machine cannot boot this image from a USB stick: the
+medium is written from another system.
 
 > status: unsupported
 
 ## First boot
 
-As on [`uefi-x64`](uefi-x64.md#first-boot): DATA grows to the medium, the image
-carries two signed deployments, and the health gate confirms the one that
-booted. The root's init is OpenRC, and micad drives the services each package
-ships for that init (`mica-core:docs/mica-core.md` section 3.8).
+As on [`uefi-x64`](uefi-x64.md#first-boot): the early init verifies the
+deployment, DATA grows to the end of the medium, and the health gate confirms
+the deployment that booted. The root's init is OpenRC, and micad drives the
+services each package ships for that init
+(`mica-core:docs/mica-core.md` section 3.8).
+
+`mini-x64.basic` carries no web console. It serves the API on port 8080 and is
+claimed there:
+
+```sh
+curl http://127.0.0.1:8080/api/v1/session        # {"state":"setup"}
+curl -X POST -H 'content-type: application/json' \
+  -d '{"password":"at-least-eight-bytes"}' http://127.0.0.1:8080/api/v1/setup
+```
 
 ## Updates
 
