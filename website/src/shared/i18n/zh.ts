@@ -73,7 +73,7 @@ export const zh = {
       {
         no: '01',
         name: '硬件差异收敛在板卡合约里',
-        impl: 'mica-boards + mica-build',
+        impl: 'mica-build',
         desc: '合约写死系统对硬件的要求，BSP、内核与板卡包按板卡归位；镜像按固定版本组装、签名、测试。上一块新板子走的是移植，不是另起一套系统。',
       },
     ] as ArchLayer[]),
@@ -133,15 +133,15 @@ export const zh = {
     },
     verify: {
       heading: '校验',
-      body: '元数据公钥必须来自独立的可信渠道——与产物放在一起的校验和不构成认证。启动、内容与元数据各有独立的信任锚。',
-      command: 'bash verify/run.sh --verify --board x64 \\\n  --image /path/to/disk.img --public-key /path/to/metadata-public.key',
-      note: '离线校验认证签名记录，并检查内容、几何、固件回执与根策略。',
+      body: '与文件放在一起的校验和只证明文件完整到达。镜像可信靠的是它内部的签名链，由设备在启动时校验。',
+      command: 'sha256sum -c SHA256SUMS\nawk -F\'\\t\' \'$1 == "asset" && $5 == "<file>" {print $6 "  " $5}\' mica-build.lock \\\n  | sha256sum -c -',
+      note: 'SHA256SUMS 列出发布锁，锁里写着这次发布每个文件的 sha256。三个文件都从发布里下载；“获取并识别镜像”一页逐步说明。',
     },
   },
   flow: {
     heading: '从镜像到现场',
     steps: [
-      { no: '01', title: '选板卡', body: '板卡合约说明系统对硬件的要求；BSP 与内核来自 mica-boards。' },
+      { no: '01', title: '选板卡', body: '板卡合约说明系统对硬件的要求；BSP 与内核来自 mica-build。' },
       { no: '02', title: '组装镜像', body: 'mica-build 导入固定版本的包，组合、签名、校验并测试出一份产品镜像。' },
       { no: '03', title: '安装与首次配置', body: '离线装机与首次配置，不依赖网络或云服务；SSH 默认关闭。' },
       { no: '04', title: '更新与回滚', body: '签名的 A/B 部署推送到设备，健康检查不通过就自动退回上一份可用部署。' },

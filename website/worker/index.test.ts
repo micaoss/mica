@@ -298,6 +298,12 @@ describe('the pages', () => {
     expect((await get(res(), fakeCache().cache, '/download/board-page/', { ASSETS: built }, rewriter().make)).status).toBe(404)
   })
 
+  it('answers 404 for every board when the catalogue was read and lists none', async () => {
+    const empty = res({ index: { ...index(), boards: [], products: [] } })
+
+    expect((await get(empty, fakeCache().cache, '/download/mini-x64/', { ASSETS: assets(TEMPLATE) }, rewriter().make)).status).toBe(404)
+  })
+
   it('serves a board\'s page when the catalogue cannot say which boards there are', async () => {
     const response = await get(res({ index: new Error('unreachable') }), fakeCache().cache, '/download/mini-x64/', { ASSETS: assets(TEMPLATE) }, rewriter().make)
 

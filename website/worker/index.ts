@@ -257,7 +257,7 @@ async function page(request: Request, url: URL, env: Env, ctx: Context, deps: De
 async function isListed(board: string, origin: string, env: Env, ctx: Context, deps: Deps): Promise<boolean> {
   try {
     const { answer } = await heldIndex(origin, env, ctx, deps)
-    if (answer.notListed || answer.boards.length === 0)
+    if (answer.notListed || !answer.status.lastSuccessAt)
       return true
     return answer.boards.some(entry => entry.board === board)
   }

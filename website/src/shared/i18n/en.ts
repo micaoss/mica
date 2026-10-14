@@ -63,7 +63,7 @@ export const en: typeof zh = {
       {
         no: '01',
         name: 'Hardware differences end at the board contract',
-        impl: 'mica-boards + mica-build',
+        impl: 'mica-build',
         desc: 'The contract fixes what the system needs from the hardware, and BSPs, kernels and board packages are filed per board; images are composed, signed and tested from pinned versions. Bringing up a new board is a porting job, not a second system.',
       },
     ],
@@ -123,9 +123,9 @@ export const en: typeof zh = {
     },
     verify: {
       heading: 'Verification',
-      body: 'The metadata public key has to come from an independent trusted channel — a checksum served beside the artifact is not authentication. Boot, content and metadata have separate trust anchors.',
-      command: 'bash verify/run.sh --verify --board x64 \\\n  --image /path/to/disk.img --public-key /path/to/metadata-public.key',
-      note: 'The offline check verifies the authenticated signature record and inspects content, geometry, firmware receipts and root policy.',
+      body: 'A checksum served beside a file proves only that it arrived intact. What makes an image trustworthy is the signature chain inside it, which the device checks as it boots.',
+      command: 'sha256sum -c SHA256SUMS\nawk -F\'\\t\' \'$1 == "asset" && $5 == "<file>" {print $6 "  " $5}\' mica-build.lock \\\n  | sha256sum -c -',
+      note: 'SHA256SUMS lists the release lock, and the lock names the sha256 of every file in the release. Download all three from the release; Get and identify an image walks through it.',
     },
   },
   flow: {
