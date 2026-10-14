@@ -1,0 +1,52 @@
+{
+  "$comment": "The allowlist of documents the site publishes from ../docs. A file is published by appearing here, never by existing upstream. `name` is the document; `dir` is its directory under the documentation root, and an entry without one sits at the root; `slug` overrides the site path, which is otherwise `<dir>/<name>`; `locales` defaults to both, and is narrowed only when one original is genuinely missing. Groups are the sidebar's, in order.",
+  "groups": [
+    {
+      "id": "start",
+      "docs": [
+        { "name": "quickstart", "dir": "start" },
+        { "name": "download", "dir": "start" },
+        { "name": "install", "dir": "start" },
+        { "name": "flashing", "dir": "start" },
+        { "name": "first-run", "dir": "start" }
+      ]
+    },
+    {
+      "id": "hardware",
+      "docs": [
+        { "name": "README", "dir": "hardware", "slug": "hardware" },
+        { "name": "uefi-x64", "dir": "hardware" },
+        { "name": "uefi-arm64", "dir": "hardware" },
+        { "name": "cx3576", "dir": "hardware" },
+        { "name": "s905x5m", "dir": "hardware" },
+        { "name": "mini-x64", "dir": "hardware" }
+      ]
+    },
+    {
+      "id": "operating",
+      "docs": [
+        { "name": "configuration", "dir": "operate" },
+        { "name": "applications", "dir": "integrate" },
+        { "name": "updates", "dir": "operate" },
+        { "name": "storage", "dir": "operate" }
+      ]
+    },
+    {
+      "id": "trouble",
+      "docs": [
+        { "name": "troubleshooting", "dir": "operate" },
+        { "name": "recovery", "dir": "operate" }
+      ]
+    },
+    {
+      "id": "reference",
+      "docs": [
+        { "name": "contributing" },
+        { "name": "overview", "dir": "security", "slug": "security" },
+        { "name": "api", "dir": "operate" },
+        { "name": "release-notes", "dir": "releases" },
+        { "name": "support", "dir": "releases" }
+      ]
+    }
+  ]
+}

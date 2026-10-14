@@ -1,0 +1,20 @@
+---
+import type { LocaleCode } from '@/shared/i18n'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { docsHref, homeHref } from '@/features/landing/links'
+import { copyFor, localePathsFromUrl } from '@/shared/i18n'
+
+const { locale } = Astro.locals.starlightRoute
+const code: LocaleCode = locale === 'en' ? 'en' : 'zh'
+const copy = copyFor(code)
+---
+
+<SiteHeader
+  copy={copy}
+  locale={code}
+  paths={localePathsFromUrl(Astro.url.pathname)}
+  homeHref={homeHref(code)}
+  docsHref={docsHref(code)}
+  variant="docs"
+  flush
+/>

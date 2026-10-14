@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+# Negative tests for tools/docs/verify-index.sh -- in particular for the "once each"
+# assertion, which is the half that catches a document listed TWICE.
+#
+#   bash tools/docs/verify-index-test.sh          (or: make docs-verify-test)
+#
+# WHY. With a second row injected into the index, the forward and reverse
+# membership assertions both pass and the check count does not move, so only
+# the "once each" assertion can see a duplicate. An assertion nobody has seen
+# FAIL is equally consistent with an assertion that CANNOT fail, so each
+# assertion is driven here against an index in which its fact is FALSE, and
+# each is required to fail -- and to fail with ITS OWN message, because an
+# assertion that fires for an unrelated reason is not the assertion under test.
+#
+# The two membership assertions -- a document with no row, a row with no
+# document -- are driven the same way.
+#
+# HOW. The REAL tools/docs/verify-index.sh is run, once per case, over a COPY of the
+# real docs tree with one mutation applied. Nothing is reimplemented here; a
+# reimplementation would be testing this file's idea of the assertion rather
+# than the assertion. The verifier resolves its own root from ${BASH_SOURCE},
+# so a copy at ${case}/tools/docs/verify-index.sh reads ${case}/docs -- no environment
+# hook is needed and the real tree is never written to.
+#
+# The baseline is not hand-written either: it is the SHIPPED docs/README.md
+# and design tree, copied verbatim.
+# Every case then MUTATES that baseline. An index this script had authored
+# would prove only that the script can spell. Nothing is hardcoded about how
+# many checks the baseline reports, because that number grows with every
+# document added.
+#
+# No root, no network, nothing outside a temp dir. It fails loudly when it
+# cannot run rather than skipping.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${HERE}/../.." && pwd)"
+VERIFIER="${HERE}/verify-index.sh"
+
+for required in "${VERIFIER}" "${ROOT}/docs/README.md"; do
+    [ -e "${required}" ] || { echo "error: ${required} not found" >&2; exit 1; }
+done
+
+WORK="$(mktemp -d)"
+trap 'rm -rf "${WORK}"' EXIT
+
+PASS_N=0
+FAIL_N=0
+pass() { PASS_N=$((PASS_N + 1)); echo "PASS: $*"; }
+fail() { FAIL_N=$((FAIL_N + 1)); echo "FAIL: $*"; }
+
+# A copy of everything the verifier reads, and nothing else.
+new_fixture() {
+    local dir="$1"
+    rm -rf "${dir}"
+    mkdir -p "${dir}/docs" "${dir}/tools/docs"
+    cp "${ROOT}/docs/README.md" "${dir}/docs/"
+    cp "${VERIFIER}" "${dir}/tools/docs/"
+    for tree in start operate integrate hardware security reference releases website; do
+        cp -R "${ROOT}/docs/${tree}" "${dir}/docs/"
+    done
+}
+
+# Duplicates the line matching $2 in file $1, and fails loudly if that line was
+# not there exactly once to begin with: a mutation that silently changed nothing
+# would make the case below pass for free.
+duplicate_line() {
+    local file="$1" pat="$2" times="${3:-1}" before after
+    before=$(grep -cF -- "${pat}" "${file}")
+    [ "${before}" -eq 1 ] || {
+        echo "error: ${file} has ${before} lines matching '${pat}', expected exactly 1 to duplicate" >&2
+        exit 1
+    }
+    awk -v p="${pat}" -v n="${times}" 'index($0, p) { for (i = 0; i <= n; i++) print; next } { print }' \
+        "${file}" >"${file}.new"
+    mv "${file}.new" "${file}"
+    after=$(grep -cF -- "${pat}" "${file}")
+    [ "${after}" -eq $((times + 1)) ] || {
+        echo "error: duplication of '${pat}' in ${file} produced ${after} copies, expected $((times + 1))" >&2
+        exit 1
+    }
+    echo "    | occurrences of '${pat}': ${before} -> ${after}"
+}
+
+# Runs the REAL verifier over fixture $1, leaving its output in ${WORK}/out and
+# its exit status in ${RC}.
+run_verifier() {
+    RC=0
+    bash "$1/tools/docs/verify-index.sh" >"${WORK}/out" 2>&1 || RC=$?
+}
+
+# The positive control.
+expect_all_pass() {
+    local name="$1" got_fail got_checks
+    run_verifier "${FIX}"
+    got_fail="$(grep -c '^  FAIL ' "${WORK}/out" || true)"
+    got_checks="$(sed -n 's|^tools/docs/verify-index.sh: \([0-9]*\)/\1 PASS$|\1|p' "${WORK}/out")"
+    if [ "${RC}" -eq 0 ] && [ "${got_fail}" -eq 0 ] && [ -n "${got_checks}" ]; then
+        pass "${name}: ${got_checks}/${got_checks}, no failures, exit 0"
+    else
+        fail "${name}: expected a clean N/N PASS and exit 0, got ${got_fail} failure(s) / exit ${RC}"
+        sed 's/^/    | /' "${WORK}/out"
+    fi
+}
+
+# The negative direction. $2 is how many assertions must fire -- stated rather
+# than inferred, since two substrings can legitimately belong to one message --
+# and every remaining argument is a substring that must appear in a FAIL line.
+# An EXTRA assertion firing is a failure of this test, not a bonus. Matching the
+# message rather than only the exit status is the whole point: an assertion that
+# fired for an unrelated reason is not the assertion under test.
+expect_fail() {
+    local name="$1" want="$2"
+    shift 2
+    local got_fail pat unmatched=0
+    run_verifier "${FIX}"
+    got_fail="$(grep -c '^  FAIL ' "${WORK}/out" || true)"
+    for pat in "$@"; do
+        grep -F -- "${pat}" "${WORK}/out" | grep -c '^  FAIL ' >/dev/null || {
+            unmatched=1
+            echo "    | no FAIL line contains: ${pat}"
+        }
+    done
+    if [ "${RC}" -ne 0 ] && [ "${got_fail}" -eq "${want}" ] && [ "${unmatched}" -eq 0 ]; then
+        pass "${name}: ${want} assertion(s) fail, each with its own message, exit ${RC}"
+        grep '^  FAIL ' "${WORK}/out" | sed 's/^/    | /'
+    else
+        fail "${name}: expected ${want} FAIL line(s) and a non-zero exit, got ${got_fail} FAIL / exit ${RC}"
+        sed 's/^/    | /' "${WORK}/out"
+    fi
+}
+
+echo "verifier under test: ${VERIFIER}"
+echo "fixture copied from: ${ROOT}/docs"
+echo
+
+# --- 0. positive control ----------------------------------------------------
+# Without this the negatives below could all be passing because the copy is
+# broken in some way that has nothing to do with the mutation.
+FIX="${WORK}/baseline"
+new_fixture "${FIX}"
+expect_all_pass "baseline: the shipped docs tree, copied verbatim"
+
+# --- 1. a reference/ document listed twice in the README ------------------------
+FIX="${WORK}/reference-entry-twice"
+new_fixture "${FIX}"
+# `wifi.md`, not `api.md`: `api.md` has a row under BOTH reference/ and operate/,
+# and duplicate_line rightly aborts on a pattern that is not unique in the file.
+duplicate_line "${FIX}/docs/README.md" '  - `wifi.md`'
+expect_fail "docs/README.md listing wifi.md twice under reference/" 1 \
+    "lists 'wifi.md' 2 times under reference/" \
+    "will drift apart unnoticed"
+
+# --- 2. the membership assertions, driven in the failing direction -----------
+FIX="${WORK}/dangling-readme-entry"
+new_fixture "${FIX}"
+rm "${FIX}/docs/reference/api.md"
+expect_fail "a README entry whose document a rename deleted" 1 \
+    "indexes 'api.md' under reference/, but docs/reference/api.md does not exist"
+
+# The forward direction: a document that is never listed is not broken, does
+# not fail a build, and is simply never found again.
+FIX="${WORK}/unindexed-document"
+new_fixture "${FIX}"
+cp "${FIX}/docs/reference/api.md" "${FIX}/docs/reference/unlisted.md"
+expect_fail "a reference document with no README row" 1 \
+    "docs/reference/unlisted.md exists but is not indexed in docs/README.md"
+
+# --- 3. the other trees, one case per check_readme_dir call ------------------
+# Each call is driven in a failing direction once, rotating the assertion
+# type, so removing any single call from verify-index.sh turns a case here red. The mutated names are chosen to be unique across the whole
+# README -- `api.md` appears under both reference/ and operate/, and duplicate_line
+# would rightly abort on an ambiguous pattern.
+FIX="${WORK}/user-entry-twice"
+new_fixture "${FIX}"
+duplicate_line "${FIX}/docs/README.md" '  - `quickstart.md`'
+expect_fail "docs/README.md listing quickstart.md twice under start/" 1 \
+    "lists 'quickstart.md' 2 times under start/" \
+    "will drift apart unnoticed"
+
+FIX="${WORK}/dangling-website-entry"
+new_fixture "${FIX}"
+rm "${FIX}/docs/website/downloads.md"
+expect_fail "a website README entry whose document is gone" 1 \
+    "indexes 'downloads.md' under website/, but docs/website/downloads.md does not exist"
+
+FIX="${WORK}/unindexed-hardware-document"
+new_fixture "${FIX}"
+cp "${FIX}/docs/hardware/qualification.md" "${FIX}/docs/hardware/unlisted.md"
+expect_fail "a hardware document with no README row" 1 \
+    "docs/hardware/unlisted.md exists but is not indexed in docs/README.md"
+
+FIX="${WORK}/dangling-hardware-entry"
+new_fixture "${FIX}"
+rm "${FIX}/docs/hardware/assurance.md"
+expect_fail "a hardware README entry whose document is gone" 1 \
+    "indexes 'assurance.md' under hardware/, but docs/hardware/assurance.md does not exist"
+
+echo
+total=$((PASS_N + FAIL_N))
+if [ "${FAIL_N}" -eq 0 ]; then
+    echo "RESULT: PASS (${PASS_N}/${total} cases)"
+else
+    echo "RESULT: FAIL (${PASS_N}/${total} cases)"
+    exit 1
+fi

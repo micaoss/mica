@@ -1,0 +1,103 @@
+---
+import type { LocaleCode } from '@/shared/i18n'
+import SiteHeader from '@/components/SiteHeader.astro'
+import { SiteFooter } from '@/features/landing/components/site-footer'
+import { docsHref, homeHref } from '@/features/landing/links'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { quickHrefs, sectionHrefs } from '@/shared/docs/portal-links'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { copyFor, localePathsFromUrl } from '@/shared/i18n'
+
+interface Props {
+  locale: LocaleCode
+}
+
+const { locale } = Astro.props
+const copy = copyFor(locale)
+const quick = quickHrefs(locale)
+const sections = sectionHrefs(locale)
+---
+
+<BaseLayout copy={copy} title={copy.docs.title} description={copy.docs.sub}>
+  <div class="min-h-screen">
+    <SiteHeader
+      copy={copy}
+      locale={locale}
+      paths={localePathsFromUrl(Astro.url.pathname)}
+      homeHref={homeHref(locale)}
+      docsHref={docsHref(locale)}
+      variant="docs"
+    />
+
+    <div class="mx-auto max-w-[1200px] px-gutter">
+      <header class="border-b border-border pt-14 pb-10">
+        <h1 class="m-0 text-[clamp(28px,5vw,44px)] leading-[1.15] font-semibold tracking-tight">
+          {copy.docs.heading}
+        </h1>
+        <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+          {copy.docs.sub}
+        </p>
+      </header>
+
+      <section class="pt-10 pb-16">
+        <span
+          class="mb-5 block text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase"
+        >
+          {copy.docs.quickTitle}
+        </span>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-[clamp(24px,3vw,40px)]">
+          {
+            copy.docs.quick.map((card, index) => (
+              <a
+                href={quick[index]}
+                class="group block text-foreground no-underline hover:no-underline"
+              >
+                <Card className="h-full gap-0 p-6 transition-colors group-hover:border-ring">
+                  <CardContent className="p-0">
+                    <h2 class="m-0 text-lg leading-6 font-semibold tracking-tight">
+                      {card.title}
+                    </h2>
+                    <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">
+                      {card.body}
+                    </p>
+                    <span class="mt-4 inline-block font-mono text-[13px] text-brand-strong">
+                      {card.path}
+                    </span>
+                  </CardContent>
+                </Card>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="border-t border-border py-14">
+        {
+          copy.docs.sections.map((section, index) => (
+            <a
+              href={sections[index]}
+              class="grid grid-cols-[36px_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1.5 border-b border-border py-5 last:border-b-0 text-foreground no-underline transition-colors hover:bg-accent hover:no-underline sm:grid-cols-[48px_minmax(0,1fr)_auto] sm:gap-x-[clamp(16px,3vw,40px)] sm:gap-y-4"
+            >
+              <span class="font-mono text-[13px] text-muted-foreground tabular-nums">
+                {section.no}
+              </span>
+              <span>
+                <span class="block text-lg leading-7 font-medium tracking-tight">
+                  {section.title}
+                </span>
+                <span class="mt-1 block text-[15px] leading-6 text-muted-foreground">
+                  {section.body}
+                </span>
+              </span>
+              <span class="col-start-2 font-mono text-[13px] text-brand-strong sm:col-auto sm:whitespace-nowrap">
+                {section.path}
+              </span>
+            </a>
+          ))
+        }
+      </section>
+
+      <SiteFooter copy={copy} />
+    </div>
+  </div>
+</BaseLayout>

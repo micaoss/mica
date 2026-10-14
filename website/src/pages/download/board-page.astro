@@ -1,0 +1,10 @@
+---
+import BoardDownloadPage from '@/components/BoardDownloadPage.astro'
+
+// The one page every board's download page is served from. Which boards there
+// are is the resource service's: the Worker serves this page as
+// `/download/<board>/` for a board the catalogue lists, with the board's name
+// in place of the placeholder (`worker/index.ts`).
+---
+
+<BoardDownloadPage locale="zh" board="__board__" />
