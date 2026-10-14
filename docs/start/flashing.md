@@ -173,7 +173,7 @@ image.
 A UEFI product's disk image boots under QEMU as it is: no conversion, no
 extra file. This is the path that is actually run. The amd64 walk-through
 below was run end to end against the published `mini-x64.basic` image
-(release `20261014-1108`, QEMU 10.0 under software emulation); the arm64 line
+(release `20261014-1922`, QEMU 10.0 under software emulation); the arm64 line
 is the one the acceptance suite runs.
 
 ### 4.1 What you need
@@ -266,6 +266,10 @@ gate's last line:
 mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)
 ```
 
+On an OpenRC product (`mini-x64.basic`, `uefi-x64.openrc-full`) the line
+appears as it is; on a systemd product the journal forwards it with its
+prefix, `[   14.340979] mica-health[515]: mica-health: booted slot ...`.
+
 Then, from the host:
 
 ```sh
@@ -340,7 +344,7 @@ amd64 guest takes seconds. For Secure Boot on, 4.5 applies with
 
 The acceptance suite runs this line with the certificate enrolled. With the
 plain variable store, as above, it was run against the published
-`uefi-arm64.full` image (release `20261014-1110`, QEMU 10.0 under software
+`uefi-arm64.full` image (release `20261014-1923`, QEMU 10.0 under software
 emulation): the guest came up healthy and answered `/healthz` and
 `/api/v1/session` as in 4.4.
 

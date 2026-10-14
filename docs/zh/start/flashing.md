@@ -150,7 +150,7 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 ## 4. QEMU：uefi-x64、mini-x64 与 uefi-arm64
 
 UEFI 产品的磁盘镜像可以原样在 QEMU 里启动：不用转换，也不需要别的文件。这是真正跑过
-的路径。下面 amd64 的步骤是对已发布的 `mini-x64.basic` 镜像（发布 `20261014-1108`，
+的路径。下面 amd64 的步骤是对已发布的 `mini-x64.basic` 镜像（发布 `20261014-1922`，
 QEMU 10.0，纯软件模拟）从头到尾跑过的；arm64 的命令行是验收套件运行的那一条。
 
 ### 4.1 需要什么
@@ -237,6 +237,9 @@ qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 \
 mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)
 ```
 
+OpenRC 产品（`mini-x64.basic`、`uefi-x64.openrc-full`）上这一行原样出现；systemd 产品上由
+journal 转发，带着前缀：`[   14.340979] mica-health[515]: mica-health: booted slot ...`。
+
 然后在宿主机上：
 
 ```sh
@@ -303,7 +306,7 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
 分钟计。开启 Secure Boot 时照 4.5 做，换成 `AAVMF_VARS.fd` 和 `BOOTAA64.EFI`。
 
 验收套件是在注册了证书的情况下运行这条命令的。像上面这样用原样的变量存储启动，对已发布的
-`uefi-arm64.full` 镜像（发布 `20261014-1110`，QEMU 10.0，纯软件模拟）跑过：guest 健康启动，
+`uefi-arm64.full` 镜像（发布 `20261014-1923`，QEMU 10.0，纯软件模拟）跑过：guest 健康启动，
 `/healthz` 与 `/api/v1/session` 的应答与 4.4 一致。
 
 套件用的是 `virtio-blk-pci` 和 `virtio-net-pci`。内核还驱动 AHCI、NVMe、USB 存储和常见

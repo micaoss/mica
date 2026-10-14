@@ -89,7 +89,7 @@ takes its RTC from PL031 or EFI. On an amd64 host every instruction is
 emulated, so the boot takes minutes. The acceptance suite runs this line with
 the release's certificate enrolled and Secure Boot on; with the plain variable
 store, as here, it was run against the published `uefi-arm64.full` release
-`20261014-1110`. Getting the image, Secure Boot on and troubleshooting are in
+`20261014-1923`. Getting the image, Secure Boot on and troubleshooting are in
 [flashing](../start/flashing.md) section 4.
 
 **Onto a physical arm64 machine (unverified).** As for `uefi-x64`: a
