@@ -79,8 +79,8 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 -nographic -no-reboot 
 
 guest 的控制台是 PL011 且只有这一个，需要 i6300esb 看门狗，RTC 来自 PL031 或 EFI。在
 amd64 宿主机上每条指令都是模拟执行的，启动要按分钟计。验收套件是在注册了发布证书、开启
-Secure Boot 的情况下运行这条命令的；像这里这样用原样的变量存储还没有跑过，因为
-`uefi-arm64` 还没有任何产品发布。取镜像、开启 Secure Boot 与排障见
+Secure Boot 的情况下运行这条命令的；像这里这样用原样的变量存储，对已发布的
+`uefi-arm64.full` 发布 `20261014-1110` 跑过。取镜像、开启 Secure Boot 与排障见
 [刷写](../start/flashing.md)第 4 节。
 
 **写到实体 arm64 机器上（未验证）。** 与 `uefi-x64` 同理：整盘写入，机器的固件须是带 ACPI

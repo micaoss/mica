@@ -173,7 +173,7 @@ image.
 A UEFI product's disk image boots under QEMU as it is: no conversion, no
 extra file. This is the path that is actually run. The amd64 walk-through
 below was run end to end against the published `mini-x64.basic` image
-(release `20261003-1916`, QEMU 10.0 under software emulation); the arm64 line
+(release `20261014-1108`, QEMU 10.0 under software emulation); the arm64 line
 is the one the acceptance suite runs.
 
 ### 4.1 What you need
@@ -199,7 +199,7 @@ Secure Boot support has none: the boot is then refused
 ### 4.2 Take the image
 
 ```sh
-PRODUCT=mini-x64.basic        # or uefi-x64.basic, uefi-x64.full, uefi-arm64.basic, ...
+PRODUCT=mini-x64.basic        # or uefi-x64.full, uefi-x64.openrc-full, uefi-arm64.full, ...
 curl -fsS "https://res.micaos.dev/update/products/v1/${PRODUCT%%.*}.json" -o products.json
 BASE=$(jq -r .baseUrl products.json)
 jq -r --arg p "$PRODUCT" '.products[] | select(.product == $p) | .latest.files[]
@@ -338,10 +338,11 @@ On an amd64 host every instruction is emulated, so expect minutes where the
 amd64 guest takes seconds. For Secure Boot on, 4.5 applies with
 `AAVMF_VARS.fd` and `BOOTAA64.EFI`.
 
-The acceptance suite runs this line with the certificate enrolled, which is
-the evidence the board has. Booting it with the plain variable store, as
-above, follows from the same code path the amd64 run exercised and has not
-been run here: no `uefi-arm64` product has a release yet.
+The acceptance suite runs this line with the certificate enrolled. With the
+plain variable store, as above, it was run against the published
+`uefi-arm64.full` image (release `20261014-1110`, QEMU 10.0 under software
+emulation): the guest came up healthy and answered `/healthz` and
+`/api/v1/session` as in 4.4.
 
 `virtio-blk-pci` and `virtio-net-pci` are what the suite uses. The kernel also
 drives AHCI, NVMe, USB storage and the common NICs, so another disk or network

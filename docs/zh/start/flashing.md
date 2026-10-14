@@ -150,7 +150,7 @@ Setup Mode，各厂商各不相同——或者关闭 Secure Boot。关闭它不�
 ## 4. QEMU：uefi-x64、mini-x64 与 uefi-arm64
 
 UEFI 产品的磁盘镜像可以原样在 QEMU 里启动：不用转换，也不需要别的文件。这是真正跑过
-的路径。下面 amd64 的步骤是对已发布的 `mini-x64.basic` 镜像（发布 `20261003-1916`，
+的路径。下面 amd64 的步骤是对已发布的 `mini-x64.basic` 镜像（发布 `20261014-1108`，
 QEMU 10.0，纯软件模拟）从头到尾跑过的；arm64 的命令行是验收套件运行的那一条。
 
 ### 4.1 需要什么
@@ -175,7 +175,7 @@ sudo apt-get install python3-virt-firmware sbsigntool mtools  # 仅在开启 Sec
 ### 4.2 取镜像
 
 ```sh
-PRODUCT=mini-x64.basic        # 或 uefi-x64.basic、uefi-x64.full、uefi-arm64.basic……
+PRODUCT=mini-x64.basic        # 或 uefi-x64.full、uefi-x64.openrc-full、uefi-arm64.full……
 curl -fsS "https://res.micaos.dev/update/products/v1/${PRODUCT%%.*}.json" -o products.json
 BASE=$(jq -r .baseUrl products.json)
 jq -r --arg p "$PRODUCT" '.products[] | select(.product == $p) | .latest.files[]
@@ -302,9 +302,9 @@ qemu-system-aarch64 -machine virt -cpu max -m 1024 -smp 2 \
 在 amd64 宿主机上每条指令都是模拟执行的，所以 amd64 guest 几秒能完成的事，这里要按
 分钟计。开启 Secure Boot 时照 4.5 做，换成 `AAVMF_VARS.fd` 和 `BOOTAA64.EFI`。
 
-验收套件是在注册了证书的情况下运行这条命令的，这也是这块板现有的证据。像上面这样用
-原样的变量存储启动，走的是 amd64 那次运行验证过的同一段代码，但在这里没有跑过：
-`uefi-arm64` 还没有任何产品发布。
+验收套件是在注册了证书的情况下运行这条命令的。像上面这样用原样的变量存储启动，对已发布的
+`uefi-arm64.full` 镜像（发布 `20261014-1110`，QEMU 10.0，纯软件模拟）跑过：guest 健康启动，
+`/healthz` 与 `/api/v1/session` 的应答与 4.4 一致。
 
 套件用的是 `virtio-blk-pci` 和 `virtio-net-pci`。内核还驱动 AHCI、NVMe、USB 存储和常见
 网卡，所以原则上换别的磁盘或网卡型号也能起来，但未经测试，和这里每一条非 virtio 路径

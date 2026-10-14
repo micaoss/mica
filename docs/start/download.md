@@ -57,10 +57,10 @@ A release carries:
 ## 2. Find a product's newest release
 
 ```sh
-PRODUCT=uefi-x64.basic
+PRODUCT=uefi-x64.full
 TAG=$(curl -fsSL "https://api.github.com/repos/micaoss/mica-build/releases?per_page=100" \
   | jq -r --arg p "$PRODUCT." '[.[] | select(.draft == false and (.tag_name | startswith($p)))][0].tag_name')
-echo "$TAG"                                   # uefi-x64.basic.<YYYYMMDD-HHMM>
+echo "$TAG"                                   # uefi-x64.full.<YYYYMMDD-HHMM>
 ```
 
 The GitHub API lists releases newest first. `gh release list -R micaoss/mica-build`

@@ -48,10 +48,10 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 ## 2. 找到一个产品的最新发布
 
 ```sh
-PRODUCT=uefi-x64.basic
+PRODUCT=uefi-x64.full
 TAG=$(curl -fsSL "https://api.github.com/repos/micaoss/mica-build/releases?per_page=100" \
   | jq -r --arg p "$PRODUCT." '[.[] | select(.draft == false and (.tag_name | startswith($p)))][0].tag_name')
-echo "$TAG"                                   # uefi-x64.basic.<YYYYMMDD-HHMM>
+echo "$TAG"                                   # uefi-x64.full.<YYYYMMDD-HHMM>
 ```
 
 GitHub API 按从新到旧列出发布。`gh release list -R micaoss/mica-build` 给出同一份列表。
