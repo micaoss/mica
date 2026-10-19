@@ -1,0 +1,285 @@
+import type { Download } from '../catalog'
+import type { BoardCatalogue, CatalogueWords } from '../products-catalog'
+import type { Copy } from '@/shared/i18n'
+import { useMemo, useState } from 'react'
+import { Button } from '@/shared/components/ui/button'
+import { Card } from '@/shared/components/ui/card'
+import { Input } from '@/shared/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table'
+import {
+  filterDownloads,
+  formatBytes,
+  historyCount,
+  selectVersions,
+} from '../catalog'
+import { categoriesOf, categoryOf, describeFile, productNote, productOf } from '../download-map'
+import { CATALOGUE_VERSION, NO_WORDS, readHistory } from '../products-catalog'
+import { useBoard } from '../use-catalogue'
+
+/** The primitive needs a real value, so "no constraint" gets a sentinel. */
+const ALL = 'all'
+/** One empty list, so a page without rows does not recompute on every render. */
+const NO_DOWNLOADS: Download[] = []
+
+/** Enough of a deployment identity to recognise it; the cell's title has it whole. */
+function shortId(id: string | undefined): string {
+  if (!id)
+    return '—'
+  return id.length > 16 ? `${id.slice(0, 12)}…` : id
+}
+
+interface FacetProps {
+  label: string
+  allLabel: string
+  value: string
+  options: { value: string, label: string }[]
+  onChange: (value: string) => void
+}
+
+function Facet({ label, allLabel, value, options, onChange }: FacetProps) {
+  const items = [{ value: ALL, label: allLabel }, ...options]
+
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
+        {label}
+      </span>
+      <Select
+        items={items}
+        value={value}
+        onValueChange={(next: string | null) => onChange(next ?? ALL)}
+      >
+        <SelectTrigger aria-label={label} className="h-9 w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {items.map(item => (
+            <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  )
+}
+
+export function DownloadExplorer({
+  copy,
+  board,
+  downloads,
+  words: givenWords,
+}: {
+  copy: Copy
+  /** The board whose page this is; its rows are the only ones shown. */
+  board: string
+  /** Given in tests; in the page the board is fetched from the endpoint. */
+  downloads?: Download[]
+  /** Given in tests beside the rows. */
+  words?: CatalogueWords
+}) {
+  const given = useMemo<BoardCatalogue | undefined>(
+    () => downloads && { ...(givenWords ?? NO_WORDS), version: CATALOGUE_VERSION, board, downloads, guides: [], staleGuides: [], refreshedAt: '', source: '' },
+    [board, downloads, givenWords],
+  )
+  const { data, sample, loading } = useBoard(board, given)
+  const all = data?.downloads ?? NO_DOWNLOADS
+  const words: CatalogueWords = data ?? NO_WORDS
+  const [profile, setProfile] = useState(ALL)
+  const [kind, setKind] = useState(ALL)
+  const [query, setQuery] = useState('')
+  const [history, setHistory] = useState(false)
+  // The earlier releases of this board's products: read when a visitor asks.
+  const [earlierRows, setEarlierRows] = useState<Download[] | null>(null)
+  const [reading, setReading] = useState(false)
+
+  const histories = useMemo(
+    () => words.products.filter(product => product.board === board && product.releases).map(product => product.releases),
+    [words, board],
+  )
+
+  const catalogue = useMemo(() => {
+    const latest = all.filter(download => download.board === board)
+    const shown = new Set(latest.map(download => download.href))
+    return [...latest, ...(earlierRows ?? []).filter(download => !shown.has(download.href))]
+  }, [all, board, earlierRows])
+
+  // In the catalogue's order, which an admin sets.
+  const profiles = useMemo(
+    () => [...new Set(catalogue.map(download => download.profile))],
+    [catalogue],
+  )
+
+  const toggleHistory = async (): Promise<void> => {
+    if (history || earlierRows || histories.length === 0) {
+      setHistory(!history)
+      return
+    }
+    setReading(true)
+    try {
+      setEarlierRows((await Promise.all(histories.map(url => readHistory(url)))).flat())
+      setHistory(true)
+    }
+    catch {
+      // A history that does not answer leaves the newest releases standing.
+    }
+    finally {
+      setReading(false)
+    }
+  }
+
+  // Only the categories this board actually publishes: offering "firmware"
+  // where no firmware exists is a filter that can only answer an empty table.
+  const categories = useMemo(() => categoriesOf(words, catalogue, copy.locale), [words, catalogue, copy.locale])
+
+  const matching = filterDownloads(catalogue, {
+    profile: profile === ALL ? undefined : profile,
+    query,
+  }).filter(download => kind === ALL || categoryOf(words, download) === kind)
+  const rows = selectVersions(matching, history)
+  const earlier = historyCount(matching)
+
+  const { filters, cols } = copy.download
+  const noted = (variant: string): string => {
+    const note = productNote(words, board, variant, copy.locale)
+    return note ? `${variant} · ${note}` : variant
+  }
+
+  return (
+    <div>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-4">
+        <Facet
+          label={filters.profile}
+          allLabel={filters.all}
+          value={profile}
+          onChange={setProfile}
+          options={profiles.map(value => ({ value, label: noted(value) }))}
+        />
+        <Facet
+          label={cols.kind}
+          allLabel={filters.all}
+          value={kind}
+          onChange={setKind}
+          options={categories.map(category => ({ value: category.id, label: category.label }))}
+        />
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
+            {filters.query}
+          </span>
+          <Input
+            type="search"
+            value={query}
+            placeholder={filters.query}
+            onChange={event => setQuery(event.target.value)}
+          />
+        </label>
+      </div>
+
+      {rows.length === 0
+        ? (
+            <p className="mt-8 mb-0 text-[15px] leading-7 text-muted-foreground">
+              {loading ? copy.download.loading : copy.download.empty}
+            </p>
+          )
+        : (
+            <>
+              {sample && (
+                <p className="mt-8 mb-0 rounded-lg border border-border bg-muted px-4 py-3 text-[13px] leading-6 text-muted-foreground">
+                  {copy.download.sample}
+                </p>
+              )}
+              <Card className="mt-4 gap-0 p-0">
+                <div className="w-full min-w-0 overflow-x-auto rounded-xl">
+                  <Table className="min-w-[720px]">
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="px-5">{cols.kind}</TableHead>
+                        <TableHead>{cols.profile}</TableHead>
+                        <TableHead>{cols.version}</TableHead>
+                        <TableHead>{cols.released}</TableHead>
+                        <TableHead>{cols.deployment}</TableHead>
+                        <TableHead>{cols.size}</TableHead>
+                        <TableHead className="pr-5">{cols.download}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* The URL is the identity: a deployment's three update
+                          archives share its id, its form and its version, so
+                          keying on those gave three rows one key and React
+                          reused the wrong nodes when the filters changed. */}
+                      {rows.map(download => ({ download, label: describeFile(words, download, copy.locale) })).map(({ download, label }) => (
+                        <TableRow key={download.href}>
+                          <TableCell className="px-5 text-[15px]" title={label.description}>
+                            {label.category}
+                            {label.detail && (
+                              <span className="ml-1.5 font-mono text-[13px] text-muted-foreground">
+                                {label.detail}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-mono text-[13px]" title={productNote(words, board, download.profile, copy.locale)}>
+                            {download.profile}
+                            {productOf(words, board, download.profile)?.recommended && (
+                              <span className="ml-1.5 rounded border border-border px-1.5 py-0.5 font-sans text-[11px] text-brand-strong">
+                                {copy.download.recommended}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-mono text-[13px]">{download.version}</TableCell>
+                          <TableCell className="font-mono text-[13px] text-muted-foreground">
+                            {download.releasedAt}
+                          </TableCell>
+                          {/* A deployment identity is 64 hex characters; in full it
+                              pushes the download link out of the viewport. The row
+                              shows enough to recognise it and carries the whole
+                              value for anyone who needs to compare it. */}
+                          <TableCell
+                            className="font-mono text-[13px] text-muted-foreground"
+                            title={download.deploymentId}
+                          >
+                            {shortId(download.deploymentId)}
+                          </TableCell>
+                          <TableCell className="font-mono text-[13px] text-muted-foreground tabular-nums">
+                            {formatBytes(download.bytes)}
+                          </TableCell>
+                          <TableCell className="pr-5 font-mono text-[13px]">
+                            <a href={download.href}>{download.filename}</a>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </Card>
+
+              {(earlier > 0 || history || (!earlierRows && histories.length > 0)) && (
+                <Button
+                  variant="secondary"
+                  className="mt-4"
+                  disabled={reading}
+                  onClick={() => void toggleHistory()}
+                >
+                  {reading
+                    ? copy.download.loading
+                    : history
+                      ? copy.download.historyHide
+                      : earlier > 0 ? `${copy.download.history} (${earlier})` : copy.download.history}
+                </Button>
+              )}
+            </>
+          )}
+    </div>
+  )
+}

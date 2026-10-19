@@ -1,0 +1,30 @@
+# Claims these documents make about ANOTHER repository's standing state, and
+# the artefact that settles each one. Checked by tools/docs/verify-world.sh,
+# which needs the network; `make docs-verify` stays offline and does not read
+# this.
+#
+# A row is: claim<TAB>kind<TAB>locator<TAB>expected<TAB>stated in
+#   line        the expected literal must be a line of <repo>:<path> at main
+#   no-line     it must not be
+#   newest-tag  the greatest tag of <repo> matching <locator prefix>[./] must
+#               match the expected ERE
+#   no-path     the locator's PARENT DIRECTORY must not list its basename;
+#               the expected column is the literal `absent`. The parent is
+#               listed rather than the path probed because a probe answers
+#               "not found" both for an absent file and for a reader that
+#               never arrived, and a directory that answers proves the reach.
+#
+# ONLY STANDING CLAIMS BELONG HERE: a claim that is true of the world until it
+# moves. A dated measurement is true of a moment and is not re-checked.
+#
+# Completeness is unchecked: the rows are compared against the world, and
+# nothing compares the documents against this file. A standing claim about
+# another repository's state gets a row when it is written; a claim about its
+# behaviour cannot be a row, and is cited to the repository that owns it.
+release-target.uefi-x64	line	micaoss/mica-build:boards/uefi-x64/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+release-target.uefi-arm64	line	micaoss/mica-build:boards/uefi-arm64/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+release-target.cx3576	line	micaoss/mica-build:boards/cx3576/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+release-target.s905x5m	line	micaoss/mica-build:boards/s905x5m/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+release-target.qemu-armhf	line	micaoss/mica-build:boards/qemu-armhf/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+release-target.mini-x64	line	micaoss/mica-build:boards/mini-x64/board.env	BOARD_RELEASE_TARGET=1	docs/hardware/README.md
+console-policy-in-mica-systemd	line	micaoss/mica-system-base:debs/mica-systemd/payload/etc/systemd/logind.conf.d/50-mica-console.conf	NAutoVTs=0	docs/integrate/display.md

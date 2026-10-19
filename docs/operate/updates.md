@@ -1,0 +1,263 @@
+# Updates and rollback
+
+How a device takes a new release, what it keeps to fall back on, and every
+refusal an operator can meet on the way. The contract behind this page is
+[updates](../reference/updates.md); the formats are `mica-core`'s
+(`mica-core:docs/mica-core.md` section 6).
+
+**How much of this has been run.** The producing side is exercised by every
+release, and the device side under QEMU by the lifecycle suite and by
+`mica-core`'s contract and fault tests. A core set's trial runs in that suite
+on UEFI products (`mica-build:tests/suites/lifecycle-uefi/core-sets.sh`): it
+runs to the end on the OpenRC product and not yet on the systemd products,
+where the harness does not read the failed boot's verdict. No full cycle (import, install,
+reboot, automatic confirmation, rollback) is on record for physical hardware;
+see the [support tiers](../hardware/README.md#current-boards).
+
+> status: unsupported
+
+## 1. What an update is
+
+A release of a product is one signed **deployment**: a kernel with its support
+image, and a root filesystem. The device stages a new deployment while the
+current one runs, boots it on the next reboot, and confirms it only once it has
+proved healthy. It keeps at most two deployments, so one fallback is always
+retained.
+
+The core components (the management daemon with the API, and the web console)
+are in no deployment. They come from the device's **core set**, which is
+released on its own and reaches a device alone or with a system update
+(section 10).
+
+An update never touches the bootloader, platform keys or the data on DATA.
+Firmware is maintained separately and offline ([recovery](recovery.md)).
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `docs/reference/updates.md`
+
+## 2. Which archive applies
+
+A release publishes its deployment as up to three offline archives beside the
+image. All carry the same signed descriptor and differ in the objects they
+bring; what an archive leaves out must already be on the device.
+
+| Kind | File | Carries | Published when |
+|---|---|---|---|
+| `full` | `mica-<product>-<stamp>.micaupd` | everything | always |
+| `root` | `...<stamp>.root.micaupd` | the root filesystem | the kernel is unchanged from the product's previous release |
+| `kernel` | `...<stamp>.kernel.micaupd` | the kernel and its support image | the root is unchanged |
+
+A product's first release, and a release in which both the kernel and the root
+moved, publish `full` only. `full` always applies. The others apply where the
+device already runs what they leave out: compare the release's kernel and root
+identities with `mica-deploy status` or `GET /api/v1/system/info` on the
+device.
+
+Three rules hold for every kind:
+
+- the archive's product must be the device's own (`PRODUCT=` in
+  `/usr/lib/mica/product.conf`, part of the signed root);
+- its generation must be above every generation the device has seen, not only
+  the running one;
+- its signature must verify against the keys in the device's signed kernel.
+
+The newest release of a product is the one to take; how to find it and check
+its digests is [download](../start/download.md). A core set has an archive of
+its own, one per architecture (section 10).
+
+> status: shipped — evidence: `mica-build:README.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`, `docs/reference/updates.md`
+
+## 3. Online updates
+
+A device is configured with an **update root**, a URL ending in `/`. The
+project's is `https://res.micaos.dev/update/`. Under it the device reads the
+manifest naming its product's current release, then that release's document,
+then the signed descriptor, each only when it needs it, and downloads only the
+objects it does not already hold.
+
+Trust comes from the signed descriptor, never from the address: a device takes
+only its own board, architecture and product, only a newer generation, and
+checks every byte against what the descriptor names. A product has no channel
+(a core set has one, section 10) and nothing expires, so a server that
+withholds a release reads as "nothing newer".
+
+The image carries the defaults; `/mica/config/updates.json` on DATA, or the
+System page, may set the source, the policy (`off`, `check`, `auto`), the check
+interval and the maintenance window. No setting can add a signing key.
+
+An integrator who runs their own server serves the same documents from another
+root and points the source at it (`mica-core:docs/mica-core.md` section 6.2).
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/catalog.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `mica-build:README.md`
+
+## 4. Offline updates
+
+Bring the `.micaupd` to the device one of two ways:
+
+- **Upload it.** The System page, or `POST /api/v1/update/import` with the
+  archive as the request body. The answer is 202; poll `GET /api/v1/update`
+  for the outcome. The update policy does not gate an upload: a device whose
+  policy is `off` still takes a file an operator carried to it.
+- **Copy it and import it over SSH.** `mica-deploy import <archive>`. The file
+  may sit anywhere readable except under `/mica/updates/`, the acquisition
+  workspace, where it would count against its own import's budget.
+
+Either way the archive passes the same checks as an online download and ends
+as a verified deployment waiting to be installed. A core set's archive is
+brought the same two ways, and the import reports which of the two it took.
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-deploy/src/bin/mica-deploy.rs`
+
+## 5. Install, reboot and confirmation
+
+1. **Install** writes the new objects to SYSTEM and, last, the boot entry that
+   makes the deployment a candidate. It never reboots. It needs the new bytes
+   plus the board's reserve on SYSTEM and on the boot partition.
+2. **Reboot** is a separate action, subject to the reboot gate and the
+   maintenance window when the policy is `auto`.
+3. The loader starts the candidate with **three attempts**. A candidate that
+   never comes up is skipped once its attempts are spent, and the retained
+   deployment boots instead.
+4. **Confirmation is automatic.** After boot the health gate checks that the
+   boot settled, that the management daemon answers and that the API answers,
+   then confirms the deployment. A failed gate reboots into the retained
+   deployment.
+
+From the command line the same steps are `mica-deploy install`, `confirm`,
+`status` and `booted`; every command prints one JSON object.
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-system-base:payload/etc/mica/health.conf`
+
+## 6. Rollback
+
+Manual rollback (`POST /api/v1/update/rollback`, `mica-deploy rollback`, or the
+System page) is available when the running deployment is confirmed, no
+candidate is pending and a fallback is retained. It retires the running
+deployment so the fallback boots next; the operator reboots.
+
+Rollback is a boot selection, not a data restore: configuration, databases and
+application data on DATA stay as they are.
+
+A deployment that failed or was rejected is remembered, and the generation
+floor only rises, so a known-bad release is never installed again. A corrected
+release is a new one with a higher generation.
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/micad/src/deployment.rs`
+
+## 7. The refusals
+
+Acquisition and installation check separately and both apply. The messages
+are verbatim.
+
+| Cause | Message |
+|---|---|
+| Wrong product | `deployment targets another product` |
+| Wrong board or architecture | `deployment targets another device` |
+| Boot format wrong for this device | `deployment boot format differs from this device` |
+| Generation not above the highest seen | `deployment generation is not newer` |
+| A candidate already waits for its first boot | `another deployment is pending` |
+| The running deployment is not confirmed yet | `confirm the running deployment before installation` |
+| Already installed, or previously rejected | `deployment is installed or rejected` |
+| A partial archive whose other objects are absent | `deployment objects are incomplete` |
+| The archive carries objects the descriptor does not name | `archive carries more objects than the deployment names` |
+| An object is unlisted, duplicated or the wrong length | `unlisted, duplicate or wrong-sized archive object` |
+| Object bytes do not match their digest | `archive object digest mismatch` |
+| Bytes after the last object | `trailing archive bytes` |
+| Not an update archive | `invalid component archive` |
+| Unknown signing key | `untrusted metadata key` |
+| Bad signature | `metadata signature rejected` |
+| No room in the acquisition workspace | `workspace budget exhausted`, `DATA reserve unavailable` |
+| No room at install time | `insufficient destination space`, `insufficient destination inodes` |
+| Something is mounted in the workspace | `unexpected mount in update workspace` |
+| The source is not an update root | `invalid catalog source URL` |
+| The server went back to an older manifest | `catalog revision rollback` |
+| A core set of another architecture | `set targets another architecture` |
+| A core set's generation is not above the one held | `set generation is not newer` |
+| A core set while a deployment awaits confirmation | `a deployment is on trial; confirm it before a set update` |
+| A core set while another awaits its trial | `another set is pending` |
+| A core set archive whose objects are absent | `set objects are incomplete` |
+| A core set that does not run on this root | `a selected core component does not run on this root's interface level`, `a selected core component's root requirement does not hold`, `a selected core component's need is not selected` |
+
+Over the API a policy refusal is **409** `policy_refused`, a malformed request
+**422** `validation_failed` and a backend refusal **500** `micad_failed`.
+`GET /api/v1/update` reports failures from a closed vocabulary that includes
+`no-newer-release`, `install-refused`, `outside-window` and
+`reboot-gate-closed`.
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-core:crates/mica-deploy/src/acquisition/sets.rs`, `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-core:crates/micad/src/update_codes.rs`
+
+## 8. Traps
+
+- Do not keep an archive, or mount anything, under `/mica/updates/`.
+- Do not install a second update before the running one is confirmed, or
+  while a candidate waits for its first boot.
+- Do not rebuild "the same" release with a lower generation: the device
+  refuses it.
+- Do not edit `/usr/lib/mica/product.conf`, the deployment descriptors or the
+  boot entries by hand; they are read as authenticated state.
+- Do not delete objects under `/mnt/system/` by hand; `mica-deploy gc` removes
+  exactly what no retained deployment references.
+- Do not treat rollback as a data restore.
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/acquisition.rs`, `mica-core:docs/mica-core.md`
+
+## 9. Limits
+
+- No update archive carries a bootloader. Firmware moves only through the
+  offline maintenance route of each board ([recovery](recovery.md),
+  [signing](../security/signing.md)).
+- A rotation of the verity key re-signs the root, so that release ships `full`
+  only.
+- A `dev` product is never released, so it has no update archives.
+
+> status: unsupported
+
+## 10. Core sets and channels
+
+The core components are the same bytes on every product of an architecture
+and change more often than a kernel or a root, so they are released on their
+own and reach a device without a new root.
+
+- **A core set** is the signed list of the core components of one channel and
+  architecture. It is released once, as `core.<channel>.<stamp>`, for every
+  architecture, and taken by every device of that architecture on that
+  channel.
+- **Every device has one.** A factory image carries a seed set, the newest of
+  the `general` channel when the product was built, and its deployment names
+  that set, so a new device boots without a network.
+- **Whether a set runs on a root** is what the two declare: a component may
+  declare the root's interface levels it runs on and the root packages it
+  requires, with their versions; a root states its interface level and the
+  packages it provides. What neither declares is compatible. The device
+  takes the components that match its product's features, and refuses a set
+  whose selection does not run on its root.
+- **The channel** is `general` unless the image or the operator's update
+  settings (`channels.core`) name another. Changing it is an operator action.
+  A generation only rises within a channel.
+- **A core update alone.** A check reads the core line first and offers a
+  newer set that runs on the running root. One that does not is reported as
+  waiting for a system update, and a core line that cannot be read is
+  reported too; either way the check goes on to the system update. A set
+  alone is tried for three boots: one that comes up healthy replaces the set
+  the device ran, one that does not is dropped.
+- **A system update and its core set.** On `general`, a system update takes
+  the newest `general` set that runs on its new root, never older than the
+  one its image carries, and installs the two as one pair: they are on trial
+  together, the deployment's trial is the only one counted, confirmation
+  makes both current, and a failed trial boots the previous deployment with
+  the set it ran. A device on another channel, or already holding a newer set,
+  keeps its set, and the update is refused when that set does not run on the
+  new root.
+- **One update at a time**, a set or a deployment. The policy (`off`,
+  `check`, `auto`), the maintenance window and the reboot gate are the same
+  for both.
+- **No rollback of a confirmed set.** A corrected set is a new one with a
+  higher generation; a retained deployment still boots the set it was
+  confirmed with.
+- **Offline**, a core set is `mica-core.<channel>-<stamp>.<arch>.micaupd`,
+  uploaded or imported like any archive (section 4).
+
+`GET /api/v1/update` reports the sets a device holds and the boots a set on
+trial has left; `mica-deploy status` reports them under `sets.core`. The
+contract is [deployment lifecycle](../reference/updates.md#core-sets).
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/mica-deploy/src/core_set.rs`, `mica-build:src/release/core.ts`
