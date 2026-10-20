@@ -167,7 +167,7 @@ build tree — and every pin is its producer's latest release, moved with
 | `mica-core` | the management plane: the core components `micad` (with `mica-apid`) and `mica-apid-ui`, and the packages `mica-deploy` and `mica-lifecycle` | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
 | `mica-pkgs` | the feature packages a product chooses: `mica-mqtt-broker`, `mica-mqttd`, `mica-sftp-server` and `mica-bled`, the Bluetooth LE service of the phone app; micad only configures and starts them | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
 | `mica-podman` | `mica-podman`, the container engine and its supervisor `mica-containerd`, from pinned upstream source | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
-| `mica-docker` | `mica-docker`, the Docker engine (dockerd, the `docker` and `docker compose` CLIs, containerd, runc), from pinned upstream source; no product takes it yet | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
+| `mica-docker` | `mica-docker`, the Docker engine (dockerd, the `docker` and `docker compose` CLIs, containerd, runc), from pinned upstream source; the engine of `uefi-x64.docker` | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
 | `mica-build` | per board: kernel, device tree, loader, firmware and the board package (`boards/`); and the products `<board>.<variant>`, each released on its own: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
 
 The interfaces between them are files, not directories:

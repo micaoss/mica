@@ -20,6 +20,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 | 功能 | 状态 | 说明 |
 |---|---|---|
 | 容器（Podman） | 随 `uefi-x64.full` 发布 | `BOARD_FEATURES="containers"`；`uefi-x64.basic` 不带引擎 |
+| 容器（Docker） | 随 `uefi-x64.docker` 发布 | 同一特性，`CONTAINER_ENGINE=docker`（[容器](../../integrate/containers.md)第 4 节） |
 | USB 存储 | 内核内建驱动，未在实机验证 | XHCI 与 EHCI 加 `USB_STORAGE`；`USB_UAS` 未开，只支持 UAS 的硬盘盒会退回 bulk-only 或不被驱动 |
 | SATA | 内核内建驱动，未在实机验证 | AHCI 与 `ATA_PIIX` |
 | NVMe | 内核内建驱动，未在实机验证 | — |
@@ -50,7 +51,7 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 获取镜像
 
-产品是 `uefi-x64.basic`（默认）与 `uefi-x64.full`（带容器），各自发布为
+产品是 `uefi-x64.basic`（默认）、`uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker 容器），各自发布为
 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
 校验方法见[获取发布版](../start/download.md)。
 

@@ -22,6 +22,7 @@ automatically in every release run of its products. Status is owned by the
 | Feature | State | Note |
 |---|---|---|
 | Containers (Podman) | ships in `uefi-x64.full` | `BOARD_FEATURES="containers"`; `uefi-x64.basic` leaves the engine out |
+| Containers (Docker) | ships in `uefi-x64.docker` | the same feature with `CONTAINER_ENGINE=docker` ([containers](../integrate/containers.md) section 4) |
 | USB storage | driver built in, unverified on hardware | XHCI and EHCI with `USB_STORAGE`; `USB_UAS` is off, so a UAS-only enclosure falls back to bulk-only transport or is not driven |
 | SATA | driver built in, unverified on hardware | AHCI and `ATA_PIIX` |
 | NVMe | driver built in, unverified on hardware | — |
@@ -55,8 +56,8 @@ as `eth0`.
 
 ## Obtaining an image
 
-The products are `uefi-x64.basic` (the default) and `uefi-x64.full` (with
-containers), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
+The products are `uefi-x64.basic` (the default), `uefi-x64.full` (with
+containers on Podman) and `uefi-x64.docker` (with containers on Docker), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
 image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
 [download](../start/download.md).
 

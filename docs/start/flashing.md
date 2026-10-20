@@ -61,7 +61,7 @@ Then know three things about the write:
 
 | Product | Its release carries | Onto the device | Then |
 |---|---|---|---|
-| `uefi-x64.basic`, `uefi-x64.full` | a disk image, `.img.gz` | write the whole image to a USB stick, SATA disk or NVMe drive (section 3), or boot it under QEMU (section 4) | the machine's firmware starts `EFI/BOOT/BOOTX64.EFI` |
+| `uefi-x64.basic`, `uefi-x64.full`, `uefi-x64.docker` | a disk image, `.img.gz` | write the whole image to a USB stick, SATA disk or NVMe drive (section 3), or boot it under QEMU (section 4) | the machine's firmware starts `EFI/BOOT/BOOTX64.EFI` |
 | `uefi-arm64.basic`, `uefi-arm64.full` | a disk image, `.img.gz` | as `uefi-x64`; under QEMU, section 4.6 | UEFI with ACPI starts `EFI/BOOT/BOOTAA64.EFI` |
 | `mini-x64.basic` | a disk image, `.img.gz` | write the whole image to a SATA, NVMe, SD or eMMC medium (section 3), or boot it under QEMU (section 4); **not from USB**, the kernel has no USB driver | as `uefi-x64` |
 | `qemu-armhf.basic` | a flash image, `.img.gz`, both NOR banks with the boot loader | split into QEMU's two `pflash` drives ([qemu-armhf](../hardware/qemu-armhf.md#flashing)) | U-Boot starts from the first bank |

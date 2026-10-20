@@ -20,7 +20,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 | `mica-core` | core 组件 `micad`（含 `mica-apid`）与控制台 `mica-apid-ui`——启动时叠加在 root 上的 verity 镜像，不换 root 就能更新——以及软件包 `mica-deploy` 与 `mica-lifecycle` |
 | `mica-pkgs` | 产品可选的功能包：MQTT broker 与桥（各自为两种 init 带上自己的服务），以及 SFTP 服务器 |
 | `mica-podman` | 容器引擎包 `mica-podman` 及其监管进程 `mica-containerd`，两种 init 都支持 |
-| `mica-docker` | Docker 引擎包 `mica-docker`，产品可带的另一种容器引擎；目前还没有产品采用 |
+| `mica-docker` | Docker 引擎包 `mica-docker`，产品可带的另一种容器引擎，用在 `uefi-x64.docker` 里 |
 | `mica-build` | 板卡（按板卡：内核、U-Boot、固件、板卡元数据以及板卡包）与组装：组合每个产品的根、给组件签名，并发布镜像和更新归档 |
 | `mica` | 本仓库：设计契约和指南 |
 
@@ -35,6 +35,7 @@ pin 记录，而不是一个分支（[发布锁](../../reference/release-lock.md
 
 ```text
 mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
+               │                  └─▶ mica-docker ─┤
                └─▶ mica-core ─────────────────────┴─▶ mica-build ─▶ <board>.<variant>.<stamp>
 ```
 
@@ -43,7 +44,7 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 - `mica-system-base` 发布基础根以及产品要安装的软件包池，并且每月自动更新（Debian
   快照、上游源码、信任锚），通过后发布。
 - `mica-core` 和 `mica-podman` 把各自的软件包发布进各自的池；`mica-podman` 每周跟进
-  上游最新发布，通过后发布。`mica-docker` 对 Docker 引擎也一样；目前还没有产品采用它。
+  上游最新发布，通过后发布。`mica-docker` 对 Docker 引擎也一样。
 - `mica-build` **一次发布一个产品**，`<board>.<variant>.<YYYYMMDD-HHMM>`，经由它的
   `release.yml`：产品所在板卡的组件与池，以及产品本身，一份压缩磁盘镜像和更新归档。
   没有发布索引；一个产品的最新 release 就是要取的那个。`dev` 产品从不发布。*core 发布*
@@ -85,7 +86,8 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 
 每块板都有 `basic`；`uefi-x64`、`uefi-arm64` 与 `cx3576` 另有 `full` 与 `dev`，
 `s905x5m` 按存储命名产品（`emmc-full`、`sd-full`、`dev`、`emmc-dev`）。
-`uefi-x64.openrc-full` 是跑在 OpenRC 上的 `full`。`mini-x64`（面向 128 MB 闪存）和
+`uefi-x64.openrc-full` 是跑在 OpenRC 上的 `full`，
+`uefi-x64.docker` 是以 Docker 为容器引擎的 `full`。`mini-x64`（面向 128 MB 闪存）和
 `qemu-armhf` 只有 `basic`，运行 OpenRC，带管理面与 SSH；其它每个产品运行 systemd。没有 minimal 产品。
 
 每一块板都是发布目标。**这意味着它的产品会被发布；它不是“这块板能在实机上启动”的

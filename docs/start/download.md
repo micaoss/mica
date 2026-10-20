@@ -27,7 +27,8 @@ Every board is a release target. Its products are `<board>.basic`, the
 default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`, `mini-x64` and
 `qemu-armhf`;
 `<board>.full`, which adds the container engine, on `uefi-x64`, `uefi-arm64`
-and `cx3576`; and `s905x5m.emmc-full` and `s905x5m.sd-full`, that board's
+and `cx3576`; `uefi-x64.docker`, `full` with Docker as its engine; and
+`s905x5m.emmc-full` and `s905x5m.sd-full`, that board's
 container products for its eMMC and for an SD card. **Which of them have a
 release is on the [download page](https://micaos.dev/download/)**; a product
 without one has nothing to download and is built from source
@@ -117,8 +118,8 @@ different places:
 
 The lock is a `mica-lock v1` file naming the release's commit and every input
 that went into it: the board's pool, packages and components, the input
-releases of `mica-build-env`, `mica-system-base`, `mica-core` and
-`mica-podman` with their trust hashes, and the product's signed deployment,
+releases of `mica-build-env`, `mica-system-base`, `mica-core`, `mica-pkgs`,
+`mica-podman` and `mica-docker` with their trust hashes, and the product's signed deployment,
 bundles and assets ([release lock](../reference/release-lock.md) 1.2.2).
 
 A checksum next to a file proves only that the file arrived intact. What makes

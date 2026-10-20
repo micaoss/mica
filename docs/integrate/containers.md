@@ -10,7 +10,8 @@ daemon and takes no part in a container's life, so the same declaration runs
 on either init. On a product whose engine is Docker nothing is declared to
 micad: you run containers with `docker` and `docker compose` (section 4).
 
-The engine is in the `<board>.full` products (`mica-build:boards/products.md`).
+The engine is in the `<board>.full` products, podman, and in `uefi-x64.docker`,
+Docker (`mica-build:boards/products.md`).
 It is off until you switch it on.
 
 > status: shipped — evidence: `mica-podman:README.md`, `mica-core:docs/mica-core.md`, `mica-core:crates/micad-settings/src/model/containers.rs`
@@ -34,7 +35,7 @@ out.
   `docker compose` CLIs. There is no `mica-containerd` and no declaration:
   micad switches dockerd on and off and reads and acts on its containers
   through the Docker Engine API, and dockerd runs what you create with
-  `docker` and `docker compose`. No product carries the Docker engine yet.
+  `docker` and `docker compose`. `uefi-x64.docker` carries it.
 
 Container storage and network state live on DATA under `/mica/containers`.
 
@@ -144,7 +145,9 @@ and declares nothing.
   (the OpenRC script `docker`) and waits for dockerd to answer; turned off, it
   stops and disables the service. dockerd runs with `live-restore` off, so
   stopping it stops its containers, and the next start applies their restart
-  policies.
+  policies. The package turns IP forwarding on at boot
+  (`/usr/lib/sysctl.d/50-mica-docker.conf`), which dockerd's nftables backend
+  does not do itself.
 - **Containers are made with `docker` and `docker compose`** on the device.
   Restart, start at boot and health are dockerd's, from each container's
   restart policy and health check: a container with no restart policy does not
@@ -157,7 +160,7 @@ and declares nothing.
   `check`: they say to use docker compose. The console lists and acts on
   containers but has no add or edit.
 
-> status: proposed — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad/src/docker.rs`, `mica-docker:README.md`
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad/src/docker.rs`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`
 
 ## 5. Data and updates
 

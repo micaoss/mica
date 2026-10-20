@@ -21,7 +21,7 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 ## 1. 有哪些东西可下载
 
 每块板都是发布目标。它的产品有：`uefi-x64`、`uefi-arm64`、`cx3576`、`s905x5m`、
-`mini-x64` 与 `qemu-armhf` 上默认的 `<board>.basic`；`uefi-x64`、`uefi-arm64` 与 `cx3576` 上带容器引擎的 `<board>.full`；以及
+`mini-x64` 与 `qemu-armhf` 上默认的 `<board>.basic`；`uefi-x64`、`uefi-arm64` 与 `cx3576` 上带容器引擎的 `<board>.full`；以 Docker 为引擎的 `uefi-x64.docker`；以及
 `s905x5m.emmc-full` 与 `s905x5m.sd-full`，该板分别用于 eMMC 和 SD 卡的带容器产品。**其中哪些有发布，见
 [下载页](https://micaos.dev/download/)**；没有发布的产品没有可下载的东西，需要从源码构建
 （[构建指南](../start/build.md)）。`dev` 产品只在本地
@@ -102,7 +102,7 @@ awk -F'\t' '$1 == "asset" && $5 == "mica-'"$PRODUCT-$STAMP"'.img.gz" {print $6 "
 ## 5. lock 讲了这个发布的什么
 
 lock 是一份 `mica-lock v1` 文件，写明发布的提交，以及进入它的每一项输入：板卡的池、
-软件包与组件，`mica-build-env`、`mica-system-base`、`mica-core` 与 `mica-podman` 的
+软件包与组件，`mica-build-env`、`mica-system-base`、`mica-core`、`mica-pkgs`、`mica-podman` 与 `mica-docker` 的
 输入发布及其信任哈希，以及产品的签名部署、bundle 与资产
 （[发布锁](../../reference/release-lock.md) 1.2.2）。
 

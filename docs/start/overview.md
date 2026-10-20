@@ -24,7 +24,7 @@ from source with [build](build.md), an image reaches a board through
 | `mica-core` | the core components `micad` (with `mica-apid`) and the console `mica-apid-ui` — verity images composed over the root at boot, so they update without a new root — and the packages `mica-deploy` and `mica-lifecycle` |
 | `mica-pkgs` | the feature packages a product chooses: the MQTT broker and bridge, each with its services for both inits, and the SFTP server |
 | `mica-podman` | the container engine package `mica-podman`, with its supervisor `mica-containerd`, on either init |
-| `mica-docker` | the Docker engine package `mica-docker`, the other container engine a product may carry; no product takes it yet |
+| `mica-docker` | the Docker engine package `mica-docker`, the other container engine a product may carry, in `uefi-x64.docker` |
 | `mica-build` | the boards (per board: the kernel, U-Boot, firmware, board metadata and the board package) and the assembly: it composes each product's root, signs the components, and publishes the images and the update archives |
 | `mica` | this repository: the design contracts and the guides |
 
@@ -40,6 +40,7 @@ latest release: `bin/mica-tools locks update` moves them all, and
 
 ```text
 mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
+               │                  └─▶ mica-docker ─┤
                └─▶ mica-core ─────────────────────┴─▶ mica-build ─▶ <board>.<variant>.<stamp>
 ```
 
@@ -50,8 +51,7 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
   upstream sources, the trust anchors), releasing when green.
 - `mica-core` and `mica-podman` publish their packages into their own pools;
   `mica-podman` moves to upstream's latest release weekly and releases when
-  green. `mica-docker` does the same for the Docker engine; no product takes
-  it yet.
+  green. `mica-docker` does the same for the Docker engine.
 - `mica-build` releases **one product at a time**,
   `<board>.<variant>.<YYYYMMDD-HHMM>`, through its `release.yml`: the
   product's board components and pool, and the product itself, a compressed
@@ -101,7 +101,8 @@ A product is `<board>.<variant>` (`mica-build:boards/products.md`):
 
 Every board has `basic`; `uefi-x64`, `uefi-arm64` and `cx3576` also have
 `full` and `dev`, and `s905x5m` names its products by storage (`emmc-full`,
-`sd-full`, `dev`, `emmc-dev`). `uefi-x64.openrc-full` is `full` on OpenRC.
+`sd-full`, `dev`, `emmc-dev`). `uefi-x64.openrc-full` is `full` on OpenRC, and
+`uefi-x64.docker` is `full` with Docker as its container engine.
 `mini-x64`, sized for 128 MB of flash, and `qemu-armhf` have `basic` alone,
 which runs OpenRC with the management plane and SSH; every other product runs
 systemd.

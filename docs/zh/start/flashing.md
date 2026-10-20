@@ -52,7 +52,7 @@ sha256sum disk.img                                   # 与层注解 mica.uncompr
 
 | 产品 | 发布里带什么 | 怎么进入设备 | 然后 |
 |---|---|---|---|
-| `uefi-x64.basic`、`uefi-x64.full` | 磁盘镜像 `.img.gz` | 把整个镜像写入 U 盘、SATA 硬盘或 NVMe（第 3 节），或在 QEMU 里启动（第 4 节） | 机器的固件启动 `EFI/BOOT/BOOTX64.EFI` |
+| `uefi-x64.basic`、`uefi-x64.full`、`uefi-x64.docker` | 磁盘镜像 `.img.gz` | 把整个镜像写入 U 盘、SATA 硬盘或 NVMe（第 3 节），或在 QEMU 里启动（第 4 节） | 机器的固件启动 `EFI/BOOT/BOOTX64.EFI` |
 | `uefi-arm64.basic`、`uefi-arm64.full` | 磁盘镜像 `.img.gz` | 同 `uefi-x64`；QEMU 见第 4.6 节 | 带 ACPI 的 UEFI 启动 `EFI/BOOT/BOOTAA64.EFI` |
 | `mini-x64.basic` | 磁盘镜像 `.img.gz` | 把整个镜像写入 SATA、NVMe、SD 或 eMMC 介质（第 3 节），或在 QEMU 里启动（第 4 节）；**不能从 USB 启动**，内核没有 USB 驱动 | 同 `uefi-x64` |
 | `qemu-armhf.basic` | 闪存镜像 `.img.gz`，两块 NOR 连同引导加载器 | 拆成 QEMU 的两个 `pflash` 驱动器（[qemu-armhf](../hardware/qemu-armhf.md#刷机)） | U-Boot 从第一块闪存启动 |
