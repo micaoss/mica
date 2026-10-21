@@ -13,6 +13,12 @@ on:
       - '.github/workflows/website.yml'
   # Publishing is deliberately manual: run this workflow from the Actions tab.
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'site (micaos.dev) or setup (the provisioning page, wrangler.setup.jsonc)'
+        type: choice
+        options: [site, setup]
+        default: site
 
 jobs:
   checks:
@@ -32,9 +38,10 @@ jobs:
       - run: bun run test
       # The build reads ../docs, so a documentation change rebuilds the site.
       - run: bun run build
+      - run: bun run build:setup
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'site'
     needs: [checks]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
@@ -56,3 +63,26 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: website
+
+  deploy-setup:
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'setup'
+    needs: [checks]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+        working-directory: website
+      - run: bun run build:setup
+        working-directory: website
+      - name: Upload to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: deploy --config wrangler.setup.jsonc

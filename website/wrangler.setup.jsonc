@@ -1,0 +1,13 @@
+{
+  // The provisioning page (setup/): static assets only, no Worker code, on
+  // its own hostname. Built by `bun run build:setup` into ./dist-setup.
+  "name": "micaos-setup",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "./dist-setup"
+  },
+  // The host is SETUP_HOST in setup/src/config.ts; a test holds them together.
+  "routes": [
+    { "pattern": "setup-test.micaos.dev", "custom_domain": true }
+  ]
+}

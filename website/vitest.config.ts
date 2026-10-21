@@ -5,7 +5,7 @@ export default getViteConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'worker/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'worker/**/*.test.ts', 'setup/**/*.test.{ts,tsx}'],
     coverage: {
       provider: 'istanbul',
       include: ['src/**/*.{ts,tsx}', 'worker/**/*.ts'],

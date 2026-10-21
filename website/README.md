@@ -153,6 +153,25 @@ While `CATALOG_DEMO=1` the endpoint answers a sample catalogue that declares `"s
 which the page renders behind a banner saying so. It exercises the filters and the history
 control; it is not a release and must not be presented as one.
 
+## The provisioning page
+
+`setup/` is a separate static PWA: the phone's side of BLE provisioning
+(`mica-core:docs/ble-provisioning.md`, protocol 1), served on its own host,
+`SETUP_HOST` in `setup/src/config.ts` (now `setup-test.micaos.dev`). Web Bluetooth
+talks to the device; X25519 and SPAKE2+ (RFC 9383, P-256) use `@noble/curves`, pinned,
+for point arithmetic and WebCrypto for the rest. A service worker precaches the build,
+so the page works offline once opened.
+
+```bash
+bun run build:setup  # into dist-setup/
+bun run dev:setup    # /mock.html runs the page against a mock device in the browser
+```
+
+The tests check the crypto against the RFC 9383 vector and the protocol document's
+vectors, and run every flow over a mocked GATT against a mock device whose SPAKE2+ side
+is the mica-core reference (`setup/test/reference/`, vendored). It deploys apart from the
+site: run the website workflow with target `setup`, which publishes `wrangler.setup.jsonc`.
+
 ## Adding a board
 
 Nothing in this repository. An admin lists the board in the resource service's console
@@ -176,6 +195,7 @@ src/
     i18n/           the zh and en dictionaries
   styles/global.css palette, Tailwind theme tokens, Starlight token mapping
 scripts/            docs prepare, dev server
+setup/              the provisioning page (its own Vite build and deploy)
 ```
 
 ## Stack

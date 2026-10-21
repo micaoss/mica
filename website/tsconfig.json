@@ -23,6 +23,7 @@
   ],
   "exclude": [
     "dist",
+    "dist-setup",
     "node_modules",
     ".mica-docs",
     "design",

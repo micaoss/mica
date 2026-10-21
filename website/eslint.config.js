@@ -13,6 +13,9 @@ export default antfu(
       // A checkout of micaoss/mica, and the copies prepare-docs generates from it.
       '.mica-docs/**',
       'src/content/docs/**',
+      'dist-setup/**',
+      // The mica-core reference, vendored as a test oracle: kept as upstream wrote it.
+      'setup/test/reference/**',
     ],
   },
   {

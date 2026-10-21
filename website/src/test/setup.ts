@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest'
 
 // jsdom does not implement matchMedia; ThemeProvider reads the OS colour scheme
 // through it.
-if (!window.matchMedia) {
+if (typeof window !== 'undefined' && !window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,

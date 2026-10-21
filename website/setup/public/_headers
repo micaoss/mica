@@ -1,0 +1,10 @@
+# Cloudflare static assets: the service worker is always revalidated, so a
+# deploy reaches a phone the next time the page is opened online.
+/sw.js
+  Cache-Control: no-cache
+
+# The page fetches nothing: it only links to the device's http:// address.
+/*
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
