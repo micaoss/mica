@@ -150,6 +150,14 @@ describe('the provisioning page', () => {
     expect(mock.commands.some(c => c.op === 'claim')).toBe(false)
   })
 
+  it('a wrong password shows the attempts left when the device sends them', async () => {
+    const { user } = setup({ claimed: true, auth: 'password', secret: 'harbour-pw-1', attemptsInShare: true })
+    await user.click(screen.getByRole('button', { name: '连接设备' }))
+    await user.type(await screen.findByLabelText('管理员密码'), 'wrong-pw-1')
+    await user.click(screen.getByRole('button', { name: '验证' }))
+    expect(await find('密码错误，还可尝试 4 次')).toBeInTheDocument()
+  })
+
   it('a temp-code window shows the code field and the remaining attempts', async () => {
     const { user } = setup({ claimed: true, auth: 'temp-code', secret: '40718263' })
     await user.click(screen.getByRole('button', { name: '连接设备' }))

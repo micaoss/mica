@@ -134,9 +134,12 @@ export class ProvisioningClient {
       if (typeof params.iterations !== 'number')
         throw new ProtocolError('params without iterations')
       let confirmP: Bytes, derive: () => Promise<SessionKeys>
+      // Optional in `share`: the attempts left once this one is counted.
+      let attemptsLeft: number | undefined
       try {
         ({ confirmP, keys: derive } = await spakeExchange(auth, secret, this.b64(params.salt), params.iterations, async (shareP) => {
           const m = await this.session({ t: 'share', shareP: toBase64(shareP) }, 'share')
+          attemptsLeft = typeof m.attemptsLeft === 'number' ? m.attemptsLeft : undefined
           return { shareV: this.b64(m.shareV), confirmV: this.b64(m.confirmV) }
         }))
       }
@@ -144,7 +147,7 @@ export class ProvisioningClient {
         // A wrong password shows as a confirmation that does not match; the
         // device has counted the attempt, and the page sends nothing more.
         if (e instanceof ConfirmationError)
-          throw new SessionError('auth_failed')
+          throw new SessionError('auth_failed', attemptsLeft)
         throw e
       }
       await this.session({ t: 'confirm', confirmP: toBase64(confirmP) }, 'ready')

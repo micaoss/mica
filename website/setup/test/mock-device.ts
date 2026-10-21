@@ -62,6 +62,8 @@ export interface MockOptions {
   generatedApPsk?: string
   /** How long setWifi takes, in ms. */
   connectDelay?: number
+  /** The `share` message carries the optional `attemptsLeft`. */
+  attemptsInShare?: boolean
 }
 
 const enc = new TextEncoder()
@@ -191,6 +193,7 @@ export class MockDevice {
       busy: false,
       generatedApPsk: 'harbour-ap-key-7f3a',
       connectDelay: 5,
+      attemptsInShare: false,
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -309,7 +312,8 @@ export class MockDevice {
       }
       this.attemptsLeft--
       this.spakeState = { confirmP: r.confirmP, Kshared: r.Kshared }
-      return this.sendSession({ t: 'share', shareV: b64(r.shareV), confirmV: b64(r.confirmV) })
+      const count = this.o.attemptsInShare ? { attemptsLeft: this.attemptsLeft } : {}
+      return this.sendSession({ t: 'share', shareV: b64(r.shareV), confirmV: b64(r.confirmV), ...count })
     }
     if (m.t === 'confirm' && this.spakeState) {
       const ok = b64(this.spakeState.confirmP) === m.confirmP

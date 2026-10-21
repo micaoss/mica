@@ -80,6 +80,11 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     expect(mock.attemptsLeft).toBe(5)
   })
 
+  it('reports the attempts left when the share message carries them', async () => {
+    const { client } = await open({ claimed: true, auth: 'password', secret: 'harbour-pw-1', attemptsInShare: true })
+    await expect(client.authenticate('password', 'wrong-pw')).rejects.toMatchObject({ reason: 'auth_failed', attemptsLeft: 4 })
+  })
+
   it('reports a lockout with its retry time', async () => {
     const { client } = await open({ claimed: true, auth: 'password', secret: 'pw-123456', attemptsLeft: 0 })
     const e = await client.authenticate('password', 'pw-123456').catch(err => err)
