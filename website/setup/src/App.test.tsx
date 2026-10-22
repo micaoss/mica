@@ -10,7 +10,7 @@ import { referenceVerifier } from '../test/reference-verifier'
 import { App } from './App'
 import { SETUP_HOST } from './config'
 import { detectLang } from './i18n'
-import { isIos, mergeNetworks } from './util'
+import { httpsRedirect, isIos, mergeNetworks } from './util'
 
 const ROUTERS = { Harbour: { psk: 'harbour-wifi-1', ip: '192.168.8.41' } }
 const NETWORKS = [
@@ -225,6 +225,13 @@ describe('helpers', () => {
     expect(isIos('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 5)).toBe(true)
     expect(isIos('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0)).toBe(false)
     expect(isIos('Mozilla/5.0 (Linux; Android 15)', 5)).toBe(false)
+  })
+
+  it('sends plain http on the page\'s host to https, where Web Bluetooth exists', () => {
+    expect(httpsRedirect({ protocol: 'http:', hostname: SETUP_HOST, href: `http://${SETUP_HOST}/?lang=en` }))
+      .toBe(`https://${SETUP_HOST}/?lang=en`)
+    expect(httpsRedirect({ protocol: 'https:', hostname: SETUP_HOST, href: `https://${SETUP_HOST}/` })).toBeNull()
+    expect(httpsRedirect({ protocol: 'http:', hostname: '127.0.0.1', href: 'http://127.0.0.1:5199/' })).toBeNull()
   })
 
   it('picks the language from ?lang, then the browser', () => {

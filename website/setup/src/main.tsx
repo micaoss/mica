@@ -3,8 +3,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { detectLang } from './i18n'
-import { isIos } from './util'
+import { httpsRedirect, isIos } from './util'
 import './styles.css'
+
+const secure = httpsRedirect(location)
+if (secure)
+  location.replace(secure)
 
 const lang = detectLang(navigator.languages, location.search)
 document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
