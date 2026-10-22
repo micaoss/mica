@@ -10,8 +10,8 @@ defines the backend contract.
 | Area | Purpose |
 |---|---|
 | Overview | Device identity, health and bounded runtime summaries |
-| Network | Configured interfaces, observed links and supported interface settings |
-| Services | MQTT, containers and other exposed service settings |
+| Network | Overview, interfaces, Wi-Fi (station and access point), DNS, WireGuard (systemd products) and Bluetooth with its pairing window and BLE provisioning; Wi-Fi and Bluetooth show only on a product that has them |
+| Services | MQTT, containers, other exposed service settings, and the user's own services (`services.units`) |
 | Applications | Application availability and the supported delivery boundary |
 | Access | Operator credentials, SSH and authentication settings |
 | System | Signed deployments, firmware publication, storage, diagnostics and power |

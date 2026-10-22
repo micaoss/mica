@@ -31,16 +31,42 @@ has to fit.
 
 > status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
+### The device code and the label
+
+One thing about a unit *is* known before its first boot: its **device code**,
+eleven characters printed `DFN4-L34C-T8N`, computed from a hardware value the
+board declares — the eMMC chip identifier on cx3576 and s905x5m, the DMI serial
+on uefi-x64 and mini-x64. It survives reflashing. On a product with WiFi the
+code also gives the factory access point's name and, under the product's
+secret, its key. A line prints all three on the label:
+
+```sh
+bun src/cli.ts label --secret ap-secret DFN4-L34C-T8N   # in mica-build: code, ssid, psk, qr
+micad device-code                                        # on the device: the code and its source
+```
+
+The product secret is installed in every image of the product as
+`/usr/share/mica/ap-secret`, so it is public along with the images: the
+label's key is a first-contact credential, valid until the unit is claimed,
+not a secret the line has to guard.
+
+> status: board-dependent — evidence: `mica-core:docs/factory-ap-key.md`, `mica-build:boards/products.md`
+
 ## 2. Who creates the first credential
 
-Exactly two channels can create a device's first administrator credential, and
-which one a line uses is the main manufacturing decision on this page:
+Exactly three channels can create a device's first administrator credential,
+and which one a line uses is the main manufacturing decision on this page:
 
 - **Setup at the end customer.** The unit ships unclaimed; the first person to
   reach `/_ui/` chooses the password. The factory never holds a credential.
 - **A provisioning document at the factory.** The password is written into
   `mica-provisioning.toml` on the boot partition or a removable medium and
   applied on the first boot. The factory holds that password.
+- **Bluetooth at the end customer**, on a product with WiFi and Bluetooth: a
+  phone in range during the 10 minutes after a boot of the unclaimed unit sets
+  the password ([../start/first-run.md](../start/first-run.md) section 5).
+  The factory never holds a credential, and the unit is claimable by anyone in
+  range until someone does.
 
 If a line uses the second, three rules follow and none of them is optional:
 
@@ -65,7 +91,7 @@ A document is applied **only while the device has no administrator
 credential**. A unit that has already been claimed cannot be re-provisioned
 from a medium, at the factory or anywhere else.
 
-> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/integrate/provisioning.md`, `mica-core:docs/ble-provisioning.md`
 
 ## 3. What a factory record must contain
 

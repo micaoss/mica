@@ -256,6 +256,23 @@ never replace or mask one of Mica OS's; it starts after micad and never needs
 it. It survives a reboot and an A/B update, and an application-data reset
 clears it (`mica-system-base:docs/floor-and-options.md`).
 
+The management daemon keeps such services as configuration too:
+`services.units.<name>` in `/mica/config/services.json` holds the unit's kind
+(`systemd` or `openrc`), its text, an optional conf file and whether it is
+enabled, and micad reconciles them through `mica-unit`. At most 32 services, a
+text of at most 64 KiB and a conf of at most 16 KiB, 256 KiB in all. They are
+reachable three ways:
+
+- on the device, `micad unit install [--name N] [--conf FILE] [--enable] FILE`,
+  `enable`, `disable`, `remove`, `start`, `stop`, `restart`, `list` and
+  `logs [--tail N]`;
+- the API: `GET /api/v1/units`, `PUT` and `DELETE /api/v1/units/{name}`,
+  `POST /api/v1/units/{name}/start|stop|restart` and
+  `GET /api/v1/units/{name}/logs`;
+- the console's services page, one panel per unit.
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/mica-apid/openapi.json`
+
 It exists, it works, and it is deliberately **not** the supported way to
 deliver a native application.
 

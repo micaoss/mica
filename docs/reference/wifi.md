@@ -21,7 +21,9 @@ There is no separate connectivity daemon. Wi-Fi is carried by:
 The model those parts implement: a declarative list of known networks with
 priorities, an AP with `off` / `provisioning` / `always` modes, one owner for
 the single-radio question, and the rule that **no fleet-wide credential may
-exist**.
+exist** — with one exception, public by design: the factory access-point key
+of an unclaimed device, derived from its device code and the product's secret
+(`mica-core:docs/factory-ap-key.md`).
 
 **This page is Wi-Fi alone.** CAN interfaces are network entries of kind
 `can` and Bluetooth is the `bluetooth` subtree, both micad's
@@ -46,8 +48,9 @@ networks = []          # each: { ssid, psk?, hidden, priority }
 
 [wifi.ap]
 mode = "off"           # off | provisioning | always
+security = "wpa2-psk"  # wpa2-psk | wpa2-wpa3 | open
 interface = "wlan0"
-channel = 6
+channel = 6            # 0 = automatic channel selection
 countryCode = "US"
 address = "192.168.4.1/24"
 holdDownSeconds = 120
@@ -144,9 +147,10 @@ The same three effects, same order:
 rootfs, and the server's lifecycle is the same networkd reload the address
 already needs. The absence of dnsmasq is asserted by both image verifiers.
 
-The AP is **WPA2-PSK and can never be open** — `wpa=2` + `wpa_key_mgmt=WPA-PSK`
-+ `rsn_pairwise=CCMP`, asserted as a set. The settings model cannot express an
-open AP, because this AP carries the path to a device's configuration.
+The AP's security is `wifi.ap.security`: `wpa2-psk` (the default, `wpa=2` +
+`wpa_key_mgmt=WPA-PSK` + `rsn_pairwise=CCMP`), `wpa2-wpa3` (WPA2 and SAE side
+by side), or `open`, which needs no key. An open AP is allowed and the console
+warns about it, because this AP carries the path to a device's configuration.
 `ieee80211d=1` is what makes `country_code` more than a comment; without it
 hostapd carries the code and never advertises the regulatory domain.
 
@@ -161,18 +165,21 @@ the station's, spelled hostapd's way: raw when representable, `ssid2=<hex>`
 otherwise, and the key moves with the encoding because the two are not
 interchangeable spellings of one directive.
 
-**Where the SSID and key come from.** `wifi.ap.ssid` when set, else derived from
-`provisioning.deviceId` as `mica-<first 8 hex>` — the same shape the derived
-hostname uses, so a device advertising `mica-1a2b3c4d` is recognisably the device
-called `mica-1a2b3c4d`. The key is `wifi.ap.psk` when set, else
-`/var/lib/mica/secrets/ap-psk`, the per-device secret minted at first boot. There
-is deliberately **no constant fallback**: a device with no key in either place
-refuses to raise the AP and says why. See §7.
+**Where the SSID and key come from.** `wifi.ap.ssid` when set; else, on a
+device with a device code, `mica-` and four characters derived from the code,
+as printed on the label; else derived from `provisioning.deviceId` as
+`mica-<first 8 hex>`. The key is, in order: `wifi.ap.psk` when set; the key
+derived from the device code and `/usr/share/mica/ap-secret` while the device
+is unclaimed; `/var/lib/mica/secrets/ap-psk`, the per-device secret minted at
+first boot. The claim through setup or Bluetooth sets `wifi.ap.psk`, so the
+label's key stops working at the claim; a factory reset brings it back. There
+is deliberately **no constant fallback**: a device with no key in any place
+refuses to raise the AP and says why. See §7 and `mica-core:docs/factory-ap-key.md`.
 
-`mode: off` renders no configuration at all, unlike the station reconciler. The
-AP's key comes from DATA/state, so on an unprovisioned device there is nothing to
-render — and `off` is the *default*, so rendering unconditionally would make the
-default tree fail on every reconcile.
+`mode: off` renders no configuration at all, unlike the station reconciler.
+`off` is the settings default; on a product with WiFi, first-boot provisioning
+sets `always` and turns the station off, unless the provisioning tree declares
+a network.
 
 ## 5. The single-radio conflict — reported as shipped, not arbitrated
 
@@ -254,9 +261,11 @@ What matters for Wi-Fi specifically:
   key cannot be rendered.
 - the live state publishes `secured: true`, meaning *a key exists*, never what
   it is.
-- no secret enters the image. Every key in a rendered file comes from the
-  settings tree on DATA/state or from `/var/lib/mica/secrets/ap-psk`, both born at
-  runtime.
+- no device secret enters the image. Every key in a rendered file comes from
+  the settings tree on DATA/state, from `/var/lib/mica/secrets/ap-psk`, both
+  born at runtime, or, while the device is unclaimed, from the product secret
+  the image carries — public along with the image, which makes that key a
+  first-contact credential and nothing more.
 
 ## 8. Image integration — Debian's packaging actively fights the reconcilers
 

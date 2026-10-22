@@ -19,9 +19,12 @@ configuration once, atomically, before anything else consumes it:
 - per-device secrets, minted on the device — never baked into the image,
   which is byte-identical across every device of a release;
 - **SSH off**, on both image profiles;
-- **no network configuration** — deliberately. The image ships a static DHCP
-  match for wired `eth*` interfaces, so a fresh device acquires an address on
-  any DHCP network without micad guessing interface names.
+- **no wired network configuration** — deliberately. The image ships a static
+  DHCP match for wired `eth*` interfaces, so a fresh device acquires an address
+  on any DHCP network without micad guessing interface names;
+- on a product with WiFi, the **factory access point** on, with the WiFi
+  station off, unless a provisioning document declares a network
+  (section 2).
 
 A durable undo journal covers the DATA configuration documents and DATA identity
 record. A pending rollback must finish before the next startup can consume them
@@ -54,6 +57,22 @@ new identity. No identity is stored in the bootloader's attempt records.
   operator can upload the device's own certificate instead.
 
 > status: shipped — evidence: `mica-core:crates/mica-apid`, `docs/reference/remote.md`
+
+- Over the factory access point, on a product with WiFi (cx3576.full,
+  s905x5m.sd-full, s905x5m.emmc-full): the device's label carries its
+  **device code**, printed `DFN4-L34C-T8N`, the access point's name
+  (`mica-` and four characters) and its key, also as a QR code. Join that
+  network and open `http://192.168.4.1:8080`. The label's key works only
+  while the device is unclaimed: the claim replaces it with a key you choose
+  or one the device generates and shows once (section 4). A factory reset
+  brings the label's key back. `micad device-code` prints the code on the
+  device; nothing on the device prints the key.
+- The label's key is a first-contact credential, not a secret: every image of
+  a product carries the product secret it is derived from, so whoever holds
+  an image and reads a label can compute it
+  ([../security/overview.md](../security/overview.md) section 3).
+
+> status: board-dependent — evidence: `mica-core:docs/factory-ap-key.md`, `mica-build:boards/products.md`
 
 On cx3576 neither Ethernet port has a MAC address in hardware, so the device
 derives one for each of them from the eMMC chip identifier and from where the
@@ -148,7 +167,7 @@ unproven, and a board page is where a run of it gets recorded
 
 **The claim is the unclaimed → claimed transition**, and the one fact that
 decides which side a device is on is whether an administrator credential
-exists. Exactly two channels can create the first one:
+exists. Exactly three channels can create the first one:
 
 1. **Setup** — the first visit to `/_ui/`, or `POST /api/v1/setup` for API
    clients. You choose the administrator password; the route establishes a
@@ -156,6 +175,14 @@ exists. Exactly two channels can create the first one:
    setup call on a claimed device is refused with `already_configured` and
    writes nothing.
 2. **A provisioning document** — section 3. The password came off the medium.
+3. **Bluetooth** — a phone in range of an unclaimed device, section 5. The
+   claim channel reads `ble`.
+
+On a product with WiFi, the claim through setup or Bluetooth also replaces
+the access point's label key: with the key the caller sends, or with sixteen
+random characters the answer carries once and the console shows before it
+enters. A claim by provisioning document sets no key, and the device falls
+back to a key it generated at first boot.
 
 From the claim onward, every management read and write is authenticated. See
 [../operate/api.md](../operate/api.md) for the session and token model and
@@ -199,3 +226,38 @@ before the first sign-in is physical custody of the medium, and nothing else.
   Store the credential accordingly.
 
 > status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `docs/reference/access.md`
+
+## 5. Setting up from a phone over Bluetooth
+
+On a product with WiFi and Bluetooth (cx3576.full, s905x5m.sd-full,
+s905x5m.emmc-full), a phone can give the device the WiFi network to join, and
+claim it if it is unclaimed, without joining its access point. The device
+advertises only while a **provisioning window** is open:
+
+| Window | Opens | Closes | The phone needs |
+|---|---|---|---|
+| unclaimed | every boot of an unclaimed device | 10 minutes after boot, or when the phone finishes | nothing |
+| boot | every boot of a claimed device | 10 minutes after boot, or when the phone finishes | the administrator password |
+| offline | a claimed device that lost its default route for 120 s, while `bluetooth.provisioning.autoWhenOffline` is on (the default) | the route returns, or when the phone finishes | the administrator password |
+| manual | an administrator in the console, for 5, 10 or 30 minutes | its time, the console, or when the phone finishes | the temporary code the console shows |
+
+- The phone side is the web page `https://setup-test.micaos.dev`, in Chrome or
+  Edge on Android or a desktop. iOS browsers have no Web Bluetooth, so the
+  page only explains that there.
+- On an unclaimed device the page sets the administrator password; the claim
+  takes effect when the phone finishes, and the first phone to finish wins.
+  An unclaimed device is therefore claimable by anyone within Bluetooth range
+  for 10 minutes after each boot; claim it promptly, or before it leaves your
+  custody.
+- A password window needs the password's verifier, which the device builds
+  when the administrator signs in to the console; a device nobody has signed
+  in to since it gained the feature answers that it cannot use the password.
+- While a window is open the adapter is powered even if Bluetooth is switched
+  off. Wrong passwords count towards a lockout, during which the device stops
+  advertising.
+
+> status: board-dependent — evidence: `mica-core:docs/ble-provisioning.md`, `mica-core:docs/factory-ap-key.md`, `mica-build:boards/products.md`
+
+**What has never been executed on hardware.** The protocol, the device side
+and the page are covered by tests against each other's reference, and the
+page is deployed; no run on a physical board is recorded yet.

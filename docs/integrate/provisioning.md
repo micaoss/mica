@@ -29,7 +29,7 @@ hostname, a MAC address, the machine id or the clock.
 
 | Secret | Authenticates |
 |---|---|
-| the access-point key | Wi-Fi clients joining the device's own provisioning access point ([Wi-Fi](../reference/wifi.md)) |
+| the access-point key | Wi-Fi clients joining the device's own access point once the device is claimed by document; until the claim, a product with WiFi uses the label's key instead, and a claim through setup or Bluetooth sets a new one ([Wi-Fi](../reference/wifi.md)) |
 | the device password | **nothing today**: it is minted and reserved, and no login path checks it |
 
 The two are independent draws: a Wi-Fi key can be recovered from a captured
@@ -43,22 +43,24 @@ device ([access](../reference/access.md) section 3).
 
 > status: shipped — evidence: `mica-core:crates/micad/src/identity.rs`, `docs/reference/access.md`
 
-## 3. Three ways to configure a device before it has a network
+## 3. Four ways to configure a device before it has a network
 
 | Way | Who | When it is read |
 |---|---|---|
 | **The provisioning document**, a file on the boot partition or on removable media | an operator next to the device, or the factory | at boot, on an unclaimed device |
 | **Writing `/mica/config/` on DATA** before the device runs | an integrator holding the storage medium | at every boot |
 | **A seed carried by the product** | the product's builder | at first boot, as a provisioning document |
+| **Bluetooth from a phone**, on a product with WiFi and Bluetooth | anyone in range of an unclaimed device; the administrator of a claimed one | while a provisioning window is open ([first run](../start/first-run.md) section 5) |
 
 Once any network exists, the API and the console are the way
-([configuration](../operate/configuration.md)). There is no setup wizard, no
-captive portal and no serial wizard.
+([configuration](../operate/configuration.md)); on a product with WiFi, the
+factory access point is that network out of the box. There is no captive
+portal and no serial wizard.
 
 Every way ends in the same place: the typed settings tree and its validators.
 None edits a file behind the management daemon's back.
 
-> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `mica-build:boards/products.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/micad-settings/src/configuration.rs`, `mica-build:boards/products.md`, `mica-core:docs/ble-provisioning.md`
 
 ## 4. The provisioning document
 

@@ -53,12 +53,18 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
   ifupdown 配置段。`can` 条目是一个 CAN 控制器的位速率、bus-off 后的重启与 CAN FD
   模式，不带地址；板卡可以把它的 CAN 接口作为默认值随镜像提供。WireGuard 隧道的
   私钥在设备上生成，永不进入设置树；轮换是一个显式的 API 动作；
+- **dns**——全局 DNS 服务器（开启时取代每个接口自己的服务器）与静态解析记录
+  （设备从自己的 hosts 文件解析）。**没有后备 DNS**：全局服务器关闭时，设备只问
+  接口拿到的服务器，所以路由器不下发 DNS 服务器的现场，什么都解析不了；
 - **wifi.client** 与 **wifi.ap**——WiFi station 和接入点角色，驱动
-  wpa_supplicant 和 hostapd（AP 为配置接入和产品用途而存在；无线电是
-  板卡事实）；
-- **bluetooth**——开关、可发现、名称、配对码与信任列表；蓝牙打开时 micad 启动
-  `mica-bled`，由它通过低功耗蓝牙为手机 app 服务（`mica-pkgs:docs/mica-pkgs.md`
-  第 3.6 节）；
+  wpa_supplicant 和 hostapd。接入点的运行方式为 `off`、无上行时（`provisioning`）
+  或 `always`，加密为 WPA2、WPA2 与 WPA3 并存，或不设密钥。带 WiFi 的产品首次
+  启动时打开接入点、关闭 station，在设备被认领之前，其名称和密钥就是设备标签上
+  印的那组（[首次启动](../start/first-run.md)第 2 节）；无线电是板卡事实；
+- **bluetooth**——开关、信任列表与 `provisioning.autoWhenOffline`（已认领设备
+  失去上行时开启蓝牙配网，[首次启动](../start/first-run.md)第 5 节）。适配器
+  既不可被发现也不可配对：配对新设备要在控制台开启 180 秒的窗口，并在控制台
+  确认数字比对；固定 PIN 会被拒绝；
 - **access.ssh**——SSH 启用、端口、监听地址、授权密钥，以及围绕临时 root
   密码的策略（见 [../security/overview.md](../security/overview.md)）；
 - **container**——控制容器引擎的开关与声明的 Compose 项目
@@ -66,6 +72,9 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
 - **mqtt**——本地 MQTT broker 与应用数据桥
   （[../integrate/applications.md](../integrate/applications.md)）；
 - **time**——时间来源与同步策略（第 5.1 节）；
+- **services.units**——用户自己的 systemd 单元或 OpenRC 脚本，保存在 DATA 上并在
+  这里声明，也可在设备上用 `micad unit` 管理
+  （[原生应用](../../integrate/native-applications.md)第 10 节）；
 - **电源动作与更新动作**——不是设置，但通过同一认证面可达。
 
 **更新设置不在这棵树里。**更新模式、服务器地址、维护窗口和网络模式住在
@@ -77,11 +86,12 @@ UI 的自动更新面板就是驱动它的。
 权威清单是 API 契约，不是这段散文：`mica-core:crates/mica-apid/openapi.json` 接受什么，
 设备就支持什么。
 
-> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `mica-core:crates/micad-settings`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `mica-core:crates/micad-settings`, `mica-core:docs/mica-core.md`
 
-WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；uefi-x64 QEMU 基线没有无线电。
+WiFi 的有无取决于板卡：cx3576 与 s905x5m 的 `full` 产品带 WiFi 和蓝牙；uefi-x64、
+mini-x64 与 qemu-armhf 没有无线电。
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
 
 ## 4. 未建模的设置就是不受支持的设置
 
@@ -129,9 +139,11 @@ WiFi 的有无取决于板卡：cx3576 带 WiFi 和蓝牙；uefi-x64 QEMU 基线
 一份带版本、经过校验的配置文档如今已经存在，并在网络上还没有任何东西监听
 之前就从介质上被应用：固定文件名的一个 TOML 文件、整份文档一起校验、应用一次
 并记录下来，走两条离线传输（[../start/first-run.md](../start/first-run.md)）。它就是为一台从未
-联过网的设备做配置的可重复路径。
+联过网的设备做配置的可重复路径。在带 WiFi 和蓝牙的产品上，手机还可以通过低功耗
+蓝牙把 WiFi 网络发给设备，并在设备未认领时认领它（[首次启动](../start/first-run.md)
+第 5 节）。
 
-> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:docs/ble-provisioning.md`
 
 **没有强制门户、没有屏幕上的设置向导、也没有串口向导**，而且每一条都是需要绕开的缺失，而不是
 在做的工作：AP 强制门户只有传输、没有门户本身；HDMI 本地设置向导只有浏览器

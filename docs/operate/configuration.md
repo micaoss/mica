@@ -68,13 +68,24 @@ The settings tree currently models, per subtree:
   CAN controller's bit rate, bus-off restart and CAN FD mode, with no
   addressing; a board may ship its CAN interfaces as defaults. A WireGuard tunnel's private key is generated on the device and never
   enters the settings tree; rotation is an explicit API action;
+- **dns** — global DNS servers, which replace every interface's own while
+  switched on, and static host records, which the device resolves from its
+  hosts file. There is **no fallback DNS**: with the global servers off, the
+  device asks only the servers its interfaces were given, so a site whose
+  router hands out no DNS server resolves nothing;
 - **wifi.client** and **wifi.ap** — WiFi station and access-point roles,
-  driving wpa_supplicant and hostapd (the AP exists for provisioning and
-  product use; radios are a board fact);
-- **bluetooth** — the switch, discoverability, the name, the pairing code
-  and the trust list; with Bluetooth on, micad starts `mica-bled`, which
-  serves the phone app over Bluetooth LE (`mica-pkgs:docs/mica-pkgs.md`
-  section 3.6);
+  driving wpa_supplicant and hostapd. The access point runs `off`, while no
+  uplink exists (`provisioning`) or `always`, with WPA2, WPA2 and WPA3 side
+  by side, or no key at all. On a product with WiFi, first boot turns it on
+  with the station off, and its name and key are the ones on the device's
+  label until the device is claimed ([first run](../start/first-run.md)
+  section 2); radios are a board fact;
+- **bluetooth** — the switch, the trust list and
+  `provisioning.autoWhenOffline`, which opens Bluetooth provisioning when a
+  claimed device loses its uplink ([first run](../start/first-run.md)
+  section 5). The adapter is neither discoverable nor pairable: pairing a
+  device happens in a 180-second window opened from the console, with a
+  numeric comparison confirmed there, and a fixed PIN is refused;
 - **access.ssh** — SSH enablement, port, listen addresses, authorized keys,
   and the policy around the transient root password
   (see [../security/overview.md](../security/overview.md));
@@ -83,6 +94,9 @@ The settings tree currently models, per subtree:
 - **mqtt** — the local MQTT broker and application-data bridge
   ([../integrate/applications.md](../integrate/applications.md));
 - **time** — the time source and synchronisation policy (section 5.1);
+- **services.units** — the user's own systemd units or OpenRC scripts, kept on
+  DATA and declared here, also from `micad unit` on the device
+  ([native applications](../integrate/native-applications.md) section 10);
 - **power actions and update actions** — not settings, but reachable over the
   same authenticated surface.
 
@@ -97,12 +111,12 @@ and the built-in UI's automatic-updates panel drives it.
 The authoritative list is the API contract, not this prose: what
 `mica-core:crates/mica-apid/openapi.json` accepts is what the device supports.
 
-> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `mica-core:crates/micad-settings`
+> status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`, `mica-core:crates/micad-settings`, `mica-core:docs/mica-core.md`
 
-WiFi presence is board-dependent: the cx3576 carries WiFi and Bluetooth; the
-uefi-x64 QEMU baseline has no radio.
+WiFi presence is board-dependent: cx3576 and s905x5m carry WiFi and Bluetooth
+in their `full` products; uefi-x64, mini-x64 and qemu-armhf have no radio.
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
+> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/s905x5m/board.env`
 
 ## 4. An unmodelled setting is an unsupported setting
 
@@ -158,9 +172,12 @@ A versioned, validated provisioning document now exists and is applied from a
 medium before anything is listening on the network: one TOML file at a fixed
 name, whole-document validation, applied once and recorded, over two offline
 transports ([../start/first-run.md](../start/first-run.md)). It is the repeatable path for
-configuring a device that has never had a network.
+configuring a device that has never had a network. On a product with WiFi
+and Bluetooth, a phone can also send the device its WiFi network over
+Bluetooth LE, and claim it while it is unclaimed ([first run](../start/first-run.md)
+section 5).
 
-> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`
+> status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:docs/ble-provisioning.md`
 
 **There is no captive portal, no on-screen setup wizard and no serial
 wizard**, and each is an absence to plan around: the access point has its

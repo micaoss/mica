@@ -35,6 +35,21 @@ without one has nothing to download and is built from source
 ([build guide](build.md)). A `dev` product is built
 locally and never released; there are no minimal products.
 
+The round of 2026-10-21 released these, all with core 0.0.3 (core set
+`core.general.20261021-2254`):
+
+| Product | Stamp | What it carries |
+|---|---|---|
+| `cx3576.full` | `20261021-2257` | systemd, containers, WiFi and Bluetooth: factory access point, BLE provisioning |
+| `s905x5m.sd-full` | `20261021-2318` | the same, on an SD card |
+| `s905x5m.emmc-full` | `20261021-2335` | the same, on the eMMC |
+| `uefi-x64.full` | `20261021-2316` | systemd, Podman, no radio |
+| `uefi-x64.docker` | `20261021-2338` | systemd, Docker, no radio |
+| `mini-x64.basic` | `20261021-2317` | OpenRC, the management plane and SSH, no console |
+| `qemu-armhf.basic` | `20261021-2319` | OpenRC, the management plane and SSH, no console |
+
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
+
 **A published image is not a booted image.** The `cx3576` and `s905x5m`
 products are started by nothing automatic, because no suite boots a product's FIT image
 ([board status](../hardware/README.md#current-boards)). Every amd64

@@ -27,6 +27,21 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 （[构建指南](../start/build.md)）。`dev` 产品只在本地
 构建、从不发布；没有 minimal 产品。
 
+2026-10-21 这一轮发布了下列产品，全部带 core 0.0.3（core 集
+`core.general.20261021-2254`）：
+
+| 产品 | 时间戳 | 内容 |
+|---|---|---|
+| `cx3576.full` | `20261021-2257` | systemd、容器、WiFi 与蓝牙：出厂接入点、BLE 配网 |
+| `s905x5m.sd-full` | `20261021-2318` | 同上，用于 SD 卡 |
+| `s905x5m.emmc-full` | `20261021-2335` | 同上，用于 eMMC |
+| `uefi-x64.full` | `20261021-2316` | systemd、Podman，无无线电 |
+| `uefi-x64.docker` | `20261021-2338` | systemd、Docker，无无线电 |
+| `mini-x64.basic` | `20261021-2317` | OpenRC、管理平面与 SSH，无控制台 |
+| `qemu-armhf.basic` | `20261021-2319` | OpenRC、管理平面与 SSH，无控制台 |
+
+> status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
+
 **发布了的镜像不等于被启动过的镜像。**`cx3576` 与 `s905x5m` 的产品没有任何自动流程会
 启动它们，因为没有任何套件会启动产品的 FIT 镜像（[板卡状态](../hardware/README.md#当前板卡)）。
 每个 amd64

@@ -24,15 +24,35 @@ CSPRNG 抽出 32 个十六进制字符的 `deviceId`，从中派生 `mica-xxxxxx
 
 > status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-seed-state`, `docs/integrate/provisioning.md`
 
+### 设备码与标签
+
+单元在首次启动之前确实有一样东西是已知的：它的**设备码**，十一个字符，印作
+`DFN4-L34C-T8N`，由板卡声明的硬件值算出——cx3576 和 s905x5m 上是 eMMC 芯片标识，
+uefi-x64 和 mini-x64 上是 DMI 序列号。它在重新烧录后保持不变。在带 WiFi 的产品上，
+设备码还给出出厂接入点的名称，并在产品密钥下给出它的密钥。产线把三者都印在标签上：
+
+```sh
+bun src/cli.ts label --secret ap-secret DFN4-L34C-T8N   # 在 mica-build 中：code、ssid、psk、qr
+micad device-code                                        # 在设备上：设备码及其来源
+```
+
+产品密钥以 `/usr/share/mica/ap-secret` 装在该产品的每个镜像里，因此它随镜像一起
+是公开的：标签上的密钥是首次接触凭据，在单元被认领前有效，不是产线需要守护的秘密。
+
+> status: board-dependent — evidence: `mica-core:docs/factory-ap-key.md`, `mica-build:boards/products.md`
+
 ## 2. 谁创建第一个凭据
 
-能创建设备第一个管理员凭据的通道正好两条，产线用哪一条是本页最主要的制造
+能创建设备第一个管理员凭据的通道正好三条，产线用哪一条是本页最主要的制造
 决策：
 
 - **在最终客户处 setup。**单元以未认领状态出货；第一个访问 `/_ui/` 的人
   选定密码。工厂从不持有凭据。
 - **在工厂用配置文档。**密码被写进引导分区或可移动介质上的
   `mica-provisioning.toml`，在首次启动时应用。工厂持有那个密码。
+- **在最终客户处用蓝牙**，限带 WiFi 和蓝牙的产品：未认领单元每次启动后 10 分钟
+  内，范围内的手机设置密码（[../start/first-run.md](../start/first-run.md) 第 5 节）。
+  工厂从不持有凭据，而在有人认领之前，范围内的任何人都能认领它。
 
 如果产线走第二条，随之而来三条规则，一条都不可选：
 
@@ -50,7 +70,7 @@ CSPRNG 抽出 32 个十六进制字符的 `deviceId`，从中派生 `mica-xxxxxx
 配置文档**只在设备还没有管理员凭据时**才被应用。已经被认领的单元不能用
 介质重新配置——在工厂也不行。
 
-> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/integrate/provisioning.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `docs/integrate/provisioning.md`, `mica-core:docs/ble-provisioning.md`
 
 ## 3. 一份工厂记录必须包含什么
 
