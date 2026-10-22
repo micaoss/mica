@@ -97,6 +97,10 @@ export class ProvisioningClient {
   }
 
   private eventChain = Promise.resolve()
+  // Set while a session is being authenticated: events (the `status` that follows `ready`) wait
+  // for the keys instead of failing.
+  private opening?: Promise<void>
+  private statusWaiter?: { resolve: (e: DeviceEvent) => void, reject: (e: Error) => void }
 
   private readonly t: Transport
 
@@ -121,16 +125,38 @@ export class ProvisioningClient {
     return info
   }
 
-  /** Runs the exchange `auth` names; `secret` is the password or temp-code. */
-  async authenticate(auth: 'none' | SpakeMode, secret = ''): Promise<void> {
+  /**
+   * Runs the exchange `auth` names; `secret` is the password or temp-code. Resolves with the
+   * `status` event the device sends after `ready` when it honours `"status": true`, else undefined.
+   */
+  async authenticate(auth: 'none' | SpakeMode, secret = ''): Promise<DeviceEvent | undefined> {
+    let opened = () => {}
+    this.opening = new Promise<void>((resolve) => {
+      opened = resolve
+    })
+    try {
+      return await this.exchange(auth, secret, opened)
+    }
+    finally {
+      opened()
+      this.opening = undefined
+    }
+  }
+
+  private async exchange(auth: 'none' | SpakeMode, secret: string, opened: () => void): Promise<DeviceEvent | undefined> {
     let keys: SessionKeys
+    let ready: SessionMessage
+    const status = new Promise<DeviceEvent>((resolve, reject) => {
+      this.statusWaiter = { resolve, reject }
+    })
+    status.catch(() => {})
     if (auth === 'none') {
       const x = x25519Start()
-      const ready = await this.session({ t: 'start', auth: 'none', pub: toBase64(x.pub) }, 'ready')
+      ready = await this.session({ t: 'start', auth: 'none', pub: toBase64(x.pub), status: true }, 'ready')
       keys = await x.finish(this.b64(ready.pub))
     }
     else {
-      const params = await this.session({ t: 'start', auth }, 'params')
+      const params = await this.session({ t: 'start', auth, status: true }, 'params')
       if (typeof params.iterations !== 'number')
         throw new ProtocolError('params without iterations')
       let confirmP: Bytes, derive: () => Promise<SessionKeys>
@@ -150,11 +176,17 @@ export class ProvisioningClient {
           throw new SessionError('auth_failed', attemptsLeft)
         throw e
       }
-      await this.session({ t: 'confirm', confirmP: toBase64(confirmP) }, 'ready')
+      ready = await this.session({ t: 'confirm', confirmP: toBase64(confirmP) }, 'ready')
       keys = await derive()
     }
     this.sealer = await RecordCipher.create(keys.phoneToDevice)
     this.opener = await RecordCipher.create(keys.deviceToPhone)
+    opened()
+    if (ready.status !== true) {
+      this.statusWaiter = undefined
+      return undefined
+    }
+    return status
   }
 
   /** Sends one operation; resolves with its final event (`failed` included). */
@@ -252,6 +284,8 @@ export class ProvisioningClient {
       return
     const record = whole
     this.eventChain = this.eventChain.then(async () => {
+      if (!this.opener && this.opening)
+        await this.opening
       if (!this.opener)
         throw new ProtocolError('event before the session is ready')
       let e: DeviceEvent
@@ -269,12 +303,16 @@ export class ProvisioningClient {
     if (e.id === undefined) {
       if (e.event === 'closing')
         this.onClosing(String(e.reason))
+      if (e.event === 'status') {
+        this.statusWaiter?.resolve(e)
+        this.statusWaiter = undefined
+      }
       return
     }
     const p = this.pending
     if (!p || e.id !== p.id)
       return
-    if (e.event === 'connecting') {
+    if (e.event === 'connecting' || e.event === 'applying') {
       p.onProgress?.(e)
       return
     }
@@ -285,6 +323,8 @@ export class ProvisioningClient {
   private fatal(err: Error) {
     this.pending?.reject(err)
     this.pending = undefined
+    this.statusWaiter?.reject(err)
+    this.statusWaiter = undefined
     this.t.disconnect()
   }
 
@@ -302,6 +342,8 @@ export class ProvisioningClient {
       this.opener = undefined
       this.pending?.reject(err)
       this.pending = undefined
+      this.statusWaiter?.reject(err)
+      this.statusWaiter = undefined
       this.onDisconnect()
     })
   }

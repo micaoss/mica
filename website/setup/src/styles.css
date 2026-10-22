@@ -89,7 +89,8 @@ label.check {
   gap: 0.5rem;
 }
 
-input:not([type='checkbox']) {
+input:not([type='checkbox'], [type='radio']),
+select {
   font: inherit;
   padding: 0.625rem 0.75rem;
   border: 1px solid var(--line);
@@ -98,8 +99,7 @@ input:not([type='checkbox']) {
   color: var(--fg);
 }
 
-button,
-a.button {
+button {
   font: inherit;
   font-weight: 600;
   padding: 0.75rem 1rem;
@@ -116,6 +116,10 @@ button.secondary {
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--line);
+}
+
+a {
+  color: var(--accent);
 }
 
 button.link {

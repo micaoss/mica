@@ -3,21 +3,44 @@ import type { Dict, Lang } from './i18n'
 import type { DeviceEvent, DeviceInfo } from './protocol/client'
 import type { BluetoothDeviceLike, BluetoothLike } from './protocol/gatt'
 import type { Network } from './util'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { PROTOCOLS, SETUP_HOST } from './config'
 import { DICTS, fill } from './i18n'
 import { DisconnectedError, ProvisioningClient, SessionError } from './protocol/client'
 import { connectGatt, requestDevice } from './protocol/gatt'
-import { mergeNetworks } from './util'
+import { isCidr, isIp, isIpv4, mergeNetworks, splitList } from './util'
 
 // The phone's provisioning flow, mica-network-spec chapter 5 section 3: step 0
 // (this page) to step 9 (finish); step 10 is the console on the router's LAN.
+
+interface Port {
+  name: string
+  kind: string
+  carrier: boolean
+  address: string | null
+}
 
 interface Status {
   wifiMode: string
   connected: boolean
   ssid: string | null
   ip: string | null
+  interfaces: Port[]
+}
+
+/** What the wired form holds, kept when an attempt fails. */
+interface Wired {
+  port: string
+  mode: 'dhcp' | 'static'
+  address: string
+  gateway: string
+  dns: string
+}
+
+interface Reached {
+  name: string
+  kind: string
+  address: string | null
 }
 
 type Step
@@ -29,13 +52,29 @@ type Step
     | { k: 'status', status: Status }
     | { k: 'network', status: Status, networks: Network[] | null, manual: boolean }
     | { k: 'password', ssid: string, hidden: boolean, status: Status }
-    | { k: 'joined', ssid: string, ip: string }
-    | { k: 'done', ssid: string, ip: string, hostname: string, apPsk?: string }
+    | { k: 'wired', status: Status, form?: Wired }
+    | { k: 'joined', text: string }
+    | { k: 'done', reached: Reached | null, urls: string[], claimedHere: boolean }
     | { k: 'dropped', text: string }
 
 const HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i
 const PSK = /^(?:[\x20-\x7E]{8,63}|[0-9a-f]{64})$/i
 const byteLength = (s: string) => new TextEncoder().encode(s).length
+
+function readStatus(e: DeviceEvent): Status {
+  const ports = Array.isArray(e.interfaces) ? e.interfaces : []
+  return {
+    wifiMode: String(e.wifiMode),
+    connected: e.connected === true,
+    ssid: (e.ssid as string) ?? null,
+    ip: (e.ip as string) ?? null,
+    interfaces: ports
+      .filter((p): p is Record<string, unknown> => typeof p?.name === 'string')
+      .map(p => ({ name: p.name as string, kind: String(p.kind), carrier: p.carrier === true, address: typeof p.address === 'string' ? p.address : null })),
+  }
+}
+
+const ethernetPorts = (s: Status) => s.interfaces.filter(p => p.kind === 'ethernet')
 
 interface Props {
   bluetooth: BluetoothLike | undefined
@@ -52,6 +91,8 @@ export function App({ bluetooth, ios, initialLang }: Props) {
   const deviceRef = useRef<BluetoothDeviceLike | null>(null)
   const infoRef = useRef<DeviceInfo | null>(null)
   const closingRef = useRef('')
+  // The status that came with `ready`, used once instead of a getStatus.
+  const statusRef = useRef<Status | null>(null)
   const stepRef = useRef(step)
   const tRef = useRef(t)
   tRef.current = t
@@ -114,7 +155,8 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         return stop(t.passwordUnavailable)
       if (i.auth !== 'none')
         return go({ k: 'auth', mode: i.auth })
-      await c.authenticate('none')
+      const st = await c.authenticate('none')
+      statusRef.current = st ? readStatus(st) : null
       go({ k: 'admin' })
     }
     catch (e) {
@@ -141,7 +183,8 @@ export function App({ bluetooth, ios, initialLang }: Props) {
   async function authenticate(mode: 'password' | 'temp-code', secret: string) {
     go({ k: 'busy', text: t.verifying })
     try {
-      await clientRef.current!.authenticate(mode, secret)
+      const st = await clientRef.current!.authenticate(mode, secret)
+      statusRef.current = st ? readStatus(st) : null
     }
     catch (e) {
       if (!(e instanceof SessionError))
@@ -162,12 +205,16 @@ export function App({ bluetooth, ios, initialLang }: Props) {
   }
 
   async function getStatus(): Promise<Status | null> {
+    const first = statusRef.current
+    statusRef.current = null
+    if (first)
+      return first
     const e = await clientRef.current!.run('getStatus')
     if (e.event !== 'status') {
       setNotice(reason(e))
       return null
     }
-    return { wifiMode: String(e.wifiMode), connected: e.connected === true, ssid: (e.ssid as string) ?? null, ip: (e.ip as string) ?? null }
+    return readStatus(e)
   }
 
   async function showStatus(n = '') {
@@ -220,7 +267,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     try {
       const e = await clientRef.current!.run('setWifi', { ssid, psk, hidden })
       if (e.event === 'connected')
-        return go({ k: 'joined', ssid, ip: String(e.ip) })
+        return go({ k: 'joined', text: fill(t.success, { ssid, ip: String(e.ip) }) })
       const back = { k: 'password', ssid, hidden, status } as const
       switch (e.reason) {
         case 'ssid_not_found':
@@ -241,21 +288,55 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     }
   }
 
-  async function finish(ssid: string, ip: string) {
+  async function applyWired(status: Status, form: Wired) {
+    go({ k: 'busy', text: fill(t.applying, { name: form.port }) })
+    const params = form.mode === 'dhcp'
+      ? { interface: form.port, dhcp: true }
+      : {
+          interface: form.port,
+          static: {
+            address: form.address,
+            ...(form.gateway ? { gateway: form.gateway } : {}),
+            ...(form.dns ? { dns: splitList(form.dns) } : {}),
+          },
+        }
+    try {
+      const e = await clientRef.current!.run('setNetwork', params)
+      if (e.event === 'up')
+        return go({ k: 'joined', text: fill(t.wiredUp, { name: String(e.interface), address: typeof e.address === 'string' ? e.address : '—' }) })
+      if (e.reason === 'not_claimed')
+        return go({ k: 'admin' }, reason(e))
+      if (e.reason === 'already_claimed')
+        return stop(t.alreadyClaimed)
+      go({ k: 'wired', status, form }, reason(e))
+    }
+    catch (e) {
+      broken(e)
+    }
+  }
+
+  async function finish(joined: string) {
     go({ k: 'busy', text: t.finishing })
     try {
       const e = await clientRef.current!.run('finish')
       if (e.event === 'finished') {
-        const apPsk = typeof e.apPsk === 'string' ? e.apPsk : undefined
+        const claimedHere = infoRef.current?.auth === 'none'
         if (infoRef.current)
           infoRef.current = { ...infoRef.current, claimed: e.claimed === true, hostname: String(e.hostname) }
-        return go({ k: 'done', ssid, ip, hostname: String(e.hostname), apPsk })
+        const r = e.interface as Record<string, unknown> | null | undefined
+        const reached = r && typeof r.name === 'string'
+          ? { name: r.name, kind: String(r.kind), address: typeof r.address === 'string' ? r.address : null }
+          : null
+        const urls = Array.isArray(e.consoleUrls)
+          ? e.consoleUrls.filter((u): u is string => typeof u === 'string' && /^http:\/\//.test(u))
+          : [`http://${String(e.hostname)}.local`]
+        return go({ k: 'done', reached, urls, claimedHere })
       }
       if (e.reason === 'already_claimed')
         return stop(t.alreadyClaimed)
       if (e.reason === 'not_claimed')
         return go({ k: 'admin' }, reason(e))
-      go({ k: 'joined', ssid, ip }, reason(e))
+      go({ k: 'joined', text: joined }, reason(e))
     }
     catch (e) {
       broken(e)
@@ -287,6 +368,9 @@ export function App({ bluetooth, ios, initialLang }: Props) {
           onAuth={authenticate}
           onClaim={claim}
           onConfigure={() => chooseNetwork()}
+          onWired={status => go({ k: 'wired', status })}
+          onStatus={status => go({ k: 'status', status })}
+          onApply={applyWired}
           onPick={(ssid, hidden, status) => go({ k: 'password', ssid, hidden, status })}
           onJoin={join}
           onFinish={finish}
@@ -334,9 +418,12 @@ interface StepProps {
   onAuth: (mode: 'password' | 'temp-code', secret: string) => void
   onClaim: (password: string, hostname: string) => void
   onConfigure: () => void
+  onWired: (status: Status) => void
+  onStatus: (status: Status) => void
+  onApply: (status: Status, form: Wired) => void
   onPick: (ssid: string, hidden: boolean, status: Status) => void
   onJoin: (ssid: string, psk: string, hidden: boolean, status: Status) => void
-  onFinish: (ssid: string, ip: string) => void
+  onFinish: (joined: string) => void
 }
 
 function StepView(p: StepProps) {
@@ -370,7 +457,17 @@ function StepView(p: StepProps) {
     case 'admin':
       return <AdminForm t={t} hostname={p.info?.hostname ?? ''} onSubmit={p.onClaim} />
     case 'status':
-      return <StatusView t={t} status={step.status} onConfigure={p.onConfigure} />
+      return (
+        <StatusView
+          t={t}
+          status={step.status}
+          wired={!!p.info?.ops.includes('setNetwork') && ethernetPorts(step.status).length > 0}
+          onConfigure={p.onConfigure}
+          onWired={() => p.onWired(step.status)}
+        />
+      )
+    case 'wired':
+      return <WiredForm t={t} step={step} onBack={() => p.onStatus(step.status)} onSubmit={form => p.onApply(step.status, form)} />
     case 'network':
       return <NetworkForm t={t} step={step} onRescan={p.onConfigure} onPick={(ssid, hidden) => p.onPick(ssid, hidden, step.status)} />
     case 'password':
@@ -378,8 +475,8 @@ function StepView(p: StepProps) {
     case 'joined':
       return (
         <>
-          <p className="ok" role="status">{fill(t.success, { ssid: step.ssid, ip: step.ip })}</p>
-          <button type="button" onClick={() => p.onFinish(step.ssid, step.ip)}>{t.finish}</button>
+          <p className="ok" role="status">{step.text}</p>
+          <button type="button" onClick={() => p.onFinish(step.text)}>{t.finish}</button>
         </>
       )
     case 'done':
@@ -454,8 +551,20 @@ function AdminForm({ t, hostname, onSubmit }: { t: Dict, hostname: string, onSub
   )
 }
 
-function StatusView({ t, status, onConfigure }: { t: Dict, status: Status, onConfigure: () => void }) {
+function StatusView({ t, status, wired, onConfigure, onWired }: {
+  t: Dict
+  status: Status
+  wired: boolean
+  onConfigure: () => void
+  onWired: () => void
+}) {
   const mode = status.wifiMode === 'client' ? t.modeClient : status.wifiMode === 'ap' ? t.modeAp : t.modeOff
+  const wifi = status.interfaces.length === 0 || status.interfaces.some(p => p.kind === 'wifi')
+  const port = (p: Port) => [
+    p.kind === 'ethernet' ? t.ethernet : t.wifi,
+    p.kind === 'ethernet' ? (p.carrier ? t.cableIn : t.noCable) : (p.carrier ? t.linkUp : t.notConnected),
+    ...(p.address ? [p.address] : []),
+  ].join(' · ')
   return (
     <>
       <h2>{t.statusTitle}</h2>
@@ -466,9 +575,84 @@ function StatusView({ t, status, onConfigure }: { t: Dict, status: Status, onCon
         <dd>{status.connected && status.ssid ? fill(t.connectedTo, { ssid: status.ssid }) : t.notConnected}</dd>
         <dt>{t.ip}</dt>
         <dd>{status.ip ?? '—'}</dd>
+        {status.interfaces.map(p => (
+          <Fragment key={p.name}>
+            <dt>{p.name}</dt>
+            <dd>{port(p)}</dd>
+          </Fragment>
+        ))}
       </dl>
-      <button type="button" onClick={onConfigure}>{t.configureWifi}</button>
+      {wired && <p className="muted">{t.chooseHint}</p>}
+      <div className="row">
+        {wifi && <button type="button" onClick={onConfigure}>{t.configureWifi}</button>}
+        {wired && <button type="button" onClick={onWired}>{t.configureWired}</button>}
+      </div>
     </>
+  )
+}
+
+function WiredForm({ t, step, onBack, onSubmit }: {
+  t: Dict
+  step: Extract<Step, { k: 'wired' }>
+  onBack: () => void
+  onSubmit: (form: Wired) => void
+}) {
+  const ports = ethernetPorts(step.status)
+  const [form, setForm] = useState<Wired>(step.form ?? { port: ports[0]?.name ?? '', mode: 'dhcp', address: '', gateway: '', dns: '' })
+  const [error, setError] = useState('')
+  const set = (patch: Partial<Wired>) => setForm(f => ({ ...f, ...patch }))
+  const submit = (e: SubmitEvent) => {
+    e.preventDefault()
+    const problem = form.mode === 'dhcp'
+      ? ''
+      : !isCidr(form.address)
+          ? t.results.invalid_address
+          : form.gateway && !isIpv4(form.gateway)
+            ? t.results.invalid_gateway
+            : splitList(form.dns).some(d => !isIp(d)) ? t.results.invalid_dns : ''
+    setError(problem)
+    if (!problem)
+      onSubmit(form)
+  }
+  return (
+    <form onSubmit={submit} noValidate>
+      <h2>{t.wiredTitle}</h2>
+      <label>
+        {t.port}
+        <select value={form.port} onChange={e => set({ port: e.target.value })}>
+          {ports.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+        </select>
+      </label>
+      <label className="check">
+        <input type="radio" name="mode" checked={form.mode === 'dhcp'} onChange={() => set({ mode: 'dhcp' })} />
+        {t.dhcp}
+      </label>
+      <label className="check">
+        <input type="radio" name="mode" checked={form.mode === 'static'} onChange={() => set({ mode: 'static' })} />
+        {t.static}
+      </label>
+      {form.mode === 'static' && (
+        <>
+          <label>
+            {t.addressLabel}
+            <input inputMode="decimal" autoCapitalize="none" spellCheck={false} value={form.address} onChange={e => set({ address: e.target.value.trim() })} />
+          </label>
+          <label>
+            {t.gateway}
+            <input inputMode="decimal" autoCapitalize="none" spellCheck={false} value={form.gateway} onChange={e => set({ gateway: e.target.value.trim() })} />
+          </label>
+          <label>
+            {t.dns}
+            <input autoCapitalize="none" spellCheck={false} value={form.dns} onChange={e => set({ dns: e.target.value })} />
+          </label>
+        </>
+      )}
+      {error && <p className="alert" role="alert">{error}</p>}
+      <div className="row">
+        <button type="button" className="secondary" onClick={onBack}>{t.back}</button>
+        <button type="submit">{t.apply}</button>
+      </div>
+    </form>
   )
 }
 
@@ -566,19 +750,25 @@ function PasswordForm({ t, step, onBack, onSubmit }: {
 }
 
 function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) {
+  const r = step.reached
   return (
     <>
       <h2>{t.done}</h2>
-      <p>{fill(t.doneText, { ssid: step.ssid, ip: step.ip, hostname: step.hostname })}</p>
-      {/* Only a link: the HTTPS page never requests the device's HTTP itself. */}
-      <a className="button" href={`http://${step.ip}`} target="_blank" rel="noreferrer">{t.openConsole}</a>
-      {step.apPsk && (
-        <div className="secret">
-          <p>{t.apPsk}</p>
-          <code>{step.apPsk}</code>
-          <p className="muted">{t.apPskOnce}</p>
-        </div>
+      {r && <p className="ok">{fill(t.doneConnected, { kind: r.kind === 'ethernet' ? t.ethernet : t.wifi, address: (r.address ?? '—').split('/')[0] })}</p>}
+      {/* Only links: the HTTPS page never requests the device's HTTP itself. */}
+      {step.urls.length > 0 && (
+        <p>
+          {t.consoleAt}
+          {step.urls.map((u, i) => (
+            <span key={u}>
+              {i > 0 && t.or}
+              <a href={u} target="_blank" rel="noreferrer">{u}</a>
+            </span>
+          ))}
+          {t.period}
+        </p>
       )}
+      {step.claimedHere && <p className="muted">{t.hotspotOff}</p>}
     </>
   )
 }

@@ -73,9 +73,15 @@ export async function connectGatt(device: BluetoothDeviceLike): Promise<Transpor
     disconnect: () => server.disconnect(),
   }
   const value = (e: Event) => bytesOf((e.target as GattCharacteristic).value as DataView)
-  session.addEventListener('characteristicvaluechanged', e => t.onSession(value(e)))
-  event.addEventListener('characteristicvaluechanged', e => t.onEvent(value(e)))
-  device.addEventListener('gattserverdisconnected', () => t.onDisconnect(), { once: true })
+  // A reconnect may hand out the same characteristic objects: a dead link's listeners go, or the
+  // old session would hear the new one.
+  const live = new AbortController()
+  session.addEventListener('characteristicvaluechanged', e => t.onSession(value(e)), { signal: live.signal })
+  event.addEventListener('characteristicvaluechanged', e => t.onEvent(value(e)), { signal: live.signal })
+  device.addEventListener('gattserverdisconnected', () => {
+    live.abort()
+    t.onDisconnect()
+  }, { once: true })
   await session.startNotifications()
   await event.startNotifications()
   return t

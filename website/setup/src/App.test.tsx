@@ -30,7 +30,7 @@ function setup(opts: MockOptions = {}, lang: Lang = 'zh', pick = () => true) {
 
 const find = (text: string | RegExp) => screen.findByText(text, {}, { timeout: 4000 })
 
-async function claimAndReachPassword(user: ReturnType<typeof userEvent.setup>) {
+async function claimAndReachStatus(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: '连接设备' }))
   await find('设置管理员')
   await user.type(screen.getByLabelText('管理员密码（至少 8 位）'), 'admin-pass-1')
@@ -38,6 +38,10 @@ async function claimAndReachPassword(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText('主机名（可选）'), 'quay-7')
   await user.click(screen.getByRole('button', { name: '下一步' }))
   await find('当前状态')
+}
+
+async function claimAndReachPassword(user: ReturnType<typeof userEvent.setup>) {
+  await claimAndReachStatus(user)
   await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
   await find('设备当前为 Wi-Fi 接入点模式，不能扫描，请输入网络名称。')
 }
@@ -60,7 +64,7 @@ describe('the provisioning page', () => {
     expect(screen.getByText(new RegExp(SETUP_HOST))).toBeInTheDocument()
   })
 
-  it('steps 1-9 on an unclaimed device in access-point mode, apPsk shown once', async () => {
+  it('steps 1-9 on an unclaimed device in access-point mode; the done screen names the console', async () => {
     const { mock, user } = setup()
     await claimAndReachPassword(user)
     await user.type(screen.getByLabelText('网络名称'), 'Harbour')
@@ -70,9 +74,11 @@ describe('the provisioning page', () => {
     await user.click(screen.getByRole('button', { name: '连接' }))
     expect(await find('已连接 Harbour，IP：192.168.8.41')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '完成配网' }))
-    expect(await find('请确认手机已连接到 Harbour，然后打开 http://192.168.8.41（备用 http://quay-7.local）')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '打开控制台' })).toHaveAttribute('href', 'http://192.168.8.41')
-    expect(screen.getByText('harbour-ap-key-7f3a')).toBeInTheDocument()
+    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
+    expect(screen.getByText(/^打开控制台：/)).toHaveTextContent('打开控制台：http://192.168.8.41 或 http://quay-7.local')
+    expect(screen.getByRole('link', { name: 'http://192.168.8.41' })).toHaveAttribute('href', 'http://192.168.8.41')
+    expect(screen.getByRole('link', { name: 'http://quay-7.local' })).toHaveAttribute('href', 'http://quay-7.local')
+    expect(screen.getByText('设备热点已关闭。以后如需打开，请在控制台（Wi-Fi 页面）设置它的密码。')).toBeInTheDocument()
     expect(mock.claimed).toBe(true)
     expect(mock.commands.find(c => c.op === 'claim')).toEqual({ id: 1, op: 'claim', password: 'admin-pass-1', hostname: 'quay-7' })
   })
@@ -104,6 +110,74 @@ describe('the provisioning page', () => {
       expect(screen.getByRole('heading', { name: '选择网络' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /Harbour/ })).toBeInTheDocument()
     }
+  })
+
+  it('the wired port over DHCP: choice, port, apply, finish', async () => {
+    const { user, mock } = setup()
+    await claimAndReachStatus(user)
+    expect(screen.getByText('有线 · 已插网线')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '配置有线网络' }))
+    await find('有线网络')
+    expect(screen.getByLabelText('网口')).toHaveValue('eth0')
+    expect(screen.getByLabelText('自动获取（DHCP）')).toBeChecked()
+    await user.click(screen.getByRole('button', { name: '应用' }))
+    expect(await find('eth0 已配置，地址：192.168.1.40/24')).toBeInTheDocument()
+    expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({ id: 2, op: 'setNetwork', interface: 'eth0', dhcp: true })
+    await user.click(screen.getByRole('button', { name: '完成配网' }))
+    expect(await find('已连接。有线 192.168.1.40。')).toBeInTheDocument()
+    expect(screen.getByText(/^打开控制台：/)).toHaveTextContent('打开控制台：http://192.168.1.40 或 http://quay-7.local')
+    expect(mock.claimed).toBe(true)
+  })
+
+  it('a static address is checked on the page, then sent as the doc shapes it', async () => {
+    const { user, mock } = setup()
+    await claimAndReachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置有线网络' }))
+    await user.click(await screen.findByLabelText('静态地址'))
+    const apply = () => user.click(screen.getByRole('button', { name: '应用' }))
+    await user.type(screen.getByLabelText('地址/前缀（如 192.168.1.40/24）'), '10.0.0.5')
+    await apply()
+    expect(screen.getByRole('alert')).toHaveTextContent('地址应为 IPv4 地址加前缀，如 192.168.1.40/24')
+    await user.type(screen.getByLabelText('地址/前缀（如 192.168.1.40/24）'), '/24')
+    await user.type(screen.getByLabelText('网关（可选）'), '10.0.0.300')
+    await apply()
+    expect(screen.getByRole('alert')).toHaveTextContent('网关应为 IPv4 地址')
+    await user.clear(screen.getByLabelText('网关（可选）'))
+    await user.type(screen.getByLabelText('网关（可选）'), '10.0.0.1')
+    await user.type(screen.getByLabelText('DNS 服务器（可选，用空格或逗号分隔）'), '10.0.0.1, nope')
+    await apply()
+    expect(screen.getByRole('alert')).toHaveTextContent('DNS 服务器应为 IP 地址')
+    expect(mock.commands.some(c => c.op === 'setNetwork')).toBe(false)
+    await user.clear(screen.getByLabelText('DNS 服务器（可选，用空格或逗号分隔）'))
+    await user.type(screen.getByLabelText('DNS 服务器（可选，用空格或逗号分隔）'), '10.0.0.1, 2001:db8::53')
+    await apply()
+    expect(await find('eth0 已配置，地址：10.0.0.5/24')).toBeInTheDocument()
+    expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({
+      id: 2,
+      op: 'setNetwork',
+      interface: 'eth0',
+      static: { address: '10.0.0.5/24', gateway: '10.0.0.1', dns: ['10.0.0.1', '2001:db8::53'] },
+    })
+  })
+
+  it.each([
+    [{ ports: [{ name: 'eth0', kind: 'ethernet' as const, carrier: false, address: null }] }, '没有插网线。设置已保存，插上网线后生效'],
+    [{ lease: null }, '已连接但未获得 IP，请检查路由器'],
+    [{ wiredFail: 'address_overlap' }, '该子网与设备另一个接口的子网重叠'],
+  ])('a wired failure (%o) shows its text and returns to the form', async (opts, text) => {
+    const { user } = setup(opts)
+    await claimAndReachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置有线网络' }))
+    await user.click(await screen.findByRole('button', { name: '应用' }))
+    expect(await find(text)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '有线网络' })).toBeInTheDocument()
+  })
+
+  it('offers no wired port when the device does not list setNetwork', async () => {
+    const { user } = setup({ ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'finish'] })
+    await claimAndReachStatus(user)
+    expect(screen.queryByRole('button', { name: '配置有线网络' })).toBeNull()
+    expect(screen.getByRole('button', { name: '配置 Wi-Fi' })).toBeInTheDocument()
   })
 
   it('step 4 checks the password twice and the hostname', async () => {
@@ -145,9 +219,13 @@ describe('the provisioning page', () => {
     await user.type(screen.getByLabelText('Wi-Fi 密码（开放网络留空）'), 'harbour-wifi-1')
     await user.click(screen.getByRole('button', { name: '连接' }))
     await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
-    expect(await find('请确认手机已连接到 Harbour，然后打开 http://192.168.8.41（备用 http://mica-a4e2e69e.local）')).toBeInTheDocument()
-    expect(screen.queryByText('设备热点的新密码')).toBeNull()
+    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'http://mica-a4e2e69e.local' })).toBeInTheDocument()
+    // A claimed device's hotspot is not the session's business.
+    expect(screen.queryByText(/设备热点已关闭/)).toBeNull()
     expect(mock.commands.some(c => c.op === 'claim')).toBe(false)
+    // The status came with `ready`: the one getStatus is the network step's.
+    expect(mock.commands.filter(c => c.op === 'getStatus')).toHaveLength(1)
   })
 
   it('a wrong password shows the attempts left when the device sends them', async () => {

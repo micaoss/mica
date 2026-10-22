@@ -35,6 +35,14 @@ export interface Router {
   ip?: string
 }
 
+/** A physical port, as `getStatus` lists it. */
+export interface Port {
+  name: string
+  kind: 'ethernet' | 'wifi'
+  carrier: boolean
+  address: string | null
+}
+
 export interface MockOptions {
   protocol?: number
   model?: string
@@ -58,10 +66,16 @@ export interface MockOptions {
   claimedElsewhere?: boolean
   /** Another phone holds the session. */
   busy?: boolean
-  /** The key the device generates at `finish` when the claim gave none. */
-  generatedApPsk?: string
-  /** How long setWifi takes, in ms. */
+  /** How long setWifi and setNetwork take, in ms. */
   connectDelay?: number
+  /** The device's ports. */
+  ports?: Port[]
+  /** The address a DHCP lease gives a wired port; null: no lease within 30 s. */
+  lease?: string | null
+  /** A reason setNetwork fails with after `applying`, as the network settings refuse an entry. */
+  wiredFail?: string
+  /** Whether `ready` honours `"status": true` in `start`. */
+  statusOnStart?: boolean
   /** The `share` message carries the optional `attemptsLeft`. */
   attemptsInShare?: boolean
 }
@@ -143,9 +157,13 @@ class Joiner {
 
 const HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i
 const PSK = /^(?:[\x20-\x7E]{8,63}|[0-9a-f]{64})$/i
+const OCTET = '(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)'
+const IPV4 = new RegExp(`^${OCTET}(?:\\.${OCTET}){3}$`)
+const CIDR = new RegExp(`^${OCTET}(?:\\.${OCTET}){3}/(?:3[0-2]|[12]?\\d)$`)
+const isIp = (v: unknown) => typeof v === 'string' && (IPV4.test(v) || /^[0-9a-f]{0,4}(?::[0-9a-f]{0,4}){2,7}$/i.test(v))
 
 export class MockDevice {
-  readonly o: Required<Omit<MockOptions, 'spake' | 'routers' | 'networks'>> & Pick<MockOptions, 'spake'>
+  readonly o: Required<Omit<MockOptions, 'spake' | 'routers' | 'networks' | 'wiredFail'>> & Pick<MockOptions, 'spake' | 'wiredFail'>
   readonly routers: Record<string, Router>
   networks: Network[]
   /** Every decrypted command, in order. */
@@ -159,6 +177,9 @@ export class MockDevice {
   hostname: string
   wifi: { mode: 'client' | 'ap' | 'off', connected: boolean, ssid: string | null, ip: string | null }
   attemptsLeft: number
+  ports: Port[]
+  /** The port the session brought up last. */
+  private brought?: Port
 
   // Set by the mocked GATT.
   notifySession: (f: Bytes) => void = () => {}
@@ -171,6 +192,7 @@ export class MockDevice {
   private spakeState?: { confirmP: Bytes, Kshared: Bytes }
   private dirs?: { command: Direction, event: Direction }
   private staged?: { password: string, hostname?: string, apPsk?: string }
+  private statusAsked = false
   private running = false
   private record?: VerifierRecord
   private chain = Promise.resolve()
@@ -182,7 +204,7 @@ export class MockDevice {
       hostname: 'mica-a4e2e69e',
       claimed: false,
       auth: opts.claimed ? 'password' : 'none',
-      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'finish'],
+      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'setNetwork', 'finish'],
       maxWrite: 20,
       notifySize: 20,
       wifiMode: 'ap',
@@ -191,9 +213,14 @@ export class MockDevice {
       attemptsLeft: 5,
       claimedElsewhere: false,
       busy: false,
-      generatedApPsk: 'harbour-ap-key-7f3a',
       connectDelay: 5,
       attemptsInShare: false,
+      ports: [
+        { name: 'eth0', kind: 'ethernet', carrier: true, address: null },
+        { name: 'wlan0', kind: 'wifi', carrier: false, address: null },
+      ],
+      lease: '192.168.1.40/24',
+      statusOnStart: true,
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -202,6 +229,19 @@ export class MockDevice {
     this.hostname = this.o.hostname
     this.attemptsLeft = this.o.attemptsLeft
     this.wifi = { mode: this.o.wifiMode, connected: this.o.wifiMode === 'client', ssid: null, ip: null }
+    this.ports = this.o.ports.map(p => ({ ...p }))
+  }
+
+  private status(): Json {
+    return { event: 'status', wifiMode: this.wifi.mode, connected: this.wifi.connected, ssid: this.wifi.ssid, ip: this.wifi.ip, interfaces: this.ports }
+  }
+
+  /** `ready`, and the `status` event after it when `start` asked for one. */
+  private async ready(m: Json) {
+    const asked = this.statusAsked && this.o.statusOnStart
+    await this.sendSession(asked ? { ...m, status: true } : m)
+    if (asked)
+      await this.event(this.status())
   }
 
   info(): Bytes {
@@ -278,6 +318,7 @@ export class MockDevice {
     if (this.o.busy)
       return error('busy')
     if (m.t === 'start') {
+      this.statusAsked = m.status === true
       this.auth = null
       this.dirs = undefined
       if (this.o.auth === 'password-unavailable')
@@ -295,7 +336,7 @@ export class MockDevice {
         const salt = new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array([...enc.encode('mica-provisioning/1 none'), ...phonePub, ...devicePub])))
         this.dirs = await directions(await hkdf(salt, s, 'mica-provisioning/1 session keys', 64))
         this.auth = 'none'
-        return this.sendSession({ t: 'ready', pub: b64(devicePub) })
+        return this.ready({ t: 'ready', pub: b64(devicePub) })
       }
       const salt = Uint8Array.from({ length: 16 }, (_, i) => i * 17)
       this.record = await this.o.spake!.register(this.o.secret, salt, this.o.iterations)
@@ -322,7 +363,7 @@ export class MockDevice {
       this.attemptsLeft = this.o.attemptsLeft
       this.dirs = await directions(await hkdf(new Uint8Array(0), this.spakeState.Kshared, 'mica-provisioning/1 session keys', 64))
       this.spakeState = undefined
-      return this.sendSession({ t: 'ready' })
+      return this.ready({ t: 'ready' })
     }
     return error('bad_message')
   }
@@ -344,7 +385,7 @@ export class MockDevice {
       return failed('busy')
     switch (c.op) {
       case 'getStatus':
-        return this.event({ id, event: 'status', wifiMode: this.wifi.mode, connected: this.wifi.connected, ssid: this.wifi.ssid, ip: this.wifi.ip })
+        return this.event({ id, ...this.status() })
       case 'scanWifi':
         if (this.wifi.mode === 'ap')
           return failed('ap_active')
@@ -385,13 +426,52 @@ export class MockDevice {
           if (r.psk !== psk)
             return failed('wrong_password')
           this.wifi = { mode: 'client', connected: true, ssid, ip: r.ip ?? '192.168.1.57' }
+          const wifi = this.ports.find(p => p.kind === 'wifi')
+          if (wifi) {
+            Object.assign(wifi, { carrier: true, address: `${this.wifi.ip}/24` })
+            this.brought = wifi
+          }
           return this.event({ id, event: 'connected', ip: this.wifi.ip, hostname: this.staged?.hostname ?? this.hostname })
+        }))
+        return
+      }
+      case 'setNetwork': {
+        if (this.auth === 'none' && !this.staged)
+          return failed('not_claimed')
+        const port = this.ports.find(p => p.name === c.interface && p.kind === 'ethernet')
+        if (!port)
+          return failed('unknown_interface')
+        const st = c.static as Json | undefined
+        if ((c.dhcp === true) === (st !== undefined))
+          return failed('bad_request')
+        if (st) {
+          if (typeof st.address !== 'string' || !CIDR.test(st.address))
+            return failed('invalid_address')
+          if (st.gateway !== undefined && !(typeof st.gateway === 'string' && IPV4.test(st.gateway)))
+            return failed('invalid_gateway')
+          if (st.dns !== undefined && !(Array.isArray(st.dns) && st.dns.every(isIp)))
+            return failed('invalid_dns')
+        }
+        this.running = true
+        await this.event({ id, event: 'applying' })
+        void tick(this.o.connectDelay).then(() => this.serial(async () => {
+          this.running = false
+          if (this.o.wiredFail)
+            return failed(this.o.wiredFail)
+          if (!port.carrier)
+            return failed('no_carrier')
+          const address = st ? st.address as string : this.o.lease
+          if (!address)
+            return failed('dhcp_timeout')
+          port.address = address
+          this.brought = port
+          return this.event({ id, event: 'up', interface: port.name, address })
         }))
         return
       }
       case 'finish': {
         if (this.auth !== 'none') {
-          await this.event({ id, event: 'finished', claimed: true, hostname: this.hostname })
+          await this.event({ id, event: 'finished', claimed: true, ...this.reached() })
           return this.close()
         }
         if (this.o.claimedElsewhere) {
@@ -402,12 +482,22 @@ export class MockDevice {
           return failed('not_claimed')
         this.claimed = true
         this.hostname = this.staged.hostname ?? this.hostname
-        const generated = this.staged.apPsk === undefined ? { apPsk: this.o.generatedApPsk } : {}
-        await this.event({ id, event: 'finished', claimed: true, hostname: this.hostname, ...generated })
+        await this.event({ id, event: 'finished', claimed: true, ...this.reached() })
         return this.close()
       }
       default:
         return failed('unknown_op')
+    }
+  }
+
+  /** What `finished` carries for the page's last screen. */
+  private reached(): Json {
+    const port = this.brought ?? [...this.ports].sort((a, b) => Number(b.kind === 'ethernet') - Number(a.kind === 'ethernet')).find(p => p.address)
+    const address = port?.address?.split('/')[0]
+    return {
+      hostname: this.hostname,
+      interface: port ? { name: port.name, kind: port.kind, address: port.address } : null,
+      consoleUrls: [...(address ? [`http://${address}`] : []), `http://${this.hostname}.local`],
     }
   }
 }

@@ -18,6 +18,10 @@ async function open(opts: MockOptions) {
 }
 
 const ROUTERS = { Harbour: { psk: 'harbour-wifi-1', ip: '192.168.8.41' } }
+const PORTS = [
+  { name: 'eth0', kind: 'ethernet', carrier: true, address: null },
+  { name: 'wlan0', kind: 'wifi', carrier: false, address: null },
+]
 
 describe('the client over a mocked GATT, against the mock device and the Node reference', () => {
   it('asks the chooser for the provisioning service only', async () => {
@@ -29,15 +33,17 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       hostname: 'mica-a4e2e69e',
       claimed: false,
       auth: 'none',
-      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'finish'],
+      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'setNetwork', 'finish'],
       maxWrite: 20,
     })
   })
 
   it('claims an unclaimed device over X25519: claim, setWifi, finish', async () => {
     const { mock, client } = await open({ routers: ROUTERS })
-    await client.authenticate('none')
-    expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null })
+    // `start` asks for the status, which comes as an event right after `ready`.
+    expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
+    expect(mock.sessionLog[0]).toMatchObject({ t: 'start', auth: 'none', status: true })
+    expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
     expect(await client.run('scanWifi')).toEqual({ id: 2, event: 'failed', reason: 'ap_active' })
     expect(await client.run('claim', { password: 'admin-pass-1', hostname: 'quay-7' })).toEqual({ id: 3, event: 'claimStaged' })
     const progress: DeviceEvent[] = []
@@ -48,7 +54,14 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     client.onDisconnect = () => {
       dropped = true
     }
-    expect(await client.run('finish')).toEqual({ id: 5, event: 'finished', claimed: true, hostname: 'quay-7', apPsk: 'harbour-ap-key-7f3a' })
+    expect(await client.run('finish')).toEqual({
+      id: 5,
+      event: 'finished',
+      claimed: true,
+      hostname: 'quay-7',
+      interface: { name: 'wlan0', kind: 'wifi', address: '192.168.8.41/24' },
+      consoleUrls: ['http://192.168.8.41', 'http://quay-7.local'],
+    })
     await new Promise(r => setTimeout(r, 5))
     expect(dropped).toBe(true)
     expect(mock.claimed).toBe(true)
@@ -59,9 +72,27 @@ describe('the client over a mocked GATT, against the mock device and the Node re
 
   it('authenticates a claimed device with SPAKE2+ and its password', async () => {
     const { mock, client } = await open({ claimed: true, auth: 'password', secret: 'harbour-pw-1', wifiMode: 'client', maxWrite: 182 })
-    await client.authenticate('password', 'harbour-pw-1')
+    expect(await client.authenticate('password', 'harbour-pw-1')).toMatchObject({ event: 'status', wifiMode: 'client' })
     expect(mock.sessionLog.map(m => m.t)).toEqual(['start', 'share', 'confirm'])
     expect(await client.run('getStatus')).toMatchObject({ event: 'status', wifiMode: 'client' })
+  })
+
+  it('returns no status from a device whose ready does not carry the member', async () => {
+    const { client } = await open({ statusOnStart: false })
+    expect(await client.authenticate('none')).toBeUndefined()
+    expect(await client.run('getStatus')).toMatchObject({ id: 1, event: 'status' })
+  })
+
+  it('sets up the wired port: applying, then up', async () => {
+    const { client } = await open({})
+    await client.authenticate('none')
+    expect(await client.run('setNetwork', { interface: 'eth0', dhcp: true })).toMatchObject({ event: 'failed', reason: 'not_claimed' })
+    await client.run('claim', { password: 'admin-pass-1' })
+    const progress: DeviceEvent[] = []
+    expect(await client.run('setNetwork', { interface: 'eth0', static: { address: '10.0.0.5/24', gateway: '10.0.0.1', dns: ['10.0.0.1'] } }, e => progress.push(e)))
+      .toEqual({ id: 3, event: 'up', interface: 'eth0', address: '10.0.0.5/24' })
+    expect(progress).toEqual([{ id: 3, event: 'applying' }])
+    expect(await client.run('finish')).toMatchObject({ interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5', 'http://mica-a4e2e69e.local'] })
   })
 
   it('authenticates with a temp-code typed with a space', async () => {
