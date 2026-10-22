@@ -1,0 +1,10 @@
+{
+  // The provisioning page's old host, setup-test.micaos.dev: a 301 to
+  // init.micaos.dev for every path. Deployed with the page (target setup).
+  "name": "micaos-setup-redirect",
+  "compatibility_date": "2026-09-15",
+  "main": "./worker/setup-redirect.ts",
+  "routes": [
+    { "pattern": "setup-test.micaos.dev", "custom_domain": true }
+  ]
+}

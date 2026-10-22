@@ -8,6 +8,6 @@
   },
   // The host is SETUP_HOST in setup/src/config.ts; a test holds them together.
   "routes": [
-    { "pattern": "setup-test.micaos.dev", "custom_domain": true }
+    { "pattern": "init.micaos.dev", "custom_domain": true }
   ]
 }

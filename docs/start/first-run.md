@@ -241,7 +241,7 @@ advertises only while a **provisioning window** is open:
 | offline | a claimed device that lost its default route for 120 s, while `bluetooth.provisioning.autoWhenOffline` is on (the default) | the route returns, or when the phone finishes | the administrator password |
 | manual | an administrator in the console, for 5, 10 or 30 minutes | its time, the console, or when the phone finishes | the temporary code the console shows |
 
-- The phone side is the web page `https://setup-test.micaos.dev`, in Chrome or
+- The phone side is the web page `https://init.micaos.dev`, in Chrome or
   Edge on Android or a desktop. iOS browsers have no Web Bluetooth, so the
   page only explains that there.
 - On an unclaimed device the page sets the administrator password; the claim

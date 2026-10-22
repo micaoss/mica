@@ -200,7 +200,7 @@ U 盘送进一次真实启动，其中引导分区通道尤其从未在物理板
 | 离线 | 已认领设备失去默认路由 120 秒，且 `bluetooth.provisioning.autoWhenOffline` 开启（默认） | 路由恢复，或手机完成时 | 管理员密码 |
 | 手动 | 管理员在控制台打开，5、10 或 30 分钟 | 时间到、控制台关闭，或手机完成时 | 控制台显示的临时码 |
 
-- 手机端是网页 `https://setup-test.micaos.dev`，用 Android 或桌面上的 Chrome、
+- 手机端是网页 `https://init.micaos.dev`，用 Android 或桌面上的 Chrome、
   Edge 打开。iOS 浏览器没有 Web Bluetooth，页面在那里只做说明。
 - 在未认领设备上，页面设置管理员密码；认领在手机完成时生效，先完成的手机胜出。
   因此未认领设备在每次启动后 10 分钟内，蓝牙范围内的任何人都能认领它；请尽快

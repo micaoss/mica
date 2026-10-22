@@ -86,3 +86,13 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: website
           command: deploy --config wrangler.setup.jsonc
+      # After the page: this takes the old host, setup-test.micaos.dev, over
+      # from the page's Worker and answers it with a 301 to init.micaos.dev.
+      - name: Redirect the old host
+        uses: cloudflare/wrangler-action@v4
+        with:
+          wranglerVersion: '4.131.2'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: website
+          command: deploy --config wrangler.setup-redirect.jsonc

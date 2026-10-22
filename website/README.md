@@ -157,7 +157,8 @@ control; it is not a release and must not be presented as one.
 
 `setup/` is a separate static PWA: the phone's side of BLE provisioning
 (`mica-core:docs/ble-provisioning.md`, protocol 1), served on its own host,
-`SETUP_HOST` in `setup/src/config.ts` (now `setup-test.micaos.dev`). Web Bluetooth
+`SETUP_HOST` in `setup/src/config.ts` (now `init.micaos.dev`; the old
+host, `setup-test.micaos.dev`, is a 301 to it from `worker/setup-redirect.ts`). Web Bluetooth
 talks to the device; X25519 and SPAKE2+ (RFC 9383, P-256) use `@noble/curves`, pinned,
 for point arithmetic and WebCrypto for the rest. A service worker precaches the build,
 so the page works offline once opened.
@@ -170,7 +171,8 @@ bun run dev:setup    # /mock.html runs the page against a mock device in the bro
 The tests check the crypto against the RFC 9383 vector and the protocol document's
 vectors, and run every flow over a mocked GATT against a mock device whose SPAKE2+ side
 is the mica-core reference (`setup/test/reference/`, vendored). It deploys apart from the
-site: run the website workflow with target `setup`, which publishes `wrangler.setup.jsonc`.
+site: run the website workflow with target `setup`, which publishes `wrangler.setup.jsonc`
+and then `wrangler.setup-redirect.jsonc`.
 
 ## Adding a board
 
