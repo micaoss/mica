@@ -173,10 +173,16 @@ exists. Exactly three channels can create the first one:
    clients. You choose the administrator password; the route establishes a
    browser session and mints no API token. A second
    setup call on a claimed device is refused with `already_configured` and
-   writes nothing.
+   writes nothing. From core 0.0.4, on a device with a device code, setup
+   also asks for the code printed on the label, as proof that whoever claims
+   the device holds it: reaching its console is no such proof once Bluetooth
+   has put an unclaimed device on a network. A wrong code counts towards the
+   sign-in backoff.
 2. **A provisioning document** — section 3. The password came off the medium.
-3. **Bluetooth** — a phone in range of an unclaimed device, section 5. The
-   claim channel reads `ble`.
+3. **Bluetooth**, on core 0.0.3 only — a phone in range of an unclaimed
+   device, section 5. The claim channel reads `ble`. From core 0.0.4 a phone
+   sets up the network and claims nothing; the device is claimed through
+   setup.
 
 On a product with WiFi, the claim through setup or Bluetooth also replaces
 the access point's label key: with the key the caller sends, or with sixteen
@@ -231,7 +237,8 @@ before the first sign-in is physical custody of the medium, and nothing else.
 
 On a product with WiFi and Bluetooth (cx3576.full, s905x5m.sd-full,
 s905x5m.emmc-full), a phone can give the device the WiFi network to join, and
-claim it if it is unclaimed, without joining its access point. The device
+on core 0.0.3 claim it if it is unclaimed, without joining its access
+point. From core 0.0.4 the phone can also set up the wired port. The device
 advertises only while a **provisioning window** is open:
 
 | Window | Opens | Closes | The phone needs |
@@ -244,11 +251,18 @@ advertises only while a **provisioning window** is open:
 - The phone side is the web page `https://init.micaos.dev`, in Chrome or
   Edge on Android or a desktop. iOS browsers have no Web Bluetooth, so the
   page only explains that there.
-- On an unclaimed device the page sets the administrator password; the claim
-  takes effect when the phone finishes, and the first phone to finish wins.
-  An unclaimed device is therefore claimable by anyone within Bluetooth range
-  for 10 minutes after each boot; claim it promptly, or before it leaves your
-  custody.
+- On core 0.0.3, the release of 2026-10-21, the page sets the administrator
+  password on an unclaimed device; the claim takes effect when the phone
+  finishes, and the first phone to finish wins. Such a device is therefore
+  claimable by anyone within Bluetooth range for 10 minutes after each boot;
+  claim it promptly, or before it leaves your custody.
+- From core 0.0.4 Bluetooth claims nothing. The phone sets the WiFi network or
+  the wired port's addressing, and optionally the hostname; the device stays
+  unclaimed, and the page's last screen sends you to the console, whose setup
+  asks for the administrator password and the device code on the label. After
+  a wired-only session the access point stays on, with the label's key, until
+  that claim. Until it is claimed, the device opens its unclaimed window again
+  at every boot.
 - A password window needs the password's verifier, which the device builds
   when the administrator signs in to the console; a device nobody has signed
   in to since it gained the feature answers that it cannot use the password.

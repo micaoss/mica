@@ -33,38 +33,39 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       hostname: 'mica-a4e2e69e',
       claimed: false,
       auth: 'none',
-      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'setNetwork', 'finish'],
+      ops: ['getStatus', 'scanWifi', 'setWifi', 'setNetwork', 'finish'],
       maxWrite: 20,
     })
   })
 
-  it('claims an unclaimed device over X25519: claim, setWifi, finish', async () => {
+  it('sets up an unclaimed device over X25519: setWifi, finish with a hostname; nothing is claimed', async () => {
     const { mock, client } = await open({ routers: ROUTERS })
     // `start` asks for the status, which comes as an event right after `ready`.
     expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
     expect(mock.sessionLog[0]).toMatchObject({ t: 'start', auth: 'none', status: true })
     expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
     expect(await client.run('scanWifi')).toEqual({ id: 2, event: 'failed', reason: 'ap_active' })
-    expect(await client.run('claim', { password: 'admin-pass-1', hostname: 'quay-7' })).toEqual({ id: 3, event: 'claimStaged' })
+    expect(await client.run('claim', { password: 'admin-pass-1' })).toEqual({ id: 3, event: 'failed', reason: 'unknown_op' })
     const progress: DeviceEvent[] = []
     const connected = await client.run('setWifi', { ssid: 'Harbour', psk: 'harbour-wifi-1', hidden: false }, e => progress.push(e))
     expect(progress).toEqual([{ id: 4, event: 'connecting' }])
-    expect(connected).toEqual({ id: 4, event: 'connected', ip: '192.168.8.41', hostname: 'quay-7' })
+    expect(connected).toEqual({ id: 4, event: 'connected', ip: '192.168.8.41', hostname: 'mica-a4e2e69e' })
     let dropped = false
     client.onDisconnect = () => {
       dropped = true
     }
-    expect(await client.run('finish')).toEqual({
+    expect(await client.run('finish', { hostname: 'quay-7' })).toEqual({
       id: 5,
       event: 'finished',
-      claimed: true,
+      claimed: false,
       hostname: 'quay-7',
       interface: { name: 'wlan0', kind: 'wifi', address: '192.168.8.41/24' },
       consoleUrls: ['http://192.168.8.41', 'http://quay-7.local'],
+      ap: 'off',
     })
     await new Promise(r => setTimeout(r, 5))
     expect(dropped).toBe(true)
-    expect(mock.claimed).toBe(true)
+    expect(mock.claimed).toBe(false)
     // Every write fitted info.maxWrite, and the long ones were split.
     expect(mock.largestWrite).toBe(20)
     expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'scanWifi', 'claim', 'setWifi', 'finish'])
@@ -86,13 +87,13 @@ describe('the client over a mocked GATT, against the mock device and the Node re
   it('sets up the wired port: applying, then up', async () => {
     const { client } = await open({})
     await client.authenticate('none')
-    expect(await client.run('setNetwork', { interface: 'eth0', dhcp: true })).toMatchObject({ event: 'failed', reason: 'not_claimed' })
-    await client.run('claim', { password: 'admin-pass-1' })
+    expect(await client.run('setNetwork', { interface: 'eth9', dhcp: true })).toMatchObject({ event: 'failed', reason: 'unknown_interface' })
     const progress: DeviceEvent[] = []
     expect(await client.run('setNetwork', { interface: 'eth0', static: { address: '10.0.0.5/24', gateway: '10.0.0.1', dns: ['10.0.0.1'] } }, e => progress.push(e)))
-      .toEqual({ id: 3, event: 'up', interface: 'eth0', address: '10.0.0.5/24' })
-    expect(progress).toEqual([{ id: 3, event: 'applying' }])
-    expect(await client.run('finish')).toMatchObject({ interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5', 'http://mica-a4e2e69e.local'] })
+      .toEqual({ id: 2, event: 'up', interface: 'eth0', address: '10.0.0.5/24' })
+    expect(progress).toEqual([{ id: 2, event: 'applying' }])
+    // Wired only: the access point stays on until the console claim.
+    expect(await client.run('finish')).toMatchObject({ claimed: false, interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5', 'http://mica-a4e2e69e.local'], ap: 'on' })
   })
 
   it('authenticates with a temp-code typed with a space', async () => {
@@ -134,7 +135,6 @@ describe('the client over a mocked GATT, against the mock device and the Node re
   it('runs one operation at a time', async () => {
     const { client, mock } = await open({ routers: ROUTERS, connectDelay: 30 })
     await client.authenticate('none')
-    await client.run('claim', { password: 'admin-pass-1' })
     let done: Promise<DeviceEvent> | undefined
     await new Promise<void>((resolve) => {
       done = client.run('setWifi', { ssid: 'Harbour', psk: 'harbour-wifi-1', hidden: false }, () => resolve())
@@ -152,22 +152,19 @@ describe('the client over a mocked GATT, against the mock device and the Node re
   ])('passes on setWifi failure %s', async (reason, ssid, psk, routers) => {
     const { client } = await open({ routers: { ...ROUTERS, ...routers } })
     await client.authenticate('none')
-    expect(await client.run('setWifi', { ssid, psk, hidden: false })).toMatchObject({ event: 'failed', reason: 'not_claimed' })
-    await client.run('claim', { password: 'admin-pass-1' })
     expect(await client.run('setWifi', { ssid, psk, hidden: false })).toMatchObject({ event: 'failed', reason })
   })
 
-  it('reports finish already_claimed', async () => {
+  it('reports finish already_claimed and invalid_hostname', async () => {
     const { client } = await open({ routers: ROUTERS, claimedElsewhere: true })
     await client.authenticate('none')
-    await client.run('claim', { password: 'admin-pass-1' })
+    expect(await client.run('finish', { hostname: '-bad-' })).toMatchObject({ event: 'failed', reason: 'invalid_hostname' })
     expect(await client.run('finish')).toMatchObject({ event: 'failed', reason: 'already_claimed' })
   })
 
   it('hears closing and rejects what waits when the link drops', async () => {
     const { mock, client } = await open({ routers: ROUTERS, connectDelay: 1000 })
     await client.authenticate('none')
-    await client.run('claim', { password: 'admin-pass-1' })
     const reasons: string[] = []
     client.onClosing = r => reasons.push(r)
     const pending = client.run('setWifi', { ssid: 'Harbour', psk: 'harbour-wifi-1', hidden: false })

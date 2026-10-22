@@ -54,7 +54,8 @@ type Step
     | { k: 'password', ssid: string, hidden: boolean, status: Status }
     | { k: 'wired', status: Status, form?: Wired }
     | { k: 'joined', text: string }
-    | { k: 'done', reached: Reached | null, urls: string[], claimedHere: boolean }
+    // unclaimed: BLE claims nothing, the console does; claimedHere: a 0.0.3 device claimed in the session.
+    | { k: 'done', reached: Reached | null, urls: string[], unclaimed: boolean, claimedHere: boolean, apOn: boolean }
     | { k: 'dropped', text: string }
 
 const HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i
@@ -75,6 +76,8 @@ function readStatus(e: DeviceEvent): Status {
 }
 
 const ethernetPorts = (s: Status) => s.interfaces.filter(p => p.kind === 'ethernet')
+// A core 0.0.3 device claims in the session; later devices list no `claim` and claim in the console.
+const claimsInSession = (i: DeviceInfo | null) => !!i?.ops.includes('claim')
 
 interface Props {
   bluetooth: BluetoothLike | undefined
@@ -133,7 +136,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     if (closingRef.current === 'claimed_elsewhere')
       return go({ k: 'stop', text: t.alreadyClaimed })
     const unclaimed = infoRef.current?.auth === 'none'
-    const text = unclaimed ? t.disconnectedUnclaimed : t.disconnectedClaimed
+    const text = !unclaimed ? t.disconnectedClaimed : claimsInSession(infoRef.current) ? t.disconnectedUnclaimed : t.disconnected
     go({ k: 'dropped', text: closingRef.current === 'idle' ? `${t.closingIdle} ${text}` : text })
   }
 
@@ -157,7 +160,9 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         return go({ k: 'auth', mode: i.auth })
       const st = await c.authenticate('none')
       statusRef.current = st ? readStatus(st) : null
-      go({ k: 'admin' })
+      if (claimsInSession(i))
+        return go({ k: 'admin' })
+      await showStatus()
     }
     catch (e) {
       if (e instanceof SessionError && e.reason === 'busy')
@@ -315,12 +320,14 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     }
   }
 
-  async function finish(joined: string) {
+  async function finish(joined: string, hostname: string) {
     go({ k: 'busy', text: t.finishing })
     try {
-      const e = await clientRef.current!.run('finish')
+      const e = await clientRef.current!.run('finish', hostname ? { hostname } : {})
       if (e.event === 'finished') {
-        const claimedHere = infoRef.current?.auth === 'none'
+        const session = infoRef.current?.auth === 'none'
+        const legacy = claimsInSession(infoRef.current)
+        const unclaimed = e.claimed !== true
         if (infoRef.current)
           infoRef.current = { ...infoRef.current, claimed: e.claimed === true, hostname: String(e.hostname) }
         const r = e.interface as Record<string, unknown> | null | undefined
@@ -330,12 +337,14 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         const urls = Array.isArray(e.consoleUrls)
           ? e.consoleUrls.filter((u): u is string => typeof u === 'string' && /^http:\/\//.test(u))
           : [`http://${String(e.hostname)}.local`]
-        return go({ k: 'done', reached, urls, claimedHere })
+        return go({ k: 'done', reached, urls, unclaimed, claimedHere: session && legacy, apOn: unclaimed && e.ap === 'on' })
       }
       if (e.reason === 'already_claimed')
         return stop(t.alreadyClaimed)
       if (e.reason === 'not_claimed')
         return go({ k: 'admin' }, reason(e))
+      if (e.reason === 'invalid_hostname')
+        return go({ k: 'joined', text: joined }, t.hostnameInvalid)
       go({ k: 'joined', text: joined }, reason(e))
     }
     catch (e) {
@@ -423,7 +432,7 @@ interface StepProps {
   onApply: (status: Status, form: Wired) => void
   onPick: (ssid: string, hidden: boolean, status: Status) => void
   onJoin: (ssid: string, psk: string, hidden: boolean, status: Status) => void
-  onFinish: (joined: string) => void
+  onFinish: (joined: string, hostname: string) => void
 }
 
 function StepView(p: StepProps) {
@@ -473,12 +482,7 @@ function StepView(p: StepProps) {
     case 'password':
       return <PasswordForm t={t} step={step} onBack={p.onConfigure} onSubmit={psk => p.onJoin(step.ssid, psk, step.hidden, step.status)} />
     case 'joined':
-      return (
-        <>
-          <p className="ok" role="status">{step.text}</p>
-          <button type="button" onClick={() => p.onFinish(step.text)}>{t.finish}</button>
-        </>
-      )
+      return <JoinedView t={t} text={step.text} hostname={claimsInSession(p.info) ? null : p.info?.hostname ?? ''} onFinish={h => p.onFinish(step.text, h)} />
     case 'done':
       return <DoneView t={t} step={step} />
   }
@@ -749,6 +753,32 @@ function PasswordForm({ t, step, onBack, onSubmit }: {
   )
 }
 
+/** The network is up; `hostname` is the field's placeholder, or null where finish takes none (0.0.3). */
+function JoinedView({ t, text, hostname, onFinish }: { t: Dict, text: string, hostname: string | null, onFinish: (hostname: string) => void }) {
+  const [host, setHost] = useState('')
+  const [error, setError] = useState('')
+  const submit = (e: SubmitEvent) => {
+    e.preventDefault()
+    const problem = host && !HOSTNAME.test(host) ? t.hostnameInvalid : ''
+    setError(problem)
+    if (!problem)
+      onFinish(host)
+  }
+  return (
+    <form onSubmit={submit} noValidate>
+      <p className="ok" role="status">{text}</p>
+      {hostname !== null && (
+        <label>
+          {t.hostnameOptional}
+          <input autoCapitalize="none" spellCheck={false} placeholder={hostname} value={host} onChange={e => setHost(e.target.value.trim())} />
+        </label>
+      )}
+      {error && <p className="alert" role="alert">{error}</p>}
+      <button type="submit">{t.finish}</button>
+    </form>
+  )
+}
+
 function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) {
   const r = step.reached
   return (
@@ -758,7 +788,7 @@ function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) 
       {/* Only links: the HTTPS page never requests the device's HTTP itself. */}
       {step.urls.length > 0 && (
         <p>
-          {t.consoleAt}
+          {step.unclaimed ? t.setPasswordAt : t.consoleAt}
           {step.urls.map((u, i) => (
             <span key={u}>
               {i > 0 && t.or}
@@ -768,6 +798,8 @@ function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) 
           {t.period}
         </p>
       )}
+      {step.unclaimed && <p>{t.deviceCode}</p>}
+      {step.apOn && <p className="muted">{t.apStillOn}</p>}
       {step.claimedHere && <p className="muted">{t.hotspotOff}</p>}
     </>
   )

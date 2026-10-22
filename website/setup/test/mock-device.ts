@@ -76,6 +76,11 @@ export interface MockOptions {
   wiredFail?: string
   /** Whether `ready` honours `"status": true` in `start`. */
   statusOnStart?: boolean
+  /**
+   * A core 0.0.3 device: `claim` stages the administrator, `setWifi` needs it, `finish` claims and
+   * answers `{claimed, hostname, apPsk}`; no `setNetwork`, no status after `ready`.
+   */
+  legacy?: boolean
   /** The `share` message carries the optional `attemptsLeft`. */
   attemptsInShare?: boolean
 }
@@ -204,7 +209,9 @@ export class MockDevice {
       hostname: 'mica-a4e2e69e',
       claimed: false,
       auth: opts.claimed ? 'password' : 'none',
-      ops: ['getStatus', 'scanWifi', 'claim', 'setWifi', 'setNetwork', 'finish'],
+      ops: opts.legacy
+        ? ['getStatus', 'scanWifi', 'claim', 'setWifi', 'finish']
+        : ['getStatus', 'scanWifi', 'setWifi', 'setNetwork', 'finish'],
       maxWrite: 20,
       notifySize: 20,
       wifiMode: 'ap',
@@ -220,7 +227,8 @@ export class MockDevice {
         { name: 'wlan0', kind: 'wifi', carrier: false, address: null },
       ],
       lease: '192.168.1.40/24',
-      statusOnStart: true,
+      statusOnStart: !opts.legacy,
+      legacy: false,
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -391,6 +399,8 @@ export class MockDevice {
           return failed('ap_active')
         return this.event({ id, event: 'networks', networks: this.networks })
       case 'claim': {
+        if (!this.o.legacy)
+          return failed('unknown_op')
         if (this.auth !== 'none')
           return failed('not_allowed')
         if (this.claimed)
@@ -404,8 +414,10 @@ export class MockDevice {
         return this.event({ id, event: 'claimStaged' })
       }
       case 'setWifi': {
-        if (this.auth === 'none' && !this.staged)
+        if (this.o.legacy && this.auth === 'none' && !this.staged)
           return failed('not_claimed')
+        if (this.auth === 'none' && this.o.claimedElsewhere)
+          return failed('already_claimed')
         const ssid = c.ssid
         const psk = c.psk
         if (typeof ssid !== 'string' || !enc.encode(ssid).length || enc.encode(ssid).length > 32)
@@ -436,8 +448,8 @@ export class MockDevice {
         return
       }
       case 'setNetwork': {
-        if (this.auth === 'none' && !this.staged)
-          return failed('not_claimed')
+        if (this.o.legacy)
+          return failed('unknown_op')
         const port = this.ports.find(p => p.name === c.interface && p.kind === 'ethernet')
         if (!port)
           return failed('unknown_interface')
@@ -470,19 +482,15 @@ export class MockDevice {
         return
       }
       case 'finish': {
-        if (this.auth !== 'none') {
-          await this.event({ id, event: 'finished', claimed: true, ...this.reached() })
-          return this.close()
-        }
-        if (this.o.claimedElsewhere) {
-          this.staged = undefined
+        if (this.o.legacy)
+          return this.legacyFinish(id)
+        if (c.hostname !== undefined && (typeof c.hostname !== 'string' || !HOSTNAME.test(c.hostname)))
+          return failed('invalid_hostname')
+        if (this.auth === 'none' && this.o.claimedElsewhere)
           return failed('already_claimed')
-        }
-        if (!this.staged)
-          return failed('not_claimed')
-        this.claimed = true
-        this.hostname = this.staged.hostname ?? this.hostname
-        await this.event({ id, event: 'finished', claimed: true, ...this.reached() })
+        this.hostname = (c.hostname as string | undefined) ?? this.hostname
+        // BLE claims nothing: an unclaimed device stays unclaimed.
+        await this.event({ id, event: 'finished', claimed: this.claimed, ...this.reached(), ap: this.wifi.mode === 'ap' ? 'on' : 'off' })
         return this.close()
       }
       default:
@@ -499,5 +507,24 @@ export class MockDevice {
       interface: port ? { name: port.name, kind: port.kind, address: port.address } : null,
       consoleUrls: [...(address ? [`http://${address}`] : []), `http://${this.hostname}.local`],
     }
+  }
+
+  private async legacyFinish(id: number) {
+    const failed = (reason: string) => this.event({ id, event: 'failed', reason })
+    if (this.auth !== 'none') {
+      await this.event({ id, event: 'finished', claimed: true, hostname: this.hostname })
+      return this.close()
+    }
+    if (this.o.claimedElsewhere) {
+      this.staged = undefined
+      return failed('already_claimed')
+    }
+    if (!this.staged)
+      return failed('not_claimed')
+    this.claimed = true
+    this.hostname = this.staged.hostname ?? this.hostname
+    const generated = this.staged.apPsk === undefined ? { apPsk: 'harbour-ap-key-7f3a' } : {}
+    await this.event({ id, event: 'finished', claimed: true, hostname: this.hostname, ...generated })
+    return this.close()
   }
 }
