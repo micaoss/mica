@@ -77,7 +77,7 @@ describe('the provisioning page', () => {
     expect(screen.getByText(new RegExp(SETUP_HOST))).toBeInTheDocument()
   })
 
-  it('an unclaimed device over Wi-Fi: no password, a hostname at finish, the console claims it', async () => {
+  it('an unclaimed device over Wi-Fi: no password, no hostname, the console claims it', async () => {
     const { mock, user } = setup()
     await reachSsid(user)
     expect(screen.queryByText('设置管理员')).toBeNull()
@@ -87,31 +87,19 @@ describe('the provisioning page', () => {
     await user.type(screen.getByLabelText('Wi-Fi 密码（开放网络留空）'), 'harbour-wifi-1')
     await user.click(screen.getByRole('button', { name: '连接' }))
     expect(await find('已连接 Harbour，IP：192.168.8.41')).toBeInTheDocument()
-    await user.type(screen.getByLabelText('主机名（可选）'), 'quay-7')
+    // The hostname is set with the console's claim, not here.
+    expect(screen.queryByLabelText('主机名（可选）')).toBeNull()
     await user.click(screen.getByRole('button', { name: '完成配网' }))
     expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
-    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.8.41 或 http://quay-7.local')
+    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.8.41 或 http://mica-a4e2e69e.local')
     expect(screen.getByRole('link', { name: 'http://192.168.8.41' })).toHaveAttribute('href', 'http://192.168.8.41')
-    expect(screen.getByRole('link', { name: 'http://quay-7.local' })).toHaveAttribute('href', 'http://quay-7.local')
+    expect(screen.getByRole('link', { name: 'http://mica-a4e2e69e.local' })).toHaveAttribute('href', 'http://mica-a4e2e69e.local')
     expect(screen.getByText(DEVICE_CODE)).toBeInTheDocument()
     // After setWifi the access point is off.
     expect(screen.queryByText(AP_ON)).toBeNull()
     expect(mock.claimed).toBe(false)
     expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'setWifi', 'finish'])
-    expect(mock.commands.at(-1)).toEqual({ id: 3, op: 'finish', hostname: 'quay-7' })
-  })
-
-  it('checks the hostname before finish, and sends none when the field is empty', async () => {
-    const { mock, user } = setup()
-    await reachSsid(user)
-    await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
-    await user.type(await screen.findByLabelText('主机名（可选）', {}, { timeout: 4000 }), '-bad-')
-    await user.click(screen.getByRole('button', { name: '完成配网' }))
-    expect(screen.getByRole('alert')).toHaveTextContent('主机名只能包含字母、数字和连字符')
-    expect(mock.commands.some(c => c.op === 'finish')).toBe(false)
-    await user.clear(screen.getByLabelText('主机名（可选）'))
-    await user.click(screen.getByRole('button', { name: '完成配网' }))
-    expect(await find(SET_PASSWORD)).toHaveTextContent('http://mica-a4e2e69e.local')
+    // finish carries no member but op and id; another one is bad_request.
     expect(mock.commands.at(-1)).toEqual({ id: 3, op: 'finish' })
   })
 

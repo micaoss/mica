@@ -38,7 +38,7 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     })
   })
 
-  it('sets up an unclaimed device over X25519: setWifi, finish with a hostname; nothing is claimed', async () => {
+  it('sets up an unclaimed device over X25519: setWifi, finish; nothing is claimed', async () => {
     const { mock, client } = await open({ routers: ROUTERS })
     // `start` asks for the status, which comes as an event right after `ready`.
     expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
@@ -54,13 +54,13 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     client.onDisconnect = () => {
       dropped = true
     }
-    expect(await client.run('finish', { hostname: 'quay-7' })).toEqual({
+    expect(await client.run('finish')).toEqual({
       id: 5,
       event: 'finished',
       claimed: false,
-      hostname: 'quay-7',
+      hostname: 'mica-a4e2e69e',
       interface: { name: 'wlan0', kind: 'wifi', address: '192.168.8.41/24' },
-      consoleUrls: ['http://192.168.8.41', 'http://quay-7.local'],
+      consoleUrls: ['http://192.168.8.41', 'http://mica-a4e2e69e.local'],
       ap: 'off',
     })
     await new Promise(r => setTimeout(r, 5))
@@ -155,10 +155,10 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     expect(await client.run('setWifi', { ssid, psk, hidden: false })).toMatchObject({ event: 'failed', reason })
   })
 
-  it('reports finish already_claimed and invalid_hostname', async () => {
+  it('reports finish already_claimed, and bad_request for any member', async () => {
     const { client } = await open({ routers: ROUTERS, claimedElsewhere: true })
     await client.authenticate('none')
-    expect(await client.run('finish', { hostname: '-bad-' })).toMatchObject({ event: 'failed', reason: 'invalid_hostname' })
+    expect(await client.run('finish', { hostname: 'quay-7' })).toMatchObject({ event: 'failed', reason: 'bad_request' })
     expect(await client.run('finish')).toMatchObject({ event: 'failed', reason: 'already_claimed' })
   })
 

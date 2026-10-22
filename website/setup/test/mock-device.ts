@@ -484,11 +484,11 @@ export class MockDevice {
       case 'finish': {
         if (this.o.legacy)
           return this.legacyFinish(id)
-        if (c.hostname !== undefined && (typeof c.hostname !== 'string' || !HOSTNAME.test(c.hostname)))
-          return failed('invalid_hostname')
+        // No member but op and id: an exception to ignoring unknown members.
+        if (Object.keys(c).some(k => k !== 'op' && k !== 'id'))
+          return failed('bad_request')
         if (this.auth === 'none' && this.o.claimedElsewhere)
           return failed('already_claimed')
-        this.hostname = (c.hostname as string | undefined) ?? this.hostname
         // BLE claims nothing: an unclaimed device stays unclaimed.
         await this.event({ id, event: 'finished', claimed: this.claimed, ...this.reached(), ap: this.wifi.mode === 'ap' ? 'on' : 'off' })
         return this.close()

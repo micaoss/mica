@@ -256,10 +256,11 @@ advertises only while a **provisioning window** is open:
   finishes, and the first phone to finish wins. Such a device is therefore
   claimable by anyone within Bluetooth range for 10 minutes after each boot;
   claim it promptly, or before it leaves your custody.
-- From core 0.0.4 Bluetooth claims nothing. The phone sets the WiFi network or
-  the wired port's addressing, and optionally the hostname; the device stays
-  unclaimed, and the page's last screen sends you to the console, whose setup
-  asks for the administrator password and the device code on the label. After
+- From core 0.0.4 Bluetooth claims nothing and sets nothing but the network:
+  the phone sets the WiFi network or the wired port's addressing; the device
+  stays unclaimed, and the page's last screen sends you to the console, whose
+  setup asks for the administrator password and the device code on the label.
+  The hostname is set there, or later in the console. After
   a wired-only session the access point stays on, with the label's key, until
   that claim. Until it is claimed, the device opens its unclaimed window again
   at every boot.

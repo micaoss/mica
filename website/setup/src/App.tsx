@@ -320,10 +320,10 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     }
   }
 
-  async function finish(joined: string, hostname: string) {
+  async function finish(joined: string) {
     go({ k: 'busy', text: t.finishing })
     try {
-      const e = await clientRef.current!.run('finish', hostname ? { hostname } : {})
+      const e = await clientRef.current!.run('finish')
       if (e.event === 'finished') {
         const session = infoRef.current?.auth === 'none'
         const legacy = claimsInSession(infoRef.current)
@@ -343,8 +343,6 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         return stop(t.alreadyClaimed)
       if (e.reason === 'not_claimed')
         return go({ k: 'admin' }, reason(e))
-      if (e.reason === 'invalid_hostname')
-        return go({ k: 'joined', text: joined }, t.hostnameInvalid)
       go({ k: 'joined', text: joined }, reason(e))
     }
     catch (e) {
@@ -432,7 +430,7 @@ interface StepProps {
   onApply: (status: Status, form: Wired) => void
   onPick: (ssid: string, hidden: boolean, status: Status) => void
   onJoin: (ssid: string, psk: string, hidden: boolean, status: Status) => void
-  onFinish: (joined: string, hostname: string) => void
+  onFinish: (joined: string) => void
 }
 
 function StepView(p: StepProps) {
@@ -482,7 +480,12 @@ function StepView(p: StepProps) {
     case 'password':
       return <PasswordForm t={t} step={step} onBack={p.onConfigure} onSubmit={psk => p.onJoin(step.ssid, psk, step.hidden, step.status)} />
     case 'joined':
-      return <JoinedView t={t} text={step.text} hostname={claimsInSession(p.info) ? null : p.info?.hostname ?? ''} onFinish={h => p.onFinish(step.text, h)} />
+      return (
+        <>
+          <p className="ok" role="status">{step.text}</p>
+          <button type="button" onClick={() => p.onFinish(step.text)}>{t.finish}</button>
+        </>
+      )
     case 'done':
       return <DoneView t={t} step={step} />
   }
@@ -749,32 +752,6 @@ function PasswordForm({ t, step, onBack, onSubmit }: {
         <button type="button" className="secondary" onClick={onBack}>{t.back}</button>
         <button type="submit">{t.join}</button>
       </div>
-    </form>
-  )
-}
-
-/** The network is up; `hostname` is the field's placeholder, or null where finish takes none (0.0.3). */
-function JoinedView({ t, text, hostname, onFinish }: { t: Dict, text: string, hostname: string | null, onFinish: (hostname: string) => void }) {
-  const [host, setHost] = useState('')
-  const [error, setError] = useState('')
-  const submit = (e: SubmitEvent) => {
-    e.preventDefault()
-    const problem = host && !HOSTNAME.test(host) ? t.hostnameInvalid : ''
-    setError(problem)
-    if (!problem)
-      onFinish(host)
-  }
-  return (
-    <form onSubmit={submit} noValidate>
-      <p className="ok" role="status">{text}</p>
-      {hostname !== null && (
-        <label>
-          {t.hostnameOptional}
-          <input autoCapitalize="none" spellCheck={false} placeholder={hostname} value={host} onChange={e => setHost(e.target.value.trim())} />
-        </label>
-      )}
-      {error && <p className="alert" role="alert">{error}</p>}
-      <button type="submit">{t.finish}</button>
     </form>
   )
 }
