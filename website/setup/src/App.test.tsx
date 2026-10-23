@@ -65,8 +65,8 @@ async function enterNetwork(user: User, ssid: string, psk: string) {
 }
 
 const SET_PASSWORD = /^打开控制台设置管理员密码：/
-const DEVICE_CODE = '控制台会要求输入设备标签上印的设备码。'
-const AP_ON = '设备热点仍然开着，在控制台完成认领之前，用的是标签上的密码。'
+const DEVICE_CODE = '控制台会要求输入设备码——它印在设备标签上，也显示在设备自己的控制台上（串口 / 显示器登录提示）。'
+const AP_ON = '设备热点保持使用标签上的密码，直到你在控制台设置自己的密码。'
 
 describe('the provisioning page', () => {
   it('step 0: without Web Bluetooth it sends the user to hotspot setup', () => {
@@ -132,7 +132,7 @@ describe('the provisioning page', () => {
     }
   })
 
-  it('the wired port over DHCP: the hotspot stays on with the label key until the console claim', async () => {
+  it('the wired port over DHCP: the hotspot keeps the label key until one is set in the console', async () => {
     const { user, mock } = setup()
     await reachStatus(user)
     expect(screen.getByText('有线 · 已插网线')).toBeInTheDocument()

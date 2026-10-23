@@ -62,11 +62,14 @@ new identity. No identity is stored in the bootloader's attempt records.
   s905x5m.sd-full, s905x5m.emmc-full): the device's label carries its
   **device code**, printed `DFN4-L34C-T8N`, the access point's name
   (`mica-` and four characters) and its key, also as a QR code. Join that
-  network and open `http://192.168.4.1:8080`. The label's key works only
-  while the device is unclaimed: the claim replaces it with a key you choose
-  or one the device generates and shows once (section 4). A factory reset
-  brings the label's key back. `micad device-code` prints the code on the
-  device; nothing on the device prints the key.
+  network and open `http://192.168.4.1:8080`. On core 0.0.3 the label's key
+  works only while the device is unclaimed: the claim replaces it with a key
+  you choose or one the device generates and shows once (section 4). From
+  core 0.0.4 it keeps working after the claim, until you set a key of your
+  own on the console's Wi-Fi page. A factory reset brings the label's key
+  back. `micad device-code` prints the code on the device, and from core
+  0.0.4 the device's own console shows it at the login prompt; nothing on
+  the device prints the key.
 - The label's key is a first-contact credential, not a secret: every image of
   a product carries the product secret it is derived from, so whoever holds
   an image and reads a label can compute it
@@ -174,7 +177,8 @@ exists. Exactly three channels can create the first one:
    browser session and mints no API token. A second
    setup call on a claimed device is refused with `already_configured` and
    writes nothing. From core 0.0.4, on a device with a device code, setup
-   also asks for the code printed on the label, as proof that whoever claims
+   also asks for that code, printed on the label and shown on the device's
+   own console (serial or display login prompt), as proof that whoever claims
    the device holds it: reaching its console is no such proof once Bluetooth
    has put an unclaimed device on a network. A wrong code counts towards the
    sign-in backoff.
@@ -184,11 +188,13 @@ exists. Exactly three channels can create the first one:
    sets up the network and claims nothing; the device is claimed through
    setup.
 
-On a product with WiFi, the claim through setup or Bluetooth also replaces
-the access point's label key: with the key the caller sends, or with sixteen
-random characters the answer carries once and the console shows before it
-enters. A claim by provisioning document sets no key, and the device falls
-back to a key it generated at first boot.
+On core 0.0.3, on a product with WiFi, the claim through setup or Bluetooth
+also replaces the access point's label key: with the key the caller sends, or
+with sixteen random characters the answer carries once and the console shows
+before it enters. A claim by provisioning document sets no key, and the
+device falls back to a key it generated at first boot. From core 0.0.4 no
+claim sets a key: the label's key applies until you set one on the console's
+Wi-Fi page.
 
 From the claim onward, every management read and write is authenticated. See
 [../operate/api.md](../operate/api.md) for the session and token model and
@@ -259,10 +265,11 @@ advertises only while a **provisioning window** is open:
 - From core 0.0.4 Bluetooth claims nothing and sets nothing but the network:
   the phone sets the WiFi network or the wired port's addressing; the device
   stays unclaimed, and the page's last screen sends you to the console, whose
-  setup asks for the administrator password and the device code on the label.
-  The hostname is set there, or later in the console. After
-  a wired-only session the access point stays on, with the label's key, until
-  that claim. Until it is claimed, the device opens its unclaimed window again
+  setup asks for the administrator password and the device code, which is on
+  the label and on the device's own console. The hostname is set there, or
+  later in the console. After a wired-only session the access point stays on
+  with the label's key, and keeps that key after the claim until you set your
+  own in the console. Until it is claimed, the device opens its unclaimed window again
   at every boot.
 - A password window needs the password's verifier, which the device builds
   when the administrator signs in to the console; a device nobody has signed
