@@ -60,7 +60,7 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       claimed: false,
       hostname: 'mica-a4e2e69e',
       interface: { name: 'wlan0', kind: 'wifi', address: '192.168.8.41/24' },
-      consoleUrls: ['http://192.168.8.41', 'http://mica-a4e2e69e.local'],
+      consoleUrls: ['http://192.168.8.41:8080', 'http://mica-a4e2e69e.local:8080'],
       ap: 'off',
     })
     await new Promise(r => setTimeout(r, 5))
@@ -93,7 +93,7 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       .toEqual({ id: 2, event: 'up', interface: 'eth0', address: '10.0.0.5/24' })
     expect(progress).toEqual([{ id: 2, event: 'applying' }])
     // Wired only: the access point stays on until the console claim.
-    expect(await client.run('finish')).toMatchObject({ claimed: false, interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5', 'http://mica-a4e2e69e.local'], ap: 'on' })
+    expect(await client.run('finish')).toMatchObject({ claimed: false, interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5:8080', 'http://mica-a4e2e69e.local:8080'], ap: 'on' })
   })
 
   it('authenticates with a temp-code typed with a space', async () => {
@@ -155,10 +155,9 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     expect(await client.run('setWifi', { ssid, psk, hidden: false })).toMatchObject({ event: 'failed', reason })
   })
 
-  it('reports finish already_claimed, and bad_request for any member', async () => {
+  it('reports finish already_claimed', async () => {
     const { client } = await open({ routers: ROUTERS, claimedElsewhere: true })
     await client.authenticate('none')
-    expect(await client.run('finish', { hostname: 'quay-7' })).toMatchObject({ event: 'failed', reason: 'bad_request' })
     expect(await client.run('finish')).toMatchObject({ event: 'failed', reason: 'already_claimed' })
   })
 

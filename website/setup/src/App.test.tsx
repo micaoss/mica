@@ -91,15 +91,15 @@ describe('the provisioning page', () => {
     expect(screen.queryByLabelText('主机名（可选）')).toBeNull()
     await user.click(screen.getByRole('button', { name: '完成配网' }))
     expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
-    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.8.41 或 http://mica-a4e2e69e.local')
-    expect(screen.getByRole('link', { name: 'http://192.168.8.41' })).toHaveAttribute('href', 'http://192.168.8.41')
-    expect(screen.getByRole('link', { name: 'http://mica-a4e2e69e.local' })).toHaveAttribute('href', 'http://mica-a4e2e69e.local')
+    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.8.41:8080 或 http://mica-a4e2e69e.local:8080')
+    expect(screen.getByRole('link', { name: 'http://192.168.8.41:8080' })).toHaveAttribute('href', 'http://192.168.8.41:8080')
+    expect(screen.getByRole('link', { name: 'http://mica-a4e2e69e.local:8080' })).toHaveAttribute('href', 'http://mica-a4e2e69e.local:8080')
     expect(screen.getByText(DEVICE_CODE)).toBeInTheDocument()
     // After setWifi the access point is off.
     expect(screen.queryByText(AP_ON)).toBeNull()
     expect(mock.claimed).toBe(false)
     expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'setWifi', 'finish'])
-    // finish carries no member but op and id; another one is bad_request.
+    // finish carries no member but op and id.
     expect(mock.commands.at(-1)).toEqual({ id: 3, op: 'finish' })
   })
 
@@ -145,10 +145,30 @@ describe('the provisioning page', () => {
     expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({ id: 1, op: 'setNetwork', interface: 'eth0', dhcp: true })
     await user.click(screen.getByRole('button', { name: '完成配网' }))
     expect(await find('已连接。有线 192.168.1.40。')).toBeInTheDocument()
-    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.1.40 或 http://mica-a4e2e69e.local')
+    expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.1.40:8080 或 http://mica-a4e2e69e.local:8080')
     expect(screen.getByText(DEVICE_CODE)).toBeInTheDocument()
     expect(screen.getByText(AP_ON)).toBeInTheDocument()
     expect(mock.claimed).toBe(false)
+  })
+
+  it('links https consoleUrls as the device sends them', async () => {
+    const { user } = setup({ web: { scheme: 'https', port: 443 } })
+    await reachSsid(user)
+    await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
+    await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
+    expect(await find(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：https://192.168.8.41 或 https://mica-a4e2e69e.local')
+    expect(screen.getByRole('link', { name: 'https://192.168.8.41' })).toHaveAttribute('href', 'https://192.168.8.41')
+  })
+
+  it('says the console is not on the network when consoleUrls is empty', async () => {
+    const { user } = setup({ web: null })
+    await reachSsid(user)
+    await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
+    await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
+    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
+    expect(screen.getByText('这台设备的控制台没有在网络上开放，无法从网络打开。')).toBeInTheDocument()
+    expect(screen.queryByRole('link')).toBeNull()
+    expect(screen.queryByText(SET_PASSWORD)).toBeNull()
   })
 
   it('a static address is checked on the page, then sent as the doc shapes it', async () => {
@@ -222,7 +242,7 @@ describe('the provisioning page', () => {
     await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
     expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
     // Claimed already: the console is just the console.
-    expect(screen.getByText(/^打开控制台：/)).toHaveTextContent('打开控制台：http://192.168.8.41 或 http://mica-a4e2e69e.local')
+    expect(screen.getByText(/^打开控制台：/)).toHaveTextContent('打开控制台：http://192.168.8.41:8080 或 http://mica-a4e2e69e.local:8080')
     expect(screen.queryByText(DEVICE_CODE)).toBeNull()
     expect(screen.queryByText(/^设备热点/)).toBeNull()
     // The status came with `ready`: the one getStatus is the network step's.
@@ -305,7 +325,7 @@ describe('a core 0.0.3 device (info.ops lists claim)', () => {
     expect(screen.queryByLabelText('主机名（可选）')).toBeNull()
     await user.click(screen.getByRole('button', { name: '完成配网' }))
     // 0.0.3's finished names no console: the page falls back to the hostname.
-    expect(await find(/^打开控制台：/)).toHaveTextContent('打开控制台：http://quay-7.local')
+    expect(await find(/^打开控制台：/)).toHaveTextContent('打开控制台：http://quay-7.local:8080')
     expect(screen.getByText('设备热点已关闭。以后如需打开，请在控制台（Wi-Fi 页面）设置它的密码。')).toBeInTheDocument()
     expect(screen.queryByText('harbour-ap-key-7f3a')).toBeNull()
     expect(screen.queryByText(DEVICE_CODE)).toBeNull()

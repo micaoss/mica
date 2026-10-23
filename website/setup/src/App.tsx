@@ -334,9 +334,10 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         const reached = r && typeof r.name === 'string'
           ? { name: r.name, kind: String(r.kind), address: typeof r.address === 'string' ? r.address : null }
           : null
+        // A core 0.0.3 device names no console; its console is plain HTTP on 8080.
         const urls = Array.isArray(e.consoleUrls)
-          ? e.consoleUrls.filter((u): u is string => typeof u === 'string' && /^http:\/\//.test(u))
-          : [`http://${String(e.hostname)}.local`]
+          ? e.consoleUrls.filter((u): u is string => typeof u === 'string' && /^https?:\/\//.test(u))
+          : [`http://${String(e.hostname)}.local:8080`]
         return go({ k: 'done', reached, urls, unclaimed, claimedHere: session && legacy, apOn: unclaimed && e.ap === 'on' })
       }
       if (e.reason === 'already_claimed')
@@ -763,6 +764,7 @@ function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) 
       <h2>{t.done}</h2>
       {r && <p className="ok">{fill(t.doneConnected, { kind: r.kind === 'ethernet' ? t.ethernet : t.wifi, address: (r.address ?? '—').split('/')[0] })}</p>}
       {/* Only links: the HTTPS page never requests the device's HTTP itself. */}
+      {step.urls.length === 0 && <p>{t.noConsole}</p>}
       {step.urls.length > 0 && (
         <p>
           {step.unclaimed ? t.setPasswordAt : t.consoleAt}
@@ -775,7 +777,7 @@ function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) 
           {t.period}
         </p>
       )}
-      {step.unclaimed && <p>{t.deviceCode}</p>}
+      {step.unclaimed && step.urls.length > 0 && <p>{t.deviceCode}</p>}
       {step.apOn && <p className="muted">{t.apStillOn}</p>}
       {step.claimedHere && <p className="muted">{t.hotspotOff}</p>}
     </>

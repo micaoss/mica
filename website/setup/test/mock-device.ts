@@ -81,6 +81,8 @@ export interface MockOptions {
    * answers `{claimed, hostname, apPsk}`; no `setNetwork`, no status after `ready`.
    */
   legacy?: boolean
+  /** `access.web` as consoleUrls follow it; null: mode local or off, the list is empty. */
+  web?: { scheme: 'http' | 'https', port: number } | null
   /** The `share` message carries the optional `attemptsLeft`. */
   attemptsInShare?: boolean
 }
@@ -229,6 +231,7 @@ export class MockDevice {
       lease: '192.168.1.40/24',
       statusOnStart: !opts.legacy,
       legacy: false,
+      web: { scheme: 'http', port: 8080 },
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -484,9 +487,6 @@ export class MockDevice {
       case 'finish': {
         if (this.o.legacy)
           return this.legacyFinish(id)
-        // No member but op and id: an exception to ignoring unknown members.
-        if (Object.keys(c).some(k => k !== 'op' && k !== 'id'))
-          return failed('bad_request')
         if (this.auth === 'none' && this.o.claimedElsewhere)
           return failed('already_claimed')
         // BLE claims nothing: an unclaimed device stays unclaimed.
@@ -498,6 +498,15 @@ export class MockDevice {
     }
   }
 
+  private consoleUrls(address?: string): string[] {
+    const web = this.o.web
+    if (!web)
+      return []
+    const own = web.port === (web.scheme === 'https' ? 443 : 80)
+    const url = (host: string) => `${web.scheme}://${host.includes(':') ? `[${host}]` : host}${own ? '' : `:${web.port}`}`
+    return [...(address ? [url(address)] : []), url(`${this.hostname}.local`)]
+  }
+
   /** What `finished` carries for the page's last screen. */
   private reached(): Json {
     const port = this.brought ?? [...this.ports].sort((a, b) => Number(b.kind === 'ethernet') - Number(a.kind === 'ethernet')).find(p => p.address)
@@ -505,7 +514,7 @@ export class MockDevice {
     return {
       hostname: this.hostname,
       interface: port ? { name: port.name, kind: port.kind, address: port.address } : null,
-      consoleUrls: [...(address ? [`http://${address}`] : []), `http://${this.hostname}.local`],
+      consoleUrls: this.consoleUrls(address),
     }
   }
 
