@@ -85,6 +85,12 @@ export interface MockOptions {
   web?: { scheme: 'http' | 'https', port: number } | null
   /** The `share` message carries the optional `attemptsLeft`. */
   attemptsInShare?: boolean
+  /** The factory access point; psk null: it runs on a key the user set, not the label's. */
+  ap?: { ssid: string, psk: string | null }
+  /** A device from before `ap` was an object: `finished.ap` is `on` or `off`, `status` has none. */
+  apString?: boolean
+  /** A reason the first `finish` fails with. */
+  finishFail?: string
 }
 
 const enc = new TextEncoder()
@@ -232,6 +238,9 @@ export class MockDevice {
       statusOnStart: !opts.legacy,
       legacy: false,
       web: { scheme: 'http', port: 8080 },
+      ap: { ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' },
+      apString: !!opts.legacy,
+      finishFail: '',
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -244,7 +253,15 @@ export class MockDevice {
   }
 
   private status(): Json {
-    return { event: 'status', wifiMode: this.wifi.mode, connected: this.wifi.connected, ssid: this.wifi.ssid, ip: this.wifi.ip, interfaces: this.ports }
+    const ap = this.ap()
+    return { event: 'status', wifiMode: this.wifi.mode, connected: this.wifi.connected, ssid: this.wifi.ssid, ip: this.wifi.ip, interfaces: this.ports, ...(ap.on && !this.o.apString ? { ap } : {}) }
+  }
+
+  /** The access point as `getStatus` and `finished` carry it: the label's key only while unclaimed. */
+  private ap(): Json {
+    if (this.wifi.mode !== 'ap')
+      return { on: false }
+    return { on: true, ssid: this.o.ap.ssid, psk: this.claimed ? null : this.o.ap.psk }
   }
 
   /** `ready`, and the `status` event after it when `start` asked for one. */
@@ -489,8 +506,14 @@ export class MockDevice {
           return this.legacyFinish(id)
         if (this.auth === 'none' && this.o.claimedElsewhere)
           return failed('already_claimed')
+        if (this.o.finishFail) {
+          const reason = this.o.finishFail
+          this.o.finishFail = ''
+          return failed(reason)
+        }
         // BLE claims nothing: an unclaimed device stays unclaimed.
-        await this.event({ id, event: 'finished', claimed: this.claimed, ...this.reached(), ap: this.wifi.mode === 'ap' ? 'on' : 'off' })
+        const ap = this.ap()
+        await this.event({ id, event: 'finished', claimed: this.claimed, ...this.reached(), ap: this.o.apString ? (ap.on ? 'on' : 'off') : ap })
         return this.close()
       }
       default:

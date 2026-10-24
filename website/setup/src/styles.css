@@ -232,3 +232,19 @@ button.network {
 footer {
   text-align: center;
 }
+
+.secret h3 {
+  margin: 0 0 0.375rem;
+  font-size: 1rem;
+}
+
+.secret .row {
+  margin: 0.5rem 0;
+}
+
+svg.qr {
+  display: block;
+  width: 12rem;
+  height: 12rem;
+  margin: 0.5rem auto 0;
+}

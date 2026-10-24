@@ -48,3 +48,9 @@ export const isIp = (v: string) => IPV4.test(v) || IPV6.test(v)
 export function splitList(v: string): string[] {
   return v.split(/[\s,]+/).filter(Boolean)
 }
+
+/** The text of a Wi-Fi QR code, which phone cameras join from; `\ ; , : "` are escaped. */
+export function wifiQr(ssid: string, psk: string): string {
+  const esc = (v: string) => v.replace(/[\\;,:"]/g, c => `\\${c}`)
+  return `WIFI:T:WPA;S:${esc(ssid)};P:${esc(psk)};;`
+}

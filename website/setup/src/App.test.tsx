@@ -10,7 +10,7 @@ import { referenceVerifier } from '../test/reference-verifier'
 import { App } from './App'
 import { SETUP_HOST } from './config'
 import { detectLang } from './i18n'
-import { httpsRedirect, isIos, mergeNetworks } from './util'
+import { httpsRedirect, isIos, mergeNetworks, wifiQr } from './util'
 
 const ROUTERS = { Harbour: { psk: 'harbour-wifi-1', ip: '192.168.8.41' } }
 const NETWORKS = [
@@ -77,7 +77,7 @@ describe('the provisioning page', () => {
     expect(screen.getByText(new RegExp(SETUP_HOST))).toBeInTheDocument()
   })
 
-  it('an unclaimed device over Wi-Fi: no password, no hostname, the console claims it', async () => {
+  it('an unclaimed device over Wi-Fi: no password, no hostname, finish sent by itself, the console claims it', async () => {
     const { mock, user } = setup()
     await reachSsid(user)
     expect(screen.queryByText('设置管理员')).toBeNull()
@@ -86,17 +86,18 @@ describe('the provisioning page', () => {
     expect(await find('设备将关闭热点并连接 Harbour，连着设备热点的终端会断开')).toBeInTheDocument()
     await user.type(screen.getByLabelText('Wi-Fi 密码（开放网络留空）'), 'harbour-wifi-1')
     await user.click(screen.getByRole('button', { name: '连接' }))
-    expect(await find('已连接 Harbour，IP：192.168.8.41')).toBeInTheDocument()
+    // The network came up: the page finishes at once, with no button to press.
+    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '完成配网' })).toBeNull()
     // The hostname is set with the console's claim, not here.
     expect(screen.queryByLabelText('主机名（可选）')).toBeNull()
-    await user.click(screen.getByRole('button', { name: '完成配网' }))
-    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
     expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.8.41:8080 或 http://mica-a4e2e69e.local:8080')
     expect(screen.getByRole('link', { name: 'http://192.168.8.41:8080' })).toHaveAttribute('href', 'http://192.168.8.41:8080')
     expect(screen.getByRole('link', { name: 'http://mica-a4e2e69e.local:8080' })).toHaveAttribute('href', 'http://mica-a4e2e69e.local:8080')
     expect(screen.getByText(DEVICE_CODE)).toBeInTheDocument()
     // After setWifi the access point is off.
     expect(screen.queryByText(AP_ON)).toBeNull()
+    expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
     expect(mock.claimed).toBe(false)
     expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'setWifi', 'finish'])
     // finish carries no member but op and id.
@@ -141,13 +142,16 @@ describe('the provisioning page', () => {
     expect(screen.getByLabelText('网口')).toHaveValue('eth0')
     expect(screen.getByLabelText('自动获取（DHCP）')).toBeChecked()
     await user.click(screen.getByRole('button', { name: '应用' }))
-    expect(await find('eth0 已配置，地址：192.168.1.40/24')).toBeInTheDocument()
-    expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({ id: 1, op: 'setNetwork', interface: 'eth0', dhcp: true })
-    await user.click(screen.getByRole('button', { name: '完成配网' }))
     expect(await find('已连接。有线 192.168.1.40。')).toBeInTheDocument()
+    expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({ id: 1, op: 'setNetwork', interface: 'eth0', dhcp: true })
+    expect(mock.commands.at(-1)).toEqual({ id: 2, op: 'finish' })
     expect(screen.getByText(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：http://192.168.1.40:8080 或 http://mica-a4e2e69e.local:8080')
     expect(screen.getByText(DEVICE_CODE)).toBeInTheDocument()
     expect(screen.getByText(AP_ON)).toBeInTheDocument()
+    // The access point stays on with the label's key: the page offers to join it.
+    expect(screen.getByRole('heading', { name: '加入设备热点' })).toBeInTheDocument()
+    expect(screen.getByText('mica-JXHD')).toBeInTheDocument()
+    expect(screen.getByText('W3Q3ZERVUME6L2ZV')).toBeInTheDocument()
     expect(mock.claimed).toBe(false)
   })
 
@@ -155,7 +159,6 @@ describe('the provisioning page', () => {
     const { user } = setup({ web: { scheme: 'https', port: 443 } })
     await reachSsid(user)
     await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
-    await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
     expect(await find(SET_PASSWORD)).toHaveTextContent('打开控制台设置管理员密码：https://192.168.8.41 或 https://mica-a4e2e69e.local')
     expect(screen.getByRole('link', { name: 'https://192.168.8.41' })).toHaveAttribute('href', 'https://192.168.8.41')
   })
@@ -164,7 +167,6 @@ describe('the provisioning page', () => {
     const { user } = setup({ web: null })
     await reachSsid(user)
     await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
-    await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
     expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
     expect(screen.getByText('这台设备的控制台没有在网络上开放，无法从网络打开。')).toBeInTheDocument()
     expect(screen.queryByRole('link')).toBeNull()
@@ -193,7 +195,7 @@ describe('the provisioning page', () => {
     await user.clear(screen.getByLabelText('DNS 服务器（可选，用空格或逗号分隔）'))
     await user.type(screen.getByLabelText('DNS 服务器（可选，用空格或逗号分隔）'), '10.0.0.1, 2001:db8::53')
     await apply()
-    expect(await find('eth0 已配置，地址：10.0.0.5/24')).toBeInTheDocument()
+    expect(await find('已连接。有线 10.0.0.5。')).toBeInTheDocument()
     expect(mock.commands.find(c => c.op === 'setNetwork')).toEqual({
       id: 1,
       op: 'setNetwork',
@@ -239,12 +241,12 @@ describe('the provisioning page', () => {
     expect(screen.queryByText(/设备将关闭热点/)).toBeNull()
     await user.type(screen.getByLabelText('Wi-Fi 密码（开放网络留空）'), 'harbour-wifi-1')
     await user.click(screen.getByRole('button', { name: '连接' }))
-    await user.click(await screen.findByRole('button', { name: '完成配网' }, { timeout: 4000 }))
     expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
     // Claimed already: the console is just the console.
     expect(screen.getByText(/^打开控制台：/)).toHaveTextContent('打开控制台：http://192.168.8.41:8080 或 http://mica-a4e2e69e.local:8080')
     expect(screen.queryByText(DEVICE_CODE)).toBeNull()
     expect(screen.queryByText(/^设备热点/)).toBeNull()
+    expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
     // The status came with `ready`: the one getStatus is the network step's.
     expect(mock.commands.filter(c => c.op === 'getStatus')).toHaveLength(1)
   })
@@ -282,6 +284,56 @@ describe('the provisioning page', () => {
     const { user } = setup(opts)
     await user.click(screen.getByRole('button', { name: '连接设备' }))
     expect(await find(text)).toBeInTheDocument()
+  })
+
+  it('a failed automatic finish shows the reason and a button to finish again', async () => {
+    const { user, mock } = setup({ finishFail: 'busy' })
+    await reachSsid(user)
+    await enterNetwork(user, 'Harbour', 'harbour-wifi-1')
+    expect(await find('已连接 Harbour，IP：192.168.8.41')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('设备忙，请稍候重试')
+    await user.click(screen.getByRole('button', { name: '完成配网' }))
+    expect(await find('已连接。Wi-Fi 192.168.8.41。')).toBeInTheDocument()
+    expect(mock.commands.filter(c => c.op === 'finish')).toHaveLength(2)
+  })
+
+  it('the status screen offers the unclaimed device\'s hotspot: name, key, copy, QR', async () => {
+    const { user } = setup()
+    await reachStatus(user)
+    expect(screen.getByRole('heading', { name: '加入设备热点' })).toBeInTheDocument()
+    expect(screen.getByText('mica-JXHD')).toBeInTheDocument()
+    expect(screen.getByText('W3Q3ZERVUME6L2ZV')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '设备热点的 Wi-Fi 二维码' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '复制热点名称' }))
+    expect(await navigator.clipboard.readText()).toBe('mica-JXHD')
+    await user.click(screen.getByRole('button', { name: '复制热点密码' }))
+    expect(await navigator.clipboard.readText()).toBe('W3Q3ZERVUME6L2ZV')
+    expect(screen.getByRole('button', { name: '复制热点密码' })).toHaveTextContent('已复制')
+  })
+
+  it.each<[string, MockOptions]>([
+    ['a key the user set', { ap: { ssid: 'mica-JXHD', psk: null } }],
+    ['a claimed device', { claimed: true, auth: 'password', secret: 'harbour-pw-1' }],
+  ])('shows no hotspot block with %s', async (_what, opts) => {
+    const { user } = setup(opts)
+    await user.click(screen.getByRole('button', { name: '连接设备' }))
+    if (opts.claimed) {
+      await user.type(await screen.findByLabelText('管理员密码'), 'harbour-pw-1')
+      await user.click(screen.getByRole('button', { name: '验证' }))
+    }
+    await find('当前状态')
+    expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
+  })
+
+  it('reads a device that still sends finished.ap as a string', async () => {
+    const { user } = setup({ apString: true })
+    await reachStatus(user)
+    expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
+    await user.click(screen.getByRole('button', { name: '配置有线网络' }))
+    await user.click(await screen.findByRole('button', { name: '应用' }))
+    expect(await find('已连接。有线 192.168.1.40。')).toBeInTheDocument()
+    expect(screen.getByText(AP_ON)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
   })
 
   it('a device claimed in the console meanwhile ends the flow', async () => {
@@ -364,6 +416,11 @@ describe('a core 0.0.3 device (info.ops lists claim)', () => {
 })
 
 describe('helpers', () => {
+  it('writes the Wi-Fi QR text with the special characters escaped', () => {
+    expect(wifiQr('mica-JXHD', 'W3Q3ZERVUME6L2ZV')).toBe('WIFI:T:WPA;S:mica-JXHD;P:W3Q3ZERVUME6L2ZV;;')
+    expect(wifiQr('a;b,c', 'k:e"y\\1')).toBe('WIFI:T:WPA;S:a\\;b\\,c;P:k\\:e\\"y\\\\1;;')
+  })
+
   it('merges scan results by name, strongest first, without hidden ones', () => {
     expect(mergeNetworks(NETWORKS).map(n => [n.ssid, n.signalDbm])).toEqual([['Harbour', -48], ['Marina Guest', -70]])
   })

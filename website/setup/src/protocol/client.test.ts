@@ -41,9 +41,9 @@ describe('the client over a mocked GATT, against the mock device and the Node re
   it('sets up an unclaimed device over X25519: setWifi, finish; nothing is claimed', async () => {
     const { mock, client } = await open({ routers: ROUTERS })
     // `start` asks for the status, which comes as an event right after `ready`.
-    expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
+    expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS, ap: { on: true, ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' } })
     expect(mock.sessionLog[0]).toMatchObject({ t: 'start', auth: 'none', status: true })
-    expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS })
+    expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS, ap: { on: true, ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' } })
     expect(await client.run('scanWifi')).toEqual({ id: 2, event: 'failed', reason: 'ap_active' })
     expect(await client.run('claim', { password: 'admin-pass-1' })).toEqual({ id: 3, event: 'failed', reason: 'unknown_op' })
     const progress: DeviceEvent[] = []
@@ -61,7 +61,7 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       hostname: 'mica-a4e2e69e',
       interface: { name: 'wlan0', kind: 'wifi', address: '192.168.8.41/24' },
       consoleUrls: ['http://192.168.8.41:8080', 'http://mica-a4e2e69e.local:8080'],
-      ap: 'off',
+      ap: { on: false },
     })
     await new Promise(r => setTimeout(r, 5))
     expect(dropped).toBe(true)
@@ -93,7 +93,7 @@ describe('the client over a mocked GATT, against the mock device and the Node re
       .toEqual({ id: 2, event: 'up', interface: 'eth0', address: '10.0.0.5/24' })
     expect(progress).toEqual([{ id: 2, event: 'applying' }])
     // Wired only: the access point stays on until the console claim.
-    expect(await client.run('finish')).toMatchObject({ claimed: false, interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5:8080', 'http://mica-a4e2e69e.local:8080'], ap: 'on' })
+    expect(await client.run('finish')).toMatchObject({ claimed: false, interface: { name: 'eth0', kind: 'ethernet', address: '10.0.0.5/24' }, consoleUrls: ['http://10.0.0.5:8080', 'http://mica-a4e2e69e.local:8080'], ap: { on: true, ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' } })
   })
 
   it('authenticates with a temp-code typed with a space', async () => {

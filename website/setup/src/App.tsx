@@ -4,11 +4,12 @@ import type { DeviceEvent, DeviceInfo } from './protocol/client'
 import type { BluetoothDeviceLike, BluetoothLike } from './protocol/gatt'
 import type { Network } from './util'
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { encode } from 'uqr'
 import { PROTOCOLS, SETUP_HOST } from './config'
 import { DICTS, fill } from './i18n'
 import { DisconnectedError, ProvisioningClient, SessionError } from './protocol/client'
 import { connectGatt, requestDevice } from './protocol/gatt'
-import { isCidr, isIp, isIpv4, mergeNetworks, splitList } from './util'
+import { isCidr, isIp, isIpv4, mergeNetworks, splitList, wifiQr } from './util'
 
 // The phone's provisioning flow, mica-network-spec chapter 5 section 3: step 0
 // (this page) to step 9 (finish); step 10 is the console on the router's LAN.
@@ -20,12 +21,19 @@ interface Port {
   address: string | null
 }
 
+/** The access point an unclaimed device runs on its label's key, which a phone can join. */
+interface Hotspot {
+  ssid: string
+  psk: string
+}
+
 interface Status {
   wifiMode: string
   connected: boolean
   ssid: string | null
   ip: string | null
   interfaces: Port[]
+  hotspot: Hotspot | null
 }
 
 /** What the wired form holds, kept when an attempt fails. */
@@ -55,7 +63,7 @@ type Step
     | { k: 'wired', status: Status, form?: Wired }
     | { k: 'joined', text: string }
     // unclaimed: BLE claims nothing, the console does; claimedHere: a 0.0.3 device claimed in the session.
-    | { k: 'done', reached: Reached | null, urls: string[], unclaimed: boolean, claimedHere: boolean, apOn: boolean }
+    | { k: 'done', reached: Reached | null, urls: string[], unclaimed: boolean, claimedHere: boolean, apOn: boolean, hotspot: Hotspot | null }
     | { k: 'dropped', text: string }
 
 const HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i
@@ -72,8 +80,18 @@ function readStatus(e: DeviceEvent): Status {
     interfaces: ports
       .filter((p): p is Record<string, unknown> => typeof p?.name === 'string')
       .map(p => ({ name: p.name as string, kind: String(p.kind), carrier: p.carrier === true, address: typeof p.address === 'string' ? p.address : null })),
+    hotspot: readHotspot(e.ap),
   }
 }
+
+/** `ap` with the label's key; null when it is off, runs on the user's key, or is the older string. */
+function readHotspot(ap: unknown): Hotspot | null {
+  const a = ap as Record<string, unknown> | null | undefined
+  return a?.on === true && typeof a.ssid === 'string' && typeof a.psk === 'string' ? { ssid: a.ssid, psk: a.psk } : null
+}
+
+// `finished.ap` was `on` or `off` before it became `getStatus`'s object.
+const apIsOn = (ap: unknown) => ap === 'on' || (ap as Record<string, unknown> | null | undefined)?.on === true
 
 const ethernetPorts = (s: Status) => s.interfaces.filter(p => p.kind === 'ethernet')
 // A core 0.0.3 device claims in the session; later devices list no `claim` and claim in the console.
@@ -272,7 +290,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     try {
       const e = await clientRef.current!.run('setWifi', { ssid, psk, hidden })
       if (e.event === 'connected')
-        return go({ k: 'joined', text: fill(t.success, { ssid, ip: String(e.ip) }) })
+        return joined(fill(t.success, { ssid, ip: String(e.ip) }))
       const back = { k: 'password', ssid, hidden, status } as const
       switch (e.reason) {
         case 'ssid_not_found':
@@ -308,7 +326,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     try {
       const e = await clientRef.current!.run('setNetwork', params)
       if (e.event === 'up')
-        return go({ k: 'joined', text: fill(t.wiredUp, { name: String(e.interface), address: typeof e.address === 'string' ? e.address : '—' }) })
+        return joined(fill(t.wiredUp, { name: String(e.interface), address: typeof e.address === 'string' ? e.address : '—' }))
       if (e.reason === 'not_claimed')
         return go({ k: 'admin' }, reason(e))
       if (e.reason === 'already_claimed')
@@ -318,6 +336,15 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     catch (e) {
       broken(e)
     }
+  }
+
+  // The network is up: finish at once. An older device put back what came up when the session
+  // ended without `finish`, and users leave without pressing a button. A 0.0.3 device claims at
+  // `finish`, so it keeps the button.
+  function joined(text: string) {
+    if (claimsInSession(infoRef.current))
+      return go({ k: 'joined', text })
+    return finish(text)
   }
 
   async function finish(joined: string) {
@@ -338,7 +365,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
         const urls = Array.isArray(e.consoleUrls)
           ? e.consoleUrls.filter((u): u is string => typeof u === 'string' && /^https?:\/\//.test(u))
           : [`http://${String(e.hostname)}.local:8080`]
-        return go({ k: 'done', reached, urls, unclaimed, claimedHere: session && legacy, apOn: unclaimed && e.ap === 'on' })
+        return go({ k: 'done', reached, urls, unclaimed, claimedHere: session && legacy, apOn: unclaimed && apIsOn(e.ap), hotspot: readHotspot(e.ap) })
       }
       if (e.reason === 'already_claimed')
         return stop(t.alreadyClaimed)
@@ -590,6 +617,7 @@ function StatusView({ t, status, wired, onConfigure, onWired }: {
           </Fragment>
         ))}
       </dl>
+      {status.hotspot && <HotspotView t={t} hotspot={status.hotspot} />}
       {wired && <p className="muted">{t.chooseHint}</p>}
       <div className="row">
         {wifi && <button type="button" onClick={onConfigure}>{t.configureWifi}</button>}
@@ -779,7 +807,44 @@ function DoneView({ t, step }: { t: Dict, step: Extract<Step, { k: 'done' }> }) 
       )}
       {step.unclaimed && step.urls.length > 0 && <p>{t.deviceCode}</p>}
       {step.apOn && <p className="muted">{t.apStillOn}</p>}
+      {step.hotspot && <HotspotView t={t} hotspot={step.hotspot} />}
       {step.claimedHere && <p className="muted">{t.hotspotOff}</p>}
     </>
+  )
+}
+
+function HotspotView({ t, hotspot }: { t: Dict, hotspot: Hotspot }) {
+  return (
+    <div className="secret">
+      <h3>{t.hotspotTitle}</h3>
+      <p className="muted">{t.hotspotHint}</p>
+      <p>{t.hotspotName}</p>
+      <code>{hotspot.ssid}</code>
+      <p>{t.hotspotKey}</p>
+      <code>{hotspot.psk}</code>
+      <div className="row">
+        <CopyButton t={t} label={t.copyName} value={hotspot.ssid} />
+        <CopyButton t={t} label={t.copyKey} value={hotspot.psk} />
+      </div>
+      <WifiQr label={t.hotspotQr} text={wifiQr(hotspot.ssid, hotspot.psk)} />
+    </div>
+  )
+}
+
+function CopyButton({ t, label, value }: { t: Dict, label: string, value: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = () => navigator.clipboard.writeText(value).then(() => setCopied(true), () => {})
+  return <button type="button" className="secondary" aria-label={label} onClick={copy}>{copied ? t.copied : t.copy}</button>
+}
+
+/** Dark modules on white whatever the theme: cameras read that best. */
+function WifiQr({ label, text }: { label: string, text: string }) {
+  const { size, data } = encode(text, { border: 2 })
+  const d = data.flatMap((row, y) => row.map((on, x) => (on ? `M${x} ${y}h1v1h-1z` : ''))).join('')
+  return (
+    <svg className="qr" role="img" aria-label={label} viewBox={`0 0 ${size} ${size}`} shapeRendering="crispEdges">
+      <rect width={size} height={size} fill="#fff" />
+      <path d={d} fill="#000" />
+    </svg>
   )
 }
