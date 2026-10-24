@@ -1,5 +1,6 @@
 // The dev harness (mock.html, `bun run dev:setup`): the real page against a mock device in the
-// browser, for screenshots and manual checks. ?s=unclaimed (default), claimed or none; ?ios=1.
+// browser, for screenshots and manual checks. ?s=unclaimed (default), ap-client, claimed or none;
+// ?ios=1.
 // Not part of the build.
 
 import type { MockOptions } from './mock-device'
@@ -24,8 +25,10 @@ const common: MockOptions = {
   ],
 }
 const scenarios: Record<string, MockOptions> = {
-  unclaimed: {},
-  claimed: { claimed: true, auth: 'password', secret: 'harbour-pw-1', wifiMode: 'client', hostname: 'quay-7' },
+  'unclaimed': {},
+  // A phone on the hotspot: the device serves its last scan.
+  'ap-client': { apClient: true },
+  'claimed': { claimed: true, auth: 'password', secret: 'harbour-pw-1', wifiMode: 'client', hostname: 'quay-7' },
 }
 const s = q.get('s') ?? 'unclaimed'
 const mock = new MockDevice({ ...common, ...scenarios[s] })

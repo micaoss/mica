@@ -58,7 +58,8 @@ type Step
     | { k: 'auth', mode: 'password' | 'temp-code' }
     | { k: 'admin' }
     | { k: 'status', status: Status }
-    | { k: 'network', status: Status, networks: Network[] | null, manual: boolean }
+    // age: how old a list the device served instead of scanning (`stale`), in seconds.
+    | { k: 'network', status: Status, networks: Network[] | null, manual: boolean, age: number | null }
     | { k: 'password', ssid: string, hidden: boolean, status: Status }
     | { k: 'wired', status: Status, form?: Wired }
     | { k: 'joined', text: string }
@@ -266,19 +267,19 @@ export function App({ bluetooth, ios, initialLang }: Props) {
     }
   }
 
-  async function chooseNetwork(n = '') {
+  // rescan: scan even with clients on the access point, which lose it meanwhile.
+  async function chooseNetwork(n = '', rescan = false) {
     go({ k: 'busy', text: t.scanning })
     try {
       const status = await getStatus()
       if (!status)
         return
-      if (status.wifiMode === 'ap')
-        return go({ k: 'network', status, networks: null, manual: true }, n || t.apNoScan)
-      const e = await clientRef.current!.run('scanWifi')
+      const e = await clientRef.current!.run('scanWifi', rescan ? { rescan: true } : {})
+      // An older device sends no `stale`: its list is fresh.
       if (e.event === 'networks')
-        return go({ k: 'network', status, networks: mergeNetworks(e.networks), manual: false }, n)
+        return go({ k: 'network', status, networks: mergeNetworks(e.networks), manual: false, age: e.stale === true ? Number(e.ageSeconds) : null }, n)
       const why = e.reason === 'ap_active' ? t.apNoScan : e.reason === 'scan_failed' ? t.scanFailed : reason(e)
-      go({ k: 'network', status, networks: null, manual: true }, n || why)
+      go({ k: 'network', status, networks: null, manual: true, age: null }, n || why)
     }
     catch (e) {
       broken(e)
@@ -403,6 +404,7 @@ export function App({ bluetooth, ios, initialLang }: Props) {
           onAuth={authenticate}
           onClaim={claim}
           onConfigure={() => chooseNetwork()}
+          onRescan={() => chooseNetwork('', true)}
           onWired={status => go({ k: 'wired', status })}
           onStatus={status => go({ k: 'status', status })}
           onApply={applyWired}
@@ -453,6 +455,7 @@ interface StepProps {
   onAuth: (mode: 'password' | 'temp-code', secret: string) => void
   onClaim: (password: string, hostname: string) => void
   onConfigure: () => void
+  onRescan: () => void
   onWired: (status: Status) => void
   onStatus: (status: Status) => void
   onApply: (status: Status, form: Wired) => void
@@ -504,7 +507,7 @@ function StepView(p: StepProps) {
     case 'wired':
       return <WiredForm t={t} step={step} onBack={() => p.onStatus(step.status)} onSubmit={form => p.onApply(step.status, form)} />
     case 'network':
-      return <NetworkForm t={t} step={step} onRescan={p.onConfigure} onPick={(ssid, hidden) => p.onPick(ssid, hidden, step.status)} />
+      return <NetworkForm t={t} step={step} onScan={p.onConfigure} onRescan={p.onRescan} onPick={(ssid, hidden) => p.onPick(ssid, hidden, step.status)} />
     case 'password':
       return <PasswordForm t={t} step={step} onBack={p.onConfigure} onSubmit={psk => p.onJoin(step.ssid, psk, step.hidden, step.status)} />
     case 'joined':
@@ -692,9 +695,10 @@ function WiredForm({ t, step, onBack, onSubmit }: {
   )
 }
 
-function NetworkForm({ t, step, onRescan, onPick }: {
+function NetworkForm({ t, step, onScan, onRescan, onPick }: {
   t: Dict
   step: Extract<Step, { k: 'network' }>
+  onScan: () => void
   onRescan: () => void
   onPick: (ssid: string, hidden: boolean) => void
 }) {
@@ -730,8 +734,11 @@ function NetworkForm({ t, step, onRescan, onPick }: {
               </li>
             ))}
           </ul>
+          {step.age !== null && <p className="muted">{fill(t.staleList, { n: Math.max(1, Math.round(step.age / 60)) })}</p>}
           <div className="row">
-            <button type="button" className="secondary" onClick={onRescan}>{t.rescan}</button>
+            {step.age === null
+              ? <button type="button" className="secondary" onClick={onScan}>{t.rescan}</button>
+              : <button type="button" className="secondary" onClick={onRescan}>{t.rescanAp}</button>}
             {!manual && <button type="button" className="secondary" onClick={() => setManual(true)}>{t.manual}</button>}
           </div>
         </>

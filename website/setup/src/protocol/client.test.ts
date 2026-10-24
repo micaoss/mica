@@ -44,7 +44,8 @@ describe('the client over a mocked GATT, against the mock device and the Node re
     expect(await client.authenticate('none')).toEqual({ event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS, ap: { on: true, ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' } })
     expect(mock.sessionLog[0]).toMatchObject({ t: 'start', auth: 'none', status: true })
     expect(await client.run('getStatus')).toEqual({ id: 1, event: 'status', wifiMode: 'ap', connected: false, ssid: null, ip: null, interfaces: PORTS, ap: { on: true, ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' } })
-    expect(await client.run('scanWifi')).toEqual({ id: 2, event: 'failed', reason: 'ap_active' })
+    // No client on the access point: the device pauses it and scans now.
+    expect(await client.run('scanWifi')).toEqual({ id: 2, event: 'networks', networks: [], stale: false })
     expect(await client.run('claim', { password: 'admin-pass-1' })).toEqual({ id: 3, event: 'failed', reason: 'unknown_op' })
     const progress: DeviceEvent[] = []
     const connected = await client.run('setWifi', { ssid: 'Harbour', psk: 'harbour-wifi-1', hidden: false }, e => progress.push(e))

@@ -41,7 +41,8 @@ async function reachStatus(user: User) {
 async function reachSsid(user: User) {
   await reachStatus(user)
   await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
-  await find('设备当前为 Wi-Fi 接入点模式，不能扫描，请输入网络名称。')
+  await find('选择网络')
+  await user.click(screen.getByRole('button', { name: '手动输入网络名称' }))
 }
 
 /** A core 0.0.3 device: the administrator step comes first. */
@@ -99,9 +100,9 @@ describe('the provisioning page', () => {
     expect(screen.queryByText(AP_ON)).toBeNull()
     expect(screen.queryByRole('heading', { name: '加入设备热点' })).toBeNull()
     expect(mock.claimed).toBe(false)
-    expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'setWifi', 'finish'])
+    expect(mock.commands.map(c => c.op)).toEqual(['getStatus', 'scanWifi', 'setWifi', 'finish'])
     // finish carries no member but op and id.
-    expect(mock.commands.at(-1)).toEqual({ id: 3, op: 'finish' })
+    expect(mock.commands.at(-1)).toEqual({ id: 4, op: 'finish' })
   })
 
   it.each([
@@ -284,6 +285,53 @@ describe('the provisioning page', () => {
     const { user } = setup(opts)
     await user.click(screen.getByRole('button', { name: '连接设备' }))
     expect(await find(text)).toBeInTheDocument()
+  })
+
+  it('scans beside the access point when no client is on it: a fresh list', async () => {
+    const { user, mock } = setup()
+    await reachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
+    await find('选择网络')
+    expect(screen.getByRole('button', { name: /Harbour/ })).toBeInTheDocument()
+    expect(screen.queryByText(/^列表来自/)).toBeNull()
+    expect(screen.queryByRole('button', { name: '重新扫描（会短暂断开热点）' })).toBeNull()
+    expect(screen.getByRole('button', { name: '重新扫描' })).toBeInTheDocument()
+    expect(mock.commands.find(c => c.op === 'scanWifi')).toEqual({ id: 2, op: 'scanWifi' })
+  })
+
+  it('a stale list says how old it is and rescans on request, dropping the hotspot briefly', async () => {
+    const { user, mock } = setup({ apClient: true })
+    await reachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
+    expect(await find('列表来自 12 分钟前')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Harbour/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '重新扫描' })).toBeNull()
+    await user.click(screen.getByRole('button', { name: '重新扫描（会短暂断开热点）' }))
+    await screen.findByRole('button', { name: '重新扫描' }, { timeout: 4000 })
+    expect(screen.queryByText(/^列表来自/)).toBeNull()
+    expect(mock.commands.filter(c => c.op === 'scanWifi')).toEqual([{ id: 2, op: 'scanWifi' }, { id: 4, op: 'scanWifi', rescan: true }])
+    // Manual entry stays as the fallback.
+    expect(screen.getByRole('button', { name: '手动输入网络名称' })).toBeInTheDocument()
+  })
+
+  it.each<[string, MockOptions]>([
+    ['nothing scanned yet and a client on the hotspot', { apClient: true, scanAge: null }],
+    ['an older device', { oldScan: true }],
+  ])('asks for the network name with %s', async (_what, opts) => {
+    const { user } = setup(opts)
+    await reachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
+    expect(await find('设备当前为 Wi-Fi 接入点模式，不能扫描，请输入网络名称。')).toBeInTheDocument()
+    expect(screen.getByLabelText('网络名称')).toBeInTheDocument()
+  })
+
+  it('reads a list without stale as fresh', async () => {
+    const { user } = setup({ oldScan: true, wifiMode: 'client' })
+    await reachStatus(user)
+    await user.click(screen.getByRole('button', { name: '配置 Wi-Fi' }))
+    await find('选择网络')
+    expect(screen.getByRole('button', { name: /Harbour/ })).toBeInTheDocument()
+    expect(screen.queryByText(/^列表来自/)).toBeNull()
   })
 
   it('a failed automatic finish shows the reason and a button to finish again', async () => {

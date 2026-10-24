@@ -91,6 +91,12 @@ export interface MockOptions {
   apString?: boolean
   /** A reason the first `finish` fails with. */
   finishFail?: string
+  /** A client is on the access point, so a scan would cut it off. */
+  apClient?: boolean
+  /** The age in seconds of the last scan, served while the access point has a client; null: none. */
+  scanAge?: number | null
+  /** A device from before `stale`: no scan beside the access point (`ap_active`), no `stale`. */
+  oldScan?: boolean
 }
 
 const enc = new TextEncoder()
@@ -241,6 +247,9 @@ export class MockDevice {
       ap: { ssid: 'mica-JXHD', psk: 'W3Q3ZERVUME6L2ZV' },
       apString: !!opts.legacy,
       finishFail: '',
+      apClient: false,
+      scanAge: 720,
+      oldScan: !!opts.legacy,
       ...opts,
     }
     this.routers = opts.routers ?? {}
@@ -414,10 +423,19 @@ export class MockDevice {
     switch (c.op) {
       case 'getStatus':
         return this.event({ id, ...this.status() })
-      case 'scanWifi':
-        if (this.wifi.mode === 'ap')
-          return failed('ap_active')
-        return this.event({ id, event: 'networks', networks: this.networks })
+      case 'scanWifi': {
+        if (this.o.oldScan)
+          return this.wifi.mode === 'ap' ? failed('ap_active') : this.event({ id, event: 'networks', networks: this.networks })
+        if (c.rescan !== undefined && typeof c.rescan !== 'boolean')
+          return failed('bad_request')
+        // With a client on the access point the device serves its last scan rather than cut it off.
+        if (this.wifi.mode === 'ap' && this.o.apClient && c.rescan !== true) {
+          if (this.o.scanAge === null)
+            return failed('ap_active')
+          return this.event({ id, event: 'networks', networks: this.networks, stale: true, ageSeconds: this.o.scanAge })
+        }
+        return this.event({ id, event: 'networks', networks: this.networks, stale: false })
+      }
       case 'claim': {
         if (!this.o.legacy)
           return failed('unknown_op')

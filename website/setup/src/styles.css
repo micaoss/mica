@@ -213,7 +213,7 @@ button.network {
 }
 
 .secret {
-  border: 1px dashed var(--warn);
+  background: var(--bg);
   border-radius: 0.5rem;
   padding: 0.75rem;
 }
