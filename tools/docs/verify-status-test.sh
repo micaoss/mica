@@ -229,6 +229,14 @@ printf '# fixture website page\n\nno claims here.\n' >"${FIX}/docs/website/page.
 expect_fail "a scanned tree with no status lines at all" 1 \
     "docs/website/ contains zero status lines"
 
+# --- 11. a kernel path on a board branch of mica-linux -------------------------
+# The kernel trees live on per-board branches, not main: the citation names one.
+FIX="${WORK}/kernel-branch-ref"
+new_fixture "${FIX}"
+replace_line "${FIX}/docs/hardware/page.md" '> status: board-dependent — evidence:' \
+    '> status: board-dependent — evidence: `mica-linux@mica/cx3576:arch/arm64/boot/dts/rockchip/rk3576-cx3576z.dts`'
+expect_all_pass "a mica-linux path on a board branch, accepted by shape"
+
 echo
 total=$((PASS_N + FAIL_N))
 if [ "${FAIL_N}" -eq 0 ]; then

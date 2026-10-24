@@ -132,7 +132,7 @@ mini-x64 与 qemu-armhf 没有无线电。
 
 > status: shipped — evidence: `docs/reference/time.md`, `mica-core:crates/micad/src/time_status.rs`
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
+> status: board-dependent — evidence: `mica-linux@mica/cx3576:arch/arm64/boot/dts/rockchip/rk3576-cx3576z.dts`
 
 ### 5.2 离线配置通道与工厂注入
 

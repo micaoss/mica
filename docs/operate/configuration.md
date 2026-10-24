@@ -164,7 +164,7 @@ been demonstrated.
 
 > status: shipped — evidence: `docs/reference/time.md`, `mica-core:crates/micad/src/time_status.rs`
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/kernel/dts/rk3576-cx3576z.dts`
+> status: board-dependent — evidence: `mica-linux@mica/cx3576:arch/arm64/boot/dts/rockchip/rk3576-cx3576z.dts`
 
 ### 5.2 Offline provisioning channels and factory injection
 
