@@ -3,7 +3,7 @@ import type { LocaleCode } from '@/shared/i18n'
 import SiteHeader from '@/components/SiteHeader.astro'
 import { BoardIndex } from '@/features/download/components/board-index'
 import { SiteFooter } from '@/features/landing/components/site-footer'
-import { docsHref, docsPageHref, homeHref } from '@/features/landing/links'
+import { APP_APK_URL, docsHref, docsPageHref, homeHref } from '@/features/landing/links'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { copyFor, localePathsFromUrl } from '@/shared/i18n'
@@ -43,6 +43,40 @@ const identify = docsPageHref(locale, 'start/download')
         {copy.download.boardsHeading}
       </span>
       <BoardIndex client:load copy={copy} />
+    </section>
+
+    <section id="app" class="border-t border-border py-14">
+      <h2 class="m-0 text-[clamp(22px,3vw,28px)] leading-[1.2] font-semibold tracking-tight">
+        {copy.download.app.heading}
+      </h2>
+      <p class="mt-4 mb-0 max-w-[72ch] text-[15px] leading-7 text-muted-foreground">
+        {copy.download.app.lead}
+      </p>
+      <div class="mt-8 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+        <Card className="h-full gap-0 p-6">
+          <CardContent className="p-0">
+            <h3 class="m-0 text-lg leading-6 font-semibold tracking-tight">
+              {copy.download.app.android.title}
+            </h3>
+            <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">
+              {copy.download.app.android.body}
+            </p>
+            <a class="mt-4 inline-block text-[15px]" href={APP_APK_URL}>
+              {copy.download.app.android.cta}
+            </a>
+          </CardContent>
+        </Card>
+        <Card className="h-full gap-0 p-6">
+          <CardContent className="p-0">
+            <h3 class="m-0 text-lg leading-6 font-semibold tracking-tight">
+              {copy.download.app.ios.title}
+            </h3>
+            <p class="mt-2.5 mb-0 text-[15px] leading-7 text-muted-foreground">
+              {copy.download.app.ios.body}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </section>
 
     <section class="border-t border-border py-14">

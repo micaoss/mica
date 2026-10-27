@@ -3,6 +3,8 @@ import type { LocaleCode } from '@/shared/i18n'
 export const SUPPORT_TIERS_URL = 'https://github.com/micaoss/mica/blob/main/docs/hardware/README.md'
 export const NEW_ISSUE_URL = 'https://github.com/micaoss/mica/issues/new'
 export const GITHUB_ORG_URL = 'https://github.com/micaoss'
+/** The phone app's newest Android build: every mica-app release attaches it under this name. */
+export const APP_APK_URL = 'https://github.com/micaoss/mica-app/releases/latest/download/mica-app.apk'
 
 /** The landing page for a locale. `zh` is the root locale and carries no prefix. */
 export function homeHref(locale: LocaleCode): string {

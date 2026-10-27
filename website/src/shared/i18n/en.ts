@@ -108,6 +108,19 @@ export const en: typeof zh = {
     guides: {
       heading: 'Working with this board',
     },
+    app: {
+      heading: 'Mica App',
+      lead: 'Network setup, first-run setup and management from a phone: over Bluetooth on a device that has it, over the local network on one with neither Bluetooth nor a screen.',
+      android: {
+        title: 'Android',
+        body: 'The newest APK, installed directly; later versions install over it.',
+        cta: 'Download APK',
+      },
+      ios: {
+        title: 'iOS',
+        body: 'Coming soon.',
+      },
+    },
     obtain: {
       heading: 'How to get an image',
       build: {

@@ -118,6 +118,19 @@ export const zh = {
     guides: {
       heading: '这块板卡怎么用',
     },
+    app: {
+      heading: 'Mica App',
+      lead: '手机上配网、首次设置和管理设备：有蓝牙的设备走蓝牙，没有蓝牙也没有界面的设备走局域网。',
+      android: {
+        title: 'Android',
+        body: '最新版本的 APK，直接安装；以后的版本可覆盖安装。',
+        cta: '下载 APK',
+      },
+      ios: {
+        title: 'iOS',
+        body: '即将推出。',
+      },
+    },
     obtain: {
       heading: '怎么拿到镜像',
       build: {
