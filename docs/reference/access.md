@@ -90,7 +90,9 @@ locked again.
   gone at the next boot. SSH offers password authentication only while one is
   active.
 - The SSH server is Dropbear, and micad writes the only configuration it
-  reads. OpenSSH is not installed.
+  reads, on DATA. The init starts the server at boot as that configuration
+  says, so SSH does not wait for micad and keeps working without it. OpenSSH
+  is not installed.
 - Containers are rootful, so anyone who can run the container engine is
   already root. There is no unprivileged-user story on a device.
 

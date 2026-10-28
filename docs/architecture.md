@@ -144,8 +144,8 @@ with one shell (`docs/reference/access.md`). Three ways in exist today:
    (RockUSB on cx3576), below the OS and reachable when nothing else is.
 
 Disablement is layered. One layer ships: the runtime switch, where
-`enabled: false` stops and disables `dropbear.service`, and every image seeds it
-off. There is no image profile package or profile file: development and
+`enabled: false` stops `mica-sshd` and saves SSH off on DATA, where the init
+reads it at every boot, and every image seeds it off. There is no image profile package or profile file: development and
 production images differ by the kernel command line parameter
 `mica.profile=dev|prod`, carried only in signed boot configuration; no
 difference in access follows from it, and there is no irreversible shell

@@ -81,10 +81,14 @@ shadows the saved clock silently.
 
 ## 4. Reconciliation
 
-`time.ntp.servers` renders to `/run/systemd/timesyncd.conf.d/60-mica-servers.conf`
-(`NTP=` under `[Time]`; `60-` so it sorts after the pinned `50-mica.conf` and
-shadows nothing). `/run`, not DATA/state: the file derives entirely from the
-settings tree and is re-rendered before the unit is touched on every boot.
+`time.ntp.servers` renders to `/var/lib/mica/time/timesyncd.conf` on DATA
+(`NTP=` under `[Time]`), which the image links as
+`/etc/systemd/timesyncd.conf.d/60-mica-servers.conf` (`60-` so it sorts after the
+pinned `50-mica.conf` and shadows nothing). On DATA so timesyncd uses the
+operator's servers from its first poll at boot, before micad or without it;
+until micad first writes it the link dangles and timesyncd skips it. On OpenRC
+the same list is `ntp_servers` in `/var/lib/mica/time/ntpd.conf`, which
+`mica-ntpd` reads at every start.
 An empty list renders **no `NTP=` line** — a bare `NTP=` would clear the
 compiled-in fallback pool and leave the device polling nothing.
 
