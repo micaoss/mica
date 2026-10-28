@@ -26,6 +26,37 @@ service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
 | BSP artifacts | per-board kernel, device tree and loader inputs, built into a board bundle | `mica-build:boards/`, `mica-build:boards/README.md` |
 | Workloads | Compose projects declared to micad and run by the product's container engine (podman, supervised by `mica-containerd`) on either init, off by default; in the products with the `containers` feature (the `full` variants) | `mica-podman:README.md`, `docs/integrate/containers.md` |
 
+### 1.1 The base and the management add-on
+
+A device runs in two layers, and the second is optional.
+
+- **The base** is the signed root: the init, the mounts, the accounts, the
+  hostname, the network, time, SSH, the health gate, the boot-failure handler
+  and `mica-deploy`. Every base service reads its configuration from its own
+  file on DATA (`/var/lib/mica/<service>/`), in a format the service owns, and
+  the init starts it from that file at boot. A device with the base alone boots,
+  joins its network, takes SSH logins by key, confirms its boot on the init
+  (`mica-system-base:payload/etc/mica/health.conf`) and updates by hand with
+  `mica-deploy update` and `mica-deploy rollback`.
+- **micad** is the management add-on: the product feature `micad`, which
+  selects the daemon from the core set at boot (`mica-core:docs/mica-core.md`
+  6.2), and with it apid and the console. It adds the settings tree and its
+  API, automatic updates and their policy, provisioning, containers and apps,
+  LAN discovery and the transient root password. Its reconcilers are writers
+  of the base's files, never the reason a service starts: each writes the file,
+  then restarts or stops the service, and never enables or disables one.
+
+| Base service | Its file on DATA | Without micad |
+|---|---|---|
+| SSH | `/var/lib/mica/ssh/sshd.env` | shipped: started at boot as last configured, else as the product's `SSH=on\|off` says; keys from a provisioning medium's `mica-authorized-keys` |
+| Network time | `/var/lib/mica/time/` | shipped: the servers last configured, or the default pool |
+| Health gate | -- | shipped: the init, and micad only where the image carries it |
+| Updates | `/mica/config/updates.json` | shipped: `mica-deploy update`, by hand |
+| Network (OpenRC) | `/var/lib/mica/network/interfaces` | shipped |
+| Network and DNS (systemd) | `/var/lib/mica/network/networkd`, `/var/lib/mica/dns/resolved.conf.d` | shipped: `/run/systemd/network` and `/run/systemd/resolved.conf.d` link there |
+| Static hosts records, global DNS (OpenRC) | `/var/lib/mica/dns/hosts`, `/var/lib/mica/dns/resolv.global` | shipped |
+| Wi-Fi, access point, Bluetooth, MQTT | -- | planned: off until micad configures them |
+
 ## 2. Component inventory (runtime)
 
 ```

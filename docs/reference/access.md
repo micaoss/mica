@@ -15,8 +15,9 @@ states the rules a product relies on.
   fleet. Credentials are minted on the device or supplied by its owner.
 - **Persistent access is by key. A password is the exception, and it is
   transient.**
-- **A fresh device is closed**: SSH off, no authorized key, no account that
-  accepts a password, on every product.
+- **A fresh device is closed**: no authorized key and no account that accepts
+  a password, on every product, and SSH off unless the product turns it on
+  (`SSH=on`), when it takes keys alone.
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-system-base:payload/usr/lib/mica/mica-shadow-reconcile`
 
