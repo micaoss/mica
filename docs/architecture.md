@@ -56,7 +56,8 @@ A device runs in two layers, and the second is optional.
 | Network (OpenRC) | `/var/lib/mica/network/interfaces` | shipped |
 | Network and DNS (systemd) | `/var/lib/mica/network/networkd`, `/var/lib/mica/dns/resolved.conf.d` | shipped: `/run/systemd/network` and `/run/systemd/resolved.conf.d` link there |
 | Static hosts records, global DNS (OpenRC) | `/var/lib/mica/dns/hosts`, `/var/lib/mica/dns/resolv.global` | shipped |
-| Wi-Fi, access point, Bluetooth, MQTT | -- | planned: off until micad configures them |
+| Wi-Fi, access point, MQTT, containers | `/var/lib/mica/units/enabled`, `/var/lib/mica/wifi/`, `/var/lib/mica/mqtt/` | shipped: `mica-units` starts at boot what micad last enabled, as last configured; off until micad first configures them |
+| Bluetooth | -- | shipped on systemd: `bluetooth.service` is enabled in the image and runs where the adapter exists; OpenRC: micad starts `mica-bluetoothd` |
 
 ## 2. Component inventory (runtime)
 
@@ -72,9 +73,9 @@ A device runs in two layers, and the second is optional.
   console   network,      Confirm/Reject     by micad   by default
             mqtt, container
                     |
-            /run/mica/mqttd-device.env -> mica-mqttd -> MQTT
-                                               |
-                              exact-enrolled com.mica.* apps
+            /var/lib/mica/mqtt/mqttd-device.env -> mica-mqttd -> MQTT
+                                                        |
+                                       exact-enrolled com.mica.* apps
 ```
 
 - **The init** is systemd or OpenRC, as the product states in

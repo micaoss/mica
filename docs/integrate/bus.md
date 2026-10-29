@@ -34,7 +34,7 @@ APID calls the dedicated management members such as `GetSettings`,
 operations through MQTT or application items.
 
 The bridge makes no micad call. micad renders the already-provisioned topic
-identity to `/run/mica/mqttd-device.env` before starting the bridge, and systemd
+identity to `/var/lib/mica/mqtt/mqttd-device.env` before starting the bridge, and systemd
 passes it through `--device-id`. The file is a one-purpose runtime input, not a
 general settings export.
 
