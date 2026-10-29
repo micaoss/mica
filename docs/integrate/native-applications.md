@@ -208,11 +208,11 @@ board-specific units live.
 
 ## 8. Ceilings
 
-`CPUQuota=`, `MemoryHigh=`, `MemoryMax=`, `TasksMax=` and the
-`IOReadBandwidthMax=`/`IOWriteBandwidthMax=` pair are the same kernel
-controllers, spelled the same way, as in
-[containers.md](containers.md) section 8 — a native unit reaches them
-directly instead of through a generated one.
+`CPUQuota=`, `MemoryHigh=`, `MemoryMax=` and `TasksMax=` are the same kernel
+controllers as a container's CPU, memory and pids limits
+([containers.md](containers.md) section 3), and the
+`IOReadBandwidthMax=`/`IOWriteBandwidthMax=` pair has no container
+counterpart — a native unit sets them in its own unit file.
 
 The reason to set them is not the application's own failure. It is that DATA
 and `/var` are shared: a native daemon that leaks memory or logs without
@@ -295,7 +295,7 @@ convention rather than a mechanism that refuses:
   authenticated deployment metadata and required signed dm-verity; a file written into
   `mica-unit` or a container declaration on a running device is covered by
   neither.
-- **No ceiling is mandatory.** Sections 8 and containers.md section 3 describe
+- **No ceiling is mandatory.** Section 8 and containers.md section 3 describe
   what to set; nothing checks that anything was set.
 - **There is no secret store.** A native application's credentials are files
   the package or the operator puts on DATA/state, owned by root or by the

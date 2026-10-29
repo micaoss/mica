@@ -162,7 +162,46 @@ and declares nothing.
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad/src/docker.rs`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`
 
-## 5. Data and updates
+## 5. Without micad: switching the engine on by hand
+
+On a product without micad, or before micad is installed, nothing switches the
+engine on: the container switch is micad's. The base starts at boot every unit
+listed in `/var/lib/mica/units/enabled` on DATA, one unit a line
+(`mica-system-base:payload/usr/lib/mica/mica-units`), so listing the engine's
+unit there is the manual switch. As root on the device (SSH by a key, for
+instance one from a provisioning medium's `mica-authorized-keys`):
+
+```sh
+# podman products: mica-containerd; docker products: docker.service
+mkdir -p /var/lib/mica/units
+grep -qx mica-containerd.service /var/lib/mica/units/enabled 2>/dev/null ||
+    echo mica-containerd.service >>/var/lib/mica/units/enabled
+/usr/lib/mica/mica-init start mica-containerd     # now; every boot from the list
+```
+
+Then declare the projects to the engine itself:
+
+- **podman**: `mica-containerd ctl`, the daemon's own client, in the project
+  directory: `ctl up [-p PROJECT] [-f FILE]`, `ctl list`, `ctl logs NAME`,
+  `ctl down [-p PROJECT]`. The daemon keeps each project in
+  `/var/lib/mica/containerd/projects/` on DATA and starts its services at
+  every boot (`mica-podman:README.md`, *On the device: the CLI*).
+- **docker**: `docker compose up -d`; give every service a restart policy, or
+  it does not come back after a reboot (section 4).
+
+To switch the engine off, delete its line from the list and stop it,
+`systemctl stop mica-containerd` or `rc-service mica-containerd stop`
+(`docker` on a docker product); the projects stay declared.
+
+**When micad is added later**, its `container.enabled` setting decides: off,
+the default, stops the engine and takes its line out of the list. Switch
+containers on through micad first. On podman micad then adopts, once, the
+projects put with `mica-containerd ctl` that its settings lack, and from then
+on its set is what the engine runs.
+
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-units`, `mica-core:crates/micad/src/reconciler/enabled.rs`, `mica-podman:README.md`
+
+## 6. Data and updates
 
 - **What survives an update**: everything under `/mica/` on DATA — the
   projects, their directories and volumes, the images the engine pulled. A
@@ -177,7 +216,7 @@ and declares nothing.
 
 > status: shipped — evidence: `docs/reference/recovery.md`, `docs/reference/storage.md`
 
-## 6. Limits
+## 7. Limits
 
 - No orchestration across devices, no service discovery beyond one device's
   project networks, no rolling update of a project.

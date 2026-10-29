@@ -64,7 +64,7 @@ leaves every service as micad last configured it.
 | SSH | `/var/lib/mica/ssh/sshd.env` | the init | as last configured, else as the product's `SSH=on\|off` says; keys from a provisioning medium's `mica-authorized-keys` |
 | Wi-Fi station, access point | `/var/lib/mica/wifi/` (OpenRC), the STATE binds of `/etc/wpa_supplicant` and `/etc/hostapd` (systemd) | `mica-units` | as last configured; off until micad first configures them |
 | MQTT broker and bridge | `/var/lib/mica/mqtt/` | `mica-units` | as last configured; off until micad first configures them |
-| Containers | the projects under `/mica/containers` | `mica-units` (the supervisor) | as last configured; off until micad first turns them on |
+| Containers | the engine's projects, under `/var/lib/mica/containerd/projects/` (podman) | `mica-units` (the engine) | as last configured; off until switched on through micad or by hand (`docs/integrate/containers.md` section 5) |
 | Bluetooth | the adapter's state under `/var/lib/bluetooth` | the init (systemd), micad (OpenRC) | systemd: runs where the adapter exists; OpenRC: not started |
 | Health gate | -- | the init | checks the init, and micad only where the image carries it |
 | Updates | `/mica/config/updates.json` | -- | `mica-deploy update` by hand, `update --archive` offline, and on systemd a daily timer under `policy: auto` that never reboots (OpenRC: planned) |
