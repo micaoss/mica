@@ -51,7 +51,8 @@ A device runs in two layers, and the second is optional.
 | SSH | `/var/lib/mica/ssh/sshd.env` | shipped: started at boot as last configured, else as the product's `SSH=on\|off` says; keys from a provisioning medium's `mica-authorized-keys` |
 | Network time | `/var/lib/mica/time/` | shipped: the servers last configured, or the default pool |
 | Health gate | -- | shipped: the init, and micad only where the image carries it |
-| Updates | `/mica/config/updates.json` | shipped: `mica-deploy update`, by hand |
+| Updates | `/mica/config/updates.json` | shipped: `mica-deploy update` by hand, `update --archive` offline, and on systemd a daily timer under `policy: auto` that never reboots (OpenRC: planned) |
+| Factory reset | -- | shipped: `mica-deploy factory-reset` |
 | Network (OpenRC) | `/var/lib/mica/network/interfaces` | shipped |
 | Network and DNS (systemd) | `/var/lib/mica/network/networkd`, `/var/lib/mica/dns/resolved.conf.d` | shipped: `/run/systemd/network` and `/run/systemd/resolved.conf.d` link there |
 | Static hosts records, global DNS (OpenRC) | `/var/lib/mica/dns/hosts`, `/var/lib/mica/dns/resolv.global` | shipped |
