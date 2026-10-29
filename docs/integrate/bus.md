@@ -35,7 +35,7 @@ operations through MQTT or application items.
 
 The bridge makes no micad call. micad renders the already-provisioned topic
 identity to `/var/lib/mica/mqtt/mqttd-device.env` before starting the bridge, and systemd
-passes it through `--device-id`. The file is a one-purpose runtime input, not a
+passes it through `--device-id`. The file is a one-purpose input, not a
 general settings export.
 
 micad still has a D-Bus interface because micad and APID are separate local

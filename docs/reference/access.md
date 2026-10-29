@@ -26,7 +26,7 @@ states the rules a product relies on.
 | Channel | Grants | Authenticated by | State |
 |---|---|---|---|
 | Management API and web console | everything the management plane does | the admin password (browser session) or an API token | on every product; the console only where the product carries it |
-| SSH (Dropbear, driven by micad) | root | an authorized public key, or the transient root password | off until an administrator enables it |
+| SSH (Dropbear or OpenSSH, as `mica-sshd`) | root | an authorized public key, or the transient root password | off unless the product sets `SSH=on` or an administrator enables it |
 | Local console on a display (`tty2`) | root | the transient root password | boards with a display; the first VT keeps the boot logo |
 | Serial console | a login prompt | the transient root password | present where the board has one; nothing to log in with by default |
 | Whole-disk reflash (board loader mode or external boot media) | a new device | physical access | every board; see the [board pages](../hardware/README.md) |
@@ -81,7 +81,8 @@ password: the shadow file is rebuilt at every boot and anything not locked is
 locked again.
 
 - **SSH is off until enabled** through the API (`access.ssh`), which also sets
-  its port and listen addresses. An empty address list means every address.
+  its port and listen addresses, unless the product sets `SSH=on`, when it runs
+  from the first boot. An empty address list means every address.
 - **Every authorized key is a root key.** One key list is rendered for both
   accounts. `mica` is a persistent working directory and a non-root default
   shell, not a lesser privilege level.
@@ -90,10 +91,11 @@ locked again.
   bytes), works for SSH and the local consoles, is stored in no setting, and is
   gone at the next boot. SSH offers password authentication only while one is
   active.
-- The SSH server is Dropbear, and micad writes the only configuration it
-  reads, on DATA. The init starts the server at boot as that configuration
-  says, so SSH does not wait for micad and keeps working without it. OpenSSH
-  is not installed.
+- The SSH server is Dropbear or, where the product sets `SSH_SERVER=openssh`,
+  OpenSSH, and micad writes the only configuration it reads, on DATA. The init
+  starts the server at boot as that configuration says, so SSH does not wait
+  for micad and keeps working without it. Without micad, `mica-add-keys` adds
+  the keys of a provisioning medium's `mica-authorized-keys`.
 - Containers are rootful, so anyone who can run the container engine is
   already root. There is no unprivileged-user story on a device.
 
