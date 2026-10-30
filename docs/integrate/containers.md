@@ -164,19 +164,16 @@ and declares nothing.
 
 ## 5. Without micad: switching the engine on by hand
 
-On a product without micad, or before micad is installed, nothing switches the
-engine on: the container switch is micad's. The base starts at boot every unit
-listed in `/var/lib/mica/units/enabled` on DATA, one unit a line
-(`mica-system-base:payload/usr/lib/mica/mica-units`), so listing the engine's
-unit there is the manual switch. As root on the device (SSH by a key, for
-instance one from a provisioning medium's `mica-authorized-keys`):
+On a product without micad, or before micad is installed, the container switch
+is `mica-units`: the base starts at boot every unit listed in
+`/var/lib/mica/units/enabled` on DATA, and `mica-units enable` lists one and
+starts it ([without micad](../operate/without-micad.md)). As root on the device
+(SSH by a key, for instance one from a provisioning medium's
+`mica-authorized-keys`):
 
 ```sh
-# podman products: mica-containerd; docker products: docker.service
-mkdir -p /var/lib/mica/units
-grep -qx mica-containerd.service /var/lib/mica/units/enabled 2>/dev/null ||
-    echo mica-containerd.service >>/var/lib/mica/units/enabled
-/usr/lib/mica/mica-init start mica-containerd     # now; every boot from the list
+# podman products: mica-containerd; docker products: docker
+/usr/lib/mica/mica-units enable mica-containerd   # now, and at every boot
 ```
 
 Then declare the projects to the engine itself:
@@ -189,9 +186,8 @@ Then declare the projects to the engine itself:
 - **docker**: `docker compose up -d`; give every service a restart policy, or
   it does not come back after a reboot (section 4).
 
-To switch the engine off, delete its line from the list and stop it,
-`systemctl stop mica-containerd` or `rc-service mica-containerd stop`
-(`docker` on a docker product); the projects stay declared.
+To switch the engine off, `/usr/lib/mica/mica-units disable mica-containerd`;
+the projects stay declared.
 
 **When micad is added later**, its `container.enabled` setting decides: off,
 the default, stops the engine and takes its line out of the list. Switch

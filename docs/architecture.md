@@ -53,7 +53,9 @@ switched on by the reconciler's enablement, which is recorded in
 `/var/lib/mica/units/enabled` because enablement on the read-only root lasts
 only until the next boot; the base's `mica-units` starts every unit listed
 there at boot. The base never reads the settings tree, and removing micad
-leaves every service as micad last configured it.
+leaves every service as micad last configured it. Without micad an operator
+writes the same files by hand and switches services on with `mica-units`
+([without micad](operate/without-micad.md)).
 
 | Service | Its file on DATA | Started at boot by | Without micad |
 |---|---|---|---|
@@ -64,10 +66,10 @@ leaves every service as micad last configured it.
 | SSH | `/var/lib/mica/ssh/sshd.env` | the init | as last configured, else as the product's `SSH=on\|off` says; keys from a provisioning medium's `mica-authorized-keys` |
 | Wi-Fi station, access point | `/var/lib/mica/wifi/` (OpenRC), the STATE binds of `/etc/wpa_supplicant` and `/etc/hostapd` (systemd) | `mica-units` | as last configured; off until micad first configures them |
 | MQTT broker and bridge | `/var/lib/mica/mqtt/` | `mica-units` | as last configured; off until micad first configures them |
-| Containers | the engine's projects, under `/var/lib/mica/containerd/projects/` (podman) | `mica-units` (the engine) | as last configured; off until switched on through micad or by hand (`docs/integrate/containers.md` section 5) |
-| Bluetooth | the adapter's state under `/var/lib/bluetooth` | the init (systemd), micad (OpenRC) | systemd: runs where the adapter exists; OpenRC: not started |
+| Containers | the engine's projects, under `/var/lib/mica/containerd/projects/` (podman) | `mica-units` (the engine) | as last configured; off until switched on through micad or by hand (`mica-units enable`) |
+| Bluetooth | the adapter's state under `/var/lib/bluetooth` | the init | runs where the adapter exists; micad stops it while Bluetooth is off |
 | Health gate | -- | the init | checks the init, and micad only where the image carries it |
-| Updates | `/mica/config/updates.json` | -- | `mica-deploy update` by hand, `update --archive` offline, and on systemd a daily timer under `policy: auto` that never reboots (OpenRC: planned) |
+| Updates | `/mica/config/updates.json` | -- | `mica-deploy update` by hand, `update --archive` offline, and a daily check under `policy: auto` that never reboots (`mica-update.timer`, the `mica-update` service on OpenRC) |
 | Factory reset | -- | -- | `mica-deploy factory-reset` |
 
 ## 2. Component inventory (runtime)

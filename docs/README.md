@@ -83,6 +83,7 @@ current product only; history is in Git.
   - `storage.md` — partitions, what survives what, and where data belongs
   - `troubleshooting.md` — diagnosis: access channels, evidence to read, refusals to interpret
   - `api.md` — the programmatic surface and its machine-readable contract
+  - `without-micad.md` — a device without micad: getting in, switching services on with `mica-units`, and each service's file by hand
 - `integrate/` — building a product on it: applications, containers, the bus, the console, provisioning, manufacturing
   - `applications.md` — delivering and running applications: native packages and containers
   - `bus.md` — management/application boundary, package-enrolled `com.mica.Item1` applications, D-Bus policy and MQTT grammar
