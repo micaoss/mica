@@ -30,7 +30,7 @@ automatically in every release run of its products. Status is owned by the
 | MMC / SD card readers | **not supported** | `CONFIG_MMC` is off entirely; a USB card reader is ordinary USB mass storage and is driven |
 | Wi-Fi / Bluetooth | none | no radio in `BOARD_FEATURES`; the image ships no bluez, wpasupplicant or hostapd |
 | Status LED, CAN, USB gadget | none | a generic machine declares none of them |
-| Physical recovery action | none | `BOARD_RECOVERY_ACTIONS=""`, so credential recovery and full-factory reset are refused on this board |
+| Physical recovery action | none | `BOARD_RECOVERY_ACTIONS=""`, so credential recovery is refused on this board |
 
 Those storage drivers have to be built in: a dm-verity root has no initramfs,
 so nothing can load before the root is mounted.
@@ -135,7 +135,9 @@ The full update, fault and fallback acceptance runs under QEMU.
 
 - Available: read-only diagnosis, guarded manual rollback, configuration
   reset, application-data reset, whole-disk reflash.
-- **Unavailable**: credential recovery and full-factory reset. Both are gated
+- **Factory reset**: with the administrator password, on an image built with
+  core 0.0.4; the `uefi-x64` images of 2026-10-21 refuse it.
+- **Unavailable**: credential recovery. It is gated
   by a physical-presence assertion, and this board declares no physical
   recovery action, so every such request is refused (`403`,
   `presence_required`).

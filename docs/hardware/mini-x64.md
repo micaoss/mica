@@ -28,7 +28,7 @@ flash: its own `tinyconfig`-based kernel, an xz root, and one product,
 | USB | **not supported** | `CONFIG_USB_SUPPORT` is off |
 | Network | virtio-net, Intel e1000 and e1000e | — |
 | Display, Wi-Fi, Bluetooth, status LED, CAN, USB gadget | none | headless |
-| Physical recovery action | none | credential recovery and full-factory reset are refused on this board |
+| Physical recovery action | none | credential recovery is refused on this board |
 
 > status: board-dependent — evidence: `mica-build:boards/mini-x64/board.env`, `mica-build:boards/mini-x64/kernel/config/mini-x64.fragment`, `mica-build:boards/mini-x64/evidence.json`
 
@@ -110,8 +110,9 @@ A/B switch, health confirmation and rollback of every board. See
 
 As for [`uefi-x64`](uefi-x64.md#recovery): read-only diagnosis, manual
 rollback, configuration reset and application-data reset are available;
-credential recovery and full-factory reset are refused, because the board
-declares no physical recovery action; the floor is a whole-disk reflash, which
+the factory reset takes the administrator password on an image built with
+core 0.0.4 (the `mini-x64.basic` image of 2026-10-21 refuses it); credential
+recovery is refused, because the board declares no physical recovery action; the floor is a whole-disk reflash, which
 costs every partition and the device identity. See
 [recovery](../operate/recovery.md).
 

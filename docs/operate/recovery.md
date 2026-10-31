@@ -6,8 +6,8 @@ step *n* has established that steps 1..*n*-1 were not enough. Working down the
 order is the procedure. Skipping to the bottom because it is the step everyone
 remembers is how devices lose data they did not have to lose.
 
-The page is also blunt about the gap in the middle of that order: two of the
-steps are built, tested, and **cannot be performed on any board that exists
+The page is also blunt about the gap in the middle of that order: one of the
+steps is built, tested, and **cannot be performed on any board that exists
 today**. Section 7 says which, and why, and what an operator does instead.
 
 ## 1. Automatic trial fallback
@@ -44,15 +44,16 @@ bootable deployment is unusable. Do not edit counters or import boot commands.
 | 3 | configuration reset | yes | **no** | every modelled setting the tier reaches |
 | 4 | application-data reset | yes | **no** | all operator data in `/srv` and every application's data under `/mica` |
 | 5 | credential recovery | **no** — unsupported in the field | **no** | the previous credential and every API token |
-| 6 | full factory reset | **no** — unsupported in the field | **no** | settings, credentials, applications and operator data together |
+| 6 | factory reset | yes, on an image built with core 0.0.4 | **no** | everything configured: settings, the claim, keys, applications and operator data |
 | 7 | whole-disk reflash | yes, with physical access | **no** | every partition, **and the device's identity** |
 | 8 | secure wipe | **no** — unsupported, and not planned | **terminal** | the device, as a configured unit |
 
-**Five of the eight are steps you can take.** Steps 5 and 6 are gated on a
-physical presence assertion that **no shipped board can produce**, so both are
-refused on every fielded device; step 8 has no implementation at all. Section 7
-states each absence and what to do instead. A device whose operator has lost
-the credential and every key is recovered by step 7 and by nothing else.
+**Six of the eight are steps you can take.** Step 5 is gated on a physical
+presence assertion that **no shipped board can produce**, so it is refused on
+every fielded device; step 6 needs the administrator password and an image
+built with core 0.0.4; step 8 has no implementation at all. Section 7 states
+each absence and what to do instead. A device whose operator has lost the
+credential and every key is recovered by step 7 and by nothing else.
 
 **The line is between steps 2 and 3.** Everything above it can be undone by
 rebooting. Everything below it destroys something that was on the device, and
@@ -131,8 +132,8 @@ what those built-in values are, and there are only two cases:
   override and the effective value separately, so you can see which case you
   are in.
 
-The same applies to Step 6 (full factory reset), which re-seeds everything
-this tier re-seeds and more. **Step 4 does not touch these settings** — an
+The same applies to Step 6 (factory reset), which erases every setting, so
+the device comes back with the values its image was built with. **Step 4 does not touch these settings** — an
 application-data reset leaves the update configuration alone.
 
 **If it is only the address you want back, you do not need this tier.**
@@ -174,49 +175,64 @@ spends every setting to recover one. See
 
 > status: unsupported
 
-### Step 6 — Full factory reset — IRREVERSIBLE, and not reachable today
+### Step 6 — Factory reset — IRREVERSIBLE
 
 - **Fixes:** nothing specific. It is the decision that the device's whole
-  mutable state is to be abandoned — decommissioning, handover, or a fault
-  that survived steps 3 to 5.
-- **Costs irreversibly:** settings, the administrator credential, API tokens,
-  every application and all operator data, together.
-- **Preserves, by design:** the device identity, calibration data, the update
-  metadata in DATA/meta and both retained deployments. A reset resets *state*, not the
-  installed software version.
-- **Also goes back:** the update server address and policy, to
-  the values the image was built with — Step 3's warning applies here
-  unchanged, including the case where the built-in address is *none* and the
-  device is left with no update server at all.
-- **Does not recover:** a device that cannot boot, since nothing in-band runs;
-  a corrupted deployment.
-- **How, on paper:** the reset route with `{"tier": "full-factory"}`, gated on
-  the same physical presence as step 5 — and refused for the same reason,
-  today, on every board. Plan around its absence: a device that has to be
-  handed over clean is reflashed (step 7), and the new identity is the price.
+  configured state is to be abandoned — a device handed to a new owner inside
+  your organisation, or a fault that survived steps 3 and 4.
+- **Costs irreversibly:** everything on DATA but its update records: the
+  settings, the claim and the administrator credential, the API tokens, the
+  keys, the SSH host keys and the machine-id, the containers, every
+  application, `/srv`, `/mica` and the logs kept on DATA.
+- **Keeps:** the installed software at its version (SYSTEM, both retained
+  deployments, the core set) and the device code, which is derived from the
+  hardware. The device comes back **unclaimed**, on its factory access point
+  with the label's key, and its next first boot draws a new device id,
+  hostname, machine-id and SSH host key.
+- **Also goes back:** the update server address and policy, to the values the
+  image was built with — Step 3's warning applies here unchanged, including
+  the case where the built-in address is *none* and the device is left with
+  no update server at all.
+- **Does not recover:** a lost administrator password, since every way to ask
+  for it needs that password; a device that cannot boot; a corrupted
+  deployment.
+- **How:** the console's System page, `POST /api/v1/system/factory-reset` with
+  `{"password": "..."}`, or `micad factory-reset` as root on the device. Each
+  asks for the administrator password, even from a signed-in session, and a
+  wrong one counts in the sign-in backoff. It is refused on an unclaimed
+  device, while an update installs and while a deployment is on trial. The
+  device reboots after 3 s and the erase runs at that boot; an interrupted
+  erase starts again at the next one. Without micad, `mica-deploy
+  factory-reset --reboot` as root stages the same erase
+  ([without micad](without-micad.md) section 7).
+- **Which images:** an image built with core 0.0.4 (`cx3576.full` from
+  `20261031-0512`). A device on an image of 2026-10-21 answers
+  `factory_reset_unsupported`, also after it installs core 0.0.4 from the core
+  set, until it runs a newer product image. The former
+  `{"tier": "full-factory"}` of `POST /api/v1/reset` is refused with 422 and
+  names the new route.
 
-> status: unsupported
+> status: board-dependent — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `docs/reference/recovery.md`
 
 ### A factory reset does not make a device anonymous
 
 This is the sentence a reader most often supplies for themselves, wrongly, and
 getting it wrong ends with a linkable device in somebody else's hands.
 
-**A full factory reset PRESERVES the device's identity and its calibration
-data. It does so deliberately.** The `deviceId` is drawn once on the device
-and is never re-issued, because re-minting it on a serviceable unit would
-silently sever every fleet-side, support-side and warranty record that names
-that device — an outcome worse than the lockout the reset was answering. The
-device that comes back from a factory reset is the *same device*, with the
-same identity, the same hostname derived from it, and the same calibration.
-It is not a new unit and it is not an anonymous one.
+**The device code survives a factory reset, and so does the data's trace on
+the medium.** The reset draws a new device id, hostname, machine-id and SSH
+host key, but the device code is derived from the hardware: it is the same
+code on the label, the login prompt and the setup page, and it still derives
+the access point's label key. Whoever recorded it before the reset recognises
+the device after it. And the erase deletes files: the first boot after it
+discards DATA's free space where the filesystem and the medium allow it, which
+is not a certified wipe, and on UBIFS or a card without TRIM it does not
+happen at all.
 
 So a factory reset is **not** a disposal operation. **A device leaving the
-operator's control — resale, return, RMA, disposal — needs a whole-disk
-reflash, or the medium destroyed.** Only a reflash replaces DATA outright and
-so causes a fresh identity to be minted on the next first boot, and only
-physical destruction of the medium removes the data: a reflash writes just the
-image's own extent, so blocks DATA grew into beyond it survive on the medium,
+operator's control — resale, return, RMA, disposal — needs the medium
+destroyed.** A reflash does not do it either: it writes just the image's own
+extent, so blocks DATA grew into beyond it survive on the medium,
 unreferenced by the new filesystem but present on it. `docs/reference/access.md`
 section 9.2 is the precise statement of what a reflash does and does not
 reach, and `docs/reference/manufacturing.md` section 5 is the RMA rule this
@@ -227,7 +243,7 @@ could read it.
 If the device is going to another party and its data must not go with it,
 destroy the medium. Nothing softer is honest today, and section 6 says why.
 
-> status: shipped — evidence: `mica-core:crates/micad/src/reset.rs`, `mica-core:crates/mica-apid/src/routes`, `docs/reference/manufacturing.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:docs/factory-ap-key.md`, `docs/reference/manufacturing.md`
 
 ## 6. Below the OS: reflash and disposal
 
@@ -253,8 +269,8 @@ and rewrite the disk. [../start/install.md](../start/install.md) is the procedur
 ### Step 8 — Secure wipe — TERMINAL, and not implemented
 
 There is no secure wipe on mica. The device cannot express the request: the
-reset vocabulary has exactly three tiers and no fourth, so `secure-wipe` is
-not a body this device can parse. That absence is the position rather than an
+reset route has two tiers, the factory reset erases files, and none of them
+is `secure-wipe`. That absence is the position rather than an
 oversight — a wipe promises something about the *medium*, which needs a
 device-level erase primitive (eMMC sanitize, NVMe format-NVM) whose real
 behaviour on these boards nobody has verified.
@@ -270,7 +286,7 @@ over a flash translation layer that was free to write somewhere else.
 Stated rather than omitted, because a reader who assumes these work will plan
 a recovery that does not exist.
 
-- **Steps 5 and 6 are refused on every fielded device.** Both are gated on a
+- **Step 5 is refused on every fielded device.** It is gated on a
   physical-presence assertion. The gate ships and is tested, and so does the
   system side that produces an assertion: a board declares the physical
   recovery actions it has — a bootloader menu entry, a button pattern, a USB

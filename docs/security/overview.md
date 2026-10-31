@@ -51,14 +51,22 @@ creation never happens implicitly during a build; supply inputs explicitly.
   access point is on out of the box with a key derived from that secret and the
   device code printed on its label. Whoever holds an image of the product can
   derive that key for every device of it from the label. It is a first-contact
-  credential, not a secret: it is the access point's key only until the device
-  is claimed, and the claim sets the access point's own key
+  credential, not a secret. On core 0.0.3 it is the access point's key only
+  until the device is claimed, and the claim sets the access point's own key;
+  from core 0.0.4 it stays the key, claimed or not, until an administrator sets
+  one on the console's Wi-Fi page, which the console recommends
   (`mica-core:docs/factory-ap-key.md`).
-- **An unclaimed device can be claimed by anyone in range.** For ten minutes
-  after each boot, an unclaimed device with Bluetooth accepts a claim from a
-  phone over Bluetooth LE with no credential at all, and the first claim wins,
-  as the first visit to setup does on its network. Power a device up for the
-  first time where no stranger is within radio range (about 10 to 30 m).
+- **On core 0.0.3, an unclaimed device can be claimed by anyone in range.**
+  For ten minutes after each boot, an unclaimed device with Bluetooth accepts a
+  claim from a phone over Bluetooth LE with no credential at all, and the first
+  claim wins, as the first visit to setup does on its network. Power a device
+  up for the first time where no stranger is within radio range (about 10 to
+  30 m).
+- **From core 0.0.4, Bluetooth claims nothing.** A phone in range of an
+  unclaimed device during those ten minutes can still set up its network,
+  Wi-Fi or the wired port, and read the label's access-point key; the claim is
+  the console's setup, which asks for the device code from the label or the
+  device's login prompt, unless the product sets `CLAIM_DEVICE_CODE=off`.
 - **The management API is the gate.** Plain HTTP on 8080 by default, HTTPS on
   8443 once an operator turns it on; password login with signed
   sessions and CSRF protection for browsers, bearer tokens for automation;

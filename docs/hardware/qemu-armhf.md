@@ -31,7 +31,7 @@ boot chain.
 | Watchdog (i6300esb) | verified under QEMU | the kernel arms it; the loader has none |
 | Network | virtio-net | — |
 | Display, Wi-Fi, Bluetooth, status LED, CAN, USB gadget, containers | none | `BOARD_FEATURES=""` |
-| Physical recovery action | none | credential recovery and full-factory reset are refused on this board |
+| Physical recovery action | none | credential recovery is refused on this board |
 
 > status: board-dependent — evidence: `mica-build:boards/qemu-armhf/board.env`, `mica-build:boards/qemu-armhf/evidence.json`
 
@@ -98,8 +98,10 @@ records are UBI volumes. See [updates and rollback](../operate/updates.md).
 ## Recovery
 
 Read-only diagnosis, manual rollback, configuration reset and
-application-data reset are available; credential recovery and full-factory
-reset are refused, because the board declares no physical recovery action.
+application-data reset are available, and the factory reset with the
+administrator password on an image built with core 0.0.4 (not the
+`qemu-armhf.basic` image of 2026-10-21); credential recovery is refused,
+because the board declares no physical recovery action.
 The floor is rewriting the flash image on the host, which costs every volume
 and the device identity. See [recovery](../operate/recovery.md).
 

@@ -35,18 +35,22 @@ without one has nothing to download and is built from source
 ([build guide](build.md)). A `dev` product is built
 locally and never released; there are no minimal products.
 
-The round of 2026-10-21 released these, all with core 0.0.3 (core set
-`core.general.20261021-2254`):
+The current releases, and the core each image was built with:
 
-| Product | Stamp | What it carries |
-|---|---|---|
-| `cx3576.full` | `20261021-2257` | systemd, containers, WiFi and Bluetooth: factory access point, BLE provisioning |
-| `s905x5m.sd-full` | `20261021-2318` | the same, on an SD card |
-| `s905x5m.emmc-full` | `20261021-2335` | the same, on the eMMC |
-| `uefi-x64.full` | `20261021-2316` | systemd, Podman, no radio |
-| `uefi-x64.docker` | `20261021-2338` | systemd, Docker, no radio |
-| `mini-x64.basic` | `20261021-2317` | OpenRC, the management plane and SSH, no console |
-| `qemu-armhf.basic` | `20261021-2319` | OpenRC, the management plane and SSH, no console |
+| Product | Stamp | Core in the image | What it carries |
+|---|---|---|---|
+| `cx3576.full` | `20261031-0512` | 0.0.4 | systemd, containers, WiFi and Bluetooth: factory access point, BLE provisioning |
+| `s905x5m.sd-full` | `20261021-2318` | 0.0.3 | the same, on an SD card |
+| `s905x5m.emmc-full` | `20261021-2335` | 0.0.3 | the same, on the eMMC |
+| `uefi-x64.full` | `20261021-2316` | 0.0.3 | systemd, Podman, no radio |
+| `uefi-x64.docker` | `20261021-2338` | 0.0.3 | systemd, Docker, no radio |
+| `mini-x64.basic` | `20261021-2317` | 0.0.3 | OpenRC, the management plane and SSH, no console |
+| `qemu-armhf.basic` | `20261021-2319` | 0.0.3 | OpenRC, the management plane and SSH, no console |
+
+The current core set is `core.general.20261031-0510`, core 0.0.4. Only
+`cx3576.full` was released again on 2026-10-31; a device on one of the
+2026-10-21 images boots core 0.0.3 and installs 0.0.4 from that core set with
+its next update.
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 

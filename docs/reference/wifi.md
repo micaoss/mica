@@ -22,7 +22,7 @@ The model those parts implement: a declarative list of known networks with
 priorities, an AP with `off` / `provisioning` / `always` modes, one owner for
 the single-radio question, and the rule that **no fleet-wide credential may
 exist** — with one exception, public by design: the factory access-point key
-of an unclaimed device, derived from its device code and the product's secret
+on a device's label, derived from its device code and the product's secret
 (`mica-core:docs/factory-ap-key.md`).
 
 **This page is Wi-Fi alone.** CAN interfaces are network entries of kind
@@ -168,11 +168,15 @@ interchangeable spellings of one directive.
 **Where the SSID and key come from.** `wifi.ap.ssid` when set; else, on a
 device with a device code, `mica-` and four characters derived from the code,
 as printed on the label; else derived from `provisioning.deviceId` as
-`mica-<first 8 hex>`. The key is, in order: `wifi.ap.psk` when set; the key
-derived from the device code and `/usr/share/mica/ap-secret` while the device
-is unclaimed; `/var/lib/mica/secrets/ap-psk`, the per-device secret minted at
-first boot. The claim through setup or Bluetooth sets `wifi.ap.psk`, so the
-label's key stops working at the claim; a factory reset brings it back. There
+`mica-<first 8 hex>`. The key is, in order: `wifi.ap.psk` when set; on a
+device with a device code, the key derived from it and
+`/usr/share/mica/ap-secret`, claimed or not; `/var/lib/mica/secrets/ap-psk`,
+the per-device secret minted at first boot. From core 0.0.4 no claim sets
+`wifi.ap.psk`, so the label's key holds until an administrator sets one on the
+console's Wi-Fi page. On core 0.0.3 the label's key applied only while the
+device was unclaimed, and the claim through setup or Bluetooth set
+`wifi.ap.psk`. A factory reset clears `wifi.ap.psk` and brings the label's key
+back. There
 is deliberately **no constant fallback**: a device with no key in any place
 refuses to raise the AP and says why. See §7 and `mica-core:docs/factory-ap-key.md`.
 
@@ -263,7 +267,7 @@ What matters for Wi-Fi specifically:
   it is.
 - no device secret enters the image. Every key in a rendered file comes from
   the settings tree on DATA/state, from `/var/lib/mica/secrets/ap-psk`, both
-  born at runtime, or, while the device is unclaimed, from the product secret
+  born at runtime, or, for the label's key, from the product secret
   the image carries — public along with the image, which makes that key a
   first-contact credential and nothing more.
 

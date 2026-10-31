@@ -36,7 +36,7 @@ one of the reasons this board exists.
 | RTC | built in (PL031, EFI) | available under QEMU |
 | Wi-Fi / Bluetooth | none | no bluez, wpasupplicant or hostapd in the image |
 | Status LED, CAN, USB gadget, hardware init | none | `BOARD_HWINIT_CONFS=""`, `BOARD_FIRMWARE_FILES=""` |
-| Physical recovery action | none | `BOARD_RECOVERY_ACTIONS=""`, so credential recovery and full-factory reset are refused on this board |
+| Physical recovery action | none | `BOARD_RECOVERY_ACTIONS=""`, so credential recovery is refused on this board |
 
 The driver set is enforced rather than hoped for:
 `kernel/config/uefi-arm64.required` holds 122 symbols and the build fails if
@@ -116,7 +116,9 @@ the retained fallback taken and firmware and identity unchanged. See
 
 - Available: read-only diagnosis, manual rollback, configuration reset,
   application-data reset, rewriting the disk image.
-- **Unavailable**: credential recovery and full-factory reset, for want of a
+- **Factory reset**: with the administrator password, on an image built with
+  core 0.0.4.
+- **Unavailable**: credential recovery, for want of a
   physical-presence assertion.
 - Recovery on this board is rewriting the image on the host. A host that can
   write that file has already replaced the device, so there is no in-band

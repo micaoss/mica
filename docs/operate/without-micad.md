@@ -85,7 +85,7 @@ The wired network is DHCP until a file says otherwise.
 The hostname is `/etc/hostname`, kept on DATA; a new one takes effect at the
 next boot.
 
-> status: shipped — evidence: `mica-system-base:payload/usr/lib/tmpfiles.d/mica-network.conf`, `mica-system-base:debs/mica-openrc/payload/etc/init.d/mica-network`
+> status: shipped — evidence: `mica-system-base:debs/mica-systemd/payload/usr/lib/tmpfiles.d/mica-network.conf`, `mica-system-base:debs/mica-openrc/payload/etc/init.d/mica-network`
 
 ## 4. Wi-Fi station
 

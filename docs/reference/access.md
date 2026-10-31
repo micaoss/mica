@@ -47,7 +47,15 @@ things can create the first one:
 
 Every other route requires a credential an unclaimed device does not have, and
 a provisioning document is refused once the device is claimed. The device
-records which channel claimed it and when. A credential that arrived in a
+records which channel claimed it and when.
+
+From core 0.0.4, on a device with a device code, setup also asks for that code:
+it is printed on the label and shown on the device's own login prompt, serial
+or display, so whoever claims the device has it in hand. A wrong code only
+delays the next try. A product with `CLAIM_DEVICE_CODE=off` claims with the
+password alone. Bluetooth provisioning claims nothing from 0.0.4: it sets up the
+network, and the claim is the console's ([first run](../start/first-run.md)
+section 5). A credential that arrived in a
 provisioning document is a bootstrap secret, and the console requires it to be
 rotated.
 
@@ -73,6 +81,47 @@ rotated.
   such as password hashes are never served.
 
 > status: shipped — evidence: `mica-core:crates/mica-apid/src/auth.rs`, `mica-core:crates/mica-apid/src/audit.rs`, `mica-core:docs/mica-core.md`
+
+### 4.1 Finding a device on the network: mDNS and SSDP
+
+From core 0.0.4 micad announces the device on the local network, with two
+responders of its own, on every interface with an address except the
+loopback, the container engines' links, WireGuard and CAN. Each answers only a
+query from the subnet it arrived on, and rate-limits its answers.
+
+- **mDNS** answers `<hostname>.local` and publishes `_mica._tcp`, with the
+  product and the hostname and nothing else (no version, no claim state, no
+  device code). While the console is on the network (`access.web.mode` is
+  `network`) it also publishes the console as `_http._tcp` or `_https._tcp`.
+- **SSDP** answers UPnP discovery, so the device shows in a computer's network
+  view. Its description, `http://<address>:<HTTP port>/ssdp/device.xml`, names
+  the hostname, the product and an opaque serial, and links the console. It
+  runs only while the console is on the network.
+- **SSH is never announced**, by either.
+- **The switches** are `access.mdns.enabled` and `access.ssdp.enabled`, both on
+  the console's overview (局域网发现, "LAN discovery") and in `micad mdns
+  on|off` and `micad ssdp on|off`. Unset, the product's `MDNS=` and `SSDP=`
+  lines decide, and both are on when the product says nothing. Off means no
+  socket at all. `micad mdns status`, `micad ssdp status`, `GET /api/v1/mdns`
+  and `GET /api/v1/ssdp` show what runs and what is announced.
+- **More services over mDNS**: a JSON drop-in in `/usr/share/mica/mdns.d/`
+  (the image's) or `/run/mica/mdns.d/` (gone at reboot), `micad mdns add` and
+  `micad mdns remove`, or an app's `mdns` manifest field, published while the
+  app runs:
+
+  ```json
+  {"version": 1, "services": [
+    {"instance": "Grafana", "type": "_http._tcp", "port": 3000, "txt": {"path": "/dashboards"}}
+  ]}
+  ```
+
+  The rules for names, ports and TXT records are `mica-core:docs/mica-core.md`
+  section 3.13.
+
+Without micad neither responder runs ([without micad](../operate/without-micad.md)
+section 8).
+
+> status: shipped — evidence: `mica-core:crates/micad/src/reconciler/mdns.rs`, `mica-core:crates/micad/src/reconciler/ssdp.rs`, `mica-core:crates/mica-apid/src/routes/mdns.rs`, `mica-core:crates/mica-apid/src/routes/ssdp.rs`
 
 ## 5. SSH and the accounts
 
@@ -109,14 +158,14 @@ does not model is a setting the device does not support.
 
 | What | Reboot and update | Reset |
 |---|---|---|
-| Settings and configuration documents | kept, on DATA | a configuration or full-factory reset reseeds them; identity survives |
-| `/home`, `/root`, `/srv` | kept, on DATA | an application-data reset clears `/srv`; full-factory also clears the homes |
-| Authorized keys, the SSH host key | kept | cleared with configuration |
+| Settings and configuration documents | kept, on DATA | a configuration reset reseeds them and identity survives; a factory reset erases them with the identity |
+| `/home`, `/root`, `/srv` | kept, on DATA | an application-data reset clears `/srv`; a factory reset clears all three |
+| Authorized keys, the SSH host key | kept | cleared with configuration; a factory reset draws a new host key |
 | A write under `/etc` | refused by the read-only root | — |
 | `/run` and the volatile log | lost at reboot | — |
 | The transient root password | cleared at the next boot | — |
 
-The reset tiers are [recovery](recovery.md).
+The reset tiers and the factory reset are [recovery](recovery.md).
 
 > status: shipped — evidence: `mica-core:crates/micad/src/reset.rs`, `docs/reference/recovery.md`, `docs/reference/storage.md`
 

@@ -82,17 +82,18 @@ can be reflashed whole when nothing else answers.
 The recovery ladder above that is designed and ordered least-destructive first:
 read-only diagnosis, a guarded manual rollback that refuses any switch it
 cannot prove goes backward, a configuration reset, an application-data reset,
-credential recovery, a full factory reset, and the reflash. Every tier names
-what it costs before it is offered. **Five of those seven rungs are operations
-an operator can perform; the two named below are not.**
+credential recovery, a factory reset, and the reflash. Every tier names
+what it costs before it is offered. **Six of those seven rungs are operations
+an operator can perform; the one named below is not.** The factory reset asks
+for the administrator password and needs an image built with core 0.0.4.
 
 > status: shipped — evidence: `docs/reference/recovery.md`, `mica-core:crates/micad/src/reset.rs`
 
-**Two rungs of that ladder cannot be climbed on any board that exists.**
-Credential recovery and the full factory reset are gated on a physical-presence
-assertion. The OS side that produces one from a board-declared physical action
-ships; **no board declares such an action** — not cx3576, not uefi-x64, not
-uefi-arm64 — so a fielded device refuses both, and an operator who has lost the
+**One rung of that ladder cannot be climbed on any board that exists.**
+Credential recovery is gated on a physical-presence assertion. The OS side
+that produces one from a board-declared physical action ships; **no board
+declares such an action** — not cx3576, not uefi-x64, not uefi-arm64 — so a
+fielded device refuses it, and an operator who has lost the
 administrator credential still pays the device's identity for a reflash. Secure
 wipe is not implemented at all, and no reset or reflash sanitizes the medium:
 disposal under an unrecoverability requirement means destroying it. There is

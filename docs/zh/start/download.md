@@ -27,18 +27,21 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 （[构建指南](../start/build.md)）。`dev` 产品只在本地
 构建、从不发布；没有 minimal 产品。
 
-2026-10-21 这一轮发布了下列产品，全部带 core 0.0.3（core 集
-`core.general.20261021-2254`）：
+当前的发布，以及每个镜像构建时带的 core：
 
-| 产品 | 时间戳 | 内容 |
-|---|---|---|
-| `cx3576.full` | `20261021-2257` | systemd、容器、WiFi 与蓝牙：出厂接入点、BLE 配网 |
-| `s905x5m.sd-full` | `20261021-2318` | 同上，用于 SD 卡 |
-| `s905x5m.emmc-full` | `20261021-2335` | 同上，用于 eMMC |
-| `uefi-x64.full` | `20261021-2316` | systemd、Podman，无无线电 |
-| `uefi-x64.docker` | `20261021-2338` | systemd、Docker，无无线电 |
-| `mini-x64.basic` | `20261021-2317` | OpenRC、管理平面与 SSH，无控制台 |
-| `qemu-armhf.basic` | `20261021-2319` | OpenRC、管理平面与 SSH，无控制台 |
+| 产品 | 时间戳 | 镜像中的 core | 内容 |
+|---|---|---|---|
+| `cx3576.full` | `20261031-0512` | 0.0.4 | systemd、容器、WiFi 与蓝牙：出厂接入点、BLE 配网 |
+| `s905x5m.sd-full` | `20261021-2318` | 0.0.3 | 同上，用于 SD 卡 |
+| `s905x5m.emmc-full` | `20261021-2335` | 0.0.3 | 同上，用于 eMMC |
+| `uefi-x64.full` | `20261021-2316` | 0.0.3 | systemd、Podman，无无线电 |
+| `uefi-x64.docker` | `20261021-2338` | 0.0.3 | systemd、Docker，无无线电 |
+| `mini-x64.basic` | `20261021-2317` | 0.0.3 | OpenRC、管理平面与 SSH，无控制台 |
+| `qemu-armhf.basic` | `20261021-2319` | 0.0.3 | OpenRC、管理平面与 SSH，无控制台 |
+
+当前的 core 集是 `core.general.20261031-0510`，即 core 0.0.4。2026-10-31 只重新
+发布了 `cx3576.full`；运行 2026-10-21 镜像的设备启动的是 core 0.0.3，下一次更新时
+从这个 core 集安装 0.0.4。
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 

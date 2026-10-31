@@ -131,7 +131,7 @@ bind. Large application data belongs in the bulk namespaces.
 |---|---|---|
 | Approved DATA/state-backed service leaf | Small persistent service state | Survives reboot and OS updates; reset scope is explicit |
 | `/mica/apps` | Managed application data | Unlimited DATA usage and application reset scope |
-| `/srv` | Integrator data and volumes | Unlimited DATA usage; application/full-factory reset clears it |
+| `/srv` | Integrator data and volumes | Unlimited DATA usage; the application-data reset and the factory reset clear it |
 | `/run` and volatile journal | Runtime files and logs | Recreated each boot |
 | `/var`, including `StateDirectory=` | Bounded persistent service data | Survives reboot and OS updates; shares project 101 with caches and temporary files |
 

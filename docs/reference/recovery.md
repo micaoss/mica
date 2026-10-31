@@ -20,25 +20,23 @@ See [updates](updates.md), [storage](storage.md) and the
 
 ### 2.1 Scope and survivors
 
-The API and `micad_settings::ResetTier` expose exactly three tiers. The executor
-is `mica-core:crates/micad/src/reset.rs`.
+The API and `micad_settings::ResetTier` expose exactly two tiers. The executor
+is `mica-core:crates/micad/src/reset.rs`. The factory reset is not a tier: it
+has a route of its own (2.3).
 
 | Tier | Removed or reseeded | Preserved |
 |---|---|---|
 | `configuration` | `/mica/config`; modeled settings return through first-boot provisioning | Device identity and secrets, management credential/claim/API tokens, applications and operator data |
 | `application-data` | `/mica/apps`, `/mica/volumes`, the independent DATA/containers backing directory, `/srv`, the container projects, DATA/state local-unit enrollments | Settings, identity, credentials, custom UI, update workspace and other system namespaces |
-| `full-factory` | Managed `/mica` contents, `/srv`, application enrollments and management settings/credentials | Device identity and per-device secrets; persistent service files outside the removal allowlist |
 
 Every tier preserves SYSTEM, boot records and DATA/meta lifecycle/deployment
 state. Calibration outside the removal allowlist remains untouched. TLS identity,
 machine ID and other preserved service files are not recreated as new identities.
-Full factory reset is not media sanitization and does not mean every DATA byte
-is erased.
 
 Configuration reset clears the whole public configuration directory, including
 documents not represented as modeled settings. Application reset removes unit
-enrollments together with their payloads. Configuration and full-factory reset
-mark provisioning pending so the normal initializer reestablishes defaults from
+enrollments together with their payloads. Configuration reset marks
+provisioning pending so the normal initializer reestablishes defaults from
 the preserved device identity; there is no image profile to read
 (`docs/reference/access.md` section 8).
 
@@ -56,9 +54,45 @@ retains its intent and retries the same scope; it never escalates to a broader
 tier. Successful repeated boots are idempotent.
 
 Configuration and application-data reset require authenticated management
-authority. Full factory reset also requires the physical-presence gate below.
-Direct execution in a test fixture does not prove that a board has a qualified
-physical entry mechanism.
+authority.
+
+### 2.3 Factory reset
+
+The factory reset erases everything configured and keeps the software. A
+request for the former `full-factory` tier of `/api/v1/reset` is 422 and names
+this route.
+
+- **Who asks.** `POST /api/v1/system/factory-reset` `{password}`, the console's
+  System page, and `micad factory-reset` as root on the device, which prompts
+  for the password or reads `--password-file`. Each asks for the administrator
+  password whatever the caller's credential, and a wrong one counts in the
+  login backoff. micad refuses with a code (409): `factory_reset_unsupported`
+  when the booted runkit does not carry the erase out, `not_claimed` on an
+  unclaimed device, `update_in_progress`, `trial_pending`.
+- **What goes.** The request is staged in DATA's `meta/factory-reset.json` and
+  the device reboots after 3 s. The initramfs removes everything on DATA but
+  `meta/`: STATE with the settings, the claim, the API tokens, the keys, the
+  SSH host keys and the machine-id, the containers, the apps, `/srv`, `/mica`
+  and the logs kept there. It then recreates the factory layout. An
+  interrupted erase starts again at the next boot.
+- **What stays.** SYSTEM, the boot records and the core set, so the software
+  keeps its version, and the device code, which is derived from the hardware.
+  The device comes back unclaimed, on its factory access point with the
+  label's key, and its first boot draws a new device id, hostname, machine-id
+  and SSH host key.
+- **Afterwards.** That boot records the reset (`GET
+  /api/v1/system/factory-reset`, `last`) and discards DATA's free space where
+  the filesystem and the medium allow it (not on UBIFS, not on a card without
+  TRIM). It is not a certified wipe (section 7).
+- **Which images.** The erase is carried out by the runkit of the product
+  image's kernel component. Images built with core 0.0.4 carry it
+  (`cx3576.full.20261031-0512`). A device on an image of 2026-10-21 refuses
+  with `factory_reset_unsupported`, also after it installs core 0.0.4 from the
+  core set, until it runs a newer product image.
+- **Without micad.** `mica-deploy factory-reset [--reboot]`, as root, stages
+  the same erase ([without micad](../operate/without-micad.md) section 7).
+
+> status: board-dependent — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:crates/mica-deploy/src/factory_reset.rs`, `mica-core:docs/mica-core.md`
 
 ## 3. Operator sequence
 
@@ -81,9 +115,8 @@ The runtime presence gate requires a supported, bounded assertion and consumes
 it for the authorized operation. It is separate from ordinary authentication
 and never inferred from an API caller's claim to be standing near the device.
 
-Current boards declare no qualified OS recovery action. Presence-gated full
-factory reset and credential recovery therefore refuse through the normal
-field API. An available firmware console or RockUSB loader transport does not
+Current boards declare no qualified OS recovery action. Presence-gated
+credential recovery therefore refuses through the normal field API. An available firmware console or RockUSB loader transport does not
 by itself create an OS presence assertion. Board qualification must establish
 the physical action, handoff, expiry and single-use behavior before advertising
 that capability.
@@ -122,7 +155,8 @@ environment for a damaged root or unavailable SYSTEM.
 
 ## 7. Sanitization
 
-There is no secure-wipe reset tier. File deletion does not establish removal
+There is no secure-wipe reset tier, and the factory reset is not one. File
+deletion does not establish removal
 from flash remapping, spare blocks or external backups. No board-level erase
 qualification is implied by reset or by complete-image flashing.
 
