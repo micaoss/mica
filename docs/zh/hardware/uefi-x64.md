@@ -51,7 +51,7 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 获取镜像
 
-产品是 `uefi-x64.basic`（默认）、`uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker 容器），各自发布为
+产品是 `uefi-x64.basic`（不带容器引擎）、`uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker 容器），各自发布为
 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
 校验方法见[获取发布版](../start/download.md)。
 

@@ -58,7 +58,7 @@ aarch64 `virt` 没有 VGA 也没有 framebuffer，写 `console=tty0` 就是给�
 
 ## 获取镜像
 
-产品是 `uefi-arm64.basic`（默认）与 `uefi-arm64.full`（带容器），各自发布为
+产品是 `uefi-arm64.basic`（不带容器引擎）与 `uefi-arm64.full`（带容器），各自发布为
 `uefi-arm64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名
 `mica-uefi-arm64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
 

@@ -56,7 +56,7 @@ as `eth0`.
 
 ## Obtaining an image
 
-The products are `uefi-x64.basic` (the default), `uefi-x64.full` (with
+The products are `uefi-x64.basic` (no container engine), `uefi-x64.full` (with
 containers on Podman) and `uefi-x64.docker` (with containers on Docker), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
 image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
 [download](../start/download.md).

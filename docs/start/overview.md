@@ -91,21 +91,23 @@ image kind of that product (the board's `images.tsv`). So a variant is:
 | only what is installed in the root | a product on an existing board |
 | only the file format that is downloaded | an image kind, selected per product |
 
-A product is `<board>.<variant>` (`mica-build:boards/products.md`):
+A product is `<board>.<variant>` (`mica-build:boards/products.md`). The
+variant names what the product is for, and each board names its own: no
+variant is a default, and none is defined as another plus a feature. The
+products today:
 
-| Variant | What it is | Released |
-|---|---|---|
-| `basic` | the default: the management plane, the console, SSH, the tools and MQTT, and the board's radios | yes |
-| `full` | `basic` with the container engine | yes |
-| `dev` | a development build (`PROFILE=dev`) | never; built locally |
+| Product | What it carries |
+|---|---|
+| `uefi-x64.basic`, `uefi-arm64.basic` | systemd, the management plane, the console, SSH, the tools and MQTT; no container engine |
+| `uefi-x64.full`, `uefi-arm64.full` | the same with Podman |
+| `uefi-x64.docker` | the same with Docker |
+| `uefi-x64.openrc-full` | `uefi-x64.full`'s set on OpenRC |
+| `uefi-x64.base` | the Base alone with Podman: no micad and no console, SSH on from the first boot, updates on the `auto` policy |
+| `cx3576.basic`, `s905x5m.basic` | systemd, the management plane, the console, SSH, the tools and MQTT, WiFi and Bluetooth; no container engine |
+| `cx3576.full`, `s905x5m.emmc-full`, `s905x5m.sd-full` | the same with Podman; the `s905x5m` products on its eMMC or on an SD card |
+| `mini-x64.basic`, `qemu-armhf.basic` | OpenRC, the management plane and SSH; `mini-x64` is sized for 128 MB of flash |
+| `<board>.dev`, `s905x5m.emmc-dev` | a development build (`PROFILE=dev`): built locally, never released |
 
-Every board has `basic`; `uefi-x64`, `uefi-arm64` and `cx3576` also have
-`full` and `dev`, and `s905x5m` names its products by storage (`emmc-full`,
-`sd-full`, `dev`, `emmc-dev`). `uefi-x64.openrc-full` is `full` on OpenRC, and
-`uefi-x64.docker` is `full` with Docker as its container engine.
-`mini-x64`, sized for 128 MB of flash, and `qemu-armhf` have `basic` alone,
-which runs OpenRC with the management plane and SSH; every other product runs
-systemd.
 There are no minimal products.
 
 Every board is a release target. That means its products are published; it is

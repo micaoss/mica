@@ -23,17 +23,14 @@ release an administrator deleted there is gone from both.
 
 ## 1. What exists to download
 
-Every board is a release target. Its products are `<board>.basic`, the
-default, on `uefi-x64`, `uefi-arm64`, `cx3576`, `s905x5m`, `mini-x64` and
-`qemu-armhf`;
-`<board>.full`, which adds the container engine, on `uefi-x64`, `uefi-arm64`
-and `cx3576`; `uefi-x64.docker`, `full` with Docker as its engine; and
-`s905x5m.emmc-full` and `s905x5m.sd-full`, that board's
-container products for its eMMC and for an SD card. **Which of them have a
-release is on the [download page](https://micaos.dev/download/)**; a product
-without one has nothing to download and is built from source
-([build guide](build.md)). A `dev` product is built
-locally and never released; there are no minimal products.
+Each product is `<board>.<variant>`, and the variant names what that
+product is for. Each board names its own: no variant is a default, and no
+variant name means the same thing on every board, so what a product carries is
+in the table below and on its [board page](../hardware/README.md), not in its
+name. A product with `PROFILE=dev` (`<board>.dev`, `s905x5m.emmc-dev`) is built
+locally and never released. **Which products have a release is on the
+[download page](https://micaos.dev/download/)**; a product without one has
+nothing to download and is built from source ([build guide](build.md)).
 
 The current releases, and the core each image was built with:
 

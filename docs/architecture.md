@@ -248,9 +248,9 @@ Product documentation lives here, module documentation lives with the module
 
 The current boards are `uefi-x64`, `uefi-arm64` and `mini-x64` (UEFI, signed UKI),
 `cx3576` and `s905x5m` (U-Boot, signed FIT) and `qemu-armhf` (U-Boot, an unsigned
-FIT, the root on UBI). Each has the product `<board>.basic`; `uefi-x64`,
-`uefi-arm64` and `cx3576` also `<board>.full`, `s905x5m` names its products by
-storage, and a `dev` product is built locally and never released
+FIT, the root on UBI). Each board names its own products, `<board>.<variant>`,
+the variant saying what the product is for, with no default variant; a
+`PROFILE=dev` product is built locally and never released
 (`mica-build:boards/products.md`). Their build, acceptance and support tier
 are kept in one table: [support tiers](hardware/README.md#current-boards).
 

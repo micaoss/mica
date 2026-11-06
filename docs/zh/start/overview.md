@@ -76,19 +76,23 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 | 只有根里装的东西 | 现有板卡上的一个产品 |
 | 只有下载文件的格式 | 一种镜像类型，按产品选择 |
 
-产品是 `<board>.<variant>`（`mica-build:boards/products.md`）：
+产品是 `<board>.<variant>`（`mica-build:boards/products.md`）。变体名说明产品用来
+做什么，每块板自己命名：没有哪个变体是默认的，也没有哪个变体被定义为另一个加上
+某项功能。现有的产品：
 
-| 变体 | 是什么 | 发布 |
-|---|---|---|
-| `basic` | 默认：管理面、控制台、SSH、工具与 MQTT，以及板卡的无线 | 是 |
-| `full` | `basic` 加上容器引擎 | 是 |
-| `dev` | 开发构建（`PROFILE=dev`） | 从不；只在本地构建 |
+| 产品 | 带什么 |
+|---|---|
+| `uefi-x64.basic`、`uefi-arm64.basic` | systemd、管理面、控制台、SSH、工具与 MQTT；不带容器引擎 |
+| `uefi-x64.full`、`uefi-arm64.full` | 同上，加 Podman |
+| `uefi-x64.docker` | 同上，加 Docker |
+| `uefi-x64.openrc-full` | `uefi-x64.full` 的内容，跑在 OpenRC 上 |
+| `uefi-x64.base` | 只有 Base 加 Podman：没有 micad 和控制台，SSH 从首次启动起开启，更新走 `auto` 策略 |
+| `cx3576.basic`、`s905x5m.basic` | systemd、管理面、控制台、SSH、工具与 MQTT、WiFi 与蓝牙；不带容器引擎 |
+| `cx3576.full`、`s905x5m.emmc-full`、`s905x5m.sd-full` | 同上，加 Podman；`s905x5m` 的产品分别装在 eMMC 或 SD 卡上 |
+| `mini-x64.basic`、`qemu-armhf.basic` | OpenRC、管理面与 SSH；`mini-x64` 面向 128 MB 闪存 |
+| `<board>.dev`、`s905x5m.emmc-dev` | 开发构建（`PROFILE=dev`）：只在本地构建，从不发布 |
 
-每块板都有 `basic`；`uefi-x64`、`uefi-arm64` 与 `cx3576` 另有 `full` 与 `dev`，
-`s905x5m` 按存储命名产品（`emmc-full`、`sd-full`、`dev`、`emmc-dev`）。
-`uefi-x64.openrc-full` 是跑在 OpenRC 上的 `full`，
-`uefi-x64.docker` 是以 Docker 为容器引擎的 `full`。`mini-x64`（面向 128 MB 闪存）和
-`qemu-armhf` 只有 `basic`，运行 OpenRC，带管理面与 SSH；其它每个产品运行 systemd。没有 minimal 产品。
+没有 minimal 产品。
 
 每一块板都是发布目标。**这意味着它的产品会被发布；它不是“这块板能在实机上启动”的
 断言**——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行

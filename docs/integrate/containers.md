@@ -10,8 +10,9 @@ daemon and takes no part in a container's life, so the same declaration runs
 on either init. On a product whose engine is Docker nothing is declared to
 micad: you run containers with `docker` and `docker compose` (section 4).
 
-The engine is in the `<board>.full` products, podman, and in `uefi-x64.docker`,
-Docker (`mica-build:boards/products.md`).
+The engine is in the products that carry containers, podman in all of them
+but `uefi-x64.docker`, which carries Docker; [download](../start/download.md)
+section 1 says which products those are (`mica-build:boards/products.md`).
 It is off until you switch it on.
 
 > status: shipped — evidence: `mica-podman:README.md`, `mica-core:docs/mica-core.md`, `mica-core:crates/micad-settings/src/model/containers.rs`

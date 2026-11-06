@@ -65,7 +65,7 @@ framebuffer, so `console=tty0` would name a console with no device behind it.
 
 ## Obtaining an image
 
-The products are `uefi-arm64.basic` (the default) and `uefi-arm64.full`
+The products are `uefi-arm64.basic` (no container engine) and `uefi-arm64.full`
 (with containers), each released as `uefi-arm64.<variant>.<YYYYMMDD-HHMM>` with
 the image `mica-uefi-arm64.<variant>-<YYYYMMDD-HHMM>.img.gz`.
 
