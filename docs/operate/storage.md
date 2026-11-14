@@ -95,7 +95,7 @@ mica unit install srv.mount --enable
 ```
 
 **On OpenRC**, add a line to `/usr/local/etc/fstab` (devices by `UUID=` or
-`LABEL=`; there is no `/dev/disk/by-*`), check it with `/usr/lib/mica/mica-unit fstab check`,
+`LABEL=`; there is no `/dev/disk/by-*`), check it with `mica unit fstab check`,
 and reboot. `mica-fstab` mounts the lines at boot, in order; a failing line is
 fatal unless it says `nofail`:
 

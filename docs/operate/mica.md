@@ -46,7 +46,7 @@ section 3.15.
 | `status` | board, running system and update state, uptime, interfaces, time and DATA's use in one screen |
 | `update status\|check\|install\|rollback [--reboot]` | the console's update requests; `install` and `rollback` reboot only with `--reboot` ([updates](updates.md)) |
 | `container ...` | containers ([containers](../integrate/containers.md)) |
-| `unit ...` | the user's own services ([native applications](../integrate/native-applications.md) section 10) |
+| `unit ...` | the user's own services ([native applications](../integrate/native-applications.md) section 10); on OpenRC, `unit fstab check [<file>]` checks `/usr/local/etc/fstab` or the file ([storage](storage.md)) |
 | `web status`, `web network\|local\|off` | where the API listens ([configuration](configuration.md)) |
 | `mdns status\|list\|on\|off\|add\|remove`, `ssdp status\|on\|off` | LAN discovery |
 | `reboot`, `poweroff` | power |

@@ -38,7 +38,7 @@
 | `status` | 一屏看板卡、运行中的系统与更新状态、运行时长、接口、时间和 DATA 用量 |
 | `update status\|check\|install\|rollback [--reboot]` | 控制台的那些更新请求；`install` 与 `rollback` 只有加 `--reboot` 才重启（[更新](updates.md)） |
 | `container ...` | 容器 |
-| `unit ...` | 用户自己的服务 |
+| `unit ...` | 用户自己的服务；在 OpenRC 上，`unit fstab check [<file>]` 检查 `/usr/local/etc/fstab` 或指定文件（[存储](storage.md)） |
 | `web status`、`web network\|local\|off` | API 在哪里监听（[配置](configuration.md)） |
 | `mdns status\|list\|on\|off\|add\|remove`、`ssdp status\|on\|off` | 局域网发现 |
 | `reboot`、`poweroff` | 电源 |
