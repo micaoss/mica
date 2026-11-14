@@ -48,12 +48,10 @@ Mica OS 是一台可长期无人值守的边缘设备。内置 UI 的首要任�
 ### 2.3 一个概念只放在一个产品区域
 
 - Services 管 Mica OS 自身的全局运行能力；
-- Applications 管第三方/附加应用的身份、版本、权限、数据和生命周期；
 - Access 管进入设备的凭据与维护通道；
 - System 管设备本身的身份、时间、更新、存储、诊断和恢复。
 
-相同底层技术不等于相同产品概念。例如 Container runtime 是 Services 的系统开关，具体 OCI 应用则在
-Applications 管理。
+Mica OS 没有应用管理器：应用就是容器或用户自己的服务，二者都在 Services 管理。
 
 ### 2.4 先设计完整任务，再裁剪交付
 
@@ -93,7 +91,6 @@ Applications 管理。
 | Network | 已知 Wi-Fi、WireGuard peer、key rotation | R |
 | Network | Wi-Fi 扫描/即时连接、热点、蜂窝管理 | X |
 | Services | Container runtime、MQTT 全局开关与观测 | L |
-| Applications | 清单、精选目录、安装/更新/回滚/移除 | P |
 | Access | API token、SSH key/开关、临时 root 密码 | L |
 | System | hostname、UI ZIP 上传/多版本选择、内置恢复、重启、关机 | L |
 | System | 版本/板卡/部署/软件清单 | P |
@@ -111,17 +108,15 @@ Applications 管理。
 
 ### 4.1 一级结构
 
-认证后的本地设备界面使用六个一级区域：
+认证后的本地设备界面使用五个一级区域：
 
 1. **Overview** — 设备现在怎样，是否需要处理；
 2. **Network** — 如何连接，以及期望与观测是否一致；
-3. **Services** — Mica OS 自身运行能力；
-4. **Applications** — 本机应用、精选目录和生命周期；
-5. **Access** — 管理员、API 与维护入口；
-6. **System** — 设备身份、时间、更新、存储、诊断和恢复。
+3. **Services** — Mica OS 自身运行能力、容器与用户自己的服务；
+4. **Access** — 管理员、API 与维护入口；
+5. **System** — 设备身份、时间、更新、存储、诊断和恢复。
 
-Applications 的产品位置已经确定，但在 manager 和完整安全能力交付前，生产导航仍隐藏该入口。Fleet 不
-作为第七个入口；如果未来成立，它是独立的多设备产品，通过 device detail 深链进入单机界面。
+Fleet 不作为第六个入口；如果未来成立，它是独立的多设备产品，通过 device detail 深链进入单机界面。
 
 ### 4.2 页面树
 
@@ -134,16 +129,6 @@ Network
 ├── Known Wi-Fi
 └── WireGuard tunnel / peers
 Services
-Applications
-├── Installed
-├── Catalog
-├── Activity
-└── Application detail
-    ├── Overview
-    ├── Configuration
-    ├── Permissions
-    ├── Logs
-    └── Versions
 Access
 ├── Web administrator
 ├── API tokens
@@ -215,7 +200,7 @@ System
 
 长操作使用持久 Task Progress，而不是只用 toast：queued、running、succeeded、failed、result unknown。
 Task 展示动作、目标、当前阶段、可确定/不确定进度、开始时间和安全的错误信息。离开页面再回来，任务仍可
-通过 Overview、Applications Activity 或对应详情继续观察。
+通过 Overview 或对应详情继续观察。
 
 toast 只负责短反馈，例如复制成功、非关键保存成功。错误、一次性秘密、危险后果和需继续处理的任务必须
 有页面内持久位置。
@@ -345,92 +330,11 @@ Services 管理 Mica OS 系统级运行能力，当前是 Container runtime 与 
 
 - 不在这里列出每个容器或应用；
 - 不提供任意 service start/stop、systemd unit 编辑或通用 settings；
-- Container runtime 关闭时，Applications 中 OCI 应用统一显示 prerequisite/Blocked；
-- Applications 不得为了安装一个应用而静默打开全局 runtime。
 
-## 10. Applications `[P]`
+## 10. 应用
 
-Applications 是第六个一级区域，管理应用产品而非 unit/container。设计可以完整开展；生产入口等待应用
-管理器、签名准入、资源限制、秘密和回滚能力一起交付。
-
-### 10.1 应用来源与类型
-
-每个应用同时显示 **来源** 和 **运行类型**：
-
-| 来源 | 用户含义 | 可用动作 |
-|---|---|---|
-| System · OS verified | 随系统镜像交付 | 只读；随系统更新 |
-| Catalog verified | Mica OS 精选签名目录 | 安装、运行、更新、回滚、移除 |
-| Local signer | 设备登记的可信集成商 | 与目录分开标识；入口默认关闭 |
-| External · unmanaged | 发现到但不由 Mica OS 管理 | 只读诊断，不接管 |
-
-运行类型是 OCI 或 Native。第一阶段只交付精选 OCI。Native 后续使用声明式权限和启动描述，由系统生成
-受限 unit；目录不接收任意 systemd unit 或 shell script。设计文案不能把“已签名”写成“绝对安全”。
-
-### 10.2 Installed
-
-**目标：** 找到应用、看懂状态、执行当前最合理的动作。
-
-页面包括搜索、source/kind/state filter，以及 card/list view。每项显示名称、publisher、version、source、kind、
-desired、runtime、health、更新时间、活动 task 和一个主动作。不要把三条状态压成一个圆点：应用可以是
-“Enabled · stopped · health unknown”或“Disabled · data retained”。
-
-空态区分：没有托管应用、只有 System app、只有 unmanaged evidence、manager 不可用、数据仍在但应用已移除。
-
-### 10.3 Catalog
-
-**目标：** 理解一个经过精选的应用是否适合这台设备，再决定安装。
-
-目录 card 展示 publisher/signature 身份、version、kind、兼容结论、下载大小、持久空间、权限摘要、license/
-support 和 Install/Update。目录离线时可以显示带时间的缓存，但不能把网络失败显示为“没有应用”，也不能在
-缺少在线验证时继续安装。
-
-Native 尚未开放时，条目显示明确原因和阶段，而不是普通 disabled Install。公开评分、支付、评论和任意
-第三方上传不属于当前精选目录。
-
-### 10.4 Install / Update flow
-
-原型必须覆盖四个步骤：
-
-1. **Compatibility** — 精确版本、publisher、artifact 摘要、设备/系统兼容、下载大小；
-2. **Access & storage** — ports、network、devices、bus/topic、mount、secret、CPU/memory/PIDs/I/O、持久空间；
-3. **Confirm** — 将安装/停止/改变什么，精确版本，权限 delta，数据与回滚限制；
-4. **Progress** — Downloading、Verifying、Installing、Health check、Running / Rolled back / Failed。
-
-冲突在确认前显示具体资源和占用者。不能提供“忽略并继续”。Container runtime 关闭时显示 Blocked 与
-Open Services。更新并列展示 current/target version、release notes、新增权限、data migration、空间和 code/
-data rollback 能力。
-
-### 10.5 Application detail
-
-**Overview**：identity、source/kind/trust、desired/runtime/health、current version、resource usage、storage、最近
-任务和允许动作。主操作随状态变化，不同时堆叠 Start/Stop/Restart/Update/Rollback。
-
-**Configuration**：只展示应用声明的 typed field。Secret 只显示 Configured/Missing，替换后不回显。不提供
-任意环境变量、命令或 host path 输入框。
-
-**Permissions**：按 Network、Devices、Data、Messaging、System resources 分组，对比 requested 与 granted。
-权限变化作为一次新版本/preflight 处理，不直接编辑运行中 unit。
-
-**Logs**：当前有界时间窗、时间/stream/filter、暂停滚动、复制和经过脱敏的 bounded export。清楚说明不是
-永久日志，不让日志占满页面或 DATA。
-
-**Versions**：current、last-known-good、available、compatibility 和 release notes。Rollback 只有确实 eligible
-时出现，并重复说明代码回滚不一定恢复数据。
-
-### 10.6 Start、Stop、Remove 与 Purge
-
-- Start/Restart/Stop 都绑定任务，runtime/health 以真实观测更新；
-- Remove 默认保留应用数据，说明会停止应用、删除 runtime/artifact，但保留多少数据与在哪里使用；
-- 移除后保留 Data retained 记录，提供兼容版本 Reinstall；
-- Purge retained data 是独立危险流程，要求名称/challenge，展示数据量和不可逆影响；
-- System 与 External/unmanaged 不显示 Remove/Purge。
-
-### 10.7 必须原型化的异常
-
-catalog offline、container runtime off、manager degraded、signature/revocation failure、insufficient space、port/
-device conflict、OS rollback 后不兼容、update health gate 失败并回滚、数据 migration 阻止 rollback、task result
-unknown、remove 成功但 GC 延迟、日志被截断。
+没有应用管理器、应用目录或签名应用包。应用就是容器（Services 中的 containers）或用户自己的服务
+（Services 中的 units），其数据可以放在用户自己挂载的磁盘上；见 `docs/integrate/applications.md`。
 
 ## 11. Access
 
@@ -506,7 +410,7 @@ rollback、offline bundle import。系统更新是整套系统，不设计单个
 展示固定 storage tiers 和物理介质：role、size、used/free/reserved、mount/read-only/error、health、last check/
 repair。可用时展示 eMMC lifetime/EOL、NVMe/SATA SMART 的归一化状态，并保留 support details；不支持必须直说。
 
-设计 warning/critical + hysteresis，区分系统 update workspace、Applications、custom UI 和用户数据占用。
+设计 warning/critical + hysteresis，区分系统 update workspace、容器、custom UI 和用户数据占用。
 Backup/export/restore、repair、media replacement、encryption、removable media 只有契约确定后才出现。正常界面不
 提供任意 repartition、format、mount 或文件浏览。
 
@@ -731,7 +635,7 @@ Telemetry 数据”，避免只有 “OK/确定”。
 
 推荐：`[成熟度] / [区域] / [页面或旅程] / [状态] / [屏幕]`，例如：
 
-- `P / Applications / Install / Permission conflict / Wide`
+- `L / Services / Container detail / Start failed / Wide`
 - `R / Network / Interface edit / Reconnecting / Compact`
 - `P / Update / Validate / Rolled back / Wide`
 
@@ -766,7 +670,7 @@ key、serial 或客户数据。
 - 假数据、固定绿色状态或只播放成功动画；
 - 通用 settings 表单、命令输入、unit 编辑、任意 host path；
 - 在浏览器里判断签名、安全、回滚 eligibility 或存储冲突；
-- 把 Services 临时改造成 Applications，或把 Fleet 塞入本地导航；
+- 把 Fleet 塞入本地导航；
 - 省略原型中已经定义的 offline、result unknown 和危险确认状态。
 
 ## 21. 分阶段设计与交付建议
@@ -775,11 +679,10 @@ key、serial 或客户数据。
 
 1. **现有表面统一**：shell、状态、错误、确认、双语、触控和 accessibility；
 2. **Network 完整管理**：interface、Wi-Fi known networks、WireGuard；
-3. **Applications / curated OCI**：inventory、catalog、preflight、生命周期、日志和回滚；
-4. **Identity / diagnostics**：System Information、operational network、support bundle；
-5. **Time / system update**：同步状态、更新、maintenance、验证与 rollback；
-6. **Native applications / storage / recovery**：更严格的安全与不可逆语义；
-7. **条件产品**：local display、local signed import、fleet、公开 marketplace，只在单独决策后进入。
+3. **Identity / diagnostics**：System Information、operational network、support bundle；
+4. **Time / system update**：同步状态、更新、maintenance、验证与 rollback；
+5. **Storage / recovery**：更严格的安全与不可逆语义；
+6. **条件产品**：local display、local signed import、fleet、公开 marketplace，只在单独决策后进入。
 
 ## 22. 明确不设计成正常产品功能
 

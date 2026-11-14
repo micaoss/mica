@@ -26,7 +26,9 @@ states the rules a product relies on.
 | Channel | Grants | Authenticated by | State |
 |---|---|---|---|
 | Management API and web console | everything the management plane does | the admin password (browser session) or an API token | on every product; the console only where the product carries it |
+| The local API socket, `/run/mica/apid.sock` | everything the API does | the caller's uid, which must be root (the socket is `0600`) | while apid runs (modes `network` and `local`), also before the claim |
 | SSH (Dropbear or OpenSSH, as `mica-sshd`) | root | an authorized public key, or the transient root password | off unless the product sets `SSH=on` or an administrator enables it |
+| SSH logins from the cloud's metadata | root through `sudo` while cloud administrators are on | the keys in the instance's `ssh-keys` metadata | cloud products (`uefi-x64.gcp`) |
 | Local console on a display (`tty2`) | root | the transient root password | boards with a display; the first VT keeps the boot logo |
 | Serial console | a login prompt | the transient root password | present where the board has one; nothing to log in with by default |
 | Whole-disk reflash (board loader mode or external boot media) | a new device | physical access | every board; see the [board pages](../hardware/README.md) |
@@ -49,13 +51,15 @@ Every other route requires a credential an unclaimed device does not have, and
 a provisioning document is refused once the device is claimed. The device
 records which channel claimed it and when.
 
-From core 0.0.4, on a device with a device code, setup also asks for that code:
-it is printed on the label and shown on the device's own login prompt, serial
-or display, so whoever claims the device has it in hand. A wrong code only
-delays the next try. A product with `CLAIM_DEVICE_CODE=off` claims with the
-password alone. Bluetooth provisioning claims nothing from 0.0.4: it sets up the
-network, and the claim is the console's ([first run](../start/first-run.md)
-section 5). A credential that arrived in a
+On a product with `CLAIM_DEVICE_CODE=required`, setup also asks for the
+device code: it is printed on the label and shown on the device's own login
+prompt, serial or display, so whoever claims the device has it in hand; a
+cloud product's code is random and read after logging in. A wrong code only
+delays the next try. Every released product but `uefi-x64.gcp` sets
+`CLAIM_DEVICE_CODE=off` for now and claims with the password alone, so the
+first visitor to setup claims the device. Bluetooth provisioning claims
+nothing: it sets up the network, and the claim is the console's
+([first run](../start/first-run.md) section 5). A credential that arrived in a
 provisioning document is a bootstrap secret, and the console requires it to be
 rotated.
 
@@ -73,6 +77,10 @@ rotated.
 - Security-relevant actions are written to a small local audit ring. It is a
   record of those events, not a complete history of who was on the device, and
   nothing uploads it.
+- **Where the API listens** is `access.web.mode`: `network` (the default),
+  `local` (the local socket alone: root's commands on the device, no console
+  and no HTTP API) or `off` (apid stopped). `micad web status|network|local|off` sets it as root
+  on the device, which is how a device left in `off` comes back.
 - The API listens on plain HTTP port 8080 by default. With HTTPS enabled it
   serves on 8443 with a self-signed identity, which an administrator can
   replace, and the HTTP port only redirects; the session cookie is `Secure`
@@ -84,7 +92,7 @@ rotated.
 
 ### 4.1 Finding a device on the network: mDNS and SSDP
 
-From core 0.0.4 micad announces the device on the local network, with two
+micad announces the device on the local network, with two
 responders of its own, on every interface with an address except the
 loopback, the container engines' links, WireGuard and CAN. Each answers only a
 query from the subnet it arrived on, and rate-limits its answers.
@@ -106,8 +114,7 @@ query from the subnet it arrived on, and rate-limits its answers.
   and `GET /api/v1/ssdp` show what runs and what is announced.
 - **More services over mDNS**: a JSON drop-in in `/usr/share/mica/mdns.d/`
   (the image's) or `/run/mica/mdns.d/` (gone at reboot), `micad mdns add` and
-  `micad mdns remove`, or an app's `mdns` manifest field, published while the
-  app runs:
+  `micad mdns remove`:
 
   ```json
   {"version": 1, "services": [
@@ -145,6 +152,11 @@ locked again.
   starts the server at boot as that configuration says, so SSH does not wait
   for micad and keeps working without it. Without micad, `mica-add-keys` adds
   the keys of a provisioning medium's `mica-authorized-keys`.
+- **Cloud administrators.** On a cloud product the Compute Engine agent makes
+  an account for each SSH user the instance's metadata names and adds it to
+  the group `mica-admins`. The grant is a sudo rule micad renders while
+  `access.cloudAdmins.enabled` is on (the product's default there, a switch
+  on the console's Access page); off, membership grants nothing.
 - Containers are rootful, so anyone who can run the container engine is
   already root. There is no unprivileged-user story on a device.
 
@@ -159,10 +171,10 @@ does not model is a setting the device does not support.
 | What | Reboot and update | Reset |
 |---|---|---|
 | Settings and configuration documents | kept, on DATA | a configuration reset reseeds them and identity survives; a factory reset erases them with the identity |
-| `/home`, `/root`, `/srv` | kept, on DATA | an application-data reset clears `/srv`; a factory reset clears all three |
+| `/home`, `/root`, `/srv` | kept, on DATA | no reset tier clears them; a factory reset clears all three on DATA, never a disk the user mounted there |
 | Authorized keys, the SSH host key | kept | cleared with configuration; a factory reset draws a new host key |
 | A write under `/etc` | refused by the read-only root | — |
-| `/run` and the volatile log | lost at reboot | — |
+| `/run`, and the log where it is not kept on DATA | lost at reboot | — |
 | The transient root password | cleared at the next boot | — |
 
 The reset tiers and the factory reset are [recovery](recovery.md).

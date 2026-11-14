@@ -9,12 +9,11 @@ defines the backend contract.
 
 | Area | Purpose |
 |---|---|
-| Overview | Device identity, health and bounded runtime summaries |
-| Network | Overview, interfaces, Wi-Fi (station and access point), DNS, WireGuard (systemd products) and Bluetooth with its pairing window and BLE provisioning; Wi-Fi and Bluetooth show only on a product that has them |
-| Services | MQTT, containers, other exposed service settings, and the user's own services (`services.units`) |
-| Applications | Application availability and the supported delivery boundary |
-| Access | Operator credentials, SSH and authentication settings |
-| System | Signed deployments, firmware publication, storage, diagnostics and power |
+| Overview | Device identity, health, LAN discovery (mDNS/SSDP) and bounded runtime summaries |
+| Network | Overview, interfaces (Ethernet, Wi-Fi, CAN), Wi-Fi (station and access point), DNS, routes, WireGuard with each peer's state, and Bluetooth with its pairing window and BLE provisioning; Wi-Fi and Bluetooth show only on a product that has them |
+| Services | MQTT, containers, and the user's own services (`services.units`) with their logs |
+| Access | Operator credentials, SSH, where the API listens (`network`, `local`, `off`) and its HTTPS certificate, cloud administrators on a cloud product |
+| System | Information with the integrity card and the support summary; updates (automatic updates and maintenance windows, manual import from an upload or a USB stick, rollback and its outcome); storage (DATA, external media, the user's mounts); drivers (owner certificates and driver extensions); time and time zone; logging and service logs; diagnostics; Help (troubleshooting guides and links to this documentation); resets, factory reset and power |
 | System / UI versions | Upload, retain, activate and remove custom UI generations |
 
 File routes live under `src/app/routes/`. TanStack Query owns fetched server
