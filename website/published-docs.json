@@ -4,6 +4,7 @@
     {
       "id": "start",
       "docs": [
+        { "name": "overview", "dir": "start" },
         { "name": "quickstart", "dir": "start" },
         { "name": "download", "dir": "start" },
         { "name": "install", "dir": "start" },

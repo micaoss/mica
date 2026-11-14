@@ -158,9 +158,8 @@ registry 凭据和应用密钥都是有人放在 DATA/state 上、root 可读的
 
 > status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/native-applications.md`
 
-受管与不受信任应用的控制——独立签名的应用 bundle、可分发的容器信任
-策略、能拒绝一个发布的准入、受保护的密钥存储、审计轨迹，以及按应用的
-健康闸回滚——是另一个产品，另一份成本。其设计见
-[托管应用](../../integrate/managed-applications.md)；尚未实现，也不在上面的指南里描述。
+没有应用管理器。独立签名的应用 bundle、可分发的容器信任策略、能拒绝一个发布的
+准入、受保护的密钥存储、审计轨迹以及按应用的健康闸回滚，都不属于 Mica OS：应用就是
+容器或用户服务，如上面的指南所述。
 
-> status: proposed — evidence: `docs/integrate/managed-applications.md`
+> status: unsupported

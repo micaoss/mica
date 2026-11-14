@@ -307,6 +307,4 @@ convention rather than a mechanism that refuses:
 
 The controls that would change these answers — signed independent bundles,
 admission that can refuse a unit, non-bypassable ceilings, a protected secret
-store, per-application health-gated rollback — are a separate product with a
-separate cost, and are designed in [managed applications](managed-applications.md)
-rather than here.
+store, per-application health-gated rollback — are not part of Mica OS.

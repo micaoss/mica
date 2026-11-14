@@ -197,11 +197,10 @@ data. That contract is the integrator's to write and to test, on both paths.
 
 > status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/native-applications.md`
 
-Managed and untrusted application controls — independently signed application
-bundles, a distributable container trust policy, admission that can refuse a
-release, a protected secret store, an audit trail and per-application
-health-gated rollback — are a separate product with a separate cost. Their design is
-[managed applications](managed-applications.md); they are not implemented
-and not described by the guides above.
+There is no application manager. Independently signed application bundles,
+a distributable container trust policy, admission that can refuse a release, a
+protected secret store, an audit trail and per-application health-gated
+rollback are not part of Mica OS: an application is a container or a user
+service, as the guides above describe.
 
-> status: proposed — evidence: `docs/integrate/managed-applications.md`
+> status: unsupported

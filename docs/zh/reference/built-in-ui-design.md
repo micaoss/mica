@@ -799,7 +799,6 @@ key、serial 或客户数据。
 
 - Venus 研究只贡献本地/远程共用信息模型、freshness、configured/observed、quick control、一致 settings row、
   screen class 等抽象模式；
-- Applications 的信任、manifest、存储和生命周期边界由 `docs/integrate/managed-applications.md` 定义；
 - 当前实现与开发裁剪规则由 `docs/integrate/console.md` 维护；
 - 安装、release、time、update、recovery、storage、diagnostics、安全、fleet 等能力的当前契约见 `docs/reference/`，
   未完成工作由各个仓库自己跟踪。

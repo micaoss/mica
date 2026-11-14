@@ -53,7 +53,7 @@ em dash，每个证据引用放在反引号里，多个引用以 `, ` 分隔：
 ```
 > status: shipped — evidence: `mica-core:crates/mica-apid/openapi.json`
 > status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`
-> status: proposed — evidence: `docs/integrate/managed-applications.md`
+> status: proposed — evidence: `docs/security/signing.md`
 > status: unsupported
 ```
 

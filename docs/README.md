@@ -90,7 +90,6 @@ current product only; history is in Git.
   - `console.md` — the built-in console (`mica-apid-ui`): navigation, state and actions
   - `containers.md` — integrator's guide: the container engine, declaring Compose projects to micad, what the engine does with them, persistence
   - `display.md` — HDMI kiosk UI: cage and WPE rendering `apid` locally
-  - `managed-applications.md` — planned managed applications: curated OCI-first catalog, signed manifest, lifecycle, trust and API boundary
   - `manufacturing.md` — putting Mica OS on units at volume: identity, first credential, factory record and quarantine
   - `native-applications.md` — integrator's guide to native `.deb` applications: units, accounts, writable state, the health gate, devices, ceilings and rollback limits
   - `provisioning.md` — configuration without a network: first-boot identity, provisioning documents and credentials
