@@ -168,8 +168,8 @@ Everything above is documentation and tested convention for a trusted product
 integrator. None of it is a mechanism that refuses a release, and the
 difference matters most to whoever is deciding what to promise a customer.
 
-Four controls that a managed application platform would have, and that this
-one does not: **image signature admission** — the shipped container policy
+Four controls that an application platform would have, and that Mica OS does
+not: **image signature admission** — the shipped container policy
 accepts any image, and nothing checks a signature at start; **mandatory
 resource ceilings** — CPU, memory, PID and I/O limits are documented and
 tested on both paths, and nothing requires them, so a unit with none is

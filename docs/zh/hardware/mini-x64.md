@@ -2,7 +2,7 @@
 
 `mini-x64` 和 [`uefi-x64`](uefi-x64.md) 一样是一个**通用系统**——一份镜像服务于固件是
 UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己的基于 `tinyconfig` 的
-内核、xz 压缩的根，以及唯一的产品 `mini-x64.basic`，它运行 OpenRC，带管理面与 SSH。状态以[状态表](README.md#当前板卡)为准。
+内核、xz 压缩的根，以及唯一的产品 `mini-x64.basic`，它运行 OpenRC，带管理面、控制台与 SSH。状态以[状态表](README.md#当前板卡)为准。
 
 ## 概况
 
@@ -24,10 +24,10 @@ UEFI 的 amd64 机器——但为了跑在 128 MB 闪存上做了裁剪：自己
 | virtio-blk | QEMU 下已验证 | 自动启动用的就是这条路径 |
 | SATA（AHCI）、NVMe | 内核内建驱动，未在实机验证 | — |
 | SD / eMMC（PCI 或 ACPI 上的 SDHCI） | 内核内建驱动，未在实机验证 | 这块板所面向的小容量闪存 |
-| USB | **不支持** | `CONFIG_USB_SUPPORT` 关闭 |
+| USB 主机与存储（xHCI、EHCI、大容量存储、UAS） | 驱动已内置，未在硬件上验证 | 用于外部介质：U 盘与 SD 读卡器，支持 vfat、exFAT 与 ext（[存储](../operate/storage.md)第 4 节） |
 | 网络 | virtio-net、Intel e1000 与 e1000e | — |
 | 显示、Wi-Fi、蓝牙、状态灯、CAN、USB gadget | 无 | 无头设备 |
-| 实体恢复动作 | 无 | 这块板上凭据恢复与全出厂重置会被拒绝 |
+| 实体恢复动作 | 无 | 这块板上凭据恢复会被拒绝 |
 
 > status: board-dependent — evidence: `mica-build:boards/mini-x64/board.env`, `mica-build:boards/mini-x64/kernel/config/mini-x64.fragment`, `mica-build:boards/mini-x64/evidence.json`
 
@@ -70,8 +70,8 @@ qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
 和带 `secboot` 的固件都是必需的。
 
 **写进实体机器（未验证）。** 把整个镜像写入机器的 SATA、NVMe、SD 或 eMMC 介质，不要只写
-一个分区，然后 `sync` 并回读比对（[刷写](../start/flashing.md)第 3 节）。内核没有 USB
-驱动，所以机器不能从 U 盘启动这个镜像：介质要在另一个系统上写好。
+一个分区，然后 `sync` 并回读比对（[刷写](../start/flashing.md)第 3 节）。介质在另一个
+系统上写好；从 U 盘启动这个镜像未经验证。
 
 > status: unsupported
 
@@ -81,7 +81,7 @@ qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
 启动起来的那一份。根的 init 是 OpenRC，micad 驱动的是各个包为这种 init 提供的服务
 （`mica-core:docs/mica-core.md` 第 3.8 节）。
 
-`mini-x64.basic` 不带 Web 控制台。它在 8080 端口提供 API，并在那里认领：
+`mini-x64.basic` 在 8080 端口提供控制台与 API，可以在浏览器里或经 API 认领：
 
 ```sh
 curl http://127.0.0.1:8080/api/v1/session        # {"state":"setup"}
@@ -97,15 +97,14 @@ curl -X POST -H 'content-type: application/json' \
 ## 恢复
 
 与 [`uefi-x64`](uefi-x64.md) 相同：只读诊断、手动回滚、配置重置与应用数据重置可用；
-恢复出厂需要管理员密码，并且要用 core 0.0.4 构建的镜像（2026-10-21 的
-`mini-x64.basic` 镜像会拒绝它）；凭据恢复被拒绝，因为这块板没有声明物理恢复动作；兜底是整盘重刷，代价是所有
+恢复出厂需要管理员密码；凭据恢复被拒绝，因为这块板没有声明物理恢复动作；兜底是整盘重刷，代价是所有
 分区和设备身份。见[恢复](../operate/recovery.md)。
 
 ## 已知限制
 
 - 所有证据都是模拟器证据，不是现场证据。
-- 完全没有 USB：需要从 USB 介质启动或安装的机器用不了这份镜像。
-- 没有 Web 控制台、MQTT 和容器引擎：`mini-x64.basic` 只带管理面与 SSH。
+- USB 用于外部介质；从 USB 介质启动或安装未经验证。
+- 没有 MQTT 和容器引擎：`mini-x64.basic` 只带管理面、控制台与 SSH。
 
 ## 认证结果
 

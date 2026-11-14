@@ -21,7 +21,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 |---|---|---|
 | 容器（Podman） | 随 `uefi-x64.full` 发布 | `BOARD_FEATURES="containers"`；`uefi-x64.basic` 不带引擎 |
 | 容器（Docker） | 随 `uefi-x64.docker` 发布 | 同一特性，`CONTAINER_ENGINE=docker`（[容器](../../integrate/containers.md)第 4 节） |
-| USB 存储 | 内核内建驱动，未在实机验证 | XHCI 与 EHCI 加 `USB_STORAGE`；`USB_UAS` 未开，只支持 UAS 的硬盘盒会退回 bulk-only 或不被驱动 |
+| USB 存储 | 内核内建驱动，未在实机验证 | XHCI 与 EHCI 加内建的 `USB_STORAGE`，UAS 为模块；外部介质支持 vfat、exFAT 与 ext（[存储](../operate/storage.md)第 4 节） |
 | SATA | 内核内建驱动，未在实机验证 | AHCI 与 `ATA_PIIX` |
 | NVMe | 内核内建驱动，未在实机验证 | — |
 | virtio-blk / virtio-scsi | QEMU 下已验证 | 自动启动用的就是这条路径 |

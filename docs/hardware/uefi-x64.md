@@ -23,7 +23,7 @@ automatically in every release run of its products. Status is owned by the
 |---|---|---|
 | Containers (Podman) | ships in `uefi-x64.full` | `BOARD_FEATURES="containers"`; `uefi-x64.basic` leaves the engine out |
 | Containers (Docker) | ships in `uefi-x64.docker` | the same feature with `CONTAINER_ENGINE=docker` ([containers](../integrate/containers.md) section 4) |
-| USB storage | driver built in, unverified on hardware | XHCI and EHCI with `USB_STORAGE`; `USB_UAS` is off, so a UAS-only enclosure falls back to bulk-only transport or is not driven |
+| USB storage | driver built in, unverified on hardware | XHCI and EHCI with `USB_STORAGE` built in, UAS as a module; external media with vfat, exFAT and ext ([storage](../operate/storage.md) section 4) |
 | SATA | driver built in, unverified on hardware | AHCI and `ATA_PIIX` |
 | NVMe | driver built in, unverified on hardware | — |
 | virtio-blk / virtio-scsi | verified under QEMU | this is the path the automatic boot takes |

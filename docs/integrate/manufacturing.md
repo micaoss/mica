@@ -48,30 +48,26 @@ micad device-code                                        # on the device: the co
 The product secret is installed in every image of the product as
 `/usr/share/mica/ap-secret`, so it is public along with the images: the
 label's key is a first-contact credential, not a secret the line has to
-guard. It is valid until the unit is claimed on core 0.0.3, and from core
-0.0.4 until a key is set on the console's Wi-Fi page.
+guard. It is valid until a key is set on the console's Wi-Fi page.
 
 > status: board-dependent — evidence: `mica-core:docs/factory-ap-key.md`, `mica-build:boards/products.md`
 
 ## 2. Who creates the first credential
 
-Exactly three channels can create a device's first administrator credential,
+Exactly two channels can create a device's first administrator credential,
 and which one a line uses is the main manufacturing decision on this page:
 
 - **Setup at the end customer.** The unit ships unclaimed; the first person to
-  reach `/_ui/` chooses the password. From core 0.0.4 setup also asks for the
-  device code from the label, unless the product sets `CLAIM_DEVICE_CODE=off`.
-  The factory never holds a credential.
+  reach `/_ui/` chooses the password. Setup also asks for the device code
+  from the label where the product sets `CLAIM_DEVICE_CODE=required`; every
+  released product but `uefi-x64.gcp` sets it `off` for now, so whoever
+  reaches setup first claims the unit. The factory never holds a credential.
 - **A provisioning document at the factory.** The password is written into
   `mica-provisioning.toml` on the boot partition or a removable medium and
   applied on the first boot. The factory holds that password.
-- **Bluetooth at the end customer**, on core 0.0.3 and a product with WiFi
-  and Bluetooth: a phone in range during the 10 minutes after a boot of the
-  unclaimed unit sets the password
-  ([../start/first-run.md](../start/first-run.md) section 5). The factory
-  never holds a credential, and the unit is claimable by anyone in range until
-  someone does. From core 0.0.4 Bluetooth sets up the network and claims
-  nothing, so a line on 0.0.4 has the first two channels.
+
+Bluetooth at the end customer sets up the network and claims nothing
+([../start/first-run.md](../start/first-run.md) section 5).
 
 If a line uses the second, three rules follow and none of them is optional:
 

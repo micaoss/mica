@@ -171,11 +171,9 @@ as printed on the label; else derived from `provisioning.deviceId` as
 `mica-<first 8 hex>`. The key is, in order: `wifi.ap.psk` when set; on a
 device with a device code, the key derived from it and
 `/usr/share/mica/ap-secret`, claimed or not; `/var/lib/mica/secrets/ap-psk`,
-the per-device secret minted at first boot. From core 0.0.4 no claim sets
-`wifi.ap.psk`, so the label's key holds until an administrator sets one on the
-console's Wi-Fi page. On core 0.0.3 the label's key applied only while the
-device was unclaimed, and the claim through setup or Bluetooth set
-`wifi.ap.psk`. A factory reset clears `wifi.ap.psk` and brings the label's key
+the per-device secret minted at first boot. No claim sets `wifi.ap.psk`, so
+the label's key holds until an administrator sets one on the console's Wi-Fi
+page. A factory reset clears `wifi.ap.psk` and brings the label's key
 back. There
 is deliberately **no constant fallback**: a device with no key in any place
 refuses to raise the AP and says why. See §7 and `mica-core:docs/factory-ap-key.md`.

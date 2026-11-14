@@ -2,7 +2,7 @@
 
 `qemu-armhf` 是 Mica OS 的 32 位 Arm 与 UBI 参考：QEMU 的 `virt` 机器，Cortex-A15，
 由 U-Boot 从 NOR 闪存启动，根在 UBI 上。它背后没有硬件。唯一的产品
-`qemu-armhf.basic` 运行 OpenRC，带管理面与 SSH。状态以[状态表](README.md#当前板卡)为准。
+`qemu-armhf.basic` 运行 OpenRC，带管理面、控制台与 SSH。状态以[状态表](README.md#当前板卡)为准。
 
 ## 概况
 
@@ -27,8 +27,9 @@ U-Boot 只校验 FIT 的哈希、不校验签名。内核要求签名的 verity 
 | NOR 闪存（CFI，两块 64 MiB）上的 UBI | QEMU 下已验证 | 启动测试会挂上 UBI 区域 |
 | 看门狗（i6300esb） | QEMU 下已验证 | 由内核启用；引导器没有看门狗 |
 | 网络 | virtio-net | — |
+| USB 主机与存储（xHCI、大容量存储） | 驱动已内置，未验证 | 用于外部介质，例如 QEMU 的 `qemu-xhci` 加 `usb-storage` 驱动器；支持 vfat、exFAT 与 ext（[存储](../operate/storage.md)第 4 节） |
 | 显示、Wi-Fi、蓝牙、状态灯、CAN、USB gadget、容器 | 无 | `BOARD_FEATURES=""` |
-| 实体恢复动作 | 无 | 这块板上凭据恢复与全出厂重置会被拒绝 |
+| 实体恢复动作 | 无 | 这块板上凭据恢复会被拒绝 |
 
 > status: board-dependent — evidence: `mica-build:boards/qemu-armhf/board.env`, `mica-build:boards/qemu-armhf/evidence.json`
 
@@ -77,7 +78,7 @@ qemu-system-arm -M virt,highmem=off -cpu cortex-a15 -m 128M -nographic -no-reboo
 不会扩展。根的 init 是 OpenRC，micad 驱动每个包为这种 init 带上的服务
 （`mica-core:docs/mica-core.md` 第 3.8 节）。
 
-`qemu-armhf.basic` 不带 Web 控制台；API 在 8080 端口。
+`qemu-armhf.basic` 在 8080 端口提供控制台与 API。
 
 ## 更新
 
@@ -86,8 +87,7 @@ qemu-system-arm -M virt,highmem=off -cpu cortex-a15 -m 128M -nographic -no-reboo
 
 ## 恢复
 
-只读诊断、手动回滚、配置重置与应用数据重置可用；恢复出厂需要管理员密码，并且要用
-core 0.0.4 构建的镜像（2026-10-21 的 `qemu-armhf.basic` 镜像会拒绝它）；凭据恢复被
+只读诊断、手动回滚、配置重置与应用数据重置可用；恢复出厂需要管理员密码，它会清空 `data` 卷；凭据恢复被
 拒绝，因为这块板没有声明物理恢复动作。兜底是在主机上重写闪存镜像，代价是所有卷和设备身份。
 见[恢复](../operate/recovery.md)。
 
@@ -95,7 +95,7 @@ core 0.0.4 构建的镜像（2026-10-21 的 `qemu-armhf.basic` 镜像会拒绝�
 
 - 所有证据都是模拟器证据；没有可认证的硬件。
 - FIT 不签名：能写闪存的人就能替换内核。verity 根仍然必须签名。
-- 没有 Web 控制台、MQTT 和容器引擎：`qemu-armhf.basic` 只带管理面与 SSH。
+- 没有 MQTT 和容器引擎：`qemu-armhf.basic` 只带管理面、控制台与 SSH。
 
 ## 认证结果
 

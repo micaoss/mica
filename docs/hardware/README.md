@@ -88,7 +88,7 @@ them.
 - **To see what the system is**: [`uefi-x64`](uefi-x64.md) under QEMU, the
   baseline with automatic boot evidence.
 - **To fit into 128 MB of flash**: [`mini-x64`](mini-x64.md). OpenRC, the
-  management plane and SSH; no USB.
+  management plane, the console and SSH; USB for external media.
 - **To see the 32-bit Arm and UBI path**: [`qemu-armhf`](qemu-armhf.md),
   under QEMU only; its FIT is not signed.
 - **To try a generic arm64 machine**: [`uefi-arm64`](uefi-arm64.md). It carries

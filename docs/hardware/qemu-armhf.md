@@ -3,7 +3,7 @@
 `qemu-armhf` is the 32-bit Arm and UBI reference of Mica OS: QEMU's `virt`
 machine with a Cortex-A15, booted by U-Boot from NOR flash, its root on UBI.
 There is no hardware behind it. Its one product, `qemu-armhf.basic`, runs
-OpenRC with the management plane and SSH. Status is owned by the
+OpenRC with the management plane, the console and SSH. Status is owned by the
 [status table](README.md#current-boards).
 
 ## At a glance
@@ -30,6 +30,7 @@ boot chain.
 | NOR flash (CFI, two 64 MiB banks) under UBI | verified under QEMU | the boot test attaches the UBI region |
 | Watchdog (i6300esb) | verified under QEMU | the kernel arms it; the loader has none |
 | Network | virtio-net | — |
+| USB host and storage (xHCI, mass storage) | driver built in, unverified | for external media, e.g. QEMU's `qemu-xhci` with a `usb-storage` drive; vfat, exFAT and ext ([storage](../operate/storage.md) section 4) |
 | Display, Wi-Fi, Bluetooth, status LED, CAN, USB gadget, containers | none | `BOARD_FEATURES=""` |
 | Physical recovery action | none | credential recovery is refused on this board |
 
@@ -86,7 +87,7 @@ health gate confirms the deployment that booted. DATA is a fixed UBI volume
 and does not grow. The root's init is OpenRC, and micad drives the services
 each package ships for that init (`mica-core:docs/mica-core.md` section 3.8).
 
-`qemu-armhf.basic` carries no web console; it serves the API on port 8080.
+`qemu-armhf.basic` serves the console and the API on port 8080.
 
 ## Updates
 
@@ -99,8 +100,7 @@ records are UBI volumes. See [updates and rollback](../operate/updates.md).
 
 Read-only diagnosis, manual rollback, configuration reset and
 application-data reset are available, and the factory reset with the
-administrator password on an image built with core 0.0.4 (not the
-`qemu-armhf.basic` image of 2026-10-21); credential recovery is refused,
+administrator password, which empties the `data` volume; credential recovery is refused,
 because the board declares no physical recovery action.
 The floor is rewriting the flash image on the host, which costs every volume
 and the device identity. See [recovery](../operate/recovery.md).
@@ -110,8 +110,8 @@ and the device identity. See [recovery](../operate/recovery.md).
 - All evidence is emulator evidence; there is no hardware to qualify.
 - The FIT is not signed: anything that can write the flash can replace the
   kernel. The verity root still has to be signed.
-- No web console, no MQTT and no container engine: `qemu-armhf.basic`
-  carries the management plane and SSH only.
+- No MQTT and no container engine: `qemu-armhf.basic` carries the management
+  plane, the console and SSH only.
 
 ## Qualification results
 

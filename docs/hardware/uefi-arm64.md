@@ -116,8 +116,7 @@ the retained fallback taken and firmware and identity unchanged. See
 
 - Available: read-only diagnosis, manual rollback, configuration reset,
   application-data reset, rewriting the disk image.
-- **Factory reset**: with the administrator password, on an image built with
-  core 0.0.4.
+- **Factory reset**: with the administrator password.
 - **Unavailable**: credential recovery, for want of a
   physical-presence assertion.
 - Recovery on this board is rewriting the image on the host. A host that can

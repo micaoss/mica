@@ -3,7 +3,7 @@
 `mini-x64` is a **generic system** like [`uefi-x64`](uefi-x64.md) — one image
 for amd64 machines whose firmware is UEFI — cut down to run from 128 MB of
 flash: its own `tinyconfig`-based kernel, an xz root, and one product,
-`mini-x64.basic`, which runs OpenRC with the management plane and SSH. Status is owned by the [status table](README.md#current-boards).
+`mini-x64.basic`, which runs OpenRC with the management plane, the console and SSH. Status is owned by the [status table](README.md#current-boards).
 
 ## At a glance
 
@@ -25,7 +25,7 @@ flash: its own `tinyconfig`-based kernel, an xz root, and one product,
 | virtio-blk | verified under QEMU | the path the automatic boot takes |
 | SATA (AHCI), NVMe | driver built in, unverified on hardware | — |
 | SD / eMMC (SDHCI over PCI or ACPI) | driver built in, unverified on hardware | the small flash parts this board is for |
-| USB | **not supported** | `CONFIG_USB_SUPPORT` is off |
+| USB host and storage (xHCI, EHCI, mass storage, UAS) | driver built in, unverified on hardware | for external media: USB sticks and SD readers, with vfat, exFAT and ext ([storage](../operate/storage.md) section 4) |
 | Network | virtio-net, Intel e1000 and e1000e | — |
 | Display, Wi-Fi, Bluetooth, status LED, CAN, USB gadget | none | headless |
 | Physical recovery action | none | credential recovery is refused on this board |
@@ -77,9 +77,9 @@ both required.
 
 **Onto a physical machine (unverified).** Write the whole image to the
 machine's SATA, NVMe, SD or eMMC medium, never to a partition, then `sync` and
-read back to compare ([flashing](../start/flashing.md) section 3). The kernel
-has no USB driver, so the machine cannot boot this image from a USB stick: the
-medium is written from another system.
+read back to compare ([flashing](../start/flashing.md) section 3). The medium
+is written from another system; booting this image from a USB stick is
+unverified.
 
 > status: unsupported
 
@@ -91,8 +91,8 @@ the deployment that booted. The root's init is OpenRC, and micad drives the
 services each package ships for that init
 (`mica-core:docs/mica-core.md` section 3.8).
 
-`mini-x64.basic` carries no web console. It serves the API on port 8080 and is
-claimed there:
+`mini-x64.basic` serves the console and the API on port 8080 and is claimed
+there, in a browser or over the API:
 
 ```sh
 curl http://127.0.0.1:8080/api/v1/session        # {"state":"setup"}
@@ -110,8 +110,7 @@ A/B switch, health confirmation and rollback of every board. See
 
 As for [`uefi-x64`](uefi-x64.md#recovery): read-only diagnosis, manual
 rollback, configuration reset and application-data reset are available;
-the factory reset takes the administrator password on an image built with
-core 0.0.4 (the `mini-x64.basic` image of 2026-10-21 refuses it); credential
+the factory reset takes the administrator password; credential
 recovery is refused, because the board declares no physical recovery action; the floor is a whole-disk reflash, which
 costs every partition and the device identity. See
 [recovery](../operate/recovery.md).
@@ -119,10 +118,10 @@ costs every partition and the device identity. See
 ## Known limitations
 
 - All evidence is emulator evidence, not field evidence.
-- No USB at all: a machine that has to boot or be installed from USB media is
-  not this image.
-- No web console, no MQTT and no container engine: `mini-x64.basic` carries
-  the management plane and SSH only.
+- USB is for external media; booting or installing from USB media is
+  unverified.
+- No MQTT and no container engine: `mini-x64.basic` carries the management
+  plane, the console and SSH only.
 
 ## Qualification results
 

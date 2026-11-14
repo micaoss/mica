@@ -73,7 +73,7 @@ mica-qualified。向下移动是自动的：重新认证的触发条件
 ## 选哪块板
 
 - **想看这个系统是什么**：QEMU 下的 [`uefi-x64`](uefi-x64.md)，有自动启动证据的基线。
-- **要放进 128 MB 闪存**：[`mini-x64`](mini-x64.md)。OpenRC、管理面与 SSH；没有 USB。
+- **要放进 128 MB 闪存**：[`mini-x64`](mini-x64.md)。OpenRC、管理面、控制台与 SSH；USB 用于外部介质。
 - **想看 32 位 Arm 与 UBI 这条路径**：[`qemu-armhf`](qemu-armhf.md)，只在 QEMU 下；
   它的 FIT 不签名。
 - **想试一台通用 arm64 机器**：[`uefi-arm64`](uefi-arm64.md)。它带有通用硬件驱动（AHCI、

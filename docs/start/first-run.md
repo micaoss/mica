@@ -62,14 +62,11 @@ new identity. No identity is stored in the bootloader's attempt records.
   s905x5m.sd-full, s905x5m.emmc-full): the device's label carries its
   **device code**, printed `DFN4-L34C-T8N`, the access point's name
   (`mica-` and four characters) and its key, also as a QR code. Join that
-  network and open `http://192.168.4.1:8080`. On core 0.0.3 the label's key
-  works only while the device is unclaimed: the claim replaces it with a key
-  you choose or one the device generates and shows once (section 4). From
-  core 0.0.4 it keeps working after the claim, until you set a key of your
-  own on the console's Wi-Fi page. A factory reset brings the label's key
-  back. `micad device-code` prints the code on the device, and from core
-  0.0.4 the device's own console shows it at the login prompt; nothing on
-  the device prints the key.
+  network and open `http://192.168.4.1:8080`. The label's key keeps working
+  after the claim, until you set a key of your own on the console's Wi-Fi
+  page. A factory reset brings the label's key back. `micad device-code`
+  prints the code on the device, and the device's own console shows it at the
+  login prompt; nothing on the device prints the key.
 - The label's key is a first-contact credential, not a secret: every image of
   a product carries the product secret it is derived from, so whoever holds
   an image and reads a label can compute it
@@ -170,31 +167,25 @@ unproven, and a board page is where a run of it gets recorded
 
 **The claim is the unclaimed → claimed transition**, and the one fact that
 decides which side a device is on is whether an administrator credential
-exists. Exactly three channels can create the first one:
+exists. Exactly two channels can create the first one:
 
 1. **Setup** — the first visit to `/_ui/`, or `POST /api/v1/setup` for API
    clients. You choose the administrator password; the route establishes a
    browser session and mints no API token. A second
    setup call on a claimed device is refused with `already_configured` and
-   writes nothing. From core 0.0.4, on a device with a device code, setup
-   also asks for that code, printed on the label and shown on the device's
-   own console (serial or display login prompt), as proof that whoever claims
-   the device holds it: reaching its console is no such proof once Bluetooth
-   has put an unclaimed device on a network. A wrong code counts towards the
-   sign-in backoff.
+   writes nothing. On a product with `CLAIM_DEVICE_CODE=required`, setup
+   also asks for the device code, printed on the label and shown on the
+   device's own console (serial or display login prompt), as proof that
+   whoever claims the device holds it: reaching its console is no such proof
+   once Bluetooth has put an unclaimed device on a network. A wrong code
+   counts towards the sign-in backoff. **Every released product but
+   `uefi-x64.gcp` sets it `off` for now**, so the first visitor to setup
+   claims the device: claim a new device on a network you control, promptly.
 2. **A provisioning document** — section 3. The password came off the medium.
-3. **Bluetooth**, on core 0.0.3 only — a phone in range of an unclaimed
-   device, section 5. The claim channel reads `ble`. From core 0.0.4 a phone
-   sets up the network and claims nothing; the device is claimed through
-   setup.
 
-On core 0.0.3, on a product with WiFi, the claim through setup or Bluetooth
-also replaces the access point's label key: with the key the caller sends, or
-with sixteen random characters the answer carries once and the console shows
-before it enters. A claim by provisioning document sets no key, and the
-device falls back to a key it generated at first boot. From core 0.0.4 no
-claim sets a key: the label's key applies until you set one on the console's
-Wi-Fi page.
+Bluetooth claims nothing: a phone sets up the network (section 5) and the
+device is claimed through setup. No claim sets an access-point key: the
+label's key applies until you set one on the console's Wi-Fi page.
 
 From the claim onward, every management read and write is authenticated. See
 [../operate/api.md](../operate/api.md) for the session and token model and
@@ -242,9 +233,8 @@ before the first sign-in is physical custody of the medium, and nothing else.
 ## 5. Setting up from a phone over Bluetooth
 
 On a product with WiFi and Bluetooth (cx3576.full, s905x5m.sd-full,
-s905x5m.emmc-full), a phone can give the device the WiFi network to join, and
-on core 0.0.3 claim it if it is unclaimed, without joining its access
-point. From core 0.0.4 the phone can also set up the wired port. The device
+s905x5m.emmc-full), a phone can give the device the WiFi network to join, or
+set up its wired port, without joining its access point. The device
 advertises only while a **provisioning window** is open:
 
 | Window | Opens | Closes | The phone needs |
@@ -257,16 +247,11 @@ advertises only while a **provisioning window** is open:
 - The phone side is the web page `https://init.micaos.dev`, in Chrome or
   Edge on Android or a desktop. iOS browsers have no Web Bluetooth, so the
   page only explains that there.
-- On core 0.0.3, the release of 2026-10-21, the page sets the administrator
-  password on an unclaimed device; the claim takes effect when the phone
-  finishes, and the first phone to finish wins. Such a device is therefore
-  claimable by anyone within Bluetooth range for 10 minutes after each boot;
-  claim it promptly, or before it leaves your custody.
-- From core 0.0.4 Bluetooth claims nothing and sets nothing but the network:
-  the phone sets the WiFi network or the wired port's addressing; the device
-  stays unclaimed, and the page's last screen sends you to the console, whose
-  setup asks for the administrator password and the device code, which is on
-  the label and on the device's own console. The hostname is set there, or
+- Bluetooth claims nothing and sets nothing but the network: the phone sets
+  the WiFi network or the wired port's addressing; the device stays
+  unclaimed, and the page's last screen sends you to the console, whose setup
+  asks for the administrator password (and the device code, on a product
+  that requires it). The hostname is set there, or
   later in the console. After a wired-only session the access point stays on
   with the label's key, and keeps that key after the claim until you set your
   own in the console. Until it is claimed, the device opens its unclaimed window again
