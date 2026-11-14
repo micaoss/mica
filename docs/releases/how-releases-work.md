@@ -36,7 +36,12 @@ After the GitHub release is attached, the same run posts the release to the
 resource service (`mica-build:README.md`): its files under
 `mica/<board>.<variant>/<stamp>/` on `dl.res.micaos.dev`, and its record, after
 which `https://res.micaos.dev/update/` offers it to the website and to
-devices. `publish-res.yml` posts a release that is already published.
+devices. Every object of a release's update archive is published with its
+transfer index, `objects/<sha256>.index`, and the download host serves the
+chunks a device lacks from `chunks/<digest>`, cut out of the objects by those
+indexes, so a device fetches only what it does not already hold
+([updates](../reference/updates.md)). `publish-res.yml` posts a release that
+is already published.
 
 `ci.yml` publishes nothing anywhere.
 
@@ -45,8 +50,9 @@ devices. `publish-res.yml` posts a release that is already published.
 | `mica-build-tools`, `mica-build-env`, `mica-system-base`, `mica-core`, `mica-pkgs`, `mica-podman`, `mica-docker` | `<YYYYMMDD-HHMM>` |
 | `mica-build` | `<board>.<variant>.<YYYYMMDD-HHMM>`, one product; the product's board is built and published in the same release, and a `dev` product is never released |
 
-Some releases cut themselves: `mica-system-base` and `mica-build-env` move
-their inputs on the first of each month and release when the build is green,
+Some releases cut themselves: `mica-system-base` moves its inputs on the 1st
+and 15th of each month and `mica-build-env` on the 1st, each releasing when
+the build is green,
 and `mica-podman` and `mica-docker` do the same weekly for their upstream
 engines.
 

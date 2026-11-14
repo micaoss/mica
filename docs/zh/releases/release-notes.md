@@ -39,7 +39,7 @@
 
 已发布的版本既不是板卡认证，也不是支持承诺：一块板证明到了什么程度写在它的
 [板卡页](../hardware/README.md)上，支持意味着什么见[支持](support.md)。已安装的部署会
-一直能离线启动，不管更新服务器之后提供还是扣住什么。
+一直能离线启动，不管资源服务之后提供还是扣住什么。
 
 > status: shipped — evidence: `docs/hardware/README.md`, `docs/releases/support.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
 

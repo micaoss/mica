@@ -18,10 +18,9 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`build.md`](start/build.md) — 从源码构建：在线按固定 release，离线按并排检出
 - `operate/` — 运维：配置、更新、恢复、存储、API
   - [`configuration.md`](operate/configuration.md) — 配置模型与所有受支持的修改方式
-  - [operate/updates.md](operate/updates.md) — A/B 更新、健康门与回滚
-  - [operate/updates.md](operate/updates.md) — 该用哪个更新归档、设备如何接收它、以及每一种拒绝
-  - [`recovery.md`](operate/recovery.md) — 从自动回退到整盘重刷的恢复阶梯
-  - [`storage.md`](operate/storage.md) — 分区、DATA 命名空间与数据归属规则
+  - [`updates.md`](operate/updates.md) — 该用哪个更新归档、在线/离线/U 盘更新、维护窗口、确认、回滚以及每一种拒绝
+  - [`recovery.md`](operate/recovery.md) — 从自动回退、重置层级、出厂重置到整盘重刷的恢复阶梯
+  - [`storage.md`](operate/storage.md) — 分区、DATA 命名空间、数据归属规则、自己的磁盘与外接介质
   - [`troubleshooting.md`](operate/troubleshooting.md) — 诊断顺序：访问、识别、证据
   - [`api.md`](operate/api.md) — 管理 API：一份机器可读契约
 - `integrate/` — 集成：在它上面做产品
@@ -29,7 +28,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`manufacturing.md`](integrate/manufacturing.md) — 批量装机：谁生成身份与首个凭据、工厂记录、失败与重复配置的隔离
 - `hardware/` — 支持的硬件：按板卡讲清现状、刷机、更新与恢复
   - [`README.md`](hardware/README.md) — 板卡一览、现状快照与选板指引
-  - [`uefi-x64.md`](hardware/uefi-x64.md) — 通用 amd64 UEFI 机器
+  - [`uefi-x64.md`](hardware/uefi-x64.md) — 通用 amd64 UEFI 机器，以及 Compute Engine 镜像
   - [`uefi-arm64.md`](hardware/uefi-arm64.md) — 通用 arm64 UEFI 机器
   - [`cx3576.md`](hardware/cx3576.md) — CX3576-Z / Rockchip RK3576
   - [`s905x5m.md`](hardware/s905x5m.md) — BM201 / Amlogic S905X5M

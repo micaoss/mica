@@ -27,8 +27,10 @@ gh workflow run release-core.yml -R micaoss/mica-build [-f channel=<channel>]
 
 GitHub release 挂好之后，同一次运行会把发布推送到资源服务（`mica-build:README.md`）：
 文件放到 `dl.res.micaos.dev` 的 `mica/<board>.<variant>/<stamp>/` 下，再提交发布记录，之后
-`https://res.micaos.dev/update/` 向官网和设备提供它。已经发布过的版本用 `publish-res.yml`
-补推。
+`https://res.micaos.dev/update/` 向官网和设备提供它。发布的更新归档里每个对象都带着
+自己的传输索引 `objects/<sha256>.index`，下载主机按这些索引从对象中切出块，在
+`chunks/<digest>` 提供设备缺少的部分，所以设备只取自己还没有的内容。已经发布过的版本用
+`publish-res.yml` 补推。
 
 任何仓库的 `ci.yml` 都什么都不发布。
 
@@ -37,8 +39,8 @@ GitHub release 挂好之后，同一次运行会把发布推送到资源服务�
 | `mica-build-tools`、`mica-build-env`、`mica-system-base`、`mica-core`、`mica-pkgs`、`mica-podman`、`mica-docker` | `<YYYYMMDD-HHMM>` |
 | `mica-build` | `<board>.<variant>.<YYYYMMDD-HHMM>`，一个产品；产品所在的板卡在同一个 release 里构建并发布，`dev` 产品从不发布 |
 
-有些 release 会自己切出：`mica-system-base` 与 `mica-build-env` 每月一号移动自己的
-输入，构建通过后发布；`mica-podman` 与 `mica-docker` 每周对各自的上游引擎做同样的事。
+有些 release 会自己切出：`mica-system-base` 每月 1 号和 15 号、`mica-build-env` 每月
+1 号移动自己的输入，构建通过后发布；`mica-podman` 与 `mica-docker` 每周对各自的上游引擎做同样的事。
 
 标签形式、OCI 标签和资产名都跟随板卡名与产品名（[概览](../start/overview.md)第 3 节）。
 时间戳是这次发布的 UTC 时间，没有 `v` 前缀、没有 semver、没有提交后缀。产品标签从

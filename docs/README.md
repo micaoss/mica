@@ -78,9 +78,9 @@ current product only; history is in Git.
   - `build.md` — building a product image from source, online from the pinned releases or offline from the checkouts
 - `operate/` — running a device: configuration, updates, recovery, storage, the API
   - `configuration.md` — the configuration model and every supported way to change settings
-  - `updates.md` — which update archive applies, online and offline updates, confirmation, rollback and every refusal
-  - `recovery.md` — what to do when a device does not boot, and what recovery costs
-  - `storage.md` — partitions, what survives what, and where data belongs
+  - `updates.md` — which update archive applies, online, offline and USB updates, maintenance windows, confirmation, rollback and every refusal
+  - `recovery.md` — what to do when a device does not boot, the reset tiers and the factory reset, and what recovery costs
+  - `storage.md` — partitions, what survives what, where data belongs, your own disks and external media
   - `troubleshooting.md` — diagnosis: access channels, evidence to read, refusals to interpret
   - `api.md` — the programmatic surface and its machine-readable contract
   - `without-micad.md` — a device without micad: getting in, switching services on with `mica-units`, and each service's file by hand
@@ -95,12 +95,12 @@ current product only; history is in Git.
   - `provisioning.md` — configuration without a network: first-boot identity, provisioning documents and credentials
 - `hardware/` — the supported boards: one page per board, the status table and support tiers, assurance and qualification
   - `README.md` — the board list, a dated state snapshot and the route into each board's page
-  - `uefi-x64.md` — generic amd64 UEFI machines: the baseline, booted in every release run
+  - `uefi-x64.md` — generic amd64 UEFI machines: the baseline, booted in every release run, and the Compute Engine image
   - `uefi-arm64.md` — generic arm64 UEFI machines: the carried driver set, and why carrying is not qualifying
   - `cx3576.md` — CX3576-Z / RK3576: features, the rockusb flashing path and what a reported bench boot does not establish
   - `s905x5m.md` — BM201 / S905X5M: features, and why a published image cannot install onto a blank board
   - `qemu-armhf.md` — QEMU's 32-bit Arm virt machine, U-Boot from NOR flash and the root on UBI
-  - `mini-x64.md` — small amd64 UEFI machines with 128 MB of flash: one OpenRC product with the management plane and SSH, no USB
+  - `mini-x64.md` — small amd64 UEFI machines with 128 MB of flash: one OpenRC product with the management plane, the console and SSH, USB and SD for external media
   - `assurance.md` — boot assurance ladder (I1–I4) and what each level requires
   - `qualification.md` — field-reliability qualification: the matrix and its binding rules
   - `board-template.md` — the board page template: the eleven validated sections
@@ -113,16 +113,16 @@ current product only; history is in Git.
   - `access.md` — how an operator reaches a device: the API, SSH, the consoles, and being locked out
   - `api.md` — management API: ownership, authentication, tasks and isolated UI hosting
   - `boot.md` — U-Boot signed FIT selection, redundant native records and health confirmation
-  - `diagnostics.md` — system information, observed network state, board telemetry and the bounded redacted support snapshot
+  - `diagnostics.md` — system information, observed network state, board telemetry, the support summary, service logs and the bounded redacted support snapshot
   - `management.md` — management plane: what is fixed about micad and the API, and where each edge is specified
   - `manufacturing.md` — factory inputs, per-device result records, quarantine, RMA without identity cloning, debug and fuse policy
-  - `recovery.md` — reset tiers, interrupted retry, credential and presence gates, shared-store recovery limits
+  - `recovery.md` — reset tiers, the factory reset, interrupted retry, credential and presence gates, shared-store recovery limits
   - `release-lock.md` — a pointer to the release lock's specification in `mica-build-tools`
   - `remote.md` — what reaches the device today, the NAT requirement, the designed fleet protocol and update control flow
   - `ro-root.md` — read-only root: squashfs and dm-verity packing and boot wiring
-  - `storage.md` — partitions and DATA namespaces: status surface, wear reporting, low-space policy and data-lifecycle decisions
+  - `storage.md` — partitions and DATA namespaces: status surface, wear reporting, low-space policy, user mounts, external media and data-lifecycle decisions
   - `time.md` — RTC, saved clock floor, NTP synchronization and timezone management
-  - `updates.md` — deployment lifecycle: state model, acquisition, installation, policy, reboot gate and fault evidence
+  - `updates.md` — deployment lifecycle: state model, acquisition and delta transfer, installation, policy, reboot gate, core sets, driver extensions and fault evidence
   - `wifi.md` — Wi-Fi station and access point as two micad reconcilers driving wpa_supplicant and hostapd
 - `releases/` — how releases are identified, made, distributed and supported
   - `how-releases-work.md` — how a release is cut in each repository, what it carries, and what decides a rebuild

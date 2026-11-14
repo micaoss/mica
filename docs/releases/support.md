@@ -36,17 +36,24 @@ completed board page.
 
 ## 2. Current hardware standing
 
-| Board | What it is | Standing |
+Every board is at bring-up; the evidence behind each is in
+[current boards](../hardware/README.md#current-boards).
+
+| Board | Released products | Standing |
 |---|---|---|
-| cx3576 (CX3576-Z, RK3576, arm64) | the reference hardware board: vendor kernel, mainline U-Boot with the A/B handshake, WiFi/Bluetooth | the board the full contract is built and tested against; behaviours verified locally, with on-hardware acceptance tracked in the design records |
-| uefi-x64 (generic UEFI x86_64) | the QEMU and CI baseline | supported as a development and verification target, not a product board |
+| uefi-x64 (generic UEFI amd64) | `full`, `docker`, `gcp` | bring-up: the QEMU baseline, booted in each release run |
+| mini-x64 (small UEFI amd64) | `basic` | bring-up: QEMU, booted in each release run |
+| qemu-armhf (QEMU 32-bit Arm) | `basic` | bring-up: QEMU |
+| cx3576 (CX3576-Z, RK3576) | `full` | bring-up: static verification and one hardware observation |
+| s905x5m (BM201, S905X5M) | `sd-full`, `emmc-full` | bring-up: static verification and fixtures |
+| uefi-arm64 (generic UEFI arm64) | none | bring-up: QEMU reference, not released |
 
 Integrators bringing their own hardware start at
 [`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md); the board contract itself (artifact
 boundary, kernel assertion set, layout schema) is shipped and enforced by the
 build.
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/README.md`
+> status: board-dependent — evidence: `docs/hardware/README.md`, `docs/start/download.md`, `mica-build:boards/README.md`
 
 ## 3. Lifecycle ownership
 
@@ -81,18 +88,20 @@ number, not a commitment.
 
 A report that can be acted on cites, in this order:
 
-1. **Release identity** — the bundle version, the verity root hash, and the
-   git stamp from `/usr/share/mica/manifest.tsv`
-   ([release-notes.md](release-notes.md)).
+1. **Release identity** — the product, the deployment id and generation, and
+   the core set ([release-notes.md](release-notes.md)). The support summary
+   (`GET /api/v1/system/support-info`, or the console's Help tab) carries
+   them without the device's names, addresses or credentials.
 2. **Board and revision** — and, for non-reference boards, the integrator's
    qualification standing.
 3. **The device identity** — hostname / device id ([../start/first-run.md](../start/first-run.md)).
-4. **Evidence captured before recovery** — journal excerpts, health-gate
-   verdicts, update state, and any refusal text quoted verbatim
+4. **Evidence captured before recovery** — a diagnostic snapshot (the
+   console, or `micad diag` on the device: this and the previous boot's
+   warnings, failed services, update state), and any refusal text quoted verbatim
    ([../operate/troubleshooting.md](../operate/troubleshooting.md)); a reflash destroys evidence,
    so capture first.
 
-> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/operate/troubleshooting.md`
+> status: shipped — evidence: `docs/reference/diagnostics.md`, `docs/operate/troubleshooting.md`
 
 ## 5. Where to ask
 

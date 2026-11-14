@@ -51,7 +51,7 @@ A published release is not a board qualification and not a support
 commitment: what has been proven about a board is on its
 [board page](../hardware/README.md), and what support means is
 [support](support.md). An installed deployment keeps booting offline whatever
-the update server later offers or withholds.
+the resource service later offers or withholds.
 
 > status: shipped — evidence: `docs/hardware/README.md`, `docs/releases/support.md`, `mica-core:crates/mica-deploy/src/acquisition.rs`
 

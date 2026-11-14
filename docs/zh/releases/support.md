@@ -29,15 +29,22 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 
 ## 2. 当前硬件地位
 
-| 板卡 | 是什么 | 地位 |
+每块板卡都处于 bring-up；各自背后的证据见
+[当前板卡](../hardware/README.md#当前板卡)。
+
+| 板卡 | 已发布产品 | 地位 |
 |---|---|---|
-| cx3576（CX3576-Z，RK3576，arm64） | 参考硬件板卡：厂商内核、带 A/B 握手的主线 U-Boot、WiFi/蓝牙 | 完整契约据以构建和测试的板卡；行为在本地验证，硬件上的验收在设计记录中跟踪 |
-| uefi-x64（通用 UEFI x86_64） | QEMU 与 CI 基线 | 作为开发与验证目标受支持，不是产品板卡 |
+| uefi-x64（通用 UEFI amd64） | `full`、`docker`、`gcp` | bring-up：QEMU 基线，每次发布运行都启动 |
+| mini-x64（小型 UEFI amd64） | `basic` | bring-up：QEMU，每次发布运行都启动 |
+| qemu-armhf（QEMU 32 位 Arm） | `basic` | bring-up：QEMU |
+| cx3576（CX3576-Z，RK3576） | `full` | bring-up：静态验证，加一次硬件观察 |
+| s905x5m（BM201，S905X5M） | `sd-full`、`emmc-full` | bring-up：静态验证与 fixture |
+| uefi-arm64（通用 UEFI arm64） | 无 | bring-up：QEMU 参考，不发布 |
 
 自带硬件的集成商从 [`mica-build:boards/README.md`](https://github.com/micaoss/mica-build/blob/main/boards/README.md) 开始；
 板卡契约本身（产物边界、内核断言集、布局 schema）已发布并由构建强制。
 
-> status: board-dependent — evidence: `mica-build:boards/cx3576/board.env`, `mica-build:boards/uefi-x64/board.env`, `mica-build:boards/README.md`
+> status: board-dependent — evidence: `docs/hardware/README.md`, `docs/start/download.md`, `mica-build:boards/README.md`
 
 ## 3. 生命周期归属
 
@@ -65,16 +72,17 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
 
 一份可被处理的报告按此顺序引用：
 
-1. **发布版身份**——bundle 版本、verity 根哈希，以及
-   `/usr/share/mica/manifest.tsv` 中的 git 标记
-   （[release-notes.md](release-notes.md)）。
+1. **发布版身份**——产品、deployment id 与 generation，以及 core 集合
+   （[release-notes.md](release-notes.md)）。支持摘要
+   （`GET /api/v1/system/support-info`，或控制台的帮助页）带着这些，
+   且不含设备的名称、地址或凭据。
 2. **板卡与修订版**——非参考板卡还需集成商的认证地位。
 3. **设备身份**——主机名 / 设备 id（[../start/first-run.md](../start/first-run.md)）。
-4. **恢复之前捕获的证据**——journal 片段、健康门裁决、更新状态，以及
-   逐字引用的拒绝文本（[../operate/troubleshooting.md](../operate/troubleshooting.md)）；重刷
+4. **恢复之前捕获的证据**——一份诊断快照（控制台，或设备上的 `micad diag`：
+   本次与上一次启动的警告、失败的服务、更新状态），以及逐字引用的拒绝文本（[../operate/troubleshooting.md](../operate/troubleshooting.md)）；重刷
    会销毁证据，所以先捕获。
 
-> status: shipped — evidence: `mica-build:stages/compose/90-pack.Dockerfile`, `docs/operate/troubleshooting.md`
+> status: shipped — evidence: `docs/reference/diagnostics.md`, `docs/operate/troubleshooting.md`
 
 ## 5. 去哪里问
 
