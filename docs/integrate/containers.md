@@ -10,10 +10,10 @@ daemon and takes no part in a container's life, so the same declaration runs
 on either init. On a product whose engine is Docker nothing is declared to
 micad: you run containers with `docker` and `docker compose` (section 4).
 
-The engine is in the products that carry containers, podman in all of them
-but `uefi-x64.docker`, which carries Docker; [download](../start/download.md)
-section 1 says which products those are (`mica-build:boards/products.md`).
-It is off until you switch it on.
+The engine is in the products that carry containers: Docker in `cx3576.full`,
+`uefi-x64.docker` and `uefi-x64.gcp`, podman in the others;
+[download](../start/download.md) section 1 says which products those are
+(`mica-build:boards/products.md`). It is off until you switch it on.
 
 > status: shipped — evidence: `mica-podman:README.md`, `mica-core:docs/mica-core.md`, `mica-core:crates/micad-settings/src/model/containers.rs`
 
@@ -36,7 +36,8 @@ out.
   `docker compose` CLIs. There is no `mica-containerd` and no declaration:
   micad switches dockerd on and off and reads and acts on its containers
   through the Docker Engine API, and dockerd runs what you create with
-  `docker` and `docker compose`. `uefi-x64.docker` carries it.
+  `docker` and `docker compose`. `cx3576.full`, `uefi-x64.docker` and
+  `uefi-x64.gcp` carry it.
 
 Container storage and network state live on DATA under `/mica/containers`.
 
@@ -161,7 +162,7 @@ and declares nothing.
   `check`: they say to use docker compose. The console lists and acts on
   containers but has no add or edit.
 
-> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad/src/docker.rs`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/micad/src/docker.rs`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`, `mica-build:boards/cx3576/products/full/product.env`
 
 ## 5. Without micad: switching the engine on by hand
 
@@ -204,14 +205,21 @@ on its set is what the engine runs.
   projects, their directories and volumes, the images the engine pulled. A
   deployment changes the root and the kernel, and a core set the core
   components; neither touches DATA.
+- **The engine's storage on a disk of your own.** Mount a disk exactly at the
+  engine root, `/mica/containers/storage` (podman) or `/mica/containers/docker`
+  (docker), to keep images and containers off DATA. The engine then requires
+  that mount and does not start without it, so a missing disk fails the
+  engine instead of filling DATA ([storage](../operate/storage.md) section 3).
 - **What a reset removes** is the reset tier's to say
   ([recovery](../reference/recovery.md)): a configuration reset drops the
   `container` settings, an application-data reset the projects, their volumes
-  and the container storage.
+  and the container storage on DATA, but nothing on a disk mounted at the
+  engine root. On docker an application-data reset is refused while dockerd
+  runs: switch containers off first.
 - **Images are not verified by signature**: what protects a pull is the
   registry's TLS and a digest in the reference. Pin every image by digest.
 
-> status: shipped — evidence: `docs/reference/recovery.md`, `docs/reference/storage.md`
+> status: shipped — evidence: `docs/reference/recovery.md`, `docs/reference/storage.md`, `mica-podman:README.md`, `mica-docker:README.md`
 
 ## 7. Limits
 

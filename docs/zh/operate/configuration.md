@@ -51,8 +51,13 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
 - **network**——按名字列出的接口，各自声明一种类型：物理、`vlan`、
   `bridge`、`wireguard` 或 `can`，渲染成 systemd-networkd 单元，OpenRC 上是
   ifupdown 配置段。`can` 条目是一个 CAN 控制器的位速率、bus-off 后的重启与 CAN FD
-  模式，不带地址；板卡可以把它的 CAN 接口作为默认值随镜像提供。WireGuard 隧道的
-  私钥在设备上生成，永不进入设置树；轮换是一个显式的 API 动作；
+  模式，不带地址；板卡可以把它的 CAN 接口作为默认值随镜像提供。每个有地址的接口
+  带有自己的静态路由和 `internet`，为 `false` 时不进默认路由（板卡声明为内部的端口
+  默认如此）。OpenRC 上 VLAN 与 bridge 会被点名拒绝；
+- **WireGuard**——两种 init 都支持。隧道私钥在设备上生成，永不进入设置树；轮换是
+  一个显式的 API 动作。peer 按列表版本逐个添加、就地编辑与删除（期间被改过的 peer
+  得到 `409` `version_conflict`），每个 peer 的路由跟随它允许的前缀。控制台显示每个
+  peer 的状态、最近一次握手与流量；
 - **dns**——全局 DNS 服务器（开启时取代每个接口自己的服务器）与静态解析记录
   （设备从自己的 hosts 文件解析）。**没有后备 DNS**：全局服务器关闭时，设备只问
   接口拿到的服务器，所以路由器不下发 DNS 服务器的现场，什么都解析不了；
@@ -60,22 +65,33 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
   wpa_supplicant 和 hostapd。接入点的运行方式为 `off`、无上行时（`provisioning`）
   或 `always`，加密为 WPA2、WPA2 与 WPA3 并存，或不设密钥。带 WiFi 的产品首次
   启动时打开接入点、关闭 station，在设备被认领之前，其名称和密钥就是设备标签上
-  印的那组（[首次启动](../start/first-run.md)第 2 节）；无线电是板卡事实；
+  印的那组，直到管理员设置密钥（[首次启动](../start/first-run.md)第 2 节）；无线电是板卡事实；
 - **bluetooth**——开关、信任列表与 `provisioning.autoWhenOffline`（已认领设备
   失去上行时开启蓝牙配网，[首次启动](../start/first-run.md)第 5 节）。适配器
   既不可被发现也不可配对：配对新设备要在控制台开启 180 秒的窗口，并在控制台
   确认数字比对；固定 PIN 会被拒绝；
 - **access.ssh**——SSH 启用、端口、监听地址、授权密钥，以及围绕临时 root
   密码的策略（见 [../security/overview.md](../security/overview.md)）；
+- **access.web**——API 与控制台在哪里监听：`network`（默认）、`local`（只限设备
+  本机）或 `off`；在设备上也可以 root 身份用 `micad web`；
+- **access.mdns** 与 **access.ssdp**——设备是否在局域网上公布自己；操作者设置之前
+  由产品决定（云产品上关闭）；
+- **access.cloudAdmins**——在云产品上，来自实例元数据的登录账号是否经 `sudo` 获得 root；
 - **container**——控制容器引擎的开关与声明的 Compose 项目
-  （[../integrate/applications.md](../integrate/applications.md)）；
+  （[../../integrate/containers.md](../../integrate/containers.md)）；
 - **mqtt**——本地 MQTT broker 与应用数据桥
   （[../integrate/applications.md](../integrate/applications.md)）；
-- **time**——时间来源与同步策略（第 5.1 节）；
+- **time**——NTP 服务器与时区，时区从设备 tzdata 提供的列表中选择（第 5.1 节）；
+- **logging**——日志是否跨启动保存在 DATA 上、大小上限（1 到 128 MiB），以及经 UDP
+  转发到远程 syslog 收集器（TCP 仅在 systemd 上）；日志以明文离开设备，所以只经
+  WireGuard 或 VPN 链路转发；
 - **services.units**——用户自己的 systemd 单元或 OpenRC 脚本，保存在 DATA 上并在
   这里声明，也可在设备上用 `micad unit` 管理
   （[原生应用](../../integrate/native-applications.md)第 10 节）；
 - **电源动作与更新动作**——不是设置，但通过同一认证面可达。
+
+板卡还可以声明它的物理端口（`/usr/share/mica/board/interfaces.json`）：标签、速率以及
+哪些是内部端口；控制台按这个顺序列出端口，每个标签显示在内核名旁边。
 
 **更新设置不在这棵树里。**更新模式、服务器地址、维护窗口和网络模式住在
 它们自己的文档 `/mica/config/updates.json` 里，与上面那些并列，而不在设置 schema

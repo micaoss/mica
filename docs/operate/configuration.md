@@ -66,8 +66,16 @@ The settings tree currently models, per subtree:
   physical, `vlan`, `bridge`, `wireguard` or `can`, rendered into
   systemd-networkd units, or ifupdown stanzas on OpenRC. A `can` entry is a
   CAN controller's bit rate, bus-off restart and CAN FD mode, with no
-  addressing; a board may ship its CAN interfaces as defaults. A WireGuard tunnel's private key is generated on the device and never
-  enters the settings tree; rotation is an explicit API action;
+  addressing; a board may ship its CAN interfaces as defaults. Each
+  addressed interface carries its static routes and `internet`, which keeps
+  it off the default route when `false` (the default on a port the board
+  declares internal). On OpenRC, VLAN and bridge are refused by name;
+- **WireGuard** — on both inits. A tunnel's private key is generated on the
+  device and never enters the settings tree; rotation is an explicit API
+  action. Peers are added, edited in place and removed one at a time against
+  the listing's version (a peer changed meanwhile is a `409`
+  `version_conflict`), and each peer's routes follow its allowed prefixes.
+  The console shows each peer's state, last handshake and traffic;
 - **dns** — global DNS servers, which replace every interface's own while
   switched on, and static host records, which the device resolves from its
   hosts file. There is **no fallback DNS**: with the global servers off, the
@@ -78,7 +86,7 @@ The settings tree currently models, per subtree:
   uplink exists (`provisioning`) or `always`, with WPA2, WPA2 and WPA3 side
   by side, or no key at all. On a product with WiFi, first boot turns it on
   with the station off, and its name and key are the ones on the device's
-  label until the device is claimed ([first run](../start/first-run.md)
+  label until an administrator sets a key ([first run](../start/first-run.md)
   section 2); radios are a board fact;
 - **bluetooth** — the switch, the trust list and
   `provisioning.autoWhenOffline`, which opens Bluetooth provisioning when a
@@ -89,16 +97,33 @@ The settings tree currently models, per subtree:
 - **access.ssh** — SSH enablement, port, listen addresses, authorized keys,
   and the policy around the transient root password
   (see [../security/overview.md](../security/overview.md));
+- **access.web** — where the API and console listen: `network` (the default),
+  `local` (the device itself only) or `off`; also `micad web` as root on the
+  device;
+- **access.mdns** and **access.ssdp** — whether the device announces itself
+  on the LAN; the product decides until the operator sets one (off on the
+  cloud products);
+- **access.cloudAdmins** — on a cloud product, whether the logins from the
+  instance's metadata get root through `sudo`;
 - **container** — the switch gating the container engine and the declared
   Compose projects ([../integrate/containers.md](../integrate/containers.md));
 - **mqtt** — the local MQTT broker and application-data bridge
   ([../integrate/applications.md](../integrate/applications.md));
-- **time** — the time source and synchronisation policy (section 5.1);
+- **time** — the NTP servers and the time zone, picked from the zones the
+  device's tzdata offers (section 5.1);
+- **logging** — whether the log is kept on DATA across boots, its size cap
+  (1 to 128 MiB), and forwarding to a remote syslog collector over UDP (TCP
+  on systemd only); logs leave unencrypted, so forward only through a
+  WireGuard or VPN link;
 - **services.units** — the user's own systemd units or OpenRC scripts, kept on
   DATA and declared here, also from `micad unit` on the device
   ([native applications](../integrate/native-applications.md) section 10);
 - **power actions and update actions** — not settings, but reachable over the
   same authenticated surface.
+
+The board may also declare its physical ports
+(`/usr/share/mica/board/interfaces.json`): their labels, speeds and which are
+internal; the console lists the ports in that order, each label beside its kernel name.
 
 **Update settings are not in this tree.** The update mode, server
 address, maintenance windows and network mode live in their own document,

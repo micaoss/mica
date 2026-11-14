@@ -103,7 +103,7 @@ escalation carrying the board identity, never a green result.
   project the check refused is refused by the write that carried it, with
   every problem named, and storage running full shows in `podman system df`
   or `docker system df` ([../integrate/containers.md](../integrate/containers.md)).
-  `micad ctr` works the same on either engine.
+  `micad ctr list` and `logs` work on either engine.
 - **Configuration writes:** a settings write returns a task; its outcome
   (applied, unchanged, failed and why) is observable through the API rather
   than guessed from behaviour.
