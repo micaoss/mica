@@ -1,275 +1,452 @@
 # Mica OS System Architecture
 
-The top-level map; each section names the record it summarises.
+The top-level map of Mica OS as it is released: what runs on a device, how it
+boots and updates, and which repository produces each part. Each section names
+the record it summarises; the record is authoritative where the two differ.
 
 ---
 
 ## 1. What Mica OS is
 
-An embedded appliance operating system for industrial devices: a read-only
-Debian root under systemd or OpenRC, as each product chooses, updated through
-signed file deployments. The root boots, runs and updates on its own; a small
-Rust plane, where the product carries it, owns the device's settings and
-writes the files the root starts its services from.
+An appliance operating system for embedded and industrial devices: a
+read-only Debian root, under systemd or OpenRC as each product chooses, booted
+from signed images and updated by signed, transactional deployments with an
+automatic fallback. The root boots, runs and updates on its own. A small Rust
+management plane, where the product carries it, owns the device's settings,
+writes the files the root starts its services from, and serves an API and a
+web console.
 
 **Naming.** The product is Mica OS (identifier `mica`). Package, binary,
 service, D-Bus and path names use the `mica` prefix (`micad`, `mica-deploy`,
 `com.mica.micad`, `/mica/config`).
 
-| Layer | What it is | Where |
+| Layer | What it is | Record |
 |---|---|---|
-| OS core | a Debian trixie floor with no init and busybox as its command set, plus the product's init (`mica-systemd`, or `mica-openrc` with `mica-mdev`), packed into a squashfs with a dm-verity hash tree over it | `mica-system-base:docs/floor-and-options.md`, `mica-build:rootfs/` |
-| Management plane | `micad`, optional (the product feature `micad`) — a settings tree, reconcilers that write the base's files and drive its services, and a D-Bus surface; a **core component**, a verity image composed over the root at boot, so it updates without a new root | `mica-core:crates/micad/`, `mica-core:docs/mica-core.md`, `docs/reference/management.md` |
-| API | `mica-apid` — the API daemon, in micad's component: plain HTTP on 8080 by default, HTTPS on 8443 once enabled; the console (`mica-apid-ui`, a component of its own) is one client of the API it serves | `mica-core:crates/mica-apid/`, `docs/reference/api.md` |
-| Application data | `mica-mqttd` bridges only exact package-enrolled `com.mica.<class>[.<suffix>]` application item trees to MQTT; `com.mica.micad` is forbidden | `mica-pkgs:crates/mica-mqttd/`, `mica-pkgs:crates/mica-mqtt-broker/`, `mica-pkgs:docs/mica-pkgs.md`, `docs/integrate/bus.md` |
-| A/B installer | Native durable file transactions with UEFI/FIT trial records | `mica-core:crates/mica-deploy/`, `docs/reference/boot.md` |
-| Update trust | Signed deployment/catalog envelopes and kernel-enforced root/support signatures | `mica-core:crates/mica-deploy/`, `docs/security/signing.md` |
-| BSP artifacts | per-board kernel, device tree and loader inputs, built into a board bundle | `mica-build:boards/`, `mica-build:boards/README.md` |
-| Workloads | Compose projects declared to micad and run by the product's container engine (podman, supervised by `mica-containerd`) on either init, off by default; in the products with the `containers` feature (the `full` variants) | `mica-podman:README.md`, `docs/integrate/containers.md` |
+| Root | a Debian trixie floor with BusyBox as its command set, one init (`mica-systemd`, or `mica-openrc` with `mica-mdev`) and the options the product names, packed as a squashfs under a signed dm-verity tree | `mica-system-base:docs/floor-and-options.md` |
+| Kernel | per board: a signed UKI (UEFI boards) or a signed FIT (U-Boot boards), carrying the initramfs whose PID 1 is `mica-runkit` | `mica-build:boards/README.md`, `mica-core:docs/mica-core.md` 6.5 |
+| Core components | `micad` (with `mica-apid` and the device's command line) and `mica-apid-ui` (the console), each a verity image composed over the root at boot from the device's **core set**, so they update without a new root | `mica-core:docs/mica-core.md` 2, 6.2 |
+| Deployment client | `mica-deploy`, in the root: check, fetch, import, install, confirm, roll back, factory reset | `mica-core:docs/mica-core.md` 6.3 |
+| Feature packages | the MQTT broker and bridge, the SFTP server, the Compute Engine agent; the container engine, Podman (with its supervisor `mica-containerd`) or Docker | `mica-pkgs:docs/mica-pkgs.md`, `mica-podman:README.md`, `mica-docker:README.md` |
+| Board | kernel, device tree, loader, firmware and the board package (its hardware facts) | `mica-build:boards/README.md` |
+| Resource service | `res.micaos.dev`: release files, the device update catalog and transfer indexes | `mica-res:docs/spec/release-publishing.md` |
 
-### 1.1 The base and the management add-on
+## 2. The repositories
+
+Each repository produces one thing and consumes the others only at a pinned
+release, never by reaching into another's build tree.
+
+| Repository | Produces | Consumes |
+|---|---|---|
+| `mica` | the public documentation and the website (`micaos.dev`, the setup page `init.micaos.dev`) | nothing |
+| `mica-build-tools` | the one implementation of the release-lock, packing and build rules, `bin/mica-tools`, pinned by commit in every other repository | nothing |
+| `mica-build-env` | five build images (`base`, `c`, `go`, `rust`, `bsp`); armhf is cross-built in the amd64 ones | `mica-build-tools` |
+| `mica-system-base` | the Base: the pinned Debian packages (`upstream` rows), the floor root, both inits and the option packages (SSH, Wi-Fi, Bluetooth, time zones, sudo) | `mica-build-env`, `mica-build-tools` |
+| `mica-core` | the core components `micad` and `mica-apid-ui`, and the packages `mica-deploy` and `mica-lifecycle` (the runkit) | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
+| `mica-pkgs` | `mica-mqtt-broker`, `mica-mqttd`, `mica-sftp-server`, `mica-gce-agent` | the same |
+| `mica-podman` | `mica-podman`: Podman, crun, conmon, netavark and the supervisor `mica-containerd` | the same |
+| `mica-docker` | `mica-docker`: dockerd, the `docker` CLI with `docker compose`, containerd and runc | the same |
+| `mica-linux` | the kernel trees: upstream mirrors, one branch per board, dated snapshots | upstream kernel trees |
+| `mica-uboot` | the U-Boot trees: mirrors and one branch per board loader (`mica/<board>-<medium>`) | upstream U-Boot trees |
+| `mica-build` | per board the kernel, loader, firmware and board package; per product the composed root, the signed components, the factory images and update archives; the core sets (`core.<channel>`) | all of the above, each at its pin, and the kernel and U-Boot trees by commit |
+| `mica-res` | the resource service behind `res.micaos.dev` and `dl.res.micaos.dev` | the releases posted to it |
+| `mica-app` | an Android app for BLE provisioning, speaking micad's BLE protocol | `mica-core:docs/ble-provisioning.md` |
+| `mica-fleet` | the fleet service; nothing on a device is a client of it yet | -- |
+
+```
+mica-build-tools ─▶ every repository (bin/mica-tools, pinned by commit)
+mica-build-env ──▶ mica-system-base ─▶ mica-core ─┐
+                         │       ├──▶ mica-pkgs ──┤
+                         │       ├──▶ mica-podman ┤
+                         │       └──▶ mica-docker ┤
+mica-linux, mica-uboot ──┴───────────────────────▶ mica-build ─▶ GitHub releases ─▶ mica-res ─▶ devices
+```
+
+## 3. Pins and release locks
+
+- **Every input is pinned.** A consumer keeps `locks/<repository>.lock`, the
+  producer's release lock as published, and `locks/pins/<repository>.pin`,
+  the release and the sha256 of its `SHA256SUMS`. A lock names the release's
+  pool images by digest and each package (and each core component's image and
+  record, as `item` rows) by version and sha256.
+- **Every pin is its producer's latest release**, moved with
+  `bin/mica-tools locks update`; `--check` only reports.
+- **The Base's `upstream` rows are the only source of Debian packages.** A
+  later stage installs a Debian package from its row and never pins one itself,
+  so every consumer of a Base release runs the same archives.
+- **The kernel and U-Boot** are pinned by commit in
+  `mica-build:locks/upstream.lock`, each a dated snapshot branch of
+  `mica-linux` (`mica/<board>-<YYYYMMDD>`) or a board branch of `mica-uboot`.
+- **A release is named by its UTC minute**, `YYYYMMDD-HHMM`; a product release
+  by `<board>.<variant>.<YYYYMMDD-HHMM>`, a core set by
+  `core.<channel>.<YYYYMMDD-HHMM>`.
+
+The lock format, the vectors and the version rules are
+`mica-build-tools:docs/spec/release-lock.md` and
+`mica-build-tools:docs/spec/package-versions.md`
+([release lock](reference/release-lock.md)).
+
+## 4. Products, images and core sets
+
+A **product** is a variant of its board, `<board>.<variant>`, declared in
+`mica-build:boards/<board>/products/<variant>/product.env`: its profile, its
+init, its features, its container engine and SSH server, how it is claimed
+and which images it publishes. The variant names what the product is for;
+there is no default variant. A product with `PROFILE=dev` is built locally and
+never released. The product's own facts reach the device in
+`/usr/lib/mica/product.conf` (`PRODUCT`, `FEATURES`, `INIT`,
+`CONTAINER_ENGINE`, `SSH_SERVER`, `CLAIM_DEVICE_CODE`, `MDNS`, `SSDP`,
+`CLOUD_ADMINS`, `DOCS_URL`, `DOCS_URL_EN`).
+
+A device runs two separately released things:
+
+| | The system: a **deployment** | The core: a **core set** |
+|---|---|---|
+| What | the product's kernel (with the runkit) and root, `mica/deployment/v1` | every core component of a channel and architecture, `mica/set/v1` |
+| Released as | one product, `<board>.<variant>.<stamp>` | one channel, `core.<channel>.<stamp>`, for every architecture |
+| Taken by | devices of that product | every device of the architecture on the channel |
+| Ordered by | its `generation` | its `generation` within its channel and architecture |
+| Kept on SYSTEM | at most two: the running one and its fallback | at most three: current, on trial, and the ones bound to retained deployments |
+
+- **Every image carries a seed set**, the newest `general` set at its build,
+  and its deployment names it (`coreSet`). A device with no set does not boot.
+- **Selection.** At boot the runkit composes the components of the set whose
+  features meet the product's `FEATURES` (`micad` the daemon, `ui` the
+  console). A component states the root interface levels it runs on and the
+  root packages it requires; a set that does not select on a root is not
+  composed over it, and a deployment is not installed with one.
+- **A core update alone** is offered once the latest set of the device's
+  channel selects on the running root; one that does not waits for a system
+  update (`waitsForSystem`).
+- **A system update on `general`** takes the channel's latest set for the new
+  root with it, as one **pair** on one trial; a system update never
+  downgrades core and never moves a device off its channel.
+
+The rules are `mica-core:docs/mica-core.md` 6.2; how the build releases both is
+`mica-build:README.md` (*Releases*) and [how releases work](releases/how-releases-work.md).
+
+## 5. Boot
+
+```
+UEFI boards:   firmware ─▶ systemd-boot (boot counting) ─▶ signed UKI ─┐
+U-Boot boards: ROM ─▶ U-Boot `micaboot` (records, trial count) ─▶ FIT ─┤
+                                                                       ▼
+   mica-runkit (PID 1 of the initramfs): verity root + support, core set,
+   DATA, staged factory reset, owner keyring, driver extensions, identity
+                                                                       ▼
+   the root's init (systemd or OpenRC) ─▶ services ─▶ health gate ─▶ confirm
+```
+
+- **The loader picks a deployment.** Two boot record copies name at most two
+  deployments; one on trial starts with three attempts, and the loader
+  decrements and persists an attempt before it launches anything. UEFI boards
+  keep the records on the ESP (systemd-boot with persisted boot attempts,
+  `mica-system-base`'s `mica-systemd-boot`); U-Boot boards keep them in two
+  64 KiB copies in the FIRMWARE partition, or in two UBI volumes, read by the
+  `micaboot` command
+  ([cx3576 boot](reference/boot.md)).
+- **The kernel is signed.** Firmware with Secure Boot verifies the UKI; U-Boot
+  verifies the FIT's signature against the key in its control device tree.
+  `qemu-armhf` and `ssd202d` say `bootTrust: none`: their loader checks the
+  FIT's hashes only, so they have no verified boot, and every other check below
+  still holds.
+- **`mica-runkit init`** (PID 1 of the initramfs; no network and no shell)
+  requires dm-verity signature enforcement and arms the watchdog; reads the
+  signed boot policy; authenticates the selected deployment; maps the support
+  image and the root as signed dm-verity devices; composes the core set's
+  selected components over `/usr` and `/etc` as read-only overlays; opens and
+  mounts DATA (section 6), carrying out a staged factory reset first; seals
+  the owner keyring; maps the driver extensions and composes modules and
+  firmware; seeds the machine identity; and hands over to the root's init.
+- **The health gate confirms.** `mica-health` (`/etc/mica/health.conf`)
+  requires the init up and not in `maintenance` or `stopping`, and micad
+  answering where the image carries it. It then runs `mica-deploy confirm`,
+  which makes the booted deployment, set or extension change current. A trial
+  that never confirms runs out of attempts and the loader boots the fallback.
+- **Shutdown.** On systemd the runkit's `shutdown` is the exit ramdisk: it
+  releases the verity, loop and DATA mappings in order and powers off or
+  reboots only once nothing is left to write. An OpenRC root and a UBI board
+  get none: the init leaves DATA read-only and reboots.
+
+`mica-core:docs/mica-core.md` 6.4 and 6.5 are the runkit's contract.
+
+## 6. Storage
+
+### 6.1 Partitions
+
+| Board storage | Partitions or volumes |
+|---|---|
+| GPT disk, UEFI (`uefi-x64`, `uefi-arm64`, `mini-x64`) | ESP (systemd-boot, UKIs, boot records), SYSTEM, DATA |
+| GPT disk, U-Boot (`cx3576`, `s905x5m`) | FIRMWARE (loader and both record copies), SYSTEM, DATA |
+| Raw NAND under UBI (`qemu-armhf`, `ssd202d`) | UBI volumes: `system` and `data` (UBIFS), `records-a`/`records-b`, and one static volume per kernel, support image, root, core component and driver extension |
+
+- **SYSTEM** holds what the signed metadata names: at most two deployments
+  (descriptors, signatures and content-addressed objects), the core sets,
+  driver extensions, the owner's certificates and a staged factory reset. It
+  is mounted read-only and made writable only inside a `mica-deploy`
+  transaction.
+- **DATA** holds everything the device writes and is the only partition that
+  grows: the factory image's DATA is small (256 MiB on most boards) and, on a
+  disk, grows to the end of it at the first boot. On ext4 it carries project quotas:
+  `mica` and `srv` (project 100), the disposable `cache`, `tmp` and `var`
+  (project 101, an eighth of DATA, 32 to 256 MiB), and `containers`
+  (project 102).
+
+### 6.2 The write map
+
+The root is never written. What a running device can write:
+
+| Path | Backing | Options |
+|---|---|---|
+| `/`, `/usr`, `/etc` | the root's and the core components' squashfs on dm-verity | `ro,nodev` |
+| `/mnt/data` | DATA | `rw,noatime`, project quotas where on |
+| `/mica`, `/mica/containers`, `/srv`, `/var` | binds of DATA's `mica/`, `containers/`, `srv/`, `var/` | `nosuid,nodev`, private |
+| `/var/lib/mica`, `/root`, `/home` | binds of DATA's `state/mica`, `/mica/root`, `/mica/home` | `nosuid,nodev` |
+| `/etc/hostname`, `/usr/local/lib/systemd/system`, `/usr/local/etc`, the network daemons' `/etc` directories | binds of DATA's `state/` | bind |
+| `/run`, `/dev/shm` | tmpfs | `nosuid,nodev` |
+
+Configuration lives in `/mica/config` (one JSON document per concern, written
+by micad) and on STATE (`/var/lib/mica`, what the device mints: identity,
+credentials, the settings file, each service's rendered configuration).
+
+### 6.3 The user's own disks and external media
+
+- **A user mounts their own disks** in the places that are theirs: `/srv` and
+  below, `/var/mnt/<name>`, `/home/<user>`, and exactly at a container
+  engine's root (`/mica/containers/storage` for Podman,
+  `/mica/containers/docker` for Docker). They declare it with a `.mount`,
+  `.automount` or `.swap` unit on systemd, or a line of
+  `/usr/local/etc/fstab` on OpenRC; Base refuses any other target. An engine
+  whose root is declared on a disk does not start without it, so a missing
+  disk fails the engine instead of filling DATA. No reset crosses into a mount.
+- **External media** (USB mass storage, SD cards) are listed by micad, mounted
+  read-only (`ro,nosuid,nodev,noexec`) under `/run/mica/media/<id>` when they
+  are clean and of a supported file system (vfat, exFAT, ext2/3/4), and can be
+  unmounted and ejected from the console. An update archive on a stick is
+  imported from there. A device whose kernel has no host for them (`ssd202d`)
+  reports media as unsupported.
+
+[Storage](operate/storage.md) is the operator's view;
+`mica-core:docs/mica-core.md` 6.1 and `mica-system-base:docs/floor-and-options.md`
+(*The user's own mounts*) are the contracts.
+
+## 7. The base and the management plane
 
 A device runs in two layers, and the second is optional.
 
 - **The base** is the signed root: the init, the mounts, the accounts, the
-  hostname, the network and DNS, time, SSH, the feature services the product
-  chose (Wi-Fi, the access point, MQTT, containers), the health gate, the
-  boot-failure handler and `mica-deploy`. Every service reads its configuration
-  from its own file on DATA, in a format the service owns, and starts from that
-  file at boot. A device with the base alone boots, joins its
-  network, takes SSH logins by key, confirms its boot on the init
-  (`mica-system-base:payload/etc/mica/health.conf`), updates by hand, from an
-  archive or on a timer, and resets to factory.
-- **micad** is the management add-on: the product feature `micad`, which
-  selects the daemon from the core set at boot (`mica-core:docs/mica-core.md`
-  6.2), and with it apid and the console. It adds the settings tree and its
-  API, update policy and approval, provisioning, containers and apps, LAN
-  discovery and the transient root password.
+  hostname, the network and DNS, time, SSH, the log, the feature services the
+  product chose (Wi-Fi, the access point, Bluetooth, MQTT, a container
+  engine), the health gate and `mica-deploy`. Every service reads its
+  configuration from its own file on DATA and starts from it at boot. A device
+  with the base alone boots, joins its network, takes SSH logins by key,
+  confirms its boot, updates by hand, from an archive or on a daily timer, and
+  resets to factory.
+- **micad** is the management add-on (the product feature `micad`), with apid
+  and the console. It adds the settings tree and its API, the console, update
+  policy (cadence, maintenance windows, the reboot gate), provisioning and the
+  claim, Wi-Fi and the access point, container projects and the user's
+  services, LAN discovery and the transient root password.
 
-The contract between them is the files on DATA. micad is a writer of them,
-never the reason a service runs: a reconciler writes a service's file, then
-restarts or stops the service. A feature service the image does not enable is
-switched on by the reconciler's enablement, which is recorded in
-`/var/lib/mica/units/enabled` because enablement on the read-only root lasts
-only until the next boot; the base's `mica-units` starts every unit listed
-there at boot. The base never reads the settings tree, and removing micad
-leaves every service as micad last configured it. Without micad an operator
-writes the same files by hand and switches services on with `mica-units`
-([without micad](operate/without-micad.md)).
+The contract between them is the files on DATA. micad writes a service's file,
+then restarts or stops the service; the base never reads the settings tree, and
+removing micad leaves every service as micad last configured it. A feature
+service micad switches on is recorded in `/var/lib/mica/units/enabled`, which
+the base's `mica-units` starts at boot, because enablement on the read-only
+root lasts only until the next boot. Without micad an operator writes the same
+files and uses `mica-units` ([without micad](operate/without-micad.md)).
 
-| Service | Its file on DATA | Started at boot by | Without micad |
-|---|---|---|---|
-| Network (OpenRC) | `/var/lib/mica/network/interfaces` | the init | as last configured; DHCP on every `eth*` until then |
-| Network and DNS (systemd) | `/var/lib/mica/network/networkd`, `/var/lib/mica/dns/resolved.conf.d`, linked from `/run/systemd/network` and `/run/systemd/resolved.conf.d` | the init | as last configured; DHCP until then |
-| Static hosts records, global DNS | `/var/lib/mica/dns/hosts`, `/var/lib/mica/dns/resolv.global` (OpenRC) | the init | as last configured |
-| Network time | `/var/lib/mica/time/` | the init | the servers last configured, or the default pool |
-| SSH | `/var/lib/mica/ssh/sshd.env` | the init | as last configured, else as the product's `SSH=on\|off` says; keys from a provisioning medium's `mica-authorized-keys` |
-| Wi-Fi station, access point | `/var/lib/mica/wifi/` (OpenRC), the STATE binds of `/etc/wpa_supplicant` and `/etc/hostapd` (systemd) | `mica-units` | as last configured; off until micad first configures them |
-| MQTT broker and bridge | `/var/lib/mica/mqtt/` | `mica-units` | as last configured; off until micad first configures them |
-| Containers | the engine's projects, under `/var/lib/mica/containerd/projects/` (podman) | `mica-units` (the engine) | as last configured; off until switched on through micad or by hand (`mica-units enable`) |
-| Bluetooth | the adapter's state under `/var/lib/bluetooth` | the init | runs where the adapter exists; micad stops it while Bluetooth is off |
-| Health gate | -- | the init | checks the init, and micad only where the image carries it |
-| Updates | `/mica/config/updates.json` | -- | `mica-deploy update` by hand, `update --archive` offline, and a daily check under `policy: auto` that never reboots (`mica-update.timer`, the `mica-update` service on OpenRC) |
-| Factory reset | -- | -- | `mica-deploy factory-reset` |
-
-## 2. Component inventory (runtime)
-
-```
-  management add-on (optional)
-    apid + console --- com.mica.micad1 (system bus) --- micad
-    HTTP(S) API                                   settings tree on DATA
-                                                  reconcilers, Deployments
-                                                          |
-                     writes each service's file, restarts or stops it,
-                     records what it enabled
-                                                          v
-  DATA      /var/lib/mica/<service>/      /var/lib/mica/units/enabled
-                     |                                    |
-  base      the init, at boot                    mica-units, at boot
-                     |                                    |
-            network, DNS, time, SSH,          Wi-Fi station, access point,
-            health gate, mica-update.timer    MQTT broker and bridge,
-                                              mica-containerd (podman)
-            mica-deploy: update, rollback, factory-reset
-
-  mica-mqttd -> MQTT, from exact-enrolled com.mica.* applications only
-```
-
-- **The init** is systemd or OpenRC, as the product states in
-  `/usr/lib/mica/product.conf` (`INIT`). Every piece above is a service of it,
-  shipped by the package that carries the daemon for both inits. The init
-  starts each from its file on DATA, and micad re-renders, restarts and stops
-  them rather than supervising processes of its own (`docs/reference/wifi.md`).
-  What each reconciler drives on either init is `mica-core:docs/mica-core.md`
-  sections 3.4 and 3.8; what the base starts at boot is
-  `mica-system-base:docs/floor-and-options.md`.
-- **`micad`** owns the settings tree persisted on DATA/state, exports it over the
-  system bus as `com.mica.micad`, and runs one reconciler per concern in
-  `mica-core:crates/micad/src/reconciler/`. Its unit is `Type=dbus` (`mica-core:crates/micad/dist/micad.service`).
-- **`apid`** listens where `access.web` says — plain HTTP on 8080 by default,
-  HTTPS on 8443 with a per-device certificate once enabled, the HTTP port then
-  only redirecting — authenticates the operator, and reads and writes
-  device state by calling micad over that bus; its TLS material, login-backoff
-  counters and audit ring live under `/var/lib/mica/apid`
-  (`mica-core:crates/mica-apid/dist/apid.service`). The dashboard is one of its clients, and
-  `mica-core:crates/mica-apid/openapi.json` is generated from the handlers.
-- **Networking** is micad's `network`, `wifi.client` and `wifi.ap` subtrees,
-  reconciled into systemd-networkd, wpa_supplicant and hostapd units (on
-  OpenRC, busybox ifupdown and the `mica-wifi-*` services). Wi-Fi
-  is a pair of reconcilers, not a separate daemon (`docs/reference/wifi.md`).
-- **Interface kinds.** A `network` entry declares a **kind** — physical, `vlan`,
-  `bridge` or `wireguard` — and the one optional block that belongs to it. The
-  block is authoritative and the interface name is not:
-  *"`eth0.100` is a convention, not a declaration"*
-  (`mica-core:crates/micad-settings/src/model.rs`). A physical entry renders
-  one `.network` file, as it always did; each of the other three additionally
-  renders a `.netdev` that creates the device, and the attachment is a line on
-  the *other* interface's unit — `VLAN=` on the parent, `Bridge=` on the port.
-  A removed virtual entry is torn down, not just unlinked, and a WireGuard
-  tunnel's private key is drawn on the device into a `networkd-secrets/`
-  directory beside the settings file, never into the settings tree
-  (`mica-core:docs/mica-core.md` section 3.4).
-- **`mica-mqttd`** dynamically publishes only exact package-enrolled
-  `com.mica.<class>[.<suffix>]` application item trees and, in full mode,
-  applies writes to the exact application service. It has zero D-Bus access to
-  `com.mica.micad`; micad renders its topic identity into a one-purpose file on
-  DATA, `/var/lib/mica/mqtt/mqttd-device.env`.
-  SSH, networking, credentials, containers, MQTT
-  configuration, health, updates and power stay on the management plane and
-  never become MQTT items (`docs/integrate/bus.md`). `mica-mqtt-broker` is the
-  local broker, built from `rumqttd` as a library
-  (`mica-core:Cargo.toml`, one Cargo workspace over `crates/`).
-- **Containers** are Compose projects declared in micad's `container`
-  settings and handed to `mica-containerd`, which runs them with podman,
-  restarts them by policy and starts them at boot; systemd or OpenRC only
-  starts the supervisor. While the `container.enabled` switch is false — the
-  default — the supervisor is stopped and the projects stay declared (`mica-podman:README.md`,
-  `docs/integrate/containers.md`).
-
-## 3. Storage and boot
-
-Current images contain ESP/SYSTEM/DATA on uefi-x64 and uefi-arm64, or
-FIRMWARE/SYSTEM/DATA on cx3576. SYSTEM owns immutable root/support objects and
-signed deployment records, and the device's core sets with their components
-under `sets/core/`. DATA owns persistent state, metadata, applications,
-user data and bounded disposable namespaces. Only DATA grows.
-
-The signed UKI/FIT starts `mica-init`. It authenticates the selected descriptor,
-opens signed root/support verity mappings, establishes persistent identity and
-binds modules and firmware before the init. Native trial records are decremented
-before launch and confirmed only by the health path. Shutdown uses a bounded
-exitramfs to release loops/mappings before their backing filesystem.
-
-DATA/var provides the writable `/var` tree under a byte/inode project limit.
-Protected identity and management state use separate DATA/state binds; project
-accounting separates container and system/user usage without limiting either.
-Only general variable data has a project quota limit.
-DATA/containers is a separate bind at `/mica/containers`.
-See [storage](reference/storage.md) and [read-only root](reference/ro-root.md).
-
-## 4. Trust chain
-
-Boot, content and metadata signing use independent keys. Firmware authenticates
-the UKI/FIT; the kernel authenticates signed verity roots; native tools authenticate
-strict component/deployment/catalog metadata against embedded public policy.
-Normal updates never write firmware. Firmware publication and offline maintenance
-have a separate signed receipt and mandatory readback.
-
-See [release signing](security/signing.md) for overlap/removal and measured
-limits. Development signing does not establish physical ROM/SPL provisioning.
-QEMU evidence and pending cx3576 bench evidence are tracked separately.
-
-## 5. Access model
-
-Provisioning and debugging are different problems, and Mica OS does not answer both
-with one shell (`docs/reference/access.md`). Three ways in exist today:
-
-1. **The API**, over HTTP or, once enabled, HTTPS, authenticated by an argon2id password hash held in
-   the settings tree, with persistent login-backoff counters and an audit ring.
-2. **SSH** — `mica-sshd`, Dropbear or, where the product sets
-   `SSH_SERVER=openssh`, OpenSSH, started by the init from
-   `/var/lib/mica/ssh/sshd.env` on DATA. micad writes that file and the
-   authorized keys of the two managed accounts; without micad, `mica-add-keys`
-   takes the keys from a provisioning medium. A product carries it with the
-   feature `ssh` and says with `SSH=on|off` whether it runs at first boot (off
-   by default); persistent access is by public key and a root password is the
-   transient exception.
-3. **Physical recovery** — a whole-disk reflash through the board's loader path
-   (RockUSB on cx3576), below the OS and reachable when nothing else is.
-
-Disablement is layered. One layer ships: the runtime switch, where
-`enabled: false` stops `mica-sshd` and saves SSH off on DATA, where the init
-reads it at every boot, and every image seeds it as its product's `SSH=` says. There is no image profile package or profile file: development and
-production images differ by the kernel command line parameter
-`mica.profile=dev|prod`, carried only in signed boot configuration; no
-difference in access follows from it, and there is no irreversible shell
-lockdown (`docs/reference/access.md` section 8).
-
-## 6. Repository map
-
-Mica OS is built from the repositories below. Each produces one thing, and
-consumes the others only at a pinned release — never by reaching into another's
-build tree — and every pin is its producer's latest release, moved with
-`bin/mica-tools locks update`.
-
-| Repository | Produces | Consumes |
+| Service | Its file on DATA | Started at boot by |
 |---|---|---|
-| `mica` | the product's design contracts and the public documentation | nothing |
-| `mica-build-tools` | the one implementation of the release-lock and build rules (`bin/mica-tools`), pinned by commit in every other repository's `locks/mica-build-tools.pin` | nothing |
-| `mica-build-env` | five build-env images (`base`, `c`, `go`, `rust`, `bsp`), armhf cross-built in the amd64 ones | `mica-build-tools` |
-| `mica-system-base` | the board-independent base: the pinned Debian lock, the Base's own packages (the two inits among them), the floor root | `mica-build-env`, `mica-build-tools` |
-| `mica-core` | the management plane: the core components `micad` (with `mica-apid`) and `mica-apid-ui`, and the packages `mica-deploy` and `mica-lifecycle` | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
-| `mica-pkgs` | the feature packages a product chooses: `mica-mqtt-broker`, `mica-mqttd` and `mica-sftp-server`; micad only configures and starts them | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
-| `mica-podman` | `mica-podman`, the container engine and its supervisor `mica-containerd`, from pinned upstream source | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
-| `mica-docker` | `mica-docker`, the Docker engine (dockerd, the `docker` and `docker compose` CLIs, containerd, runc), from pinned upstream source; the engine of `uefi-x64.docker` | `mica-build-env`, `mica-build-tools`, `mica-system-base` |
-| `mica-build` | per board: kernel, device tree, loader, firmware and the board package (`boards/`); and the products `<board>.<variant>`, each released on its own: a composed root, signed components, factory images and update archives | all of the above, each at its pin |
+| Network (systemd) | `/var/lib/mica/network/networkd`, linked from `/run/systemd/network` | the init |
+| Network (OpenRC) | `/var/lib/mica/network/interfaces`, for BusyBox ifupdown | the init |
+| DNS | `/var/lib/mica/dns/` (resolved's drop-ins, the static hosts records, the global servers on OpenRC) | the init |
+| Time | `/var/lib/mica/time/` (timesyncd, or BusyBox `ntpd` on OpenRC) | the init |
+| Log | `/var/lib/mica/log/log.env` (persistence, size, a remote collector) | the init |
+| SSH | `/var/lib/mica/ssh/sshd.env` | the init, as last configured, else as the product's `SSH=` says |
+| Wi-Fi station and access point | `/var/lib/mica/wifi/`, the STATE binds of `/etc/wpa_supplicant` and `/etc/hostapd` | `mica-units` |
+| MQTT broker and bridge | `/var/lib/mica/mqtt/` | `mica-units` |
+| Container engine | the engine's state under `/mica/containers` | `mica-units` |
+| The user's services | `/usr/local/lib/systemd/system` or `/usr/local/etc` (DATA state) | the init |
+| Updates without micad | `/mica/config/updates.json` | `mica-update.timer` (systemd) or `mica-update` (OpenRC), daily, `policy: auto` only |
 
-The interfaces between them are files, not directories:
+### 7.1 systemd and OpenRC products
 
-- **`locks/mica-build-env.lock`** — the build-env release every repository builds in.
-- **`locks/mica-build-tools.pin`** — the mica-build-tools commit every repository runs.
-- **`mica-system-base.lock`** and its `locks/pins/<repository>.pin` — the floor root, the
-  Debian pools by digest and the archive any other package resolves from
-  ([release lock](reference/release-lock.md)).
-- **The Debian pool** — every `.deb` a product installs is imported at its pin from the
-  release of the repository that produces it, except the board packages,
-  which `mica-build` builds from `boards/` and `common/` into the board's pool.
-- **The board bundle** — a board directory under `mica-build:boards/` produces a
-  board's kernel, loader, firmware and board package; the engine consumes them
-  and never reaches into a board's build (`mica-build:boards/README.md`).
-- **The signed deployment envelope** — what `mica-build` signs and what `mica-deploy`
-  authenticates on the device ([release signing](security/signing.md)).
+Each product installs exactly one init; every package ships the start-up
+files of its own services for both.
 
-Each repository's own layout is documented in its README; this map does not restate it.
-Product documentation lives here, module documentation lives with the module
-(`docs/README.md`, *Where documentation lives*).
+| | systemd | OpenRC |
+|---|---|---|
+| Devices | udev | BusyBox `mdev` |
+| Network | networkd and resolved | BusyBox ifupdown and `udhcpc` (`mica-udhcpc`) |
+| Time | timesyncd | BusyBox `ntpd` |
+| Log | journald, `systemd-netlogd` for forwarding | BusyBox `syslogd`, `logread` |
+| User mounts | `.mount`/`.automount`/`.swap` units | `/usr/local/etc/fstab`, `mica-fstab` |
+| Shutdown | the runkit's exit ramdisk | `openrc-init`; no exit ramdisk |
+| Products today | every other product | `mini-x64.basic`, `qemu-armhf.basic`, `ssd202d.basic`, `uefi-x64.openrc-full` |
 
-## 7. Boards
+A 32-bit board runs an OpenRC root: the exit ramdisk exists on x86-64 and
+aarch64 only.
 
-The current boards are `uefi-x64`, `uefi-arm64` and `mini-x64` (UEFI, signed UKI),
-`cx3576` and `s905x5m` (U-Boot, signed FIT) and `qemu-armhf` (U-Boot, an unsigned
-FIT, the root on UBI). Each board names its own products, `<board>.<variant>`,
-the variant saying what the product is for, with no default variant; a
-`PROFILE=dev` product is built locally and never released
-(`mica-build:boards/products.md`). Their build, acceptance and support tier
+### 7.2 micad, apid and the console
+
+```
+   browser / automation ─HTTP(S)─▶ apid ◀─ /run/mica/apid.sock ─ root on the device
+                                    │
+                         com.mica.micad1 (system bus, root only)
+                                    ▼
+   micad: settings tree (/mica/config, STATE), reconcilers, observers,
+          provisioning, updates (via mica-deploy), resets, LAN discovery
+                                    │ writes files, starts/stops services
+                                    ▼
+   the base's services: network, DNS, time, log, SSH, Wi-Fi, AP, Bluetooth,
+   MQTT, the container engine, the user's units
+```
+
+- **micad** (`micad daemon`, one instance, no network listener) loads the
+  settings, applies a staged reset, imports a provisioning document, mints
+  first-boot identity and credentials, runs one reconciler per subtree, keeps
+  the live state and observers, and serves `com.mica.micad` on the system bus.
+  It answers mDNS (`<hostname>.local`, `_mica._tcp`, the console) and SSDP
+  itself, each switchable, and never announces SSH.
+- **apid** (`mica-apid`, the same executable) serves the API and the console as
+  `access.web.mode` says: `network` (default: plain HTTP on 8080, or HTTPS on
+  8443 once enabled, plus the local socket), `local` (the local socket alone)
+  or `off`. Every read and change goes through micad. Browsers use an argon2id
+  password and a session cookie, automation bearer tokens; failed logins back
+  off persistently, and security-relevant actions go to an audit ring.
+- **The console** (`mica-apid-ui`) is a client of the API, served at `/_ui/`;
+  an operator may upload and activate a console bundle of their own.
+- **On the device**, root runs `micad` subcommands over the bus: `micad update`
+  (also `mica-update`), `micad ctr` (also `mica-ctr`), `micad unit`, `micad web`,
+  `micad mdns`, `micad ssdp`, `micad factory-reset`, `micad diag` and
+  `micad device-code`.
+
+The settings, reconcilers and bus are `mica-core:docs/mica-core.md` 3; the API
+is section 4 and [the API](operate/api.md).
+
+### 7.3 Workloads
+
+A device runs the user's software in two ways, both kept on DATA and both
+surviving every update:
+
+- **The user's own services**: a systemd unit or an OpenRC script with its
+  binaries on DATA (in `/srv`, say), installed with Base's `mica-unit` or
+  declared in micad's `services.units`, running as a service account of its
+  own when it wants one.
+- **Containers**, in a product with the `containers` feature. On Podman,
+  Compose projects are declared to micad and run by `mica-containerd`; on
+  Docker, containers are made on the device with `docker` and `docker compose`
+  and micad only switches dockerd on and off. Either is off until switched on
+  ([containers](integrate/containers.md)).
+
+Application data reaches MQTT only through `mica-mqttd`, from services enrolled
+by exact name on the bus; configuration, credentials and updates never become
+MQTT items ([the bus](integrate/bus.md)).
+
+## 8. Updates, rollback and resets
+
+- **The catalog** is unsigned and read from an update root,
+  `https://res.micaos.dev/update/` by default: `v1/manifest.json` names each
+  product's current release and each channel's current set; a release's
+  document names its signed descriptor and objects. Trust comes from the signed
+  descriptor and set: a device takes only its own board, architecture and
+  product, only a generation above the one it runs, and checks every byte.
+- **micad's policy** decides when: the check cadence and time of day, the
+  maintenance windows (UTC, by weekday), metered or offline links, the fetch
+  budget and the reboot gate. Without micad, `mica-deploy update` runs by hand
+  and the daily timer runs it under `policy: auto`, never rebooting.
+- **Offline**, an `MICAUPD1` archive (a system, a set or a driver extension) is
+  uploaded through the console or imported from a USB stick.
+- **Installation is a durable file transaction**, proven by a fault suite that
+  interrupts it at every IO. The new deployment, set or pair boots on trial and
+  is confirmed by the health gate; a failed trial falls back by itself.
+- **Rollback** to the retained deployment is an operator action; the API binds
+  it to the target the caller confirmed, and the next boot reports whether the
+  booted deployment is that target (`lastRollback`).
+- **Delta transfer**: `fetch` first assembles a missing object from chunks the
+  device already holds, by the object's transfer index, and fetches only the
+  missing chunks; nothing in that path is trusted, and any failure falls back
+  to the whole object.
+- **Driver extensions** are out-of-tree modules and firmware for exactly one
+  kernel, mapped only after the owner keyring is sealed; a kernel update waits
+  for a build of each installed extension, or for the owner to drop it.
+
+| Reset | Erases | Keeps |
+|---|---|---|
+| `configuration` | `/mica/config` (the settings, the SSH keys among them, return to the product's defaults) and the console's HTTPS identity | identity, the claim, the administrator password and API tokens, `/srv`, data |
+| `application-data` | `/mica/volumes`, the container projects and engine storage on DATA, the user's services and service accounts | settings, identity, credentials, `/srv` |
+| factory reset | everything on DATA: settings, the claim, tokens, keys, SSH host keys, machine-id, containers, `/srv`, `/mica`, logs; DATA is formatted again | the installed software (the running deployment and its core set), the device code |
+
+No tier opens `/srv` or crosses into a mount. The factory reset asks for the
+administrator password, is refused on an unclaimed device, during an update or trial and on an encrypted DATA, and
+brings the device back unclaimed on its factory access point. Credential
+recovery is gated on a physical-presence action no current board declares.
+[Updates](operate/updates.md) and [recovery](operate/recovery.md) are the
+operator's guides.
+
+## 9. Trust
+
+| What | Signed with | Checked by |
+|---|---|---|
+| UKI or FIT | the boot key | firmware with Secure Boot, or U-Boot with the key in its control device tree (not on `bootTrust: none` boards) |
+| Root, support image, core components | the content key, as PKCS#7 over each dm-verity root hash | the kernel, against its builtin keyring, when it maps the image |
+| Deployment, set and firmware metadata | the release key (Ed25519, canonical JSON) | `mica-deploy` and the runkit, against keys in the signed kernel |
+| Driver extensions | the vendor's or the owner's key, chained to the builtin keyring or an owner certificate | the kernel, once the runkit has sealed the owner keyring |
+
+- **Nothing secret is in an image**: identity, credentials and the SSH host key
+  are minted on the device at first boot.
+- **The owner keyring** (`.mica_owner`) holds the certificates the owner
+  enrolled; the runkit maps the system's images while only the builtin keys
+  are trusted, then adds the owner's certificates and seals the keyring, so an
+  owner key can sign an extension and never a root or core component.
+- **DATA encryption** is available groundwork and off on every product: a
+  product may have the runkit open DATA as LUKS2, unlocked by a TPM2 key
+  sealed to PCR 7 and 15, with a recovery passphrase. No released product
+  turns it on.
+
+[Release signing](security/signing.md) and the [security model](security/model.md)
+carry the detail and the evidence limits.
+
+## 10. The resource service
+
+`mica-build`'s release run posts every product and core release to `mica-res`,
+which files the bytes under `https://dl.res.micaos.dev/<namespace>/...` (the
+`mica` namespace is immutable; test images go to the `test` namespace) and
+feeds the device catalog at `https://res.micaos.dev/update/v1/manifest.json`.
+Beside every object a producer publishes its **transfer index**
+(`objects/<sha256>.index`, `MICAIDX1`); res answers `chunks/<digest>` as a
+checked range of the object that holds it, so no chunk is stored twice. The
+website's download pages read the same service
+(`mica-res:docs/spec/release-publishing.md`).
+
+## 11. Boards
+
+| Board | Arch | Boot | Storage | Kernel tree (`mica-linux`) |
+|---|---|---|---|---|
+| `uefi-x64` | amd64 | systemd-boot, signed UKI | GPT | `mica/general`, stable 6.12 |
+| `uefi-arm64` | arm64 | systemd-boot, signed UKI | GPT | `mica/general` |
+| `mini-x64` | amd64 | systemd-boot, signed UKI | GPT, 128 MB of flash | `mica/general` |
+| `cx3576` | arm64 | U-Boot, signed FIT | GPT on eMMC | `mica/cx3576`, Rockchip 6.1 with stable merges |
+| `s905x5m` | arm64 | U-Boot, signed FIT | GPT on eMMC or SD | `mica/s905x5m`, Hardkernel 6.12 with stable merges |
+| `qemu-armhf` | armhf | U-Boot, FIT, `bootTrust: none` | UBI on NAND | `mica/qemu-armhf` |
+| `ssd202d` | armhf | U-Boot, FIT, `bootTrust: none` | UBI on SPI NAND | `mica/ssd202d`; not a release target |
+
+A board produces artifacts and the product build consumes them; neither
+reaches into the other's build. A kernel configuration satisfies the shared
+floor and the kernel features the board names
+(`mica-build:boards/README.md`). Build, acceptance and support tier per board
 are kept in one table: [support tiers](hardware/README.md#current-boards).
 
-A board produces artifacts and the OS build consumes artifacts; neither side
-reaches into the other's build. Kernel configs must satisfy the shared
-floor: the `core` fragment and the kernel features each board names in
-`KERNEL_FEATURES` (`mica-build:common/kernel/features.tsv`,
-`mica-build:boards/README.md`).
-
-## 8. Where to read next
+## 12. Where to read next
 
 | Question | Document |
 |---|---|
-| What runs without micad, and from which file? | section 1.1, `mica-system-base:docs/floor-and-options.md` |
-| What does micad own, and what is in the settings tree? | `docs/reference/management.md` |
-| What is on the bus, and what are the item conventions? | `docs/integrate/bus.md` |
-| What does the API serve? | `docs/reference/api.md`, `docs/integrate/console.md` |
-| Why is the root read-only, and where do writes go? | `docs/reference/ro-root.md` |
-| How is a deployment installed and confirmed? | `docs/reference/updates.md` |
-| How is a release signed, and by whom? | `docs/security/signing.md` |
-| How does a device get its first credentials? | `docs/integrate/provisioning.md` |
-| How do I run a container here? | `docs/integrate/containers.md` |
+| Which products exist and what each carries? | [overview](start/overview.md), [download](start/download.md) |
+| What runs without micad, and from which file? | section 7, [without micad](operate/without-micad.md) |
+| What does the settings tree hold? | [configuration](operate/configuration.md), `mica-core:docs/mica-core.md` 3.3 |
+| What does the API serve? | [the API](operate/api.md), [API reference](reference/api.md) |
+| Where do writes go, and where may I mount a disk? | [storage](operate/storage.md), [read-only root](reference/ro-root.md) |
+| How is an update installed, confirmed or rolled back? | [updates](operate/updates.md), [update reference](reference/updates.md) |
+| How is a release signed, and by whom? | [release signing](security/signing.md) |
+| How does a device get its first credentials? | [first run](start/first-run.md), [provisioning](integrate/provisioning.md) |
+| How do I run my own software? | [applications](integrate/applications.md), [containers](integrate/containers.md) |

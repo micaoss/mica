@@ -42,6 +42,7 @@
     {
       "id": "reference",
       "docs": [
+        { "name": "architecture" },
         { "name": "contributing" },
         { "name": "overview", "dir": "security", "slug": "security" },
         { "name": "api", "dir": "operate" },

@@ -6,7 +6,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 工程契约只有英文版，见 [英文文档目录](../README.md)。包名、二进制名、服务名、
 总线名和路径使用 `mica` 前缀（例如 `micad`、`mica-deploy`、`/mica/config`），文中按原样引用。
 
-- [`architecture.md`](../architecture.md) — 系统架构总览与组件地图（从这里开始，英文）
+- [`architecture.md`](architecture.md) — 系统架构总览与组件地图（从这里开始）
 - [板卡状态表](../hardware/README.md#current-boards) — 各板卡的构建、验收与支持层级（权威，英文）
 - `start/` — 入门：它是什么、怎么拿到镜像、怎么启动
   - [`overview.md`](start/overview.md) — 一页读懂：仓库、发布链、产品与文件位置
