@@ -36,27 +36,27 @@ The current releases, and the core each image was built with:
 
 | Product | Stamp | Core in the image | What it carries |
 |---|---|---|---|
-| `cx3576.full` | `20261031-0512` | 0.0.4 | systemd, containers, WiFi and Bluetooth: factory access point, BLE provisioning |
-| `s905x5m.sd-full` | `20261021-2318` | 0.0.3 | the same, on an SD card |
-| `s905x5m.emmc-full` | `20261021-2335` | 0.0.3 | the same, on the eMMC |
-| `uefi-x64.full` | `20261021-2316` | 0.0.3 | systemd, Podman, no radio |
-| `uefi-x64.docker` | `20261021-2338` | 0.0.3 | systemd, Docker, no radio |
-| `mini-x64.basic` | `20261021-2317` | 0.0.3 | OpenRC, the management plane and SSH, no console |
-| `qemu-armhf.basic` | `20261021-2319` | 0.0.3 | OpenRC, the management plane and SSH, no console |
+| `cx3576.full` | `20261114-1206` | 0.0.7 | systemd, Docker, OpenSSH, WiFi and Bluetooth: factory access point, BLE provisioning |
+| `s905x5m.sd-full` | `20261114-1207` | 0.0.7 | systemd, Podman, Dropbear, WiFi and Bluetooth, on an SD card |
+| `s905x5m.emmc-full` | `20261114-1344` | 0.0.7 | the same, on the eMMC |
+| `uefi-x64.full` | `20261114-1207` | 0.0.7 | systemd, Podman, Dropbear, no radio |
+| `uefi-x64.docker` | `20261114-1344` | 0.0.7 | systemd, Docker, Dropbear, no radio |
+| `mini-x64.basic` | `20261114-1206` | 0.0.7 | OpenRC, the management plane and the console, Dropbear, no container engine |
+| `qemu-armhf.basic` | `20261114-1207` | 0.0.7 | OpenRC, the management plane and the console, Dropbear, no container engine |
 
-The current core set is `core.general.20261031-0510`, core 0.0.4. Only
-`cx3576.full` was released again on 2026-10-31; a device on one of the
-2026-10-21 images boots core 0.0.3 and installs 0.0.4 from that core set with
-its next update.
+The current core set is `core.general.20261114-1119`, core 0.0.7, and every
+image above was built with it. `uefi-x64.gcp` has a public test image on
+Google Compute Engine and no release yet ([uefi-x64](../hardware/uefi-x64.md)).
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 
-**A published image is not a booted image.** The `cx3576` and `s905x5m`
-products are started by nothing automatic, because no suite boots a product's FIT image
+**A published image is not a booted image.** The `cx3576`, `s905x5m` and
+`qemu-armhf` products are started by nothing automatic, because no suite boots
+a product's FIT image; the boards are started on hardware by hand
 ([board status](../hardware/README.md#current-boards)). Every amd64
-product (`uefi-x64.*`, `mini-x64.basic`) is booted in its release run, and the
-`uefi-arm64` ones carry hand-run QEMU rows ([harness](https://github.com/micaoss/mica-build/blob/main/README.md)
-section 4). Being a release target means the images are built and published;
+product (`uefi-x64.*`, `mini-x64.basic`) is booted in its release run
+([harness](https://github.com/micaoss/mica-build/blob/main/README.md#build-and-verify)).
+Being a release target means the images are built and published;
 it is not a claim about hardware
 ([support tiers](../hardware/README.md)).
 

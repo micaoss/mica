@@ -31,25 +31,25 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 
 | 产品 | 时间戳 | 镜像中的 core | 内容 |
 |---|---|---|---|
-| `cx3576.full` | `20261031-0512` | 0.0.4 | systemd、容器、WiFi 与蓝牙：出厂接入点、BLE 配网 |
-| `s905x5m.sd-full` | `20261021-2318` | 0.0.3 | 同上，用于 SD 卡 |
-| `s905x5m.emmc-full` | `20261021-2335` | 0.0.3 | 同上，用于 eMMC |
-| `uefi-x64.full` | `20261021-2316` | 0.0.3 | systemd、Podman，无无线电 |
-| `uefi-x64.docker` | `20261021-2338` | 0.0.3 | systemd、Docker，无无线电 |
-| `mini-x64.basic` | `20261021-2317` | 0.0.3 | OpenRC、管理平面与 SSH，无控制台 |
-| `qemu-armhf.basic` | `20261021-2319` | 0.0.3 | OpenRC、管理平面与 SSH，无控制台 |
+| `cx3576.full` | `20261114-1206` | 0.0.7 | systemd、Docker、OpenSSH、WiFi 与蓝牙：出厂接入点、BLE 配网 |
+| `s905x5m.sd-full` | `20261114-1207` | 0.0.7 | systemd、Podman、Dropbear、WiFi 与蓝牙，用于 SD 卡 |
+| `s905x5m.emmc-full` | `20261114-1344` | 0.0.7 | 同上，用于 eMMC |
+| `uefi-x64.full` | `20261114-1207` | 0.0.7 | systemd、Podman、Dropbear，无无线电 |
+| `uefi-x64.docker` | `20261114-1344` | 0.0.7 | systemd、Docker、Dropbear，无无线电 |
+| `mini-x64.basic` | `20261114-1206` | 0.0.7 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
+| `qemu-armhf.basic` | `20261114-1207` | 0.0.7 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
 
-当前的 core 集是 `core.general.20261031-0510`，即 core 0.0.4。2026-10-31 只重新
-发布了 `cx3576.full`；运行 2026-10-21 镜像的设备启动的是 core 0.0.3，下一次更新时
-从这个 core 集安装 0.0.4。
+当前的 core 集是 `core.general.20261114-1119`，即 core 0.0.7，上面每个镜像都用它
+构建。`uefi-x64.gcp` 在 Google Compute Engine 上有公开的测试镜像，还没有发布
+（[uefi-x64](../hardware/uefi-x64.md)）。
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 
-**发布了的镜像不等于被启动过的镜像。**`cx3576` 与 `s905x5m` 的产品没有任何自动流程会
-启动它们，因为没有任何套件会启动产品的 FIT 镜像（[板卡状态](../hardware/README.md#当前板卡)）。
-每个 amd64
-产品（`uefi-x64.*`、`mini-x64.basic`）都会在它的发布流程里被启动，`uefi-arm64` 的
-产品有手工跑的 QEMU 记录（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md)第 4 节）。是发布
+**发布了的镜像不等于被启动过的镜像。**`cx3576`、`s905x5m` 与 `qemu-armhf` 的产品没有
+任何自动流程会启动它们，因为没有任何套件会启动产品的 FIT 镜像；这些板卡由人在实机上启动
+（[板卡状态](../hardware/README.md#当前板卡)）。每个 amd64 产品（`uefi-x64.*`、
+`mini-x64.basic`）都会在它的发布流程里被启动
+（[构建门](https://github.com/micaoss/mica-build/blob/main/README.md#build-and-verify)）。是发布
 目标只意味着镜像被构建并发布，不是对硬件的断言
 （[支持层级](../hardware/README.md)）。
 

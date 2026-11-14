@@ -56,10 +56,36 @@ as `eth0`.
 
 ## Obtaining an image
 
-The products are `uefi-x64.basic` (no container engine), `uefi-x64.full` (with
-containers on Podman) and `uefi-x64.docker` (with containers on Docker), each released as `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the
-image `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`. Verification is in
+The released products are `uefi-x64.full` (containers on Podman) and
+`uefi-x64.docker` (containers on Docker), each released as
+`uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the image
+`mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`; `uefi-x64.basic` (no container
+engine) is built from source. Verification is in
 [download](../start/download.md).
+
+### Compute Engine (`uefi-x64.gcp`)
+
+`uefi-x64.gcp` is this board's Google Compute Engine product: Docker, OpenSSH
+on from the first boot with keys only, no MQTT, and no mDNS or SSDP. Its `gce`
+image kind is the disk image packed for import, with the DER of the boot
+certificate beside it, which the import sets as the instance's Secure Boot PK,
+KEK and db; the image is for a Shielded VM with gVNIC. DATA grows to the
+persistent disk at every boot, so a disk enlarged later grows at the next boot.
+
+- **Logins** are the users of the instance's `ssh-keys` metadata, kept by the
+  Compute Engine agent; they are cloud administrators (`CLOUD_ADMINS=on`).
+- **The console** is reached through a tunnel:
+  `gcloud compute ssh <vm> -- -L 8080:localhost:8080`.
+- **Claiming** asks for the device code, a random one the owner reads after
+  logging in (`CLAIM_DEVICE_CODE=required`).
+
+It has no release yet. A public **test** image family,
+`mica-uefi-x64-gcp-test` in project `micaos`, carries test builds only; the
+formal family `mica-uefi-x64-gcp` is not published yet. `uefi-x64.gcp-tpm2` is
+the same product with DATA encrypted under the instance's vTPM, a test product
+only.
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/README.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-build:boards/uefi-x64/gce/publish.sh`
 
 ## Flashing
 
@@ -135,8 +161,7 @@ The full update, fault and fallback acceptance runs under QEMU.
 
 - Available: read-only diagnosis, guarded manual rollback, configuration
   reset, application-data reset, whole-disk reflash.
-- **Factory reset**: with the administrator password, on an image built with
-  core 0.0.4; the `uefi-x64` images of 2026-10-21 refuse it.
+- **Factory reset**: with the administrator password.
 - **Unavailable**: credential recovery. It is gated
   by a physical-presence assertion, and this board declares no physical
   recovery action, so every such request is refused (`403`,

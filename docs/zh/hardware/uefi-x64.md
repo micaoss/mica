@@ -51,9 +51,29 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 获取镜像
 
-产品是 `uefi-x64.basic`（不带容器引擎）、`uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker 容器），各自发布为
-`uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`。
-校验方法见[获取发布版](../start/download.md)。
+已发布的产品是 `uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker
+容器），各自发布为 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名
+`mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`；`uefi-x64.basic`（不带容器引擎）
+需要从源码构建。校验方法见[获取发布版](../start/download.md)。
+
+### Compute Engine（`uefi-x64.gcp`）
+
+`uefi-x64.gcp` 是这块板的 Google Compute Engine 产品：Docker，首次启动即开启、只认
+密钥的 OpenSSH，没有 MQTT，也没有 mDNS 与 SSDP。它的 `gce` 镜像类型是打包好供导入的
+磁盘镜像，旁边附带启动证书的 DER，导入时把它设为实例 Secure Boot 的 PK、KEK 与 db；
+镜像面向带 gVNIC 的 Shielded VM。DATA 每次启动都会扩展到持久磁盘，所以之后扩大的磁盘
+在下次启动时生效。
+
+- **登录**账号是实例 `ssh-keys` 元数据里的用户，由 Compute Engine 代理维护；他们是
+  云管理员（`CLOUD_ADMINS=on`）。
+- **控制台**经隧道访问：`gcloud compute ssh <vm> -- -L 8080:localhost:8080`。
+- **认领**要求设备码，是一个随机码，所有者登录后读取（`CLAIM_DEVICE_CODE=required`）。
+
+它还没有发布。项目 `micaos` 里公开的**测试**镜像族 `mica-uefi-x64-gcp-test` 只承载
+测试构建；正式镜像族 `mica-uefi-x64-gcp` 尚未发布。`uefi-x64.gcp-tpm2` 是同一产品
+加上用实例 vTPM 加密的 DATA，仅为测试产品。
+
+> status: board-dependent — evidence: `mica-build:boards/uefi-x64/README.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-build:boards/uefi-x64/gce/publish.sh`
 
 ## 刷机
 
@@ -117,8 +137,7 @@ mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)
 ## 恢复
 
 - 可用的步骤：只读诊断、受保护的手动回滚、配置重置、应用数据重置、整盘重刷。
-- **恢复出厂**：需要管理员密码，并且要用 core 0.0.4 构建的镜像；2026-10-21 的
-  `uefi-x64` 镜像会拒绝它。
+- **恢复出厂**：需要管理员密码。
 - **不可用**：凭据恢复——它由物理在场断言把关，而这块板不声明任何物理
   恢复动作，请求一律被拒（`403`，`presence_required`）。
 - 兜底是整盘重刷：启动另一份介质并重写磁盘。代价是全部分区**以及设备身份**。

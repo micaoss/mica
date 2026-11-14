@@ -2,7 +2,9 @@
 
 The current system authenticates boot executables, immutable content and release
 metadata through three separate trust domains. Development images use explicit
-test keys. Hardware-rooted boot and encrypted DATA are not claimed.
+test keys. Hardware-rooted boot is not claimed, and DATA is not encrypted on any
+product: the encryption is built (LUKS2, unlocked by a TPM2 or a recovery
+passphrase) and switched off everywhere, groundwork for later.
 
 ## 1. Runtime integrity
 
@@ -15,6 +17,16 @@ only explicitly allowed leaves use DATA or bounded volatile storage.
 UEFI Secure Boot or required FIT signatures protect the kernel and early policy
 when the corresponding enforcing firmware and anchor are trusted. This is
 separate from authenticating every first mutable hardware boot stage.
+
+**Driver extensions and owner certificates.** A driver extension (out-of-tree
+modules and firmware for one kernel) is a verity image whose root hash carries
+a PKCS#7 signature the kernel checks when it maps the image, as it checks the
+modules inside. The signer chains to the kernel's builtin keyring or to an
+owner certificate enrolled on the device; the runkit seals that owner keyring
+at boot after the system's own images are mapped and before any extension is,
+and where the product's signed boot policy asks for it, a new certificate is
+trusted only once someone at the device's own console confirms it. Every change to the owner certificates is
+recorded, and a factory reset removes them with the extensions.
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy/src/bin/mica-runkit/init.rs`, `docs/reference/ro-root.md`, `docs/security/signing.md`
 
@@ -51,32 +63,36 @@ creation never happens implicitly during a build; supply inputs explicitly.
   access point is on out of the box with a key derived from that secret and the
   device code printed on its label. Whoever holds an image of the product can
   derive that key for every device of it from the label. It is a first-contact
-  credential, not a secret. On core 0.0.3 it is the access point's key only
-  until the device is claimed, and the claim sets the access point's own key;
-  from core 0.0.4 it stays the key, claimed or not, until an administrator sets
-  one on the console's Wi-Fi page, which the console recommends
-  (`mica-core:docs/factory-ap-key.md`).
-- **On core 0.0.3, an unclaimed device can be claimed by anyone in range.**
-  For ten minutes after each boot, an unclaimed device with Bluetooth accepts a
-  claim from a phone over Bluetooth LE with no credential at all, and the first
-  claim wins, as the first visit to setup does on its network. Power a device
-  up for the first time where no stranger is within radio range (about 10 to
-  30 m).
-- **From core 0.0.4, Bluetooth claims nothing.** A phone in range of an
-  unclaimed device during those ten minutes can still set up its network,
-  Wi-Fi or the wired port, and read the label's access-point key; the claim is
-  the console's setup, which asks for the device code from the label or the
-  device's login prompt, unless the product sets `CLAIM_DEVICE_CODE=off`.
+  credential, not a secret. It stays the access point's key, claimed or not,
+  until an administrator sets one on the console's Wi-Fi page, which the
+  console recommends (`mica-core:docs/factory-ap-key.md`).
+- **Bluetooth claims nothing.** For ten minutes after each boot, a phone in
+  range of an unclaimed device can set up its network, Wi-Fi or the wired
+  port, and read the label's access-point key; on a claimed device the same
+  window asks for the administrator password. The claim is the console's setup.
+- **The released products claim without the device code.** Setup asks for the
+  code from the label or the login prompt only on a product with
+  `CLAIM_DEVICE_CODE=required`; every released product sets `off` for now, so
+  the first visitor to setup claims the device. Claim a new device on a
+  network you control. The cloud products require the code, a random one read
+  after logging in.
 - **The management API is the gate.** Plain HTTP on 8080 by default, HTTPS on
   8443 once an operator turns it on; password login with signed
   sessions and CSRF protection for browsers, bearer tokens for automation;
   persistent login-backoff counters and a bounded, fsynced audit trail of
   logins, setup, power actions and transient-password events.
-- **SSH is off by default on both profiles.** Persistent access is by public
+- **The device's own command line** reaches the same API on the local socket
+  `/run/mica/apid.sock` (`0600`): the kernel names the caller's uid, and only
+  root may call it, with no credential.
+- **SSH is off by default**, except on the cloud products and `uefi-x64.base`,
+  which turn it on from the first boot. Persistent access is by public
   key only, and every authorized key is a root key — stated in the UI in as
   many words. The transient root password (set by an authenticated
   administrator, cleared automatically at the next boot) covers the
-  operator-at-the-bench case without creating a long-lived password.
+  operator-at-the-bench case without creating a long-lived password. On a
+  cloud product the logins come from the instance's metadata, and while cloud
+  administrators are on (`access.cloudAdmins.enabled`, the product's default)
+  they get root through `sudo`.
 - **Lockout is real.** Losing the administrator credential and all keys
   leaves no software path in ([../operate/recovery.md](../operate/recovery.md)) — a deliberate
   trade, since credentials surviving updates means updates are not a back
@@ -86,7 +102,7 @@ The audit trail does not yet record session lifecycle events and nothing
 uploads it; there is no hard lockout threshold (deliberately, until a
 physical-presence release path exists).
 
-> status: shipped — evidence: `docs/reference/access.md`, `docs/integrate/provisioning.md`, `mica-core:docs/factory-ap-key.md`, `mica-core:docs/ble-provisioning.md`
+> status: shipped — evidence: `docs/reference/access.md`, `docs/integrate/provisioning.md`, `mica-core:docs/factory-ap-key.md`, `mica-core:docs/ble-provisioning.md`, `mica-core:docs/mica-core.md`
 
 ## 4. Applications
 
@@ -101,12 +117,17 @@ management daemon. See [../integrate/applications.md](../integrate/applications.
 
 ## 5. Network exposure
 
-The inbound surface of a stock device is apid on 8080 (and on 8443 once HTTPS is on)
-— nothing else listens for management, nothing dials out, and no fleet or
-cloud channel exists. Static UI assets are public; every appliance datum and
+The inbound surface of a stock device is apid on 8080 (and on 8443 once HTTPS
+is on), which an administrator can keep to the device itself (`local`) or turn
+off; and the mDNS and SSDP responders, which announce the device's name,
+product and console address on the LAN and nothing else (off on the cloud
+products, and switchable). Nothing else listens for management, and no fleet
+or cloud management channel exists. The device dials out only for its updates
+(the update root, on its update policy), for time, and on a cloud product for
+the instance metadata. Static UI assets are public; every appliance datum and
 operation sits behind the API credential boundary.
 
-> status: shipped — evidence: `docs/reference/remote.md`
+> status: shipped — evidence: `docs/reference/remote.md`, `mica-core:docs/mica-core.md`
 
 ### 5.1 The firewall tools, and the firewall there is not
 
