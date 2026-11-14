@@ -6,11 +6,16 @@ signature and complete geometry bound by the deployment envelope.
 
 ## Boot
 
-UEFI authenticates a UKI through systemd-boot; cx3576 U-Boot authenticates a FIT.
-The signed initramfs contains `mica-init` and fixed boot policy. It authenticates
-the selected descriptor, locates the expected SYSTEM partition, opens file-backed
-loop devices, creates signature-required verity mappings, mounts root/support
-read-only and binds matching modules and firmware before systemd starts.
+UEFI authenticates a UKI through systemd-boot; U-Boot authenticates a FIT
+where the board's boot trust requires it (`qemu-armhf` and `ssd202d` say
+`bootTrust: none` and check the FIT's hashes only). The signed initramfs
+contains `mica-runkit` and the signed boot policy. Running as its PID 1, it
+authenticates the selected descriptor, locates SYSTEM (a partition, or UBI
+volumes), creates signature-required verity mappings, mounts root/support
+read-only, composes the core set's components over `/usr` and `/etc` as
+read-only overlays, opens DATA, seals the owner keyring, maps the driver
+extensions and binds matching modules and firmware before the root's init
+(systemd or OpenRC) starts.
 
 The kernel's built-in content anchors authenticate PKCS#7 root-hash signatures.
 No unsigned retry, editable root geometry, alternate early-init or old-layout
@@ -38,7 +43,7 @@ semantics. DATA/var is bound over the whole `/var` tree and accepts new service
 directories under a byte/inode project limit. `/var/tmp` shares that budget.
 The remaining root stays on read-only SquashFS; `/run` and `/tmp` are volatile.
 
-Machine identity is durably established under DATA/state before systemd and
+Machine identity is durably established under DATA/state before the init and
 bound read-only at `/etc/machine-id`; D-Bus resolves the same identity. Invalid
 or symbolic identity files are refused rather than silently regenerated. The
 random seed uses a fixed symlink to DATA/state/random-seed, outside the general
@@ -47,9 +52,10 @@ exist before random-seed IO.
 
 ## Shutdown
 
-Early boot preserves the pinned systemd shutdown executable and ELF closure in
-a bounded exitramfs. systemd pivots there to stop userspace and release read-only
-root/support mappings, loop devices and backing SYSTEM in dependency order.
-Both UEFI architectures have full-runtime shutdown evidence. The gate rejects
-incomplete loop/DM teardown rather than treating the final poweroff line alone
-as success.
+On systemd, the runkit's `shutdown` is the exit ramdisk: systemd pivots there
+to stop userspace, and it releases the verity, loop and DATA mappings and the
+backing SYSTEM in dependency order before it powers off or reboots. The UEFI
+products have full-runtime shutdown evidence, and the gate rejects incomplete
+loop/DM teardown rather than treating the final poweroff line alone as
+success. An OpenRC root and a UBI board have no exit ramdisk: the init leaves
+DATA read-only and reboots.
