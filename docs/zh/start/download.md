@@ -38,10 +38,10 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 | `uefi-x64.docker` | `20261114-1344` | 0.0.7 | systemd、Docker、Dropbear，无无线电 |
 | `mini-x64.basic` | `20261114-1206` | 0.0.7 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
 | `qemu-armhf.basic` | `20261114-1207` | 0.0.7 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
+| `uefi-x64.gcp` | `20261114-1416` | 0.0.7 | 用于 Google Compute Engine：systemd、Docker、OpenSSH，无无线电；另有供导入的 `.gce.tar.gz` 与启动证书 `.db.der` |
 
 当前的 core 集是 `core.general.20261114-1119`，即 core 0.0.7，上面每个镜像都用它
-构建。`uefi-x64.gcp` 在 Google Compute Engine 上有公开的测试镜像，还没有发布
-（[uefi-x64](../hardware/uefi-x64.md)）。
+构建。如何把 `uefi-x64.gcp` 导入 Compute Engine 见 [uefi-x64](../hardware/uefi-x64.md)。
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 

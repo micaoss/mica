@@ -43,10 +43,11 @@ The current releases, and the core each image was built with:
 | `uefi-x64.docker` | `20261114-1344` | 0.0.7 | systemd, Docker, Dropbear, no radio |
 | `mini-x64.basic` | `20261114-1206` | 0.0.7 | OpenRC, the management plane and the console, Dropbear, no container engine |
 | `qemu-armhf.basic` | `20261114-1207` | 0.0.7 | OpenRC, the management plane and the console, Dropbear, no container engine |
+| `uefi-x64.gcp` | `20261114-1416` | 0.0.7 | for Google Compute Engine: systemd, Docker, OpenSSH, no radio; also a `.gce.tar.gz` to import and the boot certificate `.db.der` |
 
 The current core set is `core.general.20261114-1119`, core 0.0.7, and every
-image above was built with it. `uefi-x64.gcp` has a public test image on
-Google Compute Engine and no release yet ([uefi-x64](../hardware/uefi-x64.md)).
+image above was built with it. How to import `uefi-x64.gcp` into Compute
+Engine is on [uefi-x64](../hardware/uefi-x64.md).
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`
 

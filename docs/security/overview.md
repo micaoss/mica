@@ -70,9 +70,10 @@ creation never happens implicitly during a build; supply inputs explicitly.
   range of an unclaimed device can set up its network, Wi-Fi or the wired
   port, and read the label's access-point key; on a claimed device the same
   window asks for the administrator password. The claim is the console's setup.
-- **The released products claim without the device code.** Setup asks for the
-  code from the label or the login prompt only on a product with
-  `CLAIM_DEVICE_CODE=required`; every released product sets `off` for now, so
+- **The released products claim without the device code**, except the
+  cloud product. Setup asks for the code from the label or the login prompt
+  only on a product with `CLAIM_DEVICE_CODE=required`; every other released
+  product sets `off` for now, so
   the first visitor to setup claims the device. Claim a new device on a
   network you control. The cloud products require the code, a random one read
   after logging in.

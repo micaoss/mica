@@ -51,8 +51,8 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 
 ## 获取镜像
 
-已发布的产品是 `uefi-x64.full`（带 Podman 容器）与 `uefi-x64.docker`（带 Docker
-容器），各自发布为 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名
+已发布的产品是 `uefi-x64.full`（带 Podman 容器）、`uefi-x64.docker`（带 Docker
+容器）与 `uefi-x64.gcp`（见下），各自发布为 `uefi-x64.<variant>.<YYYYMMDD-HHMM>`，镜像文件名
 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`；`uefi-x64.basic`（不带容器引擎）
 需要从源码构建。校验方法见[获取发布版](../start/download.md)。
 
@@ -69,8 +69,10 @@ SYSTEM 恰好 1 GiB，同时容纳两份部署。ESP 携带 `EFI/BOOT/BOOTX64.EF
 - **控制台**经隧道访问：`gcloud compute ssh <vm> -- -L 8080:localhost:8080`。
 - **认领**要求设备码，是一个随机码，所有者登录后读取（`CLAIM_DEVICE_CODE=required`）。
 
-它还没有发布。项目 `micaos` 里公开的**测试**镜像族 `mica-uefi-x64-gcp-test` 只承载
-测试构建；正式镜像族 `mica-uefi-x64-gcp` 尚未发布。`uefi-x64.gcp-tpm2` 是同一产品
+它的发布除磁盘镜像和更新归档外，还带 `mica-uefi-x64.gcp-<stamp>.gce.tar.gz` 与
+`mica-uefi-x64.gcp-<stamp>.db.der`；`mica-build:boards/uefi-x64/gce/gce-import.sh`
+把归档上传到你自己的项目，并用这张证书创建镜像。项目 `micaos` 里公开的**测试**镜像族
+`mica-uefi-x64-gcp-test` 只承载测试构建；正式镜像族 `mica-uefi-x64-gcp` 尚未发布。`uefi-x64.gcp-tpm2` 是同一产品
 加上用实例 vTPM 加密的 DATA，仅为测试产品。
 
 > status: board-dependent — evidence: `mica-build:boards/uefi-x64/README.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-build:boards/uefi-x64/gce/publish.sh`

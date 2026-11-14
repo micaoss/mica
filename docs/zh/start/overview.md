@@ -92,7 +92,7 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 | `uefi-x64.docker` | 同上，换成 Docker | 是 |
 | `mini-x64.basic` | OpenRC、管理面与控制台、Dropbear；面向 128 MB 闪存 | 是 |
 | `qemu-armhf.basic` | OpenRC、管理面与控制台、Dropbear | 是 |
-| `uefi-x64.gcp` | 用于 Google Compute Engine：systemd、管理面与控制台、首次启动即开启的 OpenSSH（登录账号来自实例元数据）、Docker，不做局域网发现 | 尚未：只有公开的测试镜像 |
+| `uefi-x64.gcp` | 用于 Google Compute Engine：systemd、管理面与控制台、首次启动即开启的 OpenSSH（登录账号来自实例元数据）、Docker，不做局域网发现 | 是 |
 | `uefi-x64.gcp-tpm2` | `uefi-x64.gcp` 加上用实例 TPM 加密的 DATA | 否；测试产品 |
 | `uefi-x64.basic`、`uefi-arm64.basic`、`cx3576.basic`、`s905x5m.basic` | 对应产品去掉容器引擎 | 否 |
 | `uefi-arm64.full` | 与 `uefi-x64.full` 相同，跑在 arm64 上 | 否 |
@@ -101,8 +101,8 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 | `ssd202d.basic` | OpenRC、管理面与控制台、Dropbear，装在 SPI NAND 上 | 否：`ssd202d` 不是发布目标 |
 | `<board>.dev`、`s905x5m.emmc-dev` | 开发构建（`PROFILE=dev`） | 从不；只在本地构建 |
 
-没有 minimal 产品。目前每个已发布的产品认领时都不要求设备码（`CLAIM_DEVICE_CODE=off`）；
-云产品要求设备码。
+没有 minimal 产品。目前除 `uefi-x64.gcp` 外，每个已发布的产品认领时都不要求
+设备码（`CLAIM_DEVICE_CODE=off`）；云产品要求设备码。
 
 除 `ssd202d` 外，每一块板都是发布目标。**这意味着它的产品会被发布；它不是“这块板能在实机上启动”的
 断言**——`uefi-arm64` 的合格范围仍只有 QEMU，`s905x5m` 仍停在 bring-up 层级、实机行

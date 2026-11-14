@@ -108,7 +108,7 @@ products today, and which of them are released:
 | `uefi-x64.docker` | the same with Docker | yes |
 | `mini-x64.basic` | OpenRC, the management plane and the console, Dropbear; sized for 128 MB of flash | yes |
 | `qemu-armhf.basic` | OpenRC, the management plane and the console, Dropbear | yes |
-| `uefi-x64.gcp` | for Google Compute Engine: systemd, the management plane and the console, OpenSSH on from the first boot with logins from the instance metadata, Docker, no LAN discovery | not yet: a public test image only |
+| `uefi-x64.gcp` | for Google Compute Engine: systemd, the management plane and the console, OpenSSH on from the first boot with logins from the instance metadata, Docker, no LAN discovery | yes |
 | `uefi-x64.gcp-tpm2` | `uefi-x64.gcp` with DATA encrypted under the instance's TPM | no; a test product |
 | `uefi-x64.basic`, `uefi-arm64.basic`, `cx3576.basic`, `s905x5m.basic` | the corresponding product without a container engine | no |
 | `uefi-arm64.full` | as `uefi-x64.full`, on arm64 | no |
@@ -117,8 +117,9 @@ products today, and which of them are released:
 | `ssd202d.basic` | OpenRC, the management plane and the console, Dropbear, on SPI NAND | no: `ssd202d` is not a release target |
 | `<board>.dev`, `s905x5m.emmc-dev` | a development build (`PROFILE=dev`) | never; built locally |
 
-There are no minimal products. Every released product claims without the
-device code for now (`CLAIM_DEVICE_CODE=off`); the cloud products ask for it.
+There are no minimal products. Every released product but `uefi-x64.gcp`
+claims without the device code for now (`CLAIM_DEVICE_CODE=off`); the cloud
+products ask for it.
 
 Every board but `ssd202d` is a release target. That means its products are
 published; it is not a claim that the board boots on hardware — `uefi-arm64`'s qualification

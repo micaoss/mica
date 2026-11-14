@@ -56,8 +56,8 @@ as `eth0`.
 
 ## Obtaining an image
 
-The released products are `uefi-x64.full` (containers on Podman) and
-`uefi-x64.docker` (containers on Docker), each released as
+The released products are `uefi-x64.full` (containers on Podman),
+`uefi-x64.docker` (containers on Docker) and `uefi-x64.gcp` (below), each released as
 `uefi-x64.<variant>.<YYYYMMDD-HHMM>` with the image
 `mica-uefi-x64.<variant>-<YYYYMMDD-HHMM>.img.gz`; `uefi-x64.basic` (no container
 engine) is built from source. Verification is in
@@ -79,9 +79,12 @@ persistent disk at every boot, so a disk enlarged later grows at the next boot.
 - **Claiming** asks for the device code, a random one the owner reads after
   logging in (`CLAIM_DEVICE_CODE=required`).
 
-It has no release yet. A public **test** image family,
-`mica-uefi-x64-gcp-test` in project `micaos`, carries test builds only; the
-formal family `mica-uefi-x64-gcp` is not published yet. `uefi-x64.gcp-tpm2` is
+Its release carries, besides the disk image and the update archive,
+`mica-uefi-x64.gcp-<stamp>.gce.tar.gz` and `mica-uefi-x64.gcp-<stamp>.db.der`;
+`mica-build:boards/uefi-x64/gce/gce-import.sh` uploads the archive to your own
+project and creates the image with that certificate. A public **test** image
+family, `mica-uefi-x64-gcp-test` in project `micaos`, carries test builds only;
+the formal family `mica-uefi-x64-gcp` is not published yet. `uefi-x64.gcp-tpm2` is
 the same product with DATA encrypted under the instance's vTPM, a test product
 only.
 
