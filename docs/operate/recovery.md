@@ -42,16 +42,16 @@ bootable deployment is unusable. Do not edit counters or import boot commands.
 | 1 | read-only diagnosis | yes | yes | nothing |
 | 2 | guarded manual rollback | yes | yes | one reboot; the condemned deployment stops being a rollback target |
 | 3 | configuration reset | yes | **no** | every modelled setting the tier reaches |
-| 4 | application-data reset | yes | **no** | all operator data in `/srv` and every application's data under `/mica` |
+| 4 | application-data reset | yes | **no** | every container with its images and volumes, the user's services and the service accounts; not `/srv`, nothing on a disk mounted in |
 | 5 | credential recovery | **no** — unsupported in the field | **no** | the previous credential and every API token |
-| 6 | factory reset | yes, on an image built with core 0.0.4 | **no** | everything configured: settings, the claim, keys, applications and operator data |
+| 6 | factory reset | yes, with the administrator password | **no** | everything on DATA: settings, the claim, keys, containers, `/srv`; and the fallback deployment |
 | 7 | whole-disk reflash | yes, with physical access | **no** | every partition, **and the device's identity** |
 | 8 | secure wipe | **no** — unsupported, and not planned | **terminal** | the device, as a configured unit |
 
 **Six of the eight are steps you can take.** Step 5 is gated on a physical
 presence assertion that **no shipped board can produce**, so it is refused on
-every fielded device; step 6 needs the administrator password and an image
-built with core 0.0.4; step 8 has no implementation at all. Section 7 states
+every fielded device; step 6 needs the administrator password; step 8 has no
+implementation at all. Section 7 states
 each absence and what to do instead. A device whose operator has lost the
 credential and every key is recovered by step 7 and by nothing else.
 
@@ -106,11 +106,13 @@ that boot. An interrupted reset is replayable: the next boot finishes it.
 - **Fixes:** a device made unreachable or unusable by its own network, access
   or policy settings, and any settings state too tangled to unpick.
 - **Costs irreversibly:** every modelled setting — network, access, time,
-  update policy, application settings, all at once. There is no per-subtree
-  reset.
-- **Does not recover:** a lost credential (the administrator credential is
-  kept on purpose — a settings action that dropped it would be a lockout
-  wearing a friendlier name), application data, a broken deployment.
+  update policy, all at once — and the HTTPS identity the console was served
+  with. There is no per-subtree reset.
+- **Keeps:** the claim, the administrator credential and the API tokens — on
+  purpose: a settings action that dropped them would be a lockout wearing a
+  friendlier name.
+- **Does not recover:** a lost credential, application data, a broken
+  deployment.
 - **How:** `POST /api/v1/reset` with `{"tier": "configuration"}`,
   authenticated, no physical presence needed.
 
@@ -144,14 +146,20 @@ spends every setting to recover one. See
 
 ### Step 4 — Application-data reset — IRREVERSIBLE
 
-- **Fixes:** an application whose own state wedges it or the device, a full
-  `/srv`, an application layer to be handed over clean.
-- **Costs irreversibly:** **all operator data in `/srv`** and every
-  application's data under `/mica`. There is no backup contract to fall back
-  on.
+- **Fixes:** an application whose own state wedges it or the device, an
+  application layer to be handed over clean.
+- **Costs irreversibly:** every container with its images, the container
+  engine's storage and the volumes under `/mica/volumes`; the user's own
+  services (systemd units and OpenRC scripts the operator added); and the
+  service accounts, which are built again. There is no backup contract to
+  fall back on.
+- **Keeps:** `/srv`, which is the user's, and everything on a disk the user
+  mounted in, wherever it is mounted (also over container storage): the reset
+  clears what is on DATA and never crosses into a mount.
 - **Does not recover:** platform settings, credentials, deployments.
 - **How:** the same route with `{"tier": "application-data"}`, on the same
-  terms.
+  terms. On a Docker product it is refused while `dockerd` runs, since it
+  would clear the engine's storage under it: stop the engine first.
 
 ### Step 5 — Credential recovery — IRREVERSIBLE, and not reachable today
 
@@ -180,15 +188,20 @@ spends every setting to recover one. See
 - **Fixes:** nothing specific. It is the decision that the device's whole
   configured state is to be abandoned — a device handed to a new owner inside
   your organisation, or a fault that survived steps 3 and 4.
-- **Costs irreversibly:** everything on DATA but its update records: the
-  settings, the claim and the administrator credential, the API tokens, the
-  keys, the SSH host keys and the machine-id, the containers, every
-  application, `/srv`, `/mica` and the logs kept on DATA.
-- **Keeps:** the installed software at its version (SYSTEM, both retained
-  deployments, the core set) and the device code, which is derived from the
-  hardware. The device comes back **unclaimed**, on its factory access point
-  with the label's key, and its next first boot draws a new device id,
-  hostname, machine-id and SSH host key.
+- **Costs irreversibly:** everything on DATA, which is made again (formatted,
+  or on a UBI board emptied): the settings, the claim and the administrator
+  credential, the API tokens, the keys, the SSH host keys and the machine-id,
+  the containers, the user's services, `/srv`, `/mica` and the logs kept on
+  DATA. On SYSTEM it removes every other deployment and core set, so there is
+  no fallback until the next update, and every driver extension and owner
+  certificate.
+- **Keeps:** the running deployment and its core set, at their version; the
+  update records that describe SYSTEM, which it saves before and restores
+  after; the user's own disks, which are not DATA; and the device code, which
+  is derived from the hardware. The device comes back **unclaimed**, on its
+  factory access point with the label's key, and its next first boot draws a
+  new device id, hostname, machine-id and SSH host key (and a new code where
+  the product's code is random).
 - **Also goes back:** the update server address and policy, to the values the
   image was built with — Step 3's warning applies here unchanged, including
   the case where the built-in address is *none* and the device is left with
@@ -199,20 +212,16 @@ spends every setting to recover one. See
 - **How:** the console's System page, `POST /api/v1/system/factory-reset` with
   `{"password": "..."}`, or `micad factory-reset` as root on the device. Each
   asks for the administrator password, even from a signed-in session, and a
-  wrong one counts in the sign-in backoff. It is refused on an unclaimed
-  device, while an update installs and while a deployment is on trial. The
-  device reboots after 3 s and the erase runs at that boot; an interrupted
-  erase starts again at the next one. Without micad, `mica-deploy
-  factory-reset --reboot` as root stages the same erase
-  ([without micad](without-micad.md) section 7).
-- **Which images:** an image built with core 0.0.4 (`cx3576.full` from
-  `20261031-0512`). A device on an image of 2026-10-21 answers
-  `factory_reset_unsupported`, also after it installs core 0.0.4 from the core
-  set, until it runs a newer product image. The former
-  `{"tier": "full-factory"}` of `POST /api/v1/reset` is refused with 422 and
-  names the new route.
+  wrong one counts in the sign-in backoff; `micad factory-reset` prompts for
+  it, or reads it from `--password-file`. It is refused on an unclaimed
+  device (`not_claimed`), while an update installs (`update_in_progress`),
+  while a deployment or core set is on trial (`trial_pending`), and on an
+  encrypted DATA (`factory_reset_unsupported`). The device reboots after 3 s
+  and the reset runs at that boot; an interruption anywhere runs it again at
+  the next one. Without micad, `mica-deploy factory-reset --reboot` as root
+  stages the same reset ([without micad](without-micad.md) section 7).
 
-> status: board-dependent — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `docs/reference/recovery.md`
+> status: shipped — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:docs/mica-core.md`, `docs/reference/recovery.md`
 
 ### A factory reset does not make a device anonymous
 
@@ -224,10 +233,11 @@ the medium.** The reset draws a new device id, hostname, machine-id and SSH
 host key, but the device code is derived from the hardware: it is the same
 code on the label, the login prompt and the setup page, and it still derives
 the access point's label key. Whoever recorded it before the reset recognises
-the device after it. And the erase deletes files: the first boot after it
-discards DATA's free space where the filesystem and the medium allow it, which
-is not a certified wipe, and on UBIFS or a card without TRIM it does not
-happen at all.
+the device after it. And making DATA again writes a new filesystem over the
+old one, it does not erase the blocks: the first boot after it discards DATA's
+free space where the filesystem and the medium allow it, which is not a
+certified wipe, and on UBIFS or a card without TRIM it does not happen at
+all.
 
 So a factory reset is **not** a disposal operation. **A device leaving the
 operator's control — resale, return, RMA, disposal — needs the medium
@@ -269,8 +279,8 @@ and rewrite the disk. [../start/install.md](../start/install.md) is the procedur
 ### Step 8 — Secure wipe — TERMINAL, and not implemented
 
 There is no secure wipe on mica. The device cannot express the request: the
-reset route has two tiers, the factory reset erases files, and none of them
-is `secure-wipe`. That absence is the position rather than an
+reset route has two tiers, the factory reset makes a new filesystem, and
+none of them is `secure-wipe`. That absence is the position rather than an
 oversight — a wipe promises something about the *medium*, which needs a
 device-level erase primitive (eMMC sanitize, NVMe format-NVM) whose real
 behaviour on these boards nobody has verified.

@@ -9,11 +9,16 @@ carries that evidence into a support case.
 
 In order of preference:
 
-1. **The API and built-in UI** — HTTPS to the device, `/_ui/`. Live network
+1. **The API and built-in UI** — the console on port 8080 (HTTPS on 8443 once
+   it is turned on). Its System → Help tab has guides for the common faults (a
+   failed update check, a failed offline import, an unsynchronized clock, a
+   WireGuard tunnel with a handshake and no traffic) and links this
+   documentation. Live network
    observation (carrier, addresses, DNS, routes per interface) is part of the
    API surface, which makes "the device thinks its network is X" readable
    without a shell.
-2. **SSH** — off by default; an authenticated administrator enables it and
+2. **SSH** — off by default (on from the first boot on the cloud products and
+   `uefi-x64.base`); an authenticated administrator enables it and
    installs a key through the API. Every authorized key is a root key. For an
    operator standing at a device with no key installed, the transient root
    password (set through the UI, valid until the next boot) is the intended
@@ -50,18 +55,37 @@ X". In a shell, `/usr/share/mica/manifest.tsv` is the same bill of materials
 the API reads, and `hostnamectl` gives the hostname (which encodes the first
 eight hex characters of the device id) and the machine id.
 
+**The support summary** is the read to paste into a case first:
+`GET /api/v1/system/support-info`, or the copy and download buttons on the
+console's Information, Diagnostics and Help tabs. It carries the board, kernel,
+product and component versions, the running deployment, uptime, the time zone
+and synchronization, the integrity items, DATA's readiness and space and the
+last update failure's code, and leaves out the machine id, host name, network
+names and addresses, codes, credentials, logs and settings. **The integrity
+card** (`GET /api/v1/system/integrity`) sums up, from
+the same answers, whether the boot, the deployment and the storage are as they
+should be.
+
 **Hardware-dependent, and unvalidated.** What the thermal, watchdog and
 reset-cause adapters report has been proven against fixture trees, not against
 the cx3576 or uefi-x64 boards. An absent or implausible reading there is an
 escalation carrying the board identity, never a green result.
 
-> status: shipped — evidence: `docs/reference/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `docs/reference/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`, `mica-core:docs/mica-core.md`
 
 ## 3. Reading the evidence
 
-- **Service state:** `systemctl status <unit>`, `systemctl is-system-running`,
-  and `journalctl -u <unit>`. The journal is volatile — it does not survive a
-  reboot, so capture it before power-cycling a sick device.
+- **Service logs:** the console's System → Diagnostics tab reads a service's
+  log of this boot or of the previous one (`GET /api/v1/system/logs/{source}`,
+  `?boot=previous`). The log is kept on DATA across boots by default; on the
+  UBI boards (`qemu-armhf`, `ssd202d`) it is in RAM only, and the Logging
+  section can change either, cap its size or forward it to a collector.
+- **Service state:** on systemd, `systemctl status <unit>`,
+  `systemctl is-system-running` and `journalctl -u <unit>`; on OpenRC,
+  `rc-status`.
+- **An expected kernel message.** `watchdog: watchdog0: watchdog did not stop!`
+  appears at every boot, by design: the boot hands the running watchdog to
+  the init without stopping it. It is not a fault.
 - **Boot health:** the health gate logs its required set, each member's
   verdict, and every failed unit it saw (`journalctl -u mica-health`). A deployment
   that keeps falling back after an update failed one of the required members —
@@ -77,12 +101,14 @@ escalation carrying the board identity, never a green result.
 - **Containers:** `micad ctr list` shows every project's containers and
   their phase and health, and `micad ctr logs <project>/<service>` a log; a
   project the check refused is refused by the write that carried it, with
-  every problem named, and storage running full shows in `podman system df` ([../integrate/containers.md](../integrate/containers.md)).
+  every problem named, and storage running full shows in `podman system df`
+  or `docker system df` ([../integrate/containers.md](../integrate/containers.md)).
+  `micad ctr` works the same on either engine.
 - **Configuration writes:** a settings write returns a task; its outcome
   (applied, unchanged, failed and why) is observable through the API rather
   than guessed from behaviour.
 
-> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`, `mica-core:docs/mica-core.md`
 
 ## 4. When a normal command is missing or broken
 
@@ -156,7 +182,8 @@ document — release and system information, boot and update state, this boot's
 warning-and-worse journal excerpt, failed units and tasks, storage and time
 status, telemetry and the observed network — and `GET
 /api/v1/diagnostics/snapshots/{id}` downloads it as an attachment. The
-built-in UI's diagnostics panel does the same two steps.
+built-in UI's diagnostics panel does the same two steps, and `micad diag`, as
+root on the device, collects one into the same store and prints its path.
 
 What to know before attaching one to a case:
 

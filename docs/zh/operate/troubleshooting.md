@@ -8,10 +8,12 @@ Mica OS 上的诊断遵循一个顺序：获得访问，精确识别正在运行
 
 按优先顺序：
 
-1. **API 与内置 UI**——HTTPS 到设备，`/_ui/`。实时网络观察（每接口的
+1. **API 与内置 UI**——8080 端口上的控制台（开启 HTTPS 后是 8443）。它的 System →
+   Help 页有常见故障的指南（更新检查失败、离线导入失败、时钟未同步、WireGuard 隧道
+   有握手但没有流量），并链接到本文档。实时网络观察（每接口的
    载波、地址、DNS、路由）是 API 面的一部分，这让"设备认为自己的网络是
    什么样"不需要 shell 就能读到。
-2. **SSH**——默认关闭；经过认证的管理员通过 API 启用它并安装密钥。每个
+2. **SSH**——默认关闭（云产品与 `uefi-x64.base` 从首次启动起开启）；经过认证的管理员通过 API 启用它并安装密钥。每个
    授权密钥都是 root 密钥。对于站在设备前、没有安装密钥的操作员，临时
    root 密码（通过 UI 设置，到下次启动前有效）是设计中的单次会话路径。
 3. **串口控制台**——cx3576 上存在（`ttyFIQ0`，1500000 波特），显示登录
@@ -41,17 +43,29 @@ wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认
 同一份物料清单，`hostnamectl` 给出主机名（编码了设备 id 的前八个十六进制
 字符）和 machine id。
 
+**支持摘要**是向工单里粘贴的第一份读取：`GET /api/v1/system/support-info`，或控制台
+Information、Diagnostics、Help 页上的复制与下载按钮。它包含板卡、内核、产品与组件版本、
+运行的部署、运行时长、时区与同步状态、完整性条目、DATA 的就绪与空间，以及最近一次
+更新失败的代码；不包含 machine id、主机名、网络名称与地址、各种码、凭据、日志和设置。
+**完整性卡**（`GET /api/v1/system/integrity`）用同样的回答汇总启动、
+部署和存储是否处于应有的状态。
+
 **依赖硬件，且未经验证。**温度、看门狗与复位原因这三个适配器实际报出什么，
 是对着夹具目录树证明的，不是对着 cx3576 或 uefi-x64 板卡。那里出现缺失或不合理
 的读数，是一次带上板卡身份的升级，绝不是一个"绿色"结果。
 
-> status: shipped — evidence: `docs/reference/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `docs/reference/diagnostics.md`, `mica-core:crates/mica-apid/openapi.json`, `mica-core:docs/mica-core.md`
 
 ## 3. 读取证据
 
-- **服务状态：**`systemctl status <unit>`、`systemctl is-system-running`、
-  `journalctl -u <unit>`。journal 是易失的——它不跨重启保留，所以在给
-  故障设备断电之前先捕获它。
+- **服务日志：**控制台的 System → Diagnostics 页读取某个服务本次启动或上一次启动的
+  日志（`GET /api/v1/system/logs/{source}`，`?boot=previous`）。日志默认保存在 DATA 上、
+  跨启动保留；在 UBI 板卡（`qemu-armhf`、`ssd202d`）上只在内存里。Logging 一节可以改变
+  这两种默认、限制大小，或转发到收集器。
+- **服务状态：**systemd 上用 `systemctl status <unit>`、`systemctl is-system-running`
+  与 `journalctl -u <unit>`；OpenRC 上用 `rc-status`。
+- **预期中的内核消息。**`watchdog: watchdog0: watchdog did not stop!` 每次启动都会出现，
+  这是设计如此：启动过程把正在运行的看门狗交给 init，而不停止它。这不是故障。
 - **启动健康：**健康门记录它所需的集合、每个成员的裁决，以及它看到的每一个
   失败 unit（`journalctl -u mica-health`）。更新后持续回退的部署，失败在所需成员
   之一：启动事务稳定、micad 应答、apid 监听——日志会点名是哪一项。单个失败的
@@ -63,11 +77,12 @@ wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认
 
 - **容器：**`micad ctr list` 显示每个项目的容器及其阶段和健康状态，
   `micad ctr logs <project>/<service>` 显示日志；检查不通过的项目会在携带它的那次写入里
-  被拒绝，并列出每个问题；存储快满时看 `podman system df`（[../../integrate/containers.md](../../integrate/containers.md)）。
+  被拒绝，并列出每个问题；存储快满时看 `podman system df` 或 `docker system df`（[../../integrate/containers.md](../../integrate/containers.md)）。
+  `micad ctr` 在两种引擎上用法相同。
 - **配置写入：**一次设置写入返回一个任务；其结果（已应用、无变化、失败
   及原因）通过 API 可观察，而不是从行为里猜。
 
-> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`
+> status: shipped — evidence: `mica-system-base:payload/usr/lib/mica/mica-health`, `docs/integrate/containers.md`, `mica-core:crates/mica-apid/openapi.json`, `mica-core:docs/mica-core.md`
 
 ## 4. 当某个正常命令缺失或损坏时
 
@@ -132,7 +147,7 @@ Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒
 发布版与系统信息、启动与更新状态、本次启动 warning 及以上的 journal 摘录、
 失败的单元与任务、存储与时间状态、遥测与观察到的网络——`GET
 /api/v1/diagnostics/snapshots/{id}` 把它作为附件下载。内置 UI 的诊断面板做的
-是同样这两步。
+是同样这两步；在设备上以 root 运行 `micad diag` 也会采集一份放进同一存储，并打印其路径。
 
 把它附到工单之前值得知道：
 

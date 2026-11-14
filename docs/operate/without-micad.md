@@ -3,7 +3,7 @@
 A product without the `micad` feature, or a device whose micad is gone, still
 boots, joins its network, takes SSH logins by key, updates and resets: every
 service of the base starts at boot from its own file on DATA
-([architecture](../architecture.md) section 1.1). Without micad nothing writes
+([architecture](../architecture.md) section 7). Without micad nothing writes
 those files for you. This page is how to write them by hand, as root on the
 device. Each file is in the format its service reads, the same one micad
 writes, so a device that gains micad later keeps working; micad then owns the

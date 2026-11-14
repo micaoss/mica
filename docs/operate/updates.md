@@ -6,11 +6,10 @@ refusal an operator can meet on the way. The contract behind this page is
 (`mica-core:docs/mica-core.md` section 6).
 
 **How much of this has been run.** The producing side is exercised by every
-release, and the device side under QEMU by the lifecycle suite and by
-`mica-core`'s contract and fault tests. A core set's trial runs in that suite
-on UEFI products (`mica-build:tests/suites/lifecycle-uefi/core-sets.sh`): it
-runs to the end on the OpenRC product and not yet on the systemd products,
-where the harness does not read the failed boot's verdict. No full cycle (import, install,
+release, and the device side under QEMU by the lifecycle suite on UEFI
+products (`mica-build:tests/suites/lifecycle-uefi/run.sh`: core sets, delta
+transfer, rollback, driver extensions and the factory reset among its stages)
+and by `mica-core`'s contract and fault tests. No full cycle (import, install,
 reboot, automatic confirmation, rollback) is on record for physical hardware;
 see the [support tiers](../hardware/README.md#current-boards).
 
@@ -72,7 +71,11 @@ A device is configured with an **update root**, a URL ending in `/`. The
 project's is `https://res.micaos.dev/update/`. Under it the device reads the
 manifest naming its product's current release, then that release's document,
 then the signed descriptor, each only when it needs it, and downloads only the
-objects it does not already hold.
+objects it does not already hold. A missing object is first assembled from
+chunks the device already has (its deployments, its core sets, earlier
+downloads) by the object's transfer index, and only the rest is downloaded;
+nothing in that path is trusted, the result is checked like a whole download,
+and any failure falls back to the whole object.
 
 Trust comes from the signed descriptor, never from the address: a device takes
 only its own board, architecture and product, only a newer generation, and
@@ -82,7 +85,16 @@ withholds a release reads as "nothing newer".
 
 The image carries the defaults; `/mica/config/updates.json` on DATA, or the
 System page, may set the source, the policy (`off`, `check`, `auto`), the check
-interval and the maintenance window. No setting can add a signing key.
+interval and an optional time of day for it, the fetch budget (500 MB by
+default), whether the link is metered, the reboot gate, and the maintenance
+windows. No setting can add a signing key.
+
+**Maintenance windows** are in UTC. Each names its days (`mon` to `sun`, at
+least one), a start and an end; an end at or before the start runs on into the
+next day, and an equal one is a whole day. Windows may touch but not overlap.
+Outside every window an install of the newest release is refused at once
+(`outside-window`), and on the `auto` policy the device waits for the next
+window before it reboots.
 
 An integrator who runs their own server serves the same documents from another
 root and points the source at it (`mica-core:docs/mica-core.md` section 6.2).
@@ -91,21 +103,29 @@ root and points the source at it (`mica-core:docs/mica-core.md` section 6.2).
 
 ## 4. Offline updates
 
-Bring the `.micaupd` to the device one of two ways:
+Bring the `.micaupd` to the device one of three ways:
 
 - **Upload it.** The System page, or `POST /api/v1/update/import` with the
   archive as the request body. The answer is 202; poll `GET /api/v1/update`
   for the outcome. The update policy does not gate an upload: a device whose
   policy is `off` still takes a file an operator carried to it.
+- **From a USB stick or an SD card.** Put the archive at the root of the
+  medium or in a `mica-updates/` directory and plug it in. The device mounts a
+  clean vfat, exFAT or ext volume read-only, and the System page's manual
+  update lists the archives on it with an import action
+  (`GET /api/v1/update/media`, `POST /api/v1/update/media/import`). The file
+  is copied in and checked like an upload; nothing on the medium is written.
+  Eject the medium on the Storage page before pulling it. A device with no USB
+  or SD host, such as `ssd202d`, does not offer it.
 - **Copy it and import it over SSH.** `mica-deploy import <archive>`. The file
   may sit anywhere readable except under `/mica/updates/`, the acquisition
   workspace, where it would count against its own import's budget.
 
-Either way the archive passes the same checks as an online download and ends
+Every way the archive passes the same checks as an online download and ends
 as a verified deployment waiting to be installed. A core set's archive is
-brought the same two ways, and the import reports which of the two it took.
+brought the same ways, and the import reports which of the two it took.
 
-> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-deploy/src/bin/mica-deploy.rs`
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-deploy/src/bin/mica-deploy.rs`, `mica-core:docs/mica-core.md`
 
 ## 5. Install, reboot and confirmation
 
@@ -122,17 +142,31 @@ brought the same two ways, and the import reports which of the two it took.
    then confirms the deployment. A failed gate reboots into the retained
    deployment.
 
-From the command line the same steps are `mica-deploy install`, `confirm`,
-`status` and `booted`; every command prints one JSON object.
+On the device's command line, `micad update status`, `check`, `install` and
+`rollback` (also as `mica-update`) are the console's requests: `install` takes
+the newest release through the same gates and reboots only with `--reboot`.
+The lower-level steps are `mica-deploy install`, `confirm`, `status` and
+`booted`; every one of those prints one JSON object.
 
-> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-system-base:payload/etc/mica/health.conf`
+**A new kernel waits for its driver extensions.** On a device with driver
+extensions, a deployment with another kernel is not installed while an
+extension has no build for that kernel: the check reports it as
+`waitsForExtension`, and the install is refused with an error that begins
+`waitsForExtension:` and names the extensions. Bring a build for the new
+kernel, or drop the extension, and the two are installed as one pair.
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-system-base:payload/etc/mica/health.conf`, `mica-core:docs/mica-core.md`
 
 ## 6. Rollback
 
-Manual rollback (`POST /api/v1/update/rollback`, `mica-deploy rollback`, or the
-System page) is available when the running deployment is confirmed, no
-candidate is pending and a fallback is retained. It retires the running
-deployment so the fallback boots next; the operator reboots.
+Manual rollback (the System page, `POST /api/v1/update/rollback`,
+`micad update rollback [--reboot]` or `mica-deploy rollback`) is available when
+the running deployment is confirmed, no candidate is pending and a fallback is
+retained. It retires the running deployment so the fallback boots next; the
+operator reboots. The console names the target and the request carries it
+(`expectedTarget`), so a rollback is refused if the fallback changed in the
+meantime. After the reboot, the update state reports once, as `lastRollback`,
+whether the device came up on that target.
 
 Rollback is a boot selection, not a data restore: configuration, databases and
 application data on DATA stay as they are.

@@ -26,12 +26,16 @@ has a route of its own (2.3).
 
 | Tier | Removed or reseeded | Preserved |
 |---|---|---|
-| `configuration` | `/mica/config`; modeled settings return through first-boot provisioning | Device identity and secrets, management credential/claim/API tokens, applications and operator data |
-| `application-data` | `/mica/apps`, `/mica/volumes`, the independent DATA/containers backing directory, `/srv`, the container projects, DATA/state local-unit enrollments | Settings, identity, credentials, custom UI, update workspace and other system namespaces |
+| `configuration` | `/mica/config`, the board defaults' seeding record (so the defaults come back) and apid's HTTPS identity; modeled settings return through first-boot provisioning | Device identity and secrets, management credential/claim/API tokens, containers and operator data |
+| `application-data` | `/mica/volumes`, the container engine's storage and projects, DATA/state `containerd`, `systemd-units` and `openrc-local` (the user's services) and `accounts` (the service accounts, built again) | Settings, identity, credentials, custom UI, `/srv`, update workspace and other system namespaces |
 
 Every tier preserves SYSTEM, boot records and DATA/meta lifecycle/deployment
-state. Calibration outside the removal allowlist remains untouched. TLS identity,
-machine ID and other preserved service files are not recreated as new identities.
+state. No tier opens `/srv`, and no tier crosses into a mount: a directory of a
+cleared tree that something is mounted on (the user's disk over container
+storage, for instance) stays with everything under it. `application-data` is
+refused while `/run/docker.pid` names a live `dockerd`. Calibration outside the
+removal allowlist remains untouched. The machine ID and other preserved service
+files are not recreated as new identities.
 
 Configuration reset clears the whole public configuration directory, including
 documents not represented as modeled settings. Application reset removes unit
@@ -58,39 +62,49 @@ authority.
 
 ### 2.3 Factory reset
 
-The factory reset erases everything configured and keeps the software. A
-request for the former `full-factory` tier of `/api/v1/reset` is 422 and names
-this route.
+The factory reset erases everything configured and keeps the running
+software.
 
 - **Who asks.** `POST /api/v1/system/factory-reset` `{password}`, the console's
   System page, and `micad factory-reset` as root on the device, which prompts
   for the password or reads `--password-file`. Each asks for the administrator
   password whatever the caller's credential, and a wrong one counts in the
-  login backoff. micad refuses with a code (409): `factory_reset_unsupported`
-  when the booted runkit does not carry the erase out, `not_claimed` on an
-  unclaimed device, `update_in_progress`, `trial_pending`.
-- **What goes.** The request is staged in DATA's `meta/factory-reset.json` and
-  the device reboots after 3 s. The initramfs removes everything on DATA but
-  `meta/`: STATE with the settings, the claim, the API tokens, the keys, the
-  SSH host keys and the machine-id, the containers, the apps, `/srv`, `/mica`
-  and the logs kept there. It then recreates the factory layout. An
-  interrupted erase starts again at the next boot.
-- **What stays.** SYSTEM, the boot records and the core set, so the software
-  keeps its version, and the device code, which is derived from the hardware.
-  The device comes back unclaimed, on its factory access point with the
-  label's key, and its first boot draws a new device id, hostname, machine-id
-  and SSH host key.
+  login backoff (after 3 wrong ones each doubles a wait from 5 s to 300 s).
+  micad refuses with a code (409): `factory_reset_unsupported` when the booted
+  runkit does not carry the reset out, as on an encrypted DATA; `not_claimed`
+  on an unclaimed device; `update_in_progress`; `trial_pending` while a
+  deployment or set is on trial.
+- **Staging.** The device must run a confirmed deployment; a pending candidate
+  is rejected. The request and a snapshot of DATA's `meta/` files that
+  describe SYSTEM (the firmware receipt, the catalog checkpoints, the
+  deployment state) are staged on SYSTEM, the snapshot first, and the device
+  reboots after 3 s.
+- **What goes.** The runkit makes DATA again instead of emptying it: a `gpt`
+  board's with the root's `mke2fs` as the board's `dataFormat` says, a `ubi`
+  board's by emptying the `data` volume; a DATA it cannot make again is erased
+  in place. So STATE with the settings, the claim, the API tokens, the keys,
+  the SSH host keys and the machine-id, the containers, the user's services,
+  `/srv`, `/mica` and the logs kept there are gone. It then restores the
+  snapshot. The first start of the root finishes the reset on SYSTEM (`micad`
+  runs `mica-deploy factory-reset --finish` before anything else): it removes
+  every other deployment and every core set but the running deployment's,
+  with the objects only they held, and every driver extension and enrolled
+  owner certificate, and removes the request last, so an interruption
+  anywhere before that runs the reset again at the next boot.
+- **What stays.** The running deployment and its core set, so the software
+  keeps its version, the boot records, the user's own disks, and the device
+  code, which is derived from the hardware (a `random` code, whose seed is on
+  DATA, is drawn again). The device comes back unclaimed, on its factory
+  access point with the label's key, and its first boot draws a new device id,
+  hostname, machine-id and SSH host key.
 - **Afterwards.** That boot records the reset (`GET
-  /api/v1/system/factory-reset`, `last`) and discards DATA's free space where
-  the filesystem and the medium allow it (not on UBIFS, not on a card without
-  TRIM). It is not a certified wipe (section 7).
-- **Which images.** The erase is carried out by the runkit of the product
-  image's kernel component. Images built with core 0.0.4 carry it
-  (`cx3576.full.20261031-0512`). A device on an image of 2026-10-21 refuses
-  with `factory_reset_unsupported`, also after it installs core 0.0.4 from the
-  core set, until it runs a newer product image.
+  /api/v1/system/factory-reset`, `last`, with `formatted` when DATA was made
+  again) and discards DATA's free space where the filesystem and the medium
+  allow it (not on UBIFS, not on a card without TRIM). It is not a certified
+  wipe (section 7).
 - **Without micad.** `mica-deploy factory-reset [--reboot]`, as root, stages
-  the same erase ([without micad](../operate/without-micad.md) section 7).
+  the same reset ([without micad](../operate/without-micad.md) section 7);
+  `--cancel` removes a staged one.
 
 > status: board-dependent — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:crates/mica-deploy/src/factory_reset.rs`, `mica-core:docs/mica-core.md`
 
@@ -155,17 +169,19 @@ environment for a damaged root or unavailable SYSTEM.
 
 ## 7. Sanitization
 
-There is no secure-wipe reset tier, and the factory reset is not one. File
-deletion does not establish removal
+There is no secure-wipe reset tier, and the factory reset is not one. A new
+filesystem, like file deletion, does not establish removal
 from flash remapping, spare blocks or external backups. No board-level erase
 qualification is implied by reset or by complete-image flashing.
 
 ## 8. Acceptance evidence
 
-uefi-x64 and uefi-arm64 QEMU cover signed startup, health confirmation, exhausted
-trials, panic/watchdog fallback and complete shutdown. Interrupted-reset tests
-kill the real reset applier after a successful deletion, then verify retry,
-scope preservation and a further idempotent boot for each tier.
+uefi-x64 QEMU covers signed startup, health confirmation, exhausted trials,
+panic/watchdog fallback, the factory reset and complete shutdown.
+Interrupted-reset tests kill the real reset applier after a successful
+deletion, then verify retry, scope preservation and a further idempotent boot
+for each tier; the user-storage stage checks that no tier crosses a user's
+mount.
 
 cx3576 has offline image/FIT verification and firmware-policy tests. Its
 physical startup, watchdog handoff, recovery and power-cut behavior require the

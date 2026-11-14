@@ -4,11 +4,10 @@
 本页背后的契约是[更新设计](../../reference/updates.md)（英文）；格式属于 `mica-core`
 （`mica-core:docs/mica-core.md` 第 6 节）。
 
-**其中多少真正跑过。** 生产侧在每次发布时都会执行；设备侧在 QEMU 里由生命周期套件、
-以及 `mica-core` 的契约与故障测试执行。core 集合的试运行在该套件里对 UEFI 产品执行
-（`mica-build:tests/suites/lifecycle-uefi/core-sets.sh`）：在 OpenRC 产品上跑完全程，在
-systemd 产品上还没有，因为测试框架在那里读不到失败启动的裁决。实体硬件上还没有完整一轮（导入、安装、重启、
-自动确认、回滚）的记录，见[支持层级](../hardware/README.md#current-boards)。
+**其中多少真正跑过。** 生产侧在每次发布时都会执行；设备侧在 QEMU 里由 UEFI 产品上的
+生命周期套件（`mica-build:tests/suites/lifecycle-uefi/run.sh`：其阶段包括 core 集合、增量
+传输、回滚、驱动扩展与恢复出厂）以及 `mica-core` 的契约与故障测试执行。实体硬件上还没有
+完整一轮（导入、安装、重启、自动确认、回滚）的记录，见[支持层级](../hardware/README.md#当前板卡)。
 
 > status: unsupported
 
@@ -58,13 +57,22 @@ core 组件（管理守护进程连同 API，和 Web 控制台）不在任何部
 设备配置一个**更新根**，即一个以 `/` 结尾的 URL。项目自己的是
 `https://res.micaos.dev/update/`。设备在它下面先读清单（给出本产品的当前发布），再读
 该发布的文档，再读签名描述符，每一份都只在需要时才读，并且只下载自己还没有的对象。
+缺少的对象先按它的传输索引，用设备已有的分块（它的部署、core 集合、之前的下载）拼出，
+只下载剩下的部分；这条路径上的东西都不被信任，结果像完整下载一样校验，任何失败都退回到
+下载整个对象。
 
 信任来自签名描述符，而不是地址：设备只接受自己的板卡、架构与产品，只接受更新的
 generation，并按描述符逐字节校验。产品没有通道（core 集合有，见第 10 节），也没有任何
 东西会过期，所以服务器扣住一个发布，在设备看来就是“没有更新的”。
 
 镜像里带有默认值；DATA 上的 `/mica/config/updates.json` 或 System 页面可以设置更新源、
-策略（`off`、`check`、`auto`）、检查间隔与维护窗口。任何设置都不能增加签名密钥。
+策略（`off`、`check`、`auto`）、检查间隔及可选的检查时刻、下载预算（默认 500 MB）、链路
+是否计费、重启门，以及维护窗口。任何设置都不能增加签名密钥。
+
+**维护窗口**用 UTC 表示。每个窗口指定星期几（`mon` 到 `sun`，至少一天）、开始与结束；
+结束不晚于开始时延续到第二天，两者相等即为一整天。窗口可以首尾相接，但不能重叠。在所有
+窗口之外，安装最新发布的请求会立即被拒绝（`outside-window`）；策略为 `auto` 时，设备等到
+下一个窗口才重启。
 
 自建服务器的集成商从另一个根提供同样的文档，并把更新源指向它
 （`mica-core:docs/mica-core.md` 第 6.2 节）。
@@ -73,18 +81,23 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 
 ## 4. 离线更新
 
-把 `.micaupd` 送到设备有两种方式：
+把 `.micaupd` 送到设备有三种方式：
 
 - **上传。** 用 System 页面，或 `POST /api/v1/update/import`，请求体就是归档本身。
   应答是 202；结果用 `GET /api/v1/update` 轮询。更新策略不约束上传：策略为 `off` 的
   设备照样接收操作者亲手带来的文件。
+- **从 U 盘或 SD 卡。** 把归档放在介质根目录或 `mica-updates/` 目录里，插上。设备以只读
+  方式挂载干净的 vfat、exFAT 或 ext 卷，System 页面的手动更新会列出其中的归档并提供导入
+  操作（`GET /api/v1/update/media`、`POST /api/v1/update/media/import`）。文件会被复制进来，
+  像上传一样校验；介质上什么都不写。拔出前先在 Storage 页面弹出介质。没有 USB 或 SD 主机
+  的设备（如 `ssd202d`）不提供这一项。
 - **复制后经 SSH 导入。** `mica-deploy import <archive>`。文件可以放在任何可读的位置，
   但不能放在获取工作区 `/mica/updates/` 之下，否则它会占用自己这次导入的预算。
 
-两种方式下，归档都经过与在线下载相同的检查，最后成为一个等待安装的已验证部署。core
-集合的归档也用这两种方式送达，导入结果会说明收到的是哪一种。
+每种方式下，归档都经过与在线下载相同的检查，最后成为一个等待安装的已验证部署。core
+集合的归档也用这些方式送达，导入结果会说明收到的是哪一种。
 
-> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-deploy/src/bin/mica-deploy.rs`
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-deploy/src/bin/mica-deploy.rs`, `mica-core:docs/mica-core.md`
 
 ## 5. 安装、重启与确认
 
@@ -96,16 +109,25 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 4. **确认是自动的。** 启动后，健康门检查启动已完成、管理守护进程有应答、API 有应答，
    然后确认该部署。健康门失败则重启进入保留的部署。
 
-命令行上对应的步骤是 `mica-deploy install`、`confirm`、`status` 和 `booted`；每条命令
-输出一个 JSON 对象。
+在设备的命令行上，`micad update status`、`check`、`install` 与 `rollback`（也可以写作
+`mica-update`）就是控制台的那些请求：`install` 经同样的关卡取最新发布，只有加 `--reboot`
+才重启。更底层的步骤是 `mica-deploy install`、`confirm`、`status` 和 `booted`，每条都输出
+一个 JSON 对象。
 
-> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-system-base:payload/etc/mica/health.conf`
+**新内核要等它的驱动扩展。** 在装有驱动扩展的设备上，只要还有扩展没有对应新内核的构建，
+换了内核的部署就不会被安装：检查会把它报告为 `waitsForExtension`，安装被拒绝，错误以
+`waitsForExtension:` 开头并列出这些扩展。带来新内核的构建，或者放弃该扩展，两者就作为
+一对一起安装。
+
+> status: shipped — evidence: `mica-core:crates/mica-deploy/src/deployments/install.rs`, `mica-system-base:payload/usr/lib/mica/mica-health`, `mica-system-base:payload/etc/mica/health.conf`, `mica-core:docs/mica-core.md`
 
 ## 6. 回滚
 
-手动回滚（`POST /api/v1/update/rollback`、`mica-deploy rollback` 或 System 页面）在
-运行中的部署已确认、没有待处理候选且保留有回退时可用。它淘汰运行中的部署，使回退在
-下次启动；重启由操作者执行。
+手动回滚（System 页面、`POST /api/v1/update/rollback`、`micad update rollback [--reboot]`
+或 `mica-deploy rollback`）在运行中的部署已确认、没有待处理候选且保留有回退时可用。它淘汰
+运行中的部署，使回退在下次启动；重启由操作者执行。控制台会指明回滚目标，请求也带着它
+（`expectedTarget`），所以如果回退在此期间变了，回滚会被拒绝。重启后，更新状态会以
+`lastRollback` 报告一次设备是否起在了那个目标上。
 
 回滚是启动选择，不是数据恢复：DATA 上的配置、数据库与应用数据保持原样。
 
