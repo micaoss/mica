@@ -75,7 +75,7 @@ a bare `/dev/sdX`, `/dev/mmcblkN` or `/dev/nvme*`, which names no disk for
 good. The mount options are yours; use `nosuid,nodev`.
 
 **On systemd**, write a `.mount`, `.automount` or `.swap` unit named after its
-path, install and enable it with `mica-unit`, and reboot:
+path, install and enable it with `mica unit`, and reboot:
 
 ```ini
 # srv.mount
@@ -91,11 +91,11 @@ WantedBy=local-fs.target
 ```
 
 ```sh
-mica-unit install srv.mount && mica-unit enable srv.mount
+mica unit install srv.mount --enable
 ```
 
 **On OpenRC**, add a line to `/usr/local/etc/fstab` (devices by `UUID=` or
-`LABEL=`; there is no `/dev/disk/by-*`), check it with `mica-unit fstab check`,
+`LABEL=`; there is no `/dev/disk/by-*`), check it with `/usr/lib/mica/mica-unit fstab check`,
 and reboot. `mica-fstab` mounts the lines at boot, in order; a failing line is
 fatal unless it says `nofail`:
 

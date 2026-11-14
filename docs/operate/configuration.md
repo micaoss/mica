@@ -98,7 +98,7 @@ The settings tree currently models, per subtree:
   and the policy around the transient root password
   (see [../security/overview.md](../security/overview.md));
 - **access.web** — where the API and console listen: `network` (the default),
-  `local` (the device itself only) or `off`; also `micad web` as root on the
+  `local` (the device itself only) or `off`; also `mica web` as root on the
   device;
 - **access.mdns** and **access.ssdp** — whether the device announces itself
   on the LAN; the product decides until the operator sets one (off on the
@@ -116,7 +116,7 @@ The settings tree currently models, per subtree:
   on systemd only); logs leave unencrypted, so forward only through a
   WireGuard or VPN link;
 - **services.units** — the user's own systemd units or OpenRC scripts, kept on
-  DATA and declared here, also from `micad unit` on the device
+  DATA and declared here, also from `mica unit` on the device
   ([native applications](../integrate/native-applications.md) section 10);
 - **power actions and update actions** — not settings, but reachable over the
   same authenticated surface.

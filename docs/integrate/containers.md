@@ -3,7 +3,7 @@
 **Mica OS does not orchestrate containers; it runs the Compose projects you
 declare.** A product with the `containers` feature carries a container engine.
 You declare each project — one Compose file — in micad's settings, through
-`micad ctr` on the device, the API or the console; micad hands the whole set to
+`mica container` on the device, the API or the console; micad hands the whole set to
 the engine, which runs each service as one container, restarts it by its
 policy and starts it at boot. systemd or OpenRC only starts the engine's
 daemon and takes no part in a container's life, so the same declaration runs
@@ -23,7 +23,7 @@ The engine is in the products that carry containers: Docker in `cx3576.full`,
 
 A product names its engine, `CONTAINER_ENGINE` in `/usr/lib/mica/product.conf`:
 `podman` (the default) or `docker`. The settings, the bus, the API, the console
-and `micad ctr` are the same on both; what differs is who carries a project
+and `mica container` are the same on both; what differs is who carries a project
 out.
 
 - **podman**: the package `mica-podman` — podman (also as `/usr/bin/docker`;
@@ -47,8 +47,8 @@ Container storage and network state live on DATA under `/mica/containers`.
 
 This section is podman's; on docker, section 4 says what replaces it.
 
-On the device, as root over SSH (a key in `access.ssh`), `micad ctr` (or
-`mica-ctr`) talks to micad over the bus, so it, the console and the API change
+On the device, as root over SSH (a key in `access.ssh`), `mica container`
+talks to micad over the bus, so it, the console and the API change
 one set of declarations:
 
 ```sh
@@ -61,25 +61,27 @@ services:
     volumes: ["./html:/usr/share/nginx/html:ro"]
     restart: unless-stopped
 YAML
-micad ctr up                      # project app; ./html is /mica/compose/app/html
-micad ctr list                    # every project's containers and their phase
-micad ctr logs app/web --tail 50
-micad ctr down                    # its containers and network go; ./html stays
+mica container up                 # project app; ./html is /mica/compose/app/html
+mica container list               # every project's containers and their phase
+mica container logs app/web --tail 50
+mica container down               # its containers and network go; ./html stays
 ```
 
 | Command | Does |
 |---|---|
-| `up [-p <project>] [-f <file\|->] [--project-dir <dir>]` | checks the file, prints the problems and exits 1 when refused; otherwise stores it as the project with its directory and turns containers on |
-| `down [-p <project>]` | removes the project; its containers and network go, its directory and `/mica/volumes/<project>/` stay |
-| `list` (or `ps`) | every project's containers: project, service, container, phase, health |
-| `check [-p <project>] [-f <file\|->] [--project-dir <dir>]` | checks a file without storing it |
+| `up [--project <project>] [--file <file\|->] [--project-dir <dir>]` | checks the file, prints the problems and exits 1 when refused; otherwise stores it as the project with its directory and turns containers on |
+| `down [--project <project>]` | removes the project; its containers and network go, its directory and `/mica/volumes/<project>/` stay |
+| `list` | every project's containers: project, service, container, phase, health; `--json` prints the bus answer |
+| `check [--project <project>] [--file <file\|->] [--project-dir <dir>]` | checks a file without storing it |
 | `start`, `stop`, `restart <project>[/<service>]` | the verb on every container of the project, or on one |
-| `logs <project>/<service> [--tail N]` | the last lines of its log |
+| `logs <project>/<service> [--tail N]` | the last lines of its log (100 unless asked) |
+| `status` | whether containers are on (`container.enabled`) |
+| `on`, `off` | writes `container.enabled` and waits for it; the projects stay declared |
 
 `up`, `down` and `check` take docker compose's defaults: the file is the first
 of `compose.yaml`, `compose.yml`, `docker-compose.yaml` and
 `docker-compose.yml` in the working directory; the project directory is the
-file's directory; the project is `-p`, else the file's top-level `name`, else
+file's directory; the project is `--project`, else the file's top-level `name`, else
 the directory's name. A relative host path (`./data`, an `env_file`) resolves
 in the project directory; a project declared without one has
 `/mica/volumes/<project>/`.
@@ -154,11 +156,11 @@ and declares nothing.
   Restart, start at boot and health are dockerd's, from each container's
   restart policy and health check: a container with no restart policy does not
   come back after a reboot.
-- **Reads and verbs.** `micad ctr list`, the API and the console list every
+- **Reads and verbs.** `mica container list`, the API and the console list every
   container dockerd holds, a compose one under its project and service, any
   other under its own name; start, stop, restart and logs are dockerd's.
 - **No declarations.** A write of `container.projects` or
-  `container.projectDirs` is refused, and so are `micad ctr up`, `down` and
+  `container.projectDirs` is refused, and so are `mica container up`, `down` and
   `check`: they say to use docker compose. The console lists and acts on
   containers but has no add or edit.
 

@@ -21,6 +21,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`updates.md`](operate/updates.md) — 该用哪个更新归档、在线/离线/U 盘更新、维护窗口、确认、回滚以及每一种拒绝
   - [`recovery.md`](operate/recovery.md) — 从自动回退、重置层级、出厂重置到整盘重刷的恢复阶梯
   - [`storage.md`](operate/storage.md) — 分区、DATA 命名空间、数据归属规则、自己的磁盘与外接介质
+  - [`mica.md`](operate/mica.md) — `mica` 命令：设备上 root 唯一的命令、动词、输出与退出码
   - [`troubleshooting.md`](operate/troubleshooting.md) — 诊断顺序：访问、识别、证据
   - [`api.md`](operate/api.md) — 管理 API：一份机器可读契约
 - `integrate/` — 集成：在它上面做产品
@@ -101,6 +102,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../operate/configuration.md` | current |
 | `../operate/recovery.md` | current |
 | `../operate/storage.md` | current |
+| `../operate/mica.md` | current |
 | `../operate/troubleshooting.md` | current |
 | `../operate/updates.md` | current |
 | `../operate/without-micad.md` | not-translated |

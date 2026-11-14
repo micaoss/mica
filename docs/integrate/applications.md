@@ -32,7 +32,7 @@ fact about the device rather than a preference:
 | Does an OS rollback take it back | yes, atomically, with the OS | no — it keeps running across the rollback |
 | Does its failure roll the OS back | no — a failed unit is reported, not fatal; only a unit the health gate REQUIRES rolls the OS back, and no application is in that set | no — the engine restarts it by its policy, and nothing else watches it |
 | Where the code sits | the read-only verity root | `/mica/containers/storage` on DATA |
-| Changeable on a running device | no | yes — the `container` settings, through `micad ctr`, the API or the console |
+| Changeable on a running device | no | yes — the `container` settings, through `mica container`, the API or the console |
 | Needs the container switch on | no | yes |
 
 Two consequences are worth reading twice. Neither path's failure rolls the OS
@@ -88,7 +88,7 @@ The operating facts an operator needs:
 
 - **One switch.** `container.enabled` in the settings tree, `false` by
   default. While it is false, the engine's daemon is stopped and the projects
-  stay declared. It is set through `micad ctr up`, the authenticated API or
+  stay declared. It is set through `mica container up`, the authenticated API or
   the console.
 - **Where declarations go.** `/mica/config/container/<project>.yaml` on DATA.
   They survive reboots and A/B updates, and a configuration reset removes
@@ -97,7 +97,7 @@ The operating facts an operator needs:
   directory, and its named volumes land under `/mica/volumes/<project>/`;
   images live under `/mica/containers` on DATA. Never `/var` — it is small,
   disposable, and wiped by design ([../operate/storage.md](../operate/storage.md)).
-- **Logs** are kept in RAM (`micad ctr logs <project>/<service>`), and lost at
+- **Logs** are kept in RAM (`mica container logs <project>/<service>`), and lost at
   reboot.
 - **No automatic image updates.** Pulling a new image and deciding when a
   restart is safe is the integrator's, for the same reason OS updates are A/B

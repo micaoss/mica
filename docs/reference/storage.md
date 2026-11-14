@@ -168,7 +168,7 @@ A user mounts their own disks only where `/usr/lib/mica/mica-mountpoint`
 allows: `/srv` and below, `/var/mnt/<name>` and below, `/home/<user>` and
 below, and exactly `/mica/containers/storage` or `/mica/containers/docker`;
 swap on a stable device name or a file at an allowed target. On systemd they
-are `.mount`, `.automount` and `.swap` units installed with `mica-unit` and
+are `.mount`, `.automount` and `.swap` units installed with `mica unit` and
 put into the boot's first transaction by a generator, before
 `local-fs.target` and any engine; on OpenRC they are lines of
 `/usr/local/etc/fstab`, mounted by `mica-fstab` in `boot`. A refused unit is

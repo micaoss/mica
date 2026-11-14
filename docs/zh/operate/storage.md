@@ -61,7 +61,7 @@ FIRMWARE/SYSTEM/DATA；裸 NAND 板（qemu-armhf、ssd202d）是 UBI 卷 `system
 `nosuid,nodev`。
 
 **在 systemd 上**，写一个按路径命名的 `.mount`、`.automount` 或 `.swap` 单元，用
-`mica-unit` 安装并启用，然后重启：
+`mica unit` 安装并启用，然后重启：
 
 ```ini
 # srv.mount
@@ -77,11 +77,11 @@ WantedBy=local-fs.target
 ```
 
 ```sh
-mica-unit install srv.mount && mica-unit enable srv.mount
+mica unit install srv.mount --enable
 ```
 
 **在 OpenRC 上**，在 `/usr/local/etc/fstab` 里加一行（设备用 `UUID=` 或 `LABEL=` 指定；
-没有 `/dev/disk/by-*`），用 `mica-unit fstab check` 检查，然后重启。`mica-fstab` 在启动时按
+没有 `/dev/disk/by-*`），用 `/usr/lib/mica/mica-unit fstab check` 检查，然后重启。`mica-fstab` 在启动时按
 顺序挂载各行；某一行失败是致命的，除非它写了 `nofail`：
 
 ```

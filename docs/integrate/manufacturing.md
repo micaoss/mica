@@ -42,7 +42,7 @@ secret, its key. A line prints all three on the label:
 
 ```sh
 bun src/cli.ts label --secret ap-secret DFN4-L34C-T8N   # in mica-build: code, ssid, psk, qr
-micad device-code                                        # on the device: the code and its source
+mica internal device-code                                # on the device: the code and its source
 ```
 
 The product secret is installed in every image of the product as

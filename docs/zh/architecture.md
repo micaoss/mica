@@ -266,9 +266,11 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
   自动化用 bearer token；登录失败会持久退避，安全相关操作记入审计环。
 - **控制台**（`mica-apid-ui`）是 API 的一个客户端，位于 `/_ui/`；运维人员可以上传并
   激活自己的控制台包。
-- **在设备上**，root 通过总线运行 `micad` 子命令：`micad update`（也可用
-  `mica-update`）、`micad ctr`（也可用 `mica-ctr`）、`micad unit`、`micad web`、
-  `micad mdns`、`micad ssdp`、`micad factory-reset`、`micad diag` 和 `micad device-code`。
+- **在设备上**，root 只有一个命令 `mica`（[`mica` 命令](operate/mica.md)）：初始设置、
+  管理员密码、SSH、令牌、设置、网络、Wi-Fi、时间、更新、容器、用户服务、Web 模式、
+  局域网发现、电源、出厂重置和诊断快照。micad 决定的事经总线去问，apid 决定的事
+  （凭据与设置）经 apid 的本地 socket 去问。`micad` 本身只运行 `micad daemon` 和
+  `micad apid`。
 
 设置、reconciler 与总线见 `mica-core:docs/mica-core.md` 第 3 节；API 见第 4 节和
 [API](operate/api.md)。

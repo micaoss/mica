@@ -96,7 +96,7 @@ A report that can be acted on cites, in this order:
    qualification standing.
 3. **The device identity** — hostname / device id ([../start/first-run.md](../start/first-run.md)).
 4. **Evidence captured before recovery** — a diagnostic snapshot (the
-   console, or `micad diag` on the device: this and the previous boot's
+   console, or `mica doctor` on the device: this and the previous boot's
    warnings, failed services, update state), and any refusal text quoted verbatim
    ([../operate/troubleshooting.md](../operate/troubleshooting.md)); a reflash destroys evidence,
    so capture first.

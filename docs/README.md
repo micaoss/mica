@@ -81,6 +81,7 @@ current product only; history is in Git.
   - `updates.md` — which update archive applies, online, offline and USB updates, maintenance windows, confirmation, rollback and every refusal
   - `recovery.md` — what to do when a device does not boot, the reset tiers and the factory reset, and what recovery costs
   - `storage.md` — partitions, what survives what, where data belongs, your own disks and external media
+  - `mica.md` — the `mica` command: root's one command on the device, its verbs, output and exit codes
   - `troubleshooting.md` — diagnosis: access channels, evidence to read, refusals to interpret
   - `api.md` — the programmatic surface and its machine-readable contract
   - `without-micad.md` — a device without micad: getting in, switching services on with `mica-units`, and each service's file by hand

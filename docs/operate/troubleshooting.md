@@ -98,12 +98,12 @@ escalation carrying the board identity, never a green result.
   deployments, attempt state, component verification and failed deployments.
   Capture `GET /api/v1/update` for the management view as well.
 
-- **Containers:** `micad ctr list` shows every project's containers and
-  their phase and health, and `micad ctr logs <project>/<service>` a log; a
+- **Containers:** `mica container list` shows every project's containers and
+  their phase and health, and `mica container logs <project>/<service>` a log; a
   project the check refused is refused by the write that carried it, with
   every problem named, and storage running full shows in `podman system df`
   or `docker system df` ([../integrate/containers.md](../integrate/containers.md)).
-  `micad ctr list` and `logs` work on either engine.
+  `mica container list` and `logs` work on either engine.
 - **Configuration writes:** a settings write returns a task; its outcome
   (applied, unchanged, failed and why) is observable through the API rather
   than guessed from behaviour.
@@ -182,7 +182,7 @@ document — release and system information, boot and update state, this boot's
 warning-and-worse journal excerpt, failed units and tasks, storage and time
 status, telemetry and the observed network — and `GET
 /api/v1/diagnostics/snapshots/{id}` downloads it as an attachment. The
-built-in UI's diagnostics panel does the same two steps, and `micad diag`, as
+built-in UI's diagnostics panel does the same two steps, and `mica doctor`, as
 root on the device, collects one into the same store and prints its path.
 
 What to know before attaching one to a case:

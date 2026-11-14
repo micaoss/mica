@@ -210,10 +210,12 @@ spends every setting to recover one. See
   for it needs that password; a device that cannot boot; a corrupted
   deployment.
 - **How:** the console's System page, `POST /api/v1/system/factory-reset` with
-  `{"password": "..."}`, or `micad factory-reset` as root on the device. Each
-  asks for the administrator password, even from a signed-in session, and a
-  wrong one counts in the sign-in backoff; `micad factory-reset` prompts for
-  it, or reads it from `--password-file`. It is refused on an unclaimed
+  `{"password": "..."}`, or `mica factory-reset` as root on the device. The
+  console and the API ask for the administrator password, even from a
+  signed-in session, and a wrong one counts in the sign-in backoff.
+  `mica factory-reset` asks for no password: it prints what is erased and
+  what is kept, then waits for the hostname or `factory-reset` to be typed,
+  or takes `--yes`. It is refused on an unclaimed
   device (`not_claimed`), while an update installs (`update_in_progress`),
   while a deployment or core set is on trial (`trial_pending`), and on an
   encrypted DATA (`factory_reset_unsupported`). The device reboots after 3 s

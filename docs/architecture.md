@@ -316,10 +316,13 @@ aarch64 only.
   off persistently, and security-relevant actions go to an audit ring.
 - **The console** (`mica-apid-ui`) is a client of the API, served at `/_ui/`;
   an operator may upload and activate a console bundle of their own.
-- **On the device**, root runs `micad` subcommands over the bus: `micad update`
-  (also `mica-update`), `micad ctr` (also `mica-ctr`), `micad unit`, `micad web`,
-  `micad mdns`, `micad ssdp`, `micad factory-reset`, `micad diag` and
-  `micad device-code`.
+- **On the device**, root has one command, `mica` ([the `mica`
+  command](operate/mica.md)): the setup, the administrator password, SSH,
+  tokens, settings, network, Wi-Fi, time, updates, containers, the user's
+  services, the web mode, LAN discovery, power, the factory reset and the
+  diagnostic snapshot. What micad decides it asks over the bus; what apid
+  decides (credentials and settings) it asks on apid's local socket. `micad`
+  itself runs only `micad daemon` and `micad apid`.
 
 The settings, reconcilers and bus are `mica-core:docs/mica-core.md` 3; the API
 is section 4 and [the API](operate/api.md).
@@ -330,8 +333,8 @@ A device runs the user's software in two ways, both kept on DATA and both
 surviving every update:
 
 - **The user's own services**: a systemd unit or an OpenRC script with its
-  binaries on DATA (in `/srv`, say), installed with Base's `mica-unit` or
-  declared in micad's `services.units`, running as a service account of its
+  binaries on DATA (in `/srv`, say), installed with `mica unit` (through
+  Base's `/usr/lib/mica/mica-unit`) or declared in micad's `services.units`, running as a service account of its
   own when it wants one.
 - **Containers**, in a product with the `containers` feature. On Podman,
   Compose projects are declared to micad and run by `mica-containerd`; on

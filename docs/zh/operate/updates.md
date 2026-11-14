@@ -109,8 +109,8 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 4. **确认是自动的。** 启动后，健康门检查启动已完成、管理守护进程有应答、API 有应答，
    然后确认该部署。健康门失败则重启进入保留的部署。
 
-在设备的命令行上，`micad update status`、`check`、`install` 与 `rollback`（也可以写作
-`mica-update`）就是控制台的那些请求：`install` 经同样的关卡取最新发布，只有加 `--reboot`
+在设备的命令行上，`mica update status`、`check`、`install` 与 `rollback`
+就是控制台的那些请求：`install` 经同样的关卡取最新发布，只有加 `--reboot`
 才重启。更底层的步骤是 `mica-deploy install`、`confirm`、`status` 和 `booted`，每条都输出
 一个 JSON 对象。
 
@@ -123,7 +123,7 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 
 ## 6. 回滚
 
-手动回滚（System 页面、`POST /api/v1/update/rollback`、`micad update rollback [--reboot]`
+手动回滚（System 页面、`POST /api/v1/update/rollback`、`mica update rollback [--reboot]`
 或 `mica-deploy rollback`）在运行中的部署已确认、没有待处理候选且保留有回退时可用。它淘汰
 运行中的部署，使回退在下次启动；重启由操作者执行。控制台会指明回滚目标，请求也带着它
 （`expectedTarget`），所以如果回退在此期间变了，回滚会被拒绝。重启后，更新状态会以

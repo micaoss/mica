@@ -142,8 +142,8 @@ brought the same ways, and the import reports which of the two it took.
    then confirms the deployment. A failed gate reboots into the retained
    deployment.
 
-On the device's command line, `micad update status`, `check`, `install` and
-`rollback` (also as `mica-update`) are the console's requests: `install` takes
+On the device's command line, `mica update status`, `check`, `install` and
+`rollback` are the console's requests: `install` takes
 the newest release through the same gates and reboots only with `--reboot`.
 The lower-level steps are `mica-deploy install`, `confirm`, `status` and
 `booted`; every one of those prints one JSON object.
@@ -160,7 +160,7 @@ kernel, or drop the extension, and the two are installed as one pair.
 ## 6. Rollback
 
 Manual rollback (the System page, `POST /api/v1/update/rollback`,
-`micad update rollback [--reboot]` or `mica-deploy rollback`) is available when
+`mica update rollback [--reboot]` or `mica-deploy rollback`) is available when
 the running deployment is confirmed, no candidate is pending and a fallback is
 retained. It retires the running deployment so the fallback boots next; the
 operator reboots. The console names the target and the request carries it

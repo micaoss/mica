@@ -5,7 +5,7 @@
 > the board's temperature/watchdog/reset evidence, and a bounded, redacted,
 > offline support snapshot that can be exported through the API. Companion
 > to api.md, micad.md, storage.md and time.md. The API, the console's
-> System pages and `micad diag` ship; section 10 is the operating
+> System pages and `mica doctor` ship; section 10 is the operating
 > procedure.
 
 ## 1. What ships, and what deliberately does not
@@ -33,7 +33,7 @@ against an allowlist schema, and kept in a bounded store under
 | `/api/v1/diagnostics/snapshots/{id}` | `GET` | export one as an attachment |
 | `/api/v1/diagnostics/snapshots/{id}` | `DELETE` | remove one (204) |
 
-On the device, root's `micad diag` collects the same snapshot into the same
+On the device, root's `mica doctor` collects the same snapshot into the same
 store and prints its path, whatever the web mode.
 
 Beside the snapshot, three smaller reads (`mica-core:docs/mica-core.md`

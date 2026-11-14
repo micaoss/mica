@@ -245,9 +245,10 @@ rollback of either kind.
 ## 10. User services, and why they are not this path
 
 The root is read-only, so `systemctl enable` and OpenRC's runlevels cannot
-hold a service added on a running device. `mica-unit`, on either init, keeps
-one on DATA/state instead: `mica-unit install <file>...`, `enable [--now]`,
-`disable [--now]`, `remove` and `list`. On systemd the units go into
+hold a service added on a running device. `mica unit`, on either init, keeps
+one on DATA/state instead (through Base's `/usr/lib/mica/mica-unit`, which is
+off `PATH`): `mica unit install <file>`, `enable` (which starts it),
+`disable` (which stops it), `remove` and `list`. On systemd the units go into
 `/usr/local/lib/systemd/system`, a bind of DATA/state; on OpenRC the scripts
 go into `/usr/local/etc`, a bind of DATA/state, and `mica-local` starts the
 enabled ones at boot. A name the root ships is refused, so a user service can
@@ -262,7 +263,7 @@ enabled, and micad reconciles them through `mica-unit`. At most 32 services, a
 text of at most 64 KiB and a conf of at most 16 KiB, 256 KiB in all. They are
 reachable three ways:
 
-- on the device, `micad unit install [--name N] [--conf FILE] [--enable] FILE`,
+- on the device, `mica unit install <file|-> [--name N] [--conf FILE] [--enable]`,
   `enable`, `disable`, `remove`, `start`, `stop`, `restart`, `list` and
   `logs [--tail N]`;
 - the API: `GET /api/v1/units`, `PUT` and `DELETE /api/v1/units/{name}`,

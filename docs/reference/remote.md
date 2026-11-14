@@ -14,7 +14,7 @@ nor 443 from another service. With `httpsEnabled` it serves HTTPS on
 operator may replace with an uploaded chain, and the HTTP port then only
 redirects; the session cookie is `Secure` exactly then. That is the `network`
 mode; `local` closes the listeners and leaves only the root-owned socket
-`/run/mica/apid.sock`, and `off` stops apid. Root's `micad web` on the device
+`/run/mica/apid.sock`, and `off` stops apid. Root's `mica web` on the device
 reads and sets the mode in every mode. There is no other management protocol
 or port (`mica-core:docs/mica-core.md` section 4).
 

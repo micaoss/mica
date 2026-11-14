@@ -73,7 +73,7 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
 - **access.ssh**——SSH 启用、端口、监听地址、授权密钥，以及围绕临时 root
   密码的策略（见 [../security/overview.md](../security/overview.md)）；
 - **access.web**——API 与控制台在哪里监听：`network`（默认）、`local`（只限设备
-  本机）或 `off`；在设备上也可以 root 身份用 `micad web`；
+  本机）或 `off`；在设备上也可以 root 身份用 `mica web`；
 - **access.mdns** 与 **access.ssdp**——设备是否在局域网上公布自己；操作者设置之前
   由产品决定（云产品上关闭）；
 - **access.cloudAdmins**——在云产品上，来自实例元数据的登录账号是否经 `sudo` 获得 root；
@@ -86,7 +86,7 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
   转发到远程 syslog 收集器（TCP 仅在 systemd 上）；日志以明文离开设备，所以只经
   WireGuard 或 VPN 链路转发；
 - **services.units**——用户自己的 systemd 单元或 OpenRC 脚本，保存在 DATA 上并在
-  这里声明，也可在设备上用 `micad unit` 管理
+  这里声明，也可在设备上用 `mica unit` 管理
   （[原生应用](../../integrate/native-applications.md)第 10 节）；
 - **电源动作与更新动作**——不是设置，但通过同一认证面可达。
 

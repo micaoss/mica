@@ -165,9 +165,10 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
 - **不能恢复：**丢失的管理员密码，因为每一种发起方式都要这个密码；起不来的
   设备；损坏的系统部署。
 - **怎么做：**控制台的"系统"页面、`POST /api/v1/system/factory-reset` 加
-  `{"password": "..."}`，或在设备上以 root 运行 `micad factory-reset`。每一种都
-  要求输入管理员密码，即使已经登录也一样，输错会计入登录退避；`micad factory-reset`
-  会提示输入，或从 `--password-file` 读取。设备未认领时（`not_claimed`）、正在安装
+  `{"password": "..."}`，或在设备上以 root 运行 `mica factory-reset`。控制台和 API
+  要求输入管理员密码，即使已经登录也一样，输错会计入登录退避。`mica factory-reset`
+  不要密码：它先列出会清除什么、保留什么，然后等你输入主机名或 `factory-reset`，
+  或者直接带 `--yes`。设备未认领时（`not_claimed`）、正在安装
   更新时（`update_in_progress`）、有部署或 core 集处于试运行时（`trial_pending`），
   以及 DATA 加密时（`factory_reset_unsupported`）会被拒绝。设备在 3 秒后重启，重置在
   那次启动中进行；任何地方被打断都会在下一次启动时重新执行。没有 micad 时，以 root

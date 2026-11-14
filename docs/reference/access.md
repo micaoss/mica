@@ -79,7 +79,7 @@ rotated.
   nothing uploads it.
 - **Where the API listens** is `access.web.mode`: `network` (the default),
   `local` (the local socket alone: root's commands on the device, no console
-  and no HTTP API) or `off` (apid stopped). `micad web status|network|local|off` sets it as root
+  and no HTTP API) or `off` (apid stopped). `mica web status|network|local|off` sets it as root
   on the device, which is how a device left in `off` comes back.
 - The API listens on plain HTTP port 8080 by default. With HTTPS enabled it
   serves on 8443 with a self-signed identity, which an administrator can
@@ -107,14 +107,14 @@ query from the subnet it arrived on, and rate-limits its answers.
   runs only while the console is on the network.
 - **SSH is never announced**, by either.
 - **The switches** are `access.mdns.enabled` and `access.ssdp.enabled`, both on
-  the console's overview (局域网发现, "LAN discovery") and in `micad mdns
-  on|off` and `micad ssdp on|off`. Unset, the product's `MDNS=` and `SSDP=`
+  the console's overview (局域网发现, "LAN discovery") and in `mica mdns
+  on|off` and `mica ssdp on|off`. Unset, the product's `MDNS=` and `SSDP=`
   lines decide, and both are on when the product says nothing. Off means no
-  socket at all. `micad mdns status`, `micad ssdp status`, `GET /api/v1/mdns`
+  socket at all. `mica mdns status`, `mica ssdp status`, `GET /api/v1/mdns`
   and `GET /api/v1/ssdp` show what runs and what is announced.
 - **More services over mDNS**: a JSON drop-in in `/usr/share/mica/mdns.d/`
-  (the image's) or `/run/mica/mdns.d/` (gone at reboot), `micad mdns add` and
-  `micad mdns remove`:
+  (the image's) or `/run/mica/mdns.d/` (gone at reboot), `mica mdns add` and
+  `mica mdns remove`:
 
   ```json
   {"version": 1, "services": [
@@ -183,8 +183,11 @@ The reset tiers and the factory reset are [recovery](recovery.md).
 
 ## 7. Locked out
 
-An operator who loses the admin password, every API token and every authorized
-key has **no software path back in**: the API needs the credential, SSH needs a
+Root on the device sets a new administrator password with
+`mica password set`, without the old one, so an operator who still has an
+authorized SSH key gets back in that way. An operator who loses the admin
+password, every API token and every authorized key has **no software path
+back in**: the API needs the credential, SSH needs a
 key that is not there, and the consoles have no account that accepts a
 password.
 

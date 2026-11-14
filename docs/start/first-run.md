@@ -64,7 +64,7 @@ new identity. No identity is stored in the bootloader's attempt records.
   (`mica-` and four characters) and its key, also as a QR code. Join that
   network and open `http://192.168.4.1:8080`. The label's key keeps working
   after the claim, until you set a key of your own on the console's Wi-Fi
-  page. A factory reset brings the label's key back. `micad device-code`
+  page. A factory reset brings the label's key back. `mica internal device-code`
   prints the code on the device, and the device's own console shows it at the
   login prompt; nothing on the device prints the key.
 - The label's key is a first-contact credential, not a secret: every image of
@@ -181,6 +181,8 @@ exists. Exactly two channels can create the first one:
    counts towards the sign-in backoff. **Every released product but
    `uefi-x64.gcp` sets it `off` for now**, so the first visitor to setup
    claims the device: claim a new device on a network you control, promptly.
+   Root on the device runs the same setup with `mica setup`, which asks for
+   no device code ([the `mica` command](../operate/mica.md)).
 2. **A provisioning document** — section 3. The password came off the medium.
 
 Bluetooth claims nothing: a phone sets up the network (section 5) and the

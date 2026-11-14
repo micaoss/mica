@@ -75,10 +75,10 @@ Information、Diagnostics、Help 页上的复制与下载按钮。它包含板�
 - **更新状态：**`mica-deploy status` 报告 current/candidate/fallback 部署、尝试次数、
   组件验证及失败部署。另保存 `GET /api/v1/update` 的管理视图。
 
-- **容器：**`micad ctr list` 显示每个项目的容器及其阶段和健康状态，
-  `micad ctr logs <project>/<service>` 显示日志；检查不通过的项目会在携带它的那次写入里
+- **容器：**`mica container list` 显示每个项目的容器及其阶段和健康状态，
+  `mica container logs <project>/<service>` 显示日志；检查不通过的项目会在携带它的那次写入里
   被拒绝，并列出每个问题；存储快满时看 `podman system df` 或 `docker system df`（[../../integrate/containers.md](../../integrate/containers.md)）。
-  `micad ctr list` 与 `logs` 在两种引擎上都可用。
+  `mica container list` 与 `logs` 在两种引擎上都可用。
 - **配置写入：**一次设置写入返回一个任务；其结果（已应用、无变化、失败
   及原因）通过 API 可观察，而不是从行为里猜。
 
@@ -147,7 +147,7 @@ Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒
 发布版与系统信息、启动与更新状态、本次启动 warning 及以上的 journal 摘录、
 失败的单元与任务、存储与时间状态、遥测与观察到的网络——`GET
 /api/v1/diagnostics/snapshots/{id}` 把它作为附件下载。内置 UI 的诊断面板做的
-是同样这两步；在设备上以 root 运行 `micad diag` 也会采集一份放进同一存储，并打印其路径。
+是同样这两步；在设备上以 root 运行 `mica doctor` 也会采集一份放进同一存储，并打印其路径。
 
 把它附到工单之前值得知道：
 

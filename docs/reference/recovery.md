@@ -66,10 +66,13 @@ The factory reset erases everything configured and keeps the running
 software.
 
 - **Who asks.** `POST /api/v1/system/factory-reset` `{password}`, the console's
-  System page, and `micad factory-reset` as root on the device, which prompts
-  for the password or reads `--password-file`. Each asks for the administrator
-  password whatever the caller's credential, and a wrong one counts in the
-  login backoff (after 3 wrong ones each doubles a wait from 5 s to 300 s).
+  System page, and `mica factory-reset` as root on the device. The API and
+  the console ask for the administrator password whatever the caller's
+  credential, and a wrong one counts in the login backoff (after 3 wrong ones
+  each doubles a wait from 5 s to 300 s). Root on the device is asked for no
+  password: `mica factory-reset` prints what is erased and what is kept, then
+  waits for the hostname or `factory-reset` to be typed, or takes `--yes`;
+  with neither, or no terminal, nothing is reset.
   micad refuses with a code (409): `factory_reset_unsupported` when the booted
   runkit does not carry the reset out, as on an encrypted DATA; `not_claimed`
   on an unclaimed device; `update_in_progress`; `trial_pending` while a

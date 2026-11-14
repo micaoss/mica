@@ -209,7 +209,7 @@ Maintenance windows are in UTC: each names its days (`mon` to `sun`), a window
 may run past midnight, and no two overlap. The reboot gate retains
 maintenance-window, health, active-install and override checks; an override
 does not interrupt an installation. "Install the newest release" (the console,
-`micad update install`) is refused at once outside every window or on a metered
+`mica update install`) is refused at once outside every window or on a metered
 link, then checks, fetches and installs through the same gates; it never
 reboots unless `--reboot` is given on the command line.
 

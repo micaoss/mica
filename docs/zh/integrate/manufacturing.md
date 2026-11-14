@@ -33,7 +33,7 @@ uefi-x64 和 mini-x64 上是 DMI 序列号。它在重新烧录后保持不变�
 
 ```sh
 bun src/cli.ts label --secret ap-secret DFN4-L34C-T8N   # 在 mica-build 中：code、ssid、psk、qr
-micad device-code                                        # 在设备上：设备码及其来源
+mica internal device-code                                # 在设备上：设备码及其来源
 ```
 
 产品密钥以 `/usr/share/mica/ap-secret` 装在该产品的每个镜像里，因此它随镜像一起

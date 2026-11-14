@@ -26,7 +26,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 | OS 回滚会不会把它带回去 | 会，与 OS 一起原子回滚 | 不会——它跨过回滚继续运行 |
 | 它的失败会不会让 OS 回滚 | 不会——失败的 unit 只被上报，不致命；只有健康闸**要求**的成员才会让 OS 回滚，而任何应用都不在那个集合里 | 不会——引擎按它的策略重启它，此外没有东西盯着它 |
 | 代码放在哪 | 只读 verity 根 | DATA 上的 `/mica/containers/storage` |
-| 运行中的设备上能否更改 | 不能 | 能——通过 `micad ctr`、API 或控制台修改 `container` 设置 |
+| 运行中的设备上能否更改 | 不能 | 能——通过 `mica container`、API 或控制台修改 `container` 设置 |
 | 是否需要打开容器开关 | 不需要 | 需要 |
 
 有两条后果值得读两遍。两条路径的失败本身都不会让 OS 回滚：健康闸只要求
@@ -73,13 +73,13 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 操作员需要的运行事实：
 
 - **一个开关。**设置树中的 `container.enabled`，默认 `false`。它为 false 时
-  引擎的守护进程停止，项目仍保持声明。通过 `micad ctr up`、认证 API 或控制台设置。
+  引擎的守护进程停止，项目仍保持声明。通过 `mica container up`、认证 API 或控制台设置。
 - **声明放哪。**DATA 上的 `/mica/config/container/<project>.yaml`。声明在重启和
   A/B 更新中保留，配置重置会删掉它。
 - **数据放哪。**项目的相对主机路径在它的项目目录里解析，命名卷落在
   `/mica/volumes/<project>/`；镜像在 DATA 上的 `/mica/containers`。绝不要用
   `/var`——它小、可丢弃、按设计会被清空（[../operate/storage.md](../operate/storage.md)）。
-- **日志**保存在内存里（`micad ctr logs <project>/<service>`），重启后丢失。
+- **日志**保存在内存里（`mica container logs <project>/<service>`），重启后丢失。
 - **没有自动镜像更新。**拉取新镜像并决定何时重启是安全的，属于集成商——理由与
   OS 更新采用 A/B 且刻意为之相同。
 
