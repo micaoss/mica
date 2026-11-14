@@ -22,15 +22,16 @@ the bus interface and every path are `mica-core:docs/mica-core.md`.
   in its own state store. A configuration reset clears the first and keeps the
   second ([recovery](recovery.md)).
 - **A reconciler per concern** converges the system to its subtree and reports
-  the applied state: hostname, network, SSH, Wi-Fi client and access point,
-  containers, MQTT, time, the web listener, Bluetooth.
+  the applied state: hostname, network, WireGuard, SSH, Wi-Fi client and
+  access point, containers, the user's services, MQTT, time, logging, the web
+  listener, LAN discovery (mDNS, SSDP), cloud administrators, Bluetooth.
 - **The product decides what exists.** `/usr/lib/mica/product.conf` in the
   signed root names the product, its features and its init. A feature the
   product does not carry has no reconciler, no bus member and no API route; its
   routes answer 404.
 - **Either init.** A product runs systemd or OpenRC, chosen when its root is
   composed; micad drives the same services through each. On OpenRC the network
-  reconciler supports DHCP and static addressing only.
+  reconciler refuses VLAN and bridge interfaces.
 - **Fail closed on the medium.** micad refuses to start when the DATA medium
   holding `/mica/config` is absent: a device that cannot read its
   configuration must not render another.
@@ -44,7 +45,7 @@ the bus interface and every path are `mica-core:docs/mica-core.md`.
 | Operators and automation | the HTTP API and the console: [API](api.md), [console](../integrate/console.md) |
 | Shell access | [access](access.md) |
 | Updates | micad drives the deployment client and adds the operator's policy: [updates](updates.md) |
-| Applications | containers declared in the settings tree, and native packages: [containers](../integrate/containers.md), [native applications](../integrate/native-applications.md) |
+| Applications | containers declared in the settings tree, the user's services, and native packages: [containers](../integrate/containers.md), [native applications](../integrate/native-applications.md) |
 | Application data | the local bus and MQTT carry application data only, never configuration or credentials: [bus](../integrate/bus.md) |
 | First boot | identity and credentials are minted on the device: [provisioning](../integrate/provisioning.md) |
 

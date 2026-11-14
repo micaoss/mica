@@ -44,6 +44,12 @@ Root owns userspace and an immutable `/var` skeleton. Selected persistent leaves
 bind DATA namespaces; volatile paths have explicit memory or disposable quotas.
 No unverified writable module directory or whole-tree writable `/var` is used.
 
+Driver extensions are mapped the same way, after the early init has sealed
+the owner keyring: their root hash signature chains to the kernel's builtin
+keyring or to an owner certificate, and roots, support images and core
+components are mapped before any owner certificate is loaded
+([security overview](overview.md)).
+
 This protects verified content under the authenticated running kernel. It does
 not encrypt DATA or confine a deliberately privileged administrator. See
 [read-only root](../reference/ro-root.md) and [writable storage](../reference/storage.md).
@@ -52,10 +58,10 @@ not encrypt DATA or confine a deliberately privileged administrator. See
 
 Three separate signing domains authenticate boot executables, immutable content
 and release metadata. Native installation verifies strict signed deployments and
-exact object lengths/digests before durable publication. Catalog expiry and
-monotonic acquisition policy apply to downloading new releases. An installed
-valid deployment remains bootable offline after catalog expiry or without
-network time.
+exact object lengths/digests before durable publication. Nothing in the
+catalog expires; the generation floor and the failed IDs keep a rejected or
+older release from returning. An installed valid deployment remains bootable
+offline and without network time.
 
 Installation, confirmation, GC and reset share a DATA transaction lock. Current,
 fallback and staged references protect their immutable objects; failed/partial
@@ -77,6 +83,10 @@ and firmware authenticates UKIs under enrolled Secure Boot anchors. Failure to
 persist an attempt refuses launch. On cx3576, fixed C firmware policy requires
 signed FIT configurations, disables persistent command import, arms its watchdog
 before eMMC access and flushes/read-backs the attempt update before FIT loading.
+qemu-armhf's loader checks only the FIT's hashes (`bootTrust` `none`: QEMU
+hands U-Boot its control device tree, so no key can be embedded in it); the
+device reports the boot as unverified and has no verified boot, while its
+content stays verity-signed and its metadata authenticated.
 
 The health gate alone confirms a deployment. Three failed trials exhaust without
 refill. Unusable shared storage and exhausted deployments reach explicit recovery
@@ -108,10 +118,16 @@ QEMU/sandbox environments. Board evidence remains conservative; physical cx3576
 qualification is pending. No I4 claim is made. The [BSP assurance page](../hardware/assurance.md)
 applies this distinction to board pages and release wording.
 
-## 6. Boundary (d): data confidentiality at rest — **[proposed]**
+## 6. Boundary (d): data confidentiality at rest — **[partial]**
 
-**Nothing on a Mica OS device is encrypted at rest today.** Stated as the current
-limit, explicitly:
+**Nothing on a released Mica OS product is encrypted at rest today.** The
+mechanism exists in the early init: a product whose signed boot policy turns
+it on gets a LUKS2 DATA, unlocked at boot by a TPM 2.0 key provider, with a
+recovery passphrase made on the device at the first format
+(`mica-core:docs/mica-core.md` section 6.5). It is off on every released
+product; the only image that turns it on is a test-channel uefi-x64 GCP image.
+An encrypted DATA has no factory reset yet. Stated as the current limit of the
+released products, explicitly:
 
 - DATA and its state/meta namespaces are plain ext4. Settings, the apid admin password
   hash, sshd host keys, authorized SSH keys, WiFi credentials, Bluetooth
@@ -146,8 +162,9 @@ signature and must not be confused with the signed deployment importer.
 
 Current boards declare no OS physical-presence recovery action. cx3576's loader
 button opens rockusb; it does not authorize credential recovery through apid.
-Those presence-gated requests remain refused. Captive/serial provisioning wizards
-and a device secure-erase primitive are not implemented. See
+Those presence-gated requests remain refused. Captive/serial provisioning wizards are not implemented. The factory reset
+makes DATA again ([recovery](../reference/recovery.md)); it is no certified
+wipe. See
 [provisioning](../integrate/provisioning.md) and [recovery](../reference/recovery.md).
 
 ## 8. Boundary (f): rootful applications and containers — **[implemented]**, with stated limits

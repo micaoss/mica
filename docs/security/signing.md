@@ -2,8 +2,8 @@
 
 The current contract authenticates three independent surfaces. An authenticated
 bootloader accepts the UKI/FIT; that kernel carries content and metadata anchors;
-`mica-init` authenticates deployment metadata and opens signed root/support
-mappings. No earlier update format or mutable command-line trust input is read.
+the early init (`mica-runkit`, in the signed initramfs) authenticates
+deployment metadata and opens signed root/support mappings. No earlier update format or mutable command-line trust input is read.
 
 ## Artifacts and signing owners
 
@@ -15,6 +15,7 @@ mappings. No earlier update format or mutable command-line trust input is read.
 | Core component | one per package (`micad`, `mica-apid-ui`): a verity image signed with the content key, its root's interface level and its needs | Early init, which composes it over the root |
 | Catalog | **unsigned**: the manifest and each release's document under the update root; trust is each release's signed descriptor | Acquisition client |
 | Firmware | board/arch/generation/artifact and fixed write destination | Separate firmware publisher, offline maintainer and native readback |
+| Driver extension | PKCS#7 signature over the image's root hash (and signed modules), by a key chaining to the kernel's builtin keyring or to an enrolled owner certificate; not Ed25519 | The kernel, when the early init maps it after sealing the owner keyring |
 
 The schema names and versions of these documents are
 `mica-core:docs/mica-core.md` section 6.2.
@@ -23,10 +24,9 @@ The schema names and versions of these documents are
 ordering that follows is the opposite of the producer-first instinct**
 **Every
 deserialised struct** in `mica-core:crates/mica-deploy/src/components.rs`
-carries `#[serde(deny_unknown_fields)]` — all nine that derive `Deserialize`,
-`BootArtifact` being exactly `format` and `artifact` and `KernelComponent`
-exactly its eight. The file's two other structs, `ContractError` and
-`DeploymentPaths`, derive `Debug` alone and are never parsed from a payload,
+carries `#[serde(deny_unknown_fields)]`. The file's other structs
+(`ContractError`, `RootFacts`, `DeploymentPaths`) do not derive `Deserialize`
+and are never parsed from a payload,
 so **the constraint has no exception and there is no permissive struct a field
 could be added to**: adding one does not degrade gracefully, **a device
 running today's `mica-deploy` refuses the whole record.** A new field therefore travels in this order, and only this one:
@@ -92,10 +92,9 @@ procedures. Replace the accepting kernel to remove a content key.
 4. Remove the old anchor in a subsequent accepting artifact and verify refusal
    of its signatures with a working fallback.
 
-The update server authenticates its persisted catalog and published deployment
-and firmware manifests at startup. It refuses metadata-key removal while
-published artifacts still depend on that key. Withdrawal and a newly signed
-catalog precede removal.
+Publication is static: the catalog is unsigned and no server checks key use.
+Before a metadata key leaves an accepting kernel, every release still offered
+under it is signed again or withdrawn.
 
 Firmware publication is separate from the normal OS catalog. Offline EFI
 maintenance saves the authenticated previous loader outside the ESP, writes and

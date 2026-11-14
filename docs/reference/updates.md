@@ -50,11 +50,28 @@ deployment and any subset of its objects, with no archive paths or links.
 An import may carry from 0 to the descriptor's object count: one signed
 deployment is published as `full`, `root` and `kernel` archives
 ([which archive applies](../operate/updates.md#2-which-archive-applies)).
-Every missing object must already be in the store. A deployment names no core
+Every missing object must already be in the store. An archive on a USB stick
+or SD card (at the medium's root or in `mica-updates/`) is listed by
+`GET /api/v1/update/media` and imported by `POST /api/v1/update/media/import`
+on a board whose kernel offers external media.
+A deployment names no core
 component; those come from the device's [core set](#core-sets). The descriptor's required signed
 `product` field must equal the device's product: the unquoted `PRODUCT=<name>`
 line of `/usr/lib/mica/product.conf`. A catalogue server is keyed by product.
 There is no minimum running release rule.
+
+**Delta transfer.** Before downloading a missing object, the client assembles
+what it can from chunks it already holds (its deployments' objects, the
+components of its core sets and earlier acquisitions), cut by a
+content-defined chunker both sides share, and fetches only the rest from
+`chunks/<digest>` by the object's transfer index (`<path>.index`,
+`MICAIDX1`). Nothing in that path is trusted: the assembled object is verified
+like a whole download, and any failure falls back to the whole object. An
+origin that publishes no index is still conforming. Objects are fetched
+smallest first, so a power cut most likely costs the last and largest. On a
+NAND board (`storage: ubi`, today qemu-armhf) the objects live in static UBI
+volumes instead of files on SYSTEM, with the same transactions, records,
+trials and delta transfer (`mica-core:docs/mica-core.md` section 6.6).
 
 Installation requires the authenticated running deployment A to be confirmed
 healthy. It verifies every new or reused object and checks destination capacity,
@@ -98,7 +115,11 @@ refills exhausted counters or falls back to unsigned content.
 `/confirm` and `/reject` also take a deployment ID. `/rollback` atomically checks
 that running content is confirmed, no candidate is pending and a usable fallback
 exists. It reports the target and the separate reboot action. Reasons are
-`candidate_pending`, `running_not_confirmed` and `no_usable_fallback`.
+`candidate_pending`, `running_not_confirmed` and `no_usable_fallback`. The
+caller names the `expectedTarget` it confirmed, and a rollback whose target
+has changed since is refused. micad records the target, and the first update
+state read after the next boot reports in `lastRollback`, for that boot only,
+whether the device booted it.
 
 Failed IDs and the generation floor enforce suppression across rollback and
 source changes. A corrected release needs a newly signed higher generation;
@@ -110,8 +131,30 @@ Public `/mica/config/updates.json` settings (`mica/update-config/v1`) overlay
 the factory defaults (`mica/meta/v1`) for source, mode, allowed network,
 schedule, reboot policy and the channel followed for each kind of set. They cannot inject
 metadata keys. Automatic checks/fetches use the same native acquisition path.
-The reboot gate retains maintenance-window, health, active-install and override
-checks; an override does not interrupt an installation.
+Maintenance windows are in UTC: each names its days (`mon` to `sun`), a window
+may run past midnight, and no two overlap. The reboot gate retains
+maintenance-window, health, active-install and override checks; an override
+does not interrupt an installation. "Install the newest release" (the console,
+`micad update install`) is refused at once outside every window or on a metered
+link, then checks, fetches and installs through the same gates; it never
+reboots unless `--reboot` is given on the command line.
+
+## Driver extensions
+
+A driver extension is out-of-tree kernel modules and firmware for exactly one
+kernel component, in a dm-verity image whose root hash carries a PKCS#7
+signature the kernel checks against its builtin keyring or an enrolled owner
+certificate ([security overview](../security/overview.md)). Installing or
+removing one is a change on trial with three boots, like a core set; nothing
+else is installed while it is on trial. A system update whose kernel differs
+from the running one is refused while an extension the running kernel uses has
+no build for the new kernel: the refusal and the `check`/`fetch` result name
+them as `waitsForExtension`. The owner then uploads a build for the new kernel,
+or decides that the new kernel runs without it, and either is paired with the
+deployment. The running kernel's builds stay for a rollback. The owner keyring
+is in the kernels of mini-x64, qemu-armhf and uefi-x64, not cx3576 or
+s905x5m (`KERNEL_FEATURES` `owner-keyring` in each board's `board.env`,
+e.g. `mica-build:boards/uefi-x64/board.env`).
 
 Storage reports one DATA capacity and the state/meta/bulk/disposable accounting.
 Garbage collection authenticates every retained descriptor before deleting
@@ -147,7 +190,7 @@ and the on-device state are `mica-core:docs/mica-core.md` section 6.2.
   `/etc` at boot.
 - **A set alone** is checked against the running root before it is fetched;
   one that does not select waits for a system update. It is not installed
-  while a deployment is on trial, and has three boots of its own: one that
+  while a deployment or a driver extension change is on trial, and has three boots of its own: one that
   reaches healthy becomes current, one that does not is dropped.
 - **A pair.** A system update on `general` takes the newest `general` set
   that selects on its new root, never older than its image's, and installs it

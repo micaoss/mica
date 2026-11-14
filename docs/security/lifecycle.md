@@ -29,6 +29,7 @@ What follows separates what exists from the procedure that is to be stood up.
 | **The admin password and API tokens** | the management API | set by whoever claims the device | through the API | none: see below |
 | **SSH authorized keys** | a root shell | enrolled by an administrator | edit the list | none: see below |
 | **The transient root password** | SSH and the local consoles until the next boot | set by an administrator | — | gone at the next boot by design |
+| **Owner certificates** | driver extensions only, on kernels with the owner keyring | enrolled by an administrator; each change is recorded on SYSTEM | add or remove; a change applies at the next boot | remove it; the factory reset removes them all |
 
 Rules that hold across the table:
 
@@ -38,7 +39,9 @@ Rules that hold across the table:
   takes public certificates; signing happens where the private key is held.
 - **Trust anchors are not settings.** No API, configuration document or update
   source can add or replace one; they change only with the signed kernel that
-  carries them.
+  carries them. Owner certificates are not anchors for the system: they are
+  loaded after the system images are mapped and authenticate driver
+  extensions alone.
 - **An installed deployment boots offline.** Nothing about booting waits for a
   network, a revocation list or a clock. There is no expiry, so withholding or
   retiring a release on a server does not revoke what a device already runs.

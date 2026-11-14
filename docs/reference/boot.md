@@ -36,7 +36,7 @@ Physical reset and Linux handoff remain bench acceptance requirements.
 
 ## Disk contract
 
-`mica-build:boards/cx3576/board.env` is authoritative.
+`mica-build:boards/cx3576/layout.tsv` is authoritative.
 
 | Partition | Range | Contents |
 |---|---|---|

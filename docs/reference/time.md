@@ -23,6 +23,16 @@
   HTTPS.
 - **A DATA-backed saved clock**: timesyncd owns `/var/lib/systemd/timesync`
   beneath the persistent whole-var bind.
+- **On an OpenRC root** the same two settings drive Base's `mica-ntpd`
+  instead (`ntp_servers` in `/var/lib/mica/time/ntpd.conf`, restarted on a
+  change), and the status reports whether it runs and the kernel's
+  synchronized bit (`mica-core:docs/mica-core.md` sections 3.4 and 3.8).
+  The timesyncd policy below is the systemd root's.
+- **The zone list**: `GET /api/v1/time/zones` lists the zones the device's
+  tzdata offers (`UTC`, then the installed zones of `zone1970.tab`, with the
+  tzdata release) and whether the stored `time.timezone` is installed; the
+  console's picker searches it by city, region, IANA name or current offset
+  and still writes the zone name as the setting.
 
 ## 2. UTC everywhere; the timezone is presentation
 

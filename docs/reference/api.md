@@ -1,7 +1,8 @@
 # Management API and UI hosting
 
 `apid` owns the listeners (plain HTTP on 8080 by default, HTTPS on 8443 once
-`access.web` turns it on, with a per-device or uploaded certificate),
+`access.web` turns it on, with a per-device or uploaded certificate; in the
+`local` web mode only the root-owned socket `/run/mica/apid.sock`),
 authentication, the JSON management API and static UI hosting. It is micad's
 executable under another name, in micad's core component. `micad` owns settings, reconciliation and system actions over D-Bus.
 The generated OpenAPI document (`mica-core:crates/mica-apid/openapi.json`) is the
@@ -10,7 +11,7 @@ it does not duplicate the route inventory.
 
 ## 1. Runtime boundary
 
-The appliance runs separate `micad` and `apid` systemd services. API handlers
+The appliance runs separate `micad` and `apid` services, on systemd or OpenRC. API handlers
 use the typed settings/bus client for management operations. MQTT carries only
 package-enrolled application item trees and cannot invoke this management API
 through the bus. See [management](management.md) and [bus](../integrate/bus.md).
@@ -105,8 +106,9 @@ instructions are in the [application guide](../integrate/applications.md).
 ## 6. Built-in recovery and verification
 
 `/_ui/` stays reachable even when a custom UI is missing, invalid or broken.
-Custom content cannot shadow that prefix or the API. The fallback's assets live
-inside the authenticated immutable root, independent of DATA UI selection.
+Custom content cannot shadow that prefix or the API. The built-in console's
+assets live in its verity-signed core component (`mica-apid-ui`), independent
+of DATA UI selection.
 
 Rust route and bus tests verify authentication, path isolation, validation and
 task behavior. The OpenAPI generation gate checks the committed schema against

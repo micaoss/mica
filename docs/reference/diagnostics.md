@@ -4,9 +4,9 @@
 > "what is this device", the network state as the stack actually sees it,
 > the board's temperature/watchdog/reset evidence, and a bounded, redacted,
 > offline support snapshot that can be exported through the API. Companion
-> to api.md, micad.md, storage.md and time.md. The Rust/API core ships; the
-> built-in UI pages and the operational procedures are a follow-on
-> (section 10).
+> to api.md, micad.md, storage.md and time.md. The API, the console's
+> System pages and `micad diag` ship; section 10 is the operating
+> procedure.
 
 ## 1. What ships, and what deliberately does not
 
@@ -32,6 +32,18 @@ against an allowlist schema, and kept in a bounded store under
 | `/api/v1/diagnostics/snapshots` | `POST` | collect, redact and publish one (201) |
 | `/api/v1/diagnostics/snapshots/{id}` | `GET` | export one as an attachment |
 | `/api/v1/diagnostics/snapshots/{id}` | `DELETE` | remove one (204) |
+
+On the device, root's `micad diag` collects the same snapshot into the same
+store and prints its path, whatever the web mode.
+
+Beside the snapshot, three smaller reads (`mica-core:docs/mica-core.md`
+section 4):
+
+| Route | Answer |
+|---|---|
+| `GET /api/v1/system/support-info` | the support summary: board, kernel, product and component versions, the running deployment, uptime, the zone and synchronization, the integrity items, DATA's readiness and space, the last update failure's code; picked by name, so no machine id, host name, addresses, codes, credentials, logs or settings. Served as `mica-support-<UTC time>.json`; the console copies or downloads it and the device sends it nowhere |
+| `GET /api/v1/system/integrity` | the integrity card: checks derived from the system information, the update state and the storage status, read again on each request |
+| `GET /api/v1/system/logs/{source}` | the newest 200 lines of one allowlisted service; `?boot=previous` reads the boot before this one where the log keeps it |
 
 **What does not ship, by decision.** No fleet upload: nothing here sends a
 snapshot anywhere; export is a download by an authenticated client. No
@@ -207,6 +219,7 @@ should treat the members it does know as advisory.
 | `system` | the whole section 2 surface |
 | `boot` | `deployment`, `uptime` (section 2), `reset` (section 4), `update` (micad's recorded live-state `update` entry: `boot` identities and verification, `state` with `current`, `fallback`, `candidate` and `failed`, `deployments[]` with remaining trials, `rollback`, `install`, `last_action` and the credential-free part of `lifecycle`) |
 | `journal` | the bounded excerpt: `scope` (`current boot`), `priority` (`warning`), `lineCount`, `sourceLines`, `sourceBytes`, `truncated`, `bounds`, `lines[]` |
+| `previousBoot` | the same excerpt of the boot before this one (`scope` `previous boot`), absent with the reason when the log keeps none |
 | `failures` | `units` (systemd's failed units: `count`, `truncated`, `entries[]` of `name`, `description`, `loadState`, `activeState`, `subState`), `tasks[]` (apply tasks whose outcome was not success), `health` (the live-state health map) |
 | `storage` | the `GET /api/v1/storage/status` document, verbatim (storage.md section 2) |
 | `time` | the `GET /api/v1/time/status` document, verbatim (time.md section 5) |
@@ -219,9 +232,12 @@ reason, and `collection.sections` says which way it failed; a member picked
 out of an absent section (say `boot.deployment` when `system` timed out) is absent
 and says `not collected: <the section's reason>`.
 
-The journal excerpt is this boot's, at warning and worse, newest first when
-the caps cut. journald runs `Storage=volatile` on the image, so there is no
-previous boot to ask for; the hostname column is left out of every line.
+The excerpts are this boot's and the previous boot's, at warning and worse,
+newest first when the caps cut, from `journalctl` on systemd or Base's
+`logread -b 0` / `-b -1` on OpenRC. The log is kept on DATA across boots by
+default; on a board whose log stays in RAM (UBI boards) or when
+`logging.persistent` is off, there is no previous boot and `previousBoot` says
+so. The hostname column is left out of every line.
 
 ## 6. The redaction schema
 
@@ -286,7 +302,7 @@ Bounded means enforced, and each bound has a test that drives it:
 | Whole collection deadline | 20 s | apid's collector; a source whose turn comes after the deadline is not asked and is recorded `timeout` |
 | One source's timeout | 6 s (never past the remaining deadline) | apid's collector, per section |
 | One collection at a time | — | a second `POST` while one runs is 409 `diagnostics_busy`, not queued |
-| Journal excerpt | 400 lines, 128 KiB, 1 KiB per line, warning and worse, this boot | micad's `diagnostics.rs`, newest lines kept; `journalctl` killed at 5 s |
+| Journal excerpt | 400 lines, 128 KiB, 1 KiB per line, warning and worse, per boot (this and the previous) | micad's `diagnostics.rs`, newest lines kept; `journalctl` killed at 5 s |
 | Failed units | 64 listed, the count always reported; 3 s | micad's `diagnostics.rs` |
 | Failed tasks | 32 | apid's collector |
 | Manifest rows | 4096 | micad's `system_info.rs` |
@@ -385,7 +401,7 @@ around the console.
 ### 10.2 Privacy and retention
 
 A snapshot contains the machine id, image and package versions, deployment/update
-state, warning-and-worse journal lines from this boot, failed services/tasks,
+state, warning-and-worse log lines from this boot and the previous one, failed services/tasks,
 storage and time status, IP addressing/routes/DNS, telemetry and collection
 results. IP addresses, gateways, DNS servers and the machine id are retained
 because support needs them to correlate the device and diagnose connectivity.

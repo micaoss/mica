@@ -12,8 +12,11 @@ by default plain HTTP on `0.0.0.0:8080` and no HTTPS, so it takes neither 80
 nor 443 from another service. With `httpsEnabled` it serves HTTPS on
 `httpsPort` (default 8443) with a per-device self-signed identity, which an
 operator may replace with an uploaded chain, and the HTTP port then only
-redirects; the session cookie is `Secure` exactly then. There is no other
-management protocol or port (`mica-core:docs/mica-core.md` section 4).
+redirects; the session cookie is `Secure` exactly then. That is the `network`
+mode; `local` closes the listeners and leaves only the root-owned socket
+`/run/mica/apid.sock`, and `off` stops apid. Root's `micad web` on the device
+reads and sets the mode in every mode. There is no other management protocol
+or port (`mica-core:docs/mica-core.md` section 4).
 
 **The API is the gate.** apid reserves `/api`, `/_ui`, `/healthz` and `/`
 before the custom-bundle fallback (`mica-core:crates/mica-apid/src/routes`). The static
@@ -91,7 +94,7 @@ signature, board, capacity, retained-fallback or reboot checks.
 ## 5. Security posture
 
 **Exposed today — [implemented].** apid on the LAN, on 8080 (and 8443 once HTTPS is on), is the entire inbound
-management surface. `/_ui` and custom UI assets are public static code on that
+management surface, in the default `network` mode; `local` and `off` remove it. `/_ui` and custom UI assets are public static code on that
 origin; every appliance operation and datum is protected by the `/api`
 credential boundary described in section 1.
 
