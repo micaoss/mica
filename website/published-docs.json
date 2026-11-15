@@ -76,6 +76,7 @@
         { "name": "architecture" },
         { "name": "contributing" },
         { "name": "api", "dir": "operate" },
+        { "name": "cli", "dir": "reference" },
         { "name": "http-api", "dir": "reference" },
         { "name": "errors", "dir": "reference" },
         { "name": "files", "dir": "reference" },

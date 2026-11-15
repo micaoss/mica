@@ -113,6 +113,7 @@ current product only; history is in Git.
   - `access.md` — how an operator reaches a device: the API, SSH, the consoles, and being locked out
   - `api.md` — management API (apid): web modes, listeners and HTTPS identity, URL space, the local socket, the error envelope and status codes, claim/login/tokens with a worked example, factory reset, owner certs and driver extensions, WireGuard peers, media, UI hosting
   - `boot.md` — boot and the runkit: the chain per board, deployments and trials, `mica-runkit init` stage by stage, core components, the owner keyring, health confirmation, what can go wrong, and the cx3576 signed FIT path
+  - `cli.md` — the `mica` command (core 0.0.8 and later): every verb and sub-verb, its channel, options, output, `--json`, exit codes, secret input and `mica internal`
   - `diagnostics.md` — system information, observed network state, board telemetry, the support summary, service logs and the bounded redacted support snapshot
   - `errors.md` — every API error code with its status and meaning, network rule codes, D-Bus error names, update refusals
   - `files.md` — the file map: where identity, boot state, configuration, rendered files, data and signed objects live, and what survives a reboot, update, rollback or reset

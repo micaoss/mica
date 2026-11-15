@@ -59,6 +59,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`products.md`](reference/products.md) — 已发布的产品：板卡、init、特性、容器引擎、SSH 服务器、镜像、各产品设置、板卡事实
   - [`kernel-features.md`](reference/kernel-features.md) — 每个内核特性打开了什么、哪块板卡有它
   - [`glossary.md`](reference/glossary.md) — 本文档中含义固定的词
+  - [`cli.md`](reference/cli.md) — `mica` 命令（core 0.0.8 及以后）：每个动词和子动词的通道、选项、输出、`--json`、退出码、秘密输入与 `mica internal`
   - [`access.md`](reference/access.md) — 访问：Web 模式、认领与登录、令牌、SSH 与串口控制台、mDNS/SSDP 发现、首次启动配置
   - [`time.md`](reference/time.md) — 时间：NTP 服务器、时区只用于展示、可信时钟底线、启动顺序与同步状态
   - [`wifi.md`](reference/wifi.md) — Wi-Fi 客户端与接入点：设置模型、两个调和器、单无线电冲突、凭据、镜像集成与已知局限
