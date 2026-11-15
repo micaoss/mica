@@ -41,6 +41,14 @@
       ]
     },
     {
+      "id": "concepts",
+      "docs": [
+        { "name": "boot", "dir": "reference" },
+        { "name": "storage", "dir": "reference" },
+        { "name": "updates", "dir": "reference" }
+      ]
+    },
+    {
       "id": "reference",
       "docs": [
         { "name": "architecture" },

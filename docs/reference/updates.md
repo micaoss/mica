@@ -1,4 +1,4 @@
-# File deployment lifecycle
+# The update engine
 
 Mica OS installs independently signed kernel/support and root components as
 deployments, and its core components as core sets. The native backend is
@@ -6,6 +6,41 @@ deployments, and its core components as core sets. The native backend is
 D-Bus, and `apid` exposes them behind the authenticated API/CSRF boundary.
 Formats are strict: only the current deployment, set, catalog and settings
 schemas are read.
+
+## How an update runs
+
+One update at a time, a core set or a system (a deployment). micad drives
+`mica-deploy` and adds the operator's policy; the console, the API and the
+device's command line all make the same requests.
+
+1. **Check.** The core line of the device's channel is read first: a newer
+   core set that selects on the running root is offered; one that does not is
+   shown as `update.lifecycle.waitsForSystem`. Then the product line: a
+   release of a higher generation for the device's board, architecture and
+   product is offered. A core line that cannot be read is reported
+   (`coreCheckFailed`) and never blocks the system update.
+2. **Fetch.** The objects are downloaded into `/mica/updates` on DATA,
+   smallest first, assembled from local chunks where the origin publishes
+   transfer indexes, and each verified against the signed digest and length.
+   A system update on `general` fetches the channel's latest core set for the
+   new root with it.
+3. **Install.** Only from a confirmed running deployment. The inactive
+   deployment is retired first, the new one is copied into SYSTEM with file
+   and directory syncs, and its boot entry becomes visible last, with three
+   attempts. A core set taken with it is installed as one **pair**.
+4. **Reboot.** Never on its own unless the policy is `auto` with
+   `rebootPolicy: window`; otherwise `reboot-required` waits for the operator
+   or the reboot gate.
+5. **Trial.** The loader decrements an attempt before each launch. The health
+   gate confirms the booted deployment (and its paired set), which becomes
+   `current`, and the previous one the `fallback`.
+6. **Fallback.** Three boots without confirmation exhaust the trial and the
+   loader boots the fallback with the set it ran. The failed id is remembered,
+   so the same release is never offered again; a fix needs a newer generation.
+
+`update.lifecycle` in the live state says what is on offer and staged
+(`kind` `deployment` or `set`), and a failed lifecycle names the step it ended
+in (`failedDuring`: `check`, `fetch` or `discard`).
 
 ## State and identity
 
@@ -138,6 +173,51 @@ does not interrupt an installation. "Install the newest release" (the console,
 `micad update install`) is refused at once outside every window or on a metered
 link, then checks, fetches and installs through the same gates; it never
 reboots unless `--reboot` is given on the command line.
+
+### The policy document
+
+The operator's `/mica/config/updates.json` (`mica/update-config/v1`) overlays
+the image's baked `mica/meta/v1` defaults. Every released product bakes
+`policy: check`, `checkIntervalMinutes: 1440` and the source
+`https://res.micaos.dev/update/`.
+
+| Key | Type | Default | Meaning |
+|---|---|---|---|
+| `policy` | `off`, `check`, `auto` | baked (`check`) | `off`: the device starts nothing; manual requests and imports still work. `check`: metadata checks on the interval, never a download. `auto`: checks, fetches and installs inside a maintenance window |
+| `checkIntervalMinutes` | integer | baked (1440) | minutes between automatic checks; `0` disables them |
+| `checkAt` | `HH:MM` UTC or `null` | none | anchors the check to a time of day instead of the daemon's start |
+| `channels` | `{kind: channel}` | baked, else `general` | the channel followed per kind of set, such as `{"core": "general"}` |
+| `rebootPolicy` | `manual`, `window` | `manual` | under `auto`: stop at `reboot-required`, or reboot inside the same window through the reboot gate |
+| `source.url` | update root ending in `/`, or `null` | baked | where the device checks; `null` returns to the baked address |
+| `source.maxBytes` | integer | 500000000 | the byte budget of one acquisition |
+| `network.mode` | `online`, `metered`, `offline` | `online` | `metered` allows checks but no downloads unless `meteredAllowsFetch`; `offline` allows only imports |
+| `network.meteredAllowsFetch` | boolean | `false` | permit downloads on a metered link |
+| `maintenance.windows` | list of `{days, start, end}` | none (any time) | when installs may run, in UTC; `days` from `mon` to `sun`, at least one; an `end` at or before `start` runs past midnight, an equal one is 24 hours; windows may touch but not overlap |
+| `rebootGate.blockingStatuses` | list of strings | `["blocking"]` | health statuses that close the safe-to-reboot gate |
+| `rebootGate.overrideMaxSeconds` | integer | 3600 | the longest reboot-gate override granted, never above one hour |
+
+`auto` requires at least one maintenance window: with none it is refused,
+because "any time" would install the moment a release lands. A document that
+names a trust key (a signing anchor) is refused. An example for a device that
+installs on weekend nights and reboots in the same window:
+
+```json
+{
+  "schema": "mica/update-config/v1",
+  "policy": "auto",
+  "checkIntervalMinutes": 360,
+  "rebootPolicy": "window",
+  "maintenance": {
+    "windows": [ { "days": ["sat", "sun"], "start": "01:00", "end": "04:00" } ]
+  },
+  "network": { "mode": "online" }
+}
+```
+
+An application that must not be interrupted reports
+`ReportHealth(component, "blocking", why)` on the bus and clears it when done;
+while any component reports a blocking status the reboot gate stays closed.
+The disk-pressure `degraded` status of `mica-health` does not block.
 
 ## Driver extensions
 

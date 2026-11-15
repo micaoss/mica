@@ -13,7 +13,7 @@ export interface PublishedDoc {
   sources: Partial<Record<LocaleCode, string>>
 }
 
-export type GroupId = 'start' | 'hardware' | 'operating' | 'trouble' | 'reference'
+export type GroupId = 'start' | 'hardware' | 'operating' | 'trouble' | 'concepts' | 'reference'
 
 export interface DocGroup {
   /** Key into `Copy['docs']['groups']` for the heading. */

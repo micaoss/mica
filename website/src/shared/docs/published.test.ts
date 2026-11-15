@@ -20,11 +20,11 @@ describe('the publishing allowlist', () => {
     }
   })
 
-  it('keeps the engineering record out of the site', () => {
+  it('keeps the content briefs and the design brief out of the site', () => {
     const sources = PUBLISHED_DOCS.flatMap(doc => Object.values(doc.sources))
     for (const source of sources) {
-      expect(source).not.toMatch(/^(?:reference|website)\//)
-      expect(source).not.toMatch(/^zh\/reference\//)
+      expect(source).not.toMatch(/^website\//)
+      expect(source).not.toBe('zh/reference/built-in-ui-design.md')
     }
   })
 
@@ -60,6 +60,7 @@ describe('the publishing allowlist', () => {
       'hardware',
       'operating',
       'trouble',
+      'concepts',
       'reference',
     ])
   })

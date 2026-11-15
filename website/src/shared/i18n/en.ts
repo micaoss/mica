@@ -178,6 +178,7 @@ export const en: typeof zh = {
       hardware: 'Supported hardware',
       operating: 'Operating',
       trouble: 'When something goes wrong',
+      concepts: 'How it works',
       reference: 'Reference',
       engineers: 'For engineers',
     },

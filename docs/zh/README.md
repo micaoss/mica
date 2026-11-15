@@ -41,7 +41,10 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`how-releases-work.md`](releases/how-releases-work.md) — release 如何切、携带什么、什么决定重建
   - [`support.md`](releases/support.md) — 支持层级与生命周期归属
 - [`contributing.md`](contributing.md) — 文档契约（读者、真实状态分类法、中英规则）
-- `reference/` — 应要求以中文维护的设计简报
+- `reference/` — 设备行为的契约（工作原理），以及应要求以中文维护的设计简报
+  - [`boot.md`](reference/boot.md) — 启动与 runkit：各板卡的启动链、部署与试运行、`mica-runkit init` 各阶段、core 组件、owner 密钥环、健康确认、故障与 cx3576 签名 FIT 路径
+  - [`storage.md`](reference/storage.md) — 各板卡分区、SYSTEM 与 DATA 的内容、可写路径、配额、用户挂载、外接介质、容量与故障
+  - [`updates.md`](reference/updates.md) — 更新引擎：一次更新如何进行、状态、获取与增量传输、安装、策略文档、重启闸门、驱动扩展与 core 集合
   - [`built-in-ui-design.md`](reference/built-in-ui-design.md) — 面向产品/UI 设计师的内置 UI 功能、页面、流程、状态与原型指南
 
 ## 与英文文档的关系

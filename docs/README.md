@@ -112,7 +112,7 @@ current product only; history is in Git.
 - `reference/` — the contracts of the product's behaviour on a device
   - `access.md` — how an operator reaches a device: the API, SSH, the consoles, and being locked out
   - `api.md` — management API: ownership, authentication, tasks and isolated UI hosting
-  - `boot.md` — U-Boot signed FIT selection, redundant native records and health confirmation
+  - `boot.md` — boot and the runkit: the chain per board, deployments and trials, `mica-runkit init` stage by stage, core components, the owner keyring, health confirmation, what can go wrong, and the cx3576 signed FIT path
   - `diagnostics.md` — system information, observed network state, board telemetry, the support summary, service logs and the bounded redacted support snapshot
   - `management.md` — management plane: what is fixed about micad and the API, and where each edge is specified
   - `manufacturing.md` — factory inputs, per-device result records, quarantine, RMA without identity cloning, debug and fuse policy
@@ -120,9 +120,9 @@ current product only; history is in Git.
   - `release-lock.md` — a pointer to the release lock's specification in `mica-build-tools`
   - `remote.md` — what reaches the device today, the NAT requirement, the designed fleet protocol and update control flow
   - `ro-root.md` — read-only root: squashfs and dm-verity packing and boot wiring
-  - `storage.md` — partitions and DATA namespaces: status surface, wear reporting, low-space policy, user mounts, external media and data-lifecycle decisions
+  - `storage.md` — partitions per board, what SYSTEM and DATA hold, the write map, quotas, DATA namespaces: status surface, wear reporting, low-space policy, user mounts, external media and data-lifecycle decisions
   - `time.md` — RTC, saved clock floor, NTP synchronization and timezone management
-  - `updates.md` — deployment lifecycle: state model, acquisition and delta transfer, installation, policy, reboot gate, core sets, driver extensions and fault evidence
+  - `updates.md` — the update engine: how an update runs, state model, acquisition and delta transfer, installation, the policy document, reboot gate, core sets, driver extensions and fault evidence
   - `wifi.md` — Wi-Fi station and access point as two micad reconcilers driving wpa_supplicant and hostapd
 - `releases/` — how releases are identified, made, distributed and supported
   - `how-releases-work.md` — how a release is cut in each repository, what it carries, and what decides a rebuild
