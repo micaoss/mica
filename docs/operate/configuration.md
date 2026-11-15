@@ -227,8 +227,8 @@ name, whole-document validation, applied once and recorded, over two offline
 transports ([../start/first-run.md](../start/first-run.md)). It is the repeatable path for
 configuring a device that has never had a network. On a product with WiFi
 and Bluetooth, a phone can also send the device its WiFi network over
-Bluetooth LE, and claim it while it is unclaimed ([first run](../start/first-run.md)
-section 5).
+Bluetooth LE; that claims nothing, and the claim is still made in setup
+([first run](../start/first-run.md) section 5).
 
 > status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:docs/ble-provisioning.md`
 
@@ -243,3 +243,61 @@ the documented `/mica/config/` files requires a stopped device; live changes use
 the authenticated API over an existing network.
 
 > status: unsupported
+
+## 6. A worked example: name a device and set its zone
+
+A claimed device, SSH on with your key ([SSH](ssh.md)), and an API token for
+the workstation half:
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"   # from: mica tokens create laptop
+```
+
+**On the device**, each verb waits until the setting is applied:
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica hostname boat-01
+# hostname is boat-01
+mica set time.timezone Europe/Athens
+# time.timezone is "Europe/Athens"
+mica set logging.persistent true
+# logging.persistent is true
+```
+
+**Over the API**, the same writes answer with a task to follow:
+
+```sh
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/hostname \
+  -H 'content-type: application/json' -d '"boat-01"'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/tasks/<id>
+# ... "phase":"applied", "outcome":"succeeded" ...
+```
+
+The body is the setting's JSON value: a string in quotes, `true` or `false`,
+a number, a list or an object. The update settings are not settings paths;
+they go to `POST /api/v1/update/config` ([updates](updates.md) section 3).
+
+### Check it worked
+
+```sh
+mica get hostname                    # boat-01
+mica get time.timezone               # Europe/Athens
+curl -s -H "$AUTH" $DEV/api/v1/settings/hostname     # "boat-01"
+ping -c 1 boat-01.local              # from the workstation, with mDNS on
+```
+
+Reboot and read them again: they are on DATA and stay, and so do they across
+an update. The machine clock stays UTC; the zone changes only how the console
+shows times (section 5.1).
+
+| What you see | Why, and what to do |
+|---|---|
+| `mica set: ...` and exit 1 | the value was refused; the message names the setting and nothing changed |
+| `mica set: <path> is not a setting mica set writes` | not one of the 14 paths; use the console or the API's own route |
+| exit 3 | `access.web.mode` is `off`, so the local socket is closed: `mica web local` |
+| a task with `"outcome":"failed"` | validated but not applied; the task names the reason, and `mica doctor` reads the rest |
+
+> status: shipped — evidence: `mica-core:crates/micad/src/cli/settings.rs`, `mica-core:crates/micad/src/cli.rs`, `mica-core:crates/mica-apid/openapi.json`

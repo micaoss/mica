@@ -117,3 +117,64 @@ DATA/SYSTEM 缺失、只读或损坏时，受影响的启动路径会停下来�
 行为。
 
 > status: board-dependent — evidence: `docs/reference/boot.md`
+
+## 6. 完整示例：把 `/srv` 放到第二块磁盘上
+
+一台已认领的 `uefi-x64.full` 设备（systemd），插着一块空的第二块 SATA 磁盘，
+SSH 已用你的密钥打开（[SSH](ssh.md)）。**建文件系统会抹掉整块磁盘**：设备名
+核对两遍。
+
+```sh
+ssh root@mica-a4e2e69e.local
+cat /proc/partitions                 # 新磁盘，例如 sdb，没有分区
+mkfs.ext4 -L srvdisk /dev/sdb        # 整块磁盘，此后按卷标称呼它
+cat > /tmp/srv.mount <<'UNIT'
+[Unit]
+Description=/srv on the second disk
+[Mount]
+What=/dev/disk/by-label/srvdisk
+Where=/srv
+Type=ext4
+Options=nosuid,nodev,noatime
+[Install]
+WantedBy=local-fs.target
+UNIT
+mica unit install /tmp/srv.mount --enable
+# srv.mount installed, enabled
+mica reboot
+```
+
+单元按路径命名（`/srv` 对应 `srv.mount`），用卷标而不是 `/dev/sdb` 指定磁盘，
+并保存在设备的设置里，所以更新后仍然存在；配置重置会把它和其他设置一起清掉
+（[恢复](recovery.md) 第 3 步）。DATA 自己的 `/srv` 里原有的内容被挂载遮住了，
+并没有丢：移除这个单元后就会回来。
+
+**在 OpenRC 上**（`mini-x64.basic`），同一块磁盘写成一行 fstab，而不是单元：
+
+```sh
+echo 'LABEL=srvdisk /srv ext4 nosuid,nodev,noatime 0 2' >> /usr/local/etc/fstab
+mica unit fstab check                # 接受时不输出任何内容，退出码 0
+mica reboot
+```
+
+### 检查是否生效
+
+重启后：
+
+```sh
+grep ' /srv ' /proc/mounts           # /dev/sdb /srv ext4 rw,nosuid,nodev,noatime ...
+df -h /srv                           # 第二块磁盘的大小，不是 DATA 的
+mica unit list                       # 服务里有 srv.mount（systemd）
+mica status                          # data 一行仍是 DATA 自己的大小
+```
+
+| 你看到的 | 原因与处理 |
+|---|---|
+| 安装时 `refused mountpoint <路径>` | `Where=` 不是用户可用的位置（第 3 节） |
+| `fstab check` 输出 `line 1: refused mountpoint <路径>` | OpenRC 上的同一规则；这一行不会被应用 |
+| 重启后 `/srv` 仍是 DATA 的 | 卷标写错或磁盘不在：`ls /dev/disk/by-label/`，再看 `journalctl -u srv.mount` |
+| OpenRC 启动时停在挂载上 | fstab 中失败的一行是致命的，除非写了 `nofail`；可能不在的磁盘要加上它 |
+
+在 systemd 上撤销：`mica unit remove srv.mount`，然后重启。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/unit_cli.rs`, `mica-system-base:payload/usr/lib/mica/mica-mountpoint`, `mica-system-base:debs/mica-system/control`

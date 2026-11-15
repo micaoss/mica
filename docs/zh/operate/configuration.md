@@ -178,8 +178,8 @@ mini-x64 与 qemu-armhf 没有无线电。
 之前就从介质上被应用：固定文件名的一个 TOML 文件、整份文档一起校验、应用一次
 并记录下来，走两条离线传输（[../start/first-run.md](../start/first-run.md)）。它就是为一台从未
 联过网的设备做配置的可重复路径。在带 WiFi 和蓝牙的产品上，手机还可以通过低功耗
-蓝牙把 WiFi 网络发给设备，并在设备未认领时认领它（[首次启动](../start/first-run.md)
-第 5 节）。
+蓝牙把 WiFi 网络发给设备；这不会认领设备，认领仍要在 setup 中完成
+（[首次启动](../start/first-run.md) 第 5 节）。
 
 > status: shipped — evidence: `docs/integrate/provisioning.md`, `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:docs/ble-provisioning.md`
 
@@ -192,3 +192,60 @@ mini-x64 与 qemu-armhf 没有无线电。
 `/mica/config/` 文件需要先停止设备；在线修改通过既有网络上的认证 API 完成。
 
 > status: unsupported
+
+## 6. 完整示例：给设备起名并设置时区
+
+一台已认领的设备，SSH 已用你的密钥打开（[SSH](ssh.md)），工作站那一半还要
+一个 API 令牌：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"   # 来自：mica tokens create laptop
+```
+
+**在设备上**，每个命令都会等到设置生效：
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica hostname boat-01
+# hostname is boat-01
+mica set time.timezone Europe/Athens
+# time.timezone is "Europe/Athens"
+mica set logging.persistent true
+# logging.persistent is true
+```
+
+**通过 API**，同样的写操作会返回一个任务供跟踪：
+
+```sh
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/hostname \
+  -H 'content-type: application/json' -d '"boat-01"'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/tasks/<id>
+# ... "phase":"applied", "outcome":"succeeded" ...
+```
+
+请求体是该设置的 JSON 值：带引号的字符串、`true` 或 `false`、数字、列表或
+对象。更新设置不是设置路径，要发到 `POST /api/v1/update/config`
+（[更新](updates.md) 第 3 节）。
+
+### 检查是否生效
+
+```sh
+mica get hostname                    # boat-01
+mica get time.timezone               # Europe/Athens
+curl -s -H "$AUTH" $DEV/api/v1/settings/hostname     # "boat-01"
+ping -c 1 boat-01.local              # 在工作站上，mDNS 开启时
+```
+
+重启后再读一遍：它们在 DATA 上，会保留，更新后也一样。机器时钟始终是 UTC；
+时区只改变控制台显示时间的方式（第 5.1 节）。
+
+| 你看到的 | 原因与处理 |
+|---|---|
+| `mica set: ...`，退出码 1 | 值被拒绝；消息会写明是哪个设置，什么都没有改 |
+| `mica set: <路径> is not a setting mica set writes` | 不在那 14 个路径里；用控制台或 API 自己的路由 |
+| 退出码 3 | `access.web.mode` 是 `off`，本地套接字关闭了：`mica web local` |
+| 任务 `"outcome":"failed"` | 校验通过但没有应用；任务会写明原因，其余用 `mica doctor` 查看 |
+
+> status: shipped — evidence: `mica-core:crates/micad/src/cli/settings.rs`, `mica-core:crates/micad/src/cli.rs`, `mica-core:crates/mica-apid/openapi.json`

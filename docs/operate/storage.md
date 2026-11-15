@@ -140,3 +140,66 @@ Physical eMMC durability and board recovery require the cx3576 bench tests;
 QEMU and offline checks establish only their stated software behavior.
 
 > status: board-dependent — evidence: `docs/reference/boot.md`
+
+## 6. A worked example: `/srv` on a second disk
+
+A claimed `uefi-x64.full` device (systemd) with a second, empty SATA disk,
+and SSH on with your key ([SSH](ssh.md)). **Making the filesystem erases the
+disk**: check the name twice.
+
+```sh
+ssh root@mica-a4e2e69e.local
+cat /proc/partitions                 # the new disk, e.g. sdb, with no partitions
+mkfs.ext4 -L srvdisk /dev/sdb        # the whole disk, named by its label from now on
+cat > /tmp/srv.mount <<'UNIT'
+[Unit]
+Description=/srv on the second disk
+[Mount]
+What=/dev/disk/by-label/srvdisk
+Where=/srv
+Type=ext4
+Options=nosuid,nodev,noatime
+[Install]
+WantedBy=local-fs.target
+UNIT
+mica unit install /tmp/srv.mount --enable
+# srv.mount installed, enabled
+mica reboot
+```
+
+The unit is named after its path (`srv.mount` for `/srv`), names the disk by
+label rather than `/dev/sdb`, and is kept in the device's settings, so it
+survives updates; a configuration reset removes it with the other settings
+([recovery](recovery.md) step 3). Whatever DATA's own `/srv` held is hidden under the mount,
+not lost: it is back when the unit is removed.
+
+**On OpenRC** (`mini-x64.basic`) the same disk is one fstab line instead of a
+unit:
+
+```sh
+echo 'LABEL=srvdisk /srv ext4 nosuid,nodev,noatime 0 2' >> /usr/local/etc/fstab
+mica unit fstab check                # prints nothing and exits 0 when accepted
+mica reboot
+```
+
+### Check it worked
+
+After the reboot:
+
+```sh
+grep ' /srv ' /proc/mounts           # /dev/sdb /srv ext4 rw,nosuid,nodev,noatime ...
+df -h /srv                           # the second disk's size, not DATA's
+mica unit list                       # srv.mount among the services (systemd)
+mica status                          # the data line is still DATA's own size
+```
+
+| What you see | Why, and what to do |
+|---|---|
+| `refused mountpoint <path>` at install | `Where=` is not one of the user's places (section 3) |
+| `line 1: refused mountpoint <path>` from `fstab check` | the same rule on OpenRC; the line is not applied |
+| `/srv` is still DATA's after the reboot | the label is wrong or the disk is absent: `ls /dev/disk/by-label/`, then `journalctl -u srv.mount` |
+| OpenRC stops at the mount at boot | a failing fstab line is fatal unless it says `nofail`; add it for a disk that may be absent |
+
+To undo it on systemd: `mica unit remove srv.mount`, then reboot.
+
+> status: shipped — evidence: `mica-core:crates/micad/src/unit_cli.rs`, `mica-system-base:payload/usr/lib/mica/mica-mountpoint`, `mica-system-base:debs/mica-system/control`
