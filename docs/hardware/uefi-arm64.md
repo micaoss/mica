@@ -96,6 +96,13 @@ whole-device write, on a machine whose firmware is UEFI with ACPI and either
 trusts the release's boot certificate or has Secure Boot off. No physical
 arm64 machine has been verified.
 
+**Check it worked.** The PL011 console ends the first boot with
+`mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)`,
+and `curl http://127.0.0.1:8080/api/v1/session` answers
+`{"state":"setup",...}`. After the claim, `mica status` as root shows the
+product and the running deployment
+([flashing](../start/flashing.md#check-it-worked)).
+
 > status: unsupported
 
 ## First boot

@@ -105,6 +105,22 @@ device that is already claimed. A device with no
 network at all is claimed by a `mica-provisioning.toml` document instead; see
 [first run](first-run.md) and [configuration](../operate/configuration.md).
 
+**Check it worked.** Make the claim above with a cookie jar instead, so the
+session it answers with is kept, and read the device back with it:
+
+```sh
+curl -s -c jar -X POST -H 'content-type: application/json' \
+  -d '{"password":"at-least-eight-bytes"}' http://127.0.0.1:8080/api/v1/setup
+curl -s -b jar http://127.0.0.1:8080/api/v1/system/info | jq .      # board, image, deployment
+curl -s http://127.0.0.1:8080/api/v1/session                       # {"state":"unauthenticated",...}: claimed
+```
+
+The last line, without the cookie, now says `unauthenticated` instead of
+`setup`: the device is claimed and every route wants the password or a token.
+In the console, the first page has become the login page. A token for
+scripts is made on the console's Access page ([SSH](../operate/ssh.md) and
+the other operating guides use one).
+
 > status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `mica-core:crates/mica-apid`, `docs/integrate/provisioning.md`
 
 ## 6. Next steps

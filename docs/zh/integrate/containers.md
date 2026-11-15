@@ -43,7 +43,7 @@ cat >compose.yaml <<'YAML'
 services:
   web:
     image: docker.io/library/nginx:1.27@sha256:<digest>
-    ports: ["8080:80"]
+    ports: ["8081:80"]
     volumes: ["./html:/usr/share/nginx/html:ro"]
     restart: unless-stopped
 YAML
@@ -163,7 +163,101 @@ API 是 `GET /api/v1/containers` 和 `/api/v1/container-projects/{project}`（`P
 
 > status: shipped — evidence: `docs/reference/recovery.md`, `docs/reference/storage.md`, `mica-podman:README.md`, `mica-docker:README.md`
 
-## 7. 局限
+## 7. podman 上的完整示例
+
+`uefi-x64.full`、`s905x5m.sd-full` 或 `s905x5m.emmc-full`，在设备上以 root 操作。一个从 `/srv`（任何重置层级都不清除）
+发布网页的 Web 服务器：
+
+```sh
+mica container on                      # 打开 container.enabled 并等待
+mkdir -p /srv/web/html && cd /srv/web
+echo '<h1>hello from mica</h1>' > html/index.html
+cat > compose.yaml <<'YAML'
+name: web
+services:
+  nginx:
+    image: docker.io/library/nginx:1.27
+    ports: ["8081:80"]
+    volumes: ["./html:/usr/share/nginx/html:ro"]
+    restart: unless-stopped
+YAML
+mica container check                   # 有问题时列出问题；被拒绝时退出码为 1
+mica container up                      # 以 /srv/web 为目录保存项目 "web"
+mica container list                    # web  nginx  web-nginx-1  running ...
+```
+
+需要长期保留的东西要按摘要固定镜像（`nginx:1.27@sha256:...`），这样标签更新不会改变运行的内容。用 8081 而不是
+8080：设备的控制台占用 8080。
+
+**检查是否生效：**
+
+```sh
+curl -s http://mica-a4e2e69e.local:8081/      # 在工作站上：<h1>hello from mica</h1>
+mica container logs web/nginx --tail 5
+mica reboot                                   # 启动后：
+mica container list                           # web-nginx-1 又在运行
+```
+
+**修改：**编辑 `compose.yaml`，再 `mica container up`；变化的服务会重建容器。**暂停一段时间：**
+`mica container stop web`（监督进程重启后仍保持停止，下次启动时再启动）。**删除：**`mica container down`；容器和
+网络被删除，`/srv/web` 保留。
+
+通过 API 也一样，在工作站上，Compose 文件就在手边：
+
+```sh
+jq -n --rawfile text compose.yaml '{compose: $text}' |
+  curl -s -H "$AUTH" -X POST $DEV/api/v1/container-projects/web/check \
+    -H 'content-type: application/json' -d @-          # {"ok":true,...} 或问题列表
+jq -n --rawfile text compose.yaml '{compose: $text}' |
+  curl -s -H "$AUTH" -X PUT $DEV/api/v1/container-projects/web \
+    -H 'content-type: application/json' -d @-          # 202 {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/containers              # 每个服务的容器、阶段、健康状态
+```
+
+通过 API 声明的项目没有自己的项目目录：它的相对路径（`./html`）在 `/mica/volumes/web/` 中解析，所以把网页放在那里。
+其他项目路由见 [HTTP API](../reference/http-api.md)。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/ctr_cli.rs`, `mica-podman:README.md`
+
+## 8. Docker 上的完整示例
+
+`cx3576.full`、`uefi-x64.docker` 和 `uefi-x64.gcp` 运行 Docker。不向 micad 声明任何东西；你使用 `docker compose`，
+micad 只负责开关 dockerd 并显示它的容器。
+
+```sh
+mica container on                      # 启动 docker.service 并等待 dockerd
+mkdir -p /srv/web/html && cd /srv/web
+echo '<h1>hello from mica</h1>' > html/index.html
+cat > compose.yaml <<'YAML'
+services:
+  nginx:
+    image: docker.io/library/nginx:1.27
+    ports: ["8081:80"]
+    volumes: ["./html:/usr/share/nginx/html:ro"]
+    restart: unless-stopped
+YAML
+docker compose up -d
+docker compose ps
+mica container list                    # 同一个容器，项目 web、服务 nginx
+```
+
+让它在重启后回来的是 `restart: unless-stopped`（或 `always`）：dockerd 在启动时再次启动，并应用每个容器的重启策略，
+没有重启策略的容器不会回来。在这些产品上，`mica container up`、`down` 和 `check` 会被拒绝，并提示使用 `docker compose`。
+
+**检查是否生效：**
+
+```sh
+curl -s http://mica-a4e2e69e.local:8081/      # <h1>hello from mica</h1>
+mica reboot                                   # 然后：
+docker compose -f /srv/web/compose.yaml ps    # 又在运行
+```
+
+**删除：**在 `/srv/web` 中 `docker compose down`。镜像和容器在 DATA 上的 `/mica/containers/docker`；要让它们不占用
+DATA，在那里挂载一块磁盘（[存储](../operate/storage.md)第 3 节）。
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`
+
+## 9. 局限
 
 - 没有跨设备的编排，没有超出单台设备项目网络的服务发现，没有项目的滚动更新。
 - 在 podman 上，特权容器，或项目网络、主机网络、none 之外的网络，都不是项目能够表达的。

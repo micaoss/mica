@@ -111,6 +111,12 @@ Secure Boot。关掉它不削弱根——签名的内核命令行里仍带
 `dm_verity.require_signatures=1`——但固件必须具备 Secure Boot 功能：固件没有
 `SecureBoot` 变量时，启动会被拒绝。
 
+**检查是否生效。**在 QEMU 下，控制台以
+`mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)` 结束首次启动，
+`curl http://127.0.0.1:8080/api/v1/session` 返回 `{"state":"setup",...}`：一台全新的、未认领的设备。在实体机器上，
+在 `ttyS0`（115200 波特）上看同样的输出，并访问 `http://mica-xxxxxxxx.local:8080`。认领后以 root 运行 `mica status`，
+显示产品和运行中的部署（[刷写](../start/flashing.md#检查是否生效)）。
+
 > status: unsupported
 
 ## 首次启动

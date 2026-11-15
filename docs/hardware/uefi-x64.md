@@ -130,6 +130,14 @@ off does not weaken the root — the signed kernel command line still carries
 `dm_verity.require_signatures=1` — but the firmware must have Secure Boot at
 all: a firmware with no `SecureBoot` variable is refused at boot.
 
+**Check it worked.** Under QEMU the console ends the first boot with
+`mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)`,
+and `curl http://127.0.0.1:8080/api/v1/session` answers
+`{"state":"setup",...}`: a fresh, unclaimed device. On a machine, read the
+same on `ttyS0` at 115200 baud and ask `http://mica-xxxxxxxx.local:8080`.
+After the claim, `mica status` as root shows the product and the running
+deployment ([flashing](../start/flashing.md#check-it-worked)).
+
 > status: unsupported
 
 ## First boot

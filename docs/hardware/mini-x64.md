@@ -81,6 +81,14 @@ read back to compare ([flashing](../start/flashing.md) section 3). The medium
 is written from another system; booting this image from a USB stick is
 unverified.
 
+**Check it worked.** `mini-x64.basic` runs OpenRC: the console (`ttyS0`,
+115200 baud; the terminal under QEMU) ends the first boot with a login prompt
+naming the host name and the console's address, and
+`curl http://127.0.0.1:8080/api/v1/session` (under QEMU) answers
+`{"state":"setup",...}`. After the claim, `mica status` as root shows the
+product and the running deployment
+([flashing](../start/flashing.md#check-it-worked)).
+
 > status: unsupported
 
 ## First boot

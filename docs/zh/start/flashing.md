@@ -462,6 +462,43 @@ USB Burning Tool，而不是启动；上电前松开恢复键则正常启动。
 
 > status: unsupported
 
+### 检查是否生效
+
+任何板卡写入后：
+
+1. **控制台。**接上板卡的串口控制台并上电：
+
+   | 板卡 | 控制台 |
+   |---|---|
+   | `uefi-x64`、`mini-x64` | `ttyS0`，115200 波特 |
+   | `cx3576` | `ttyFIQ0`，1500000 波特 |
+   | `s905x5m` | `ttyS0`，921600 波特 |
+   | `qemu-armhf`，以及 QEMU 下的 UEFI 板卡 | QEMU 终端 |
+
+   在 systemd 产品上，首次启动以
+   `mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)` 结束；之后每个产品都显示带主机名
+   （`mica-xxxxxxxx`）和控制台地址的登录提示。
+2. **网络。**在同一网络的电脑上：
+
+   ```sh
+   curl http://mica-xxxxxxxx.local:8080/api/v1/session    # {"state":"setup",...}
+   ```
+
+   `setup` 表示一台全新的、未认领的设备：写入和首次启动都成功了。接着认领它（[首次启动](first-run.md)）。
+3. **系统。**认领后以 root：
+
+   ```sh
+   mica status            # 产品、运行中的部署、DATA
+   mica-deploy booted     # 运行中的 deployment id，JSON 格式
+   ```
+
+   该 deployment id 就是发布的 `mica-build.lock` 在其 `product` 行中写明的那个（见上文）。
+
+写入后控制台上什么都不显示的板卡没有启动该镜像：检查写入（`cx3576` 上的回读、磁盘上的 `sfdisk -d`），UEFI 板卡还要
+检查 Secure Boot（第 3 节）。
+
+> status: board-dependent — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/start/first-run.md`, `mica-core:crates/mica-deploy`
+
 ## 8. 刷写不负责的事
 
 - **只有一种厂商格式。** 一个发布携带它的镜像和更新归档；唯一的厂商格式是 Amlogic USB

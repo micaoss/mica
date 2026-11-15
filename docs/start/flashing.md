@@ -526,6 +526,47 @@ been run on hardware. The device-side half of this section is read out of
 
 > status: unsupported
 
+### Check it worked
+
+After any write, on any board:
+
+1. **The console.** Attach the board's serial console and power it on:
+
+   | Board | Console |
+   |---|---|
+   | `uefi-x64`, `mini-x64` | `ttyS0`, 115200 baud |
+   | `cx3576` | `ttyFIQ0`, 1500000 baud |
+   | `s905x5m` | `ttyS0`, 921600 baud |
+   | `qemu-armhf`, and the UEFI boards under QEMU | the QEMU terminal |
+
+   On a systemd product the first boot ends with
+   `mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)`;
+   every product then shows a login prompt with the host name
+   (`mica-xxxxxxxx`) and the console's address.
+2. **The network.** From a computer on the same network:
+
+   ```sh
+   curl http://mica-xxxxxxxx.local:8080/api/v1/session    # {"state":"setup",...}
+   ```
+
+   `setup` means a fresh, unclaimed device: the write and the first boot
+   worked. Claim it next ([first run](first-run.md)).
+3. **The system.** After the claim, as root:
+
+   ```sh
+   mica status            # product, running deployment, DATA
+   mica-deploy booted     # the running deployment id, as JSON
+   ```
+
+   The deployment id is the one the release's `mica-build.lock` names in its
+   `product` row (above).
+
+A board that shows nothing on its console after the write did not start the
+image: check the write (the read-back on `cx3576`, `sfdisk -d` on a disk), and
+for the UEFI boards Secure Boot (section 3).
+
+> status: board-dependent — evidence: `mica-build:tests/suites/lifecycle-uefi/boot.sh`, `docs/start/first-run.md`, `mica-core:crates/mica-deploy`
+
 ## 8. What flashing does not cover
 
 - **One vendor format.** A release carries its images and its update

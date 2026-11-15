@@ -78,6 +78,12 @@ The machine options and the flash split are those of the board's boot test,
 which boots U-Boot and the kernel with a test initramfs; no suite has booted
 the product image this way.
 
+**Check it worked.** The QEMU terminal shows U-Boot, then the kernel,
+then a login prompt with the host name. The line above gives the machine no
+network; add `-netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device
+virtio-net-device,netdev=net0` to reach `http://127.0.0.1:8080`
+([flashing](../start/flashing.md#check-it-worked)).
+
 > status: unsupported
 
 ## First boot

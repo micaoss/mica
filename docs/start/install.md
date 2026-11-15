@@ -73,3 +73,47 @@ credential and no silent refill of the trial counter. See
 [recovery](../operate/recovery.md) and [storage](../operate/storage.md).
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy`, `mica-system-base:debs/mica-system`, `docs/reference/recovery.md`
+
+## 5. A worked example: `uefi-x64.full` onto a USB disk
+
+The whole order for one product, from the release to a claimed device. The
+write itself is the step this project has not run on a physical machine
+([flashing](flashing.md) section 3).
+
+```sh
+# 1. The image and its digest, from the release catalogue
+PRODUCT=uefi-x64.full
+curl -fsS https://res.micaos.dev/update/products/v1/uefi-x64.json -o products.json
+BASE=$(jq -r .baseUrl products.json)
+jq -r --arg p "$PRODUCT" '.products[] | select(.product == $p) | .latest.files[]
+      | select(.kind == "image" and .form == "disk") | "\(.path) \(.sha256)"' products.json |
+while read -r path sha256; do
+  curl -fsSLO "$BASE$path"
+  echo "$sha256  ${path##*/}" | sha256sum -c -        # expect: OK
+done
+
+# 2. The target, identified before and after plugging it in
+lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS
+
+# 3. The whole device, never a partition
+gzip -dc mica-uefi-x64.full-*.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+sync
+sudo sfdisk -d /dev/sdX | grep start=                 # expect 2048, 1050624, 3147776
+```
+
+4. Enrol the release's boot certificate in the machine's firmware, or switch
+   Secure Boot off (section 2).
+5. Boot the machine from the disk, with a network cable on `eth0`.
+6. Claim it at `http://mica-xxxxxxxx.local:8080` ([first run](first-run.md)).
+
+**Check it worked:**
+
+- On the serial console (`ttyS0`, 115200 baud), the boot ends with
+  `mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)`.
+- Before the claim, `curl http://mica-xxxxxxxx.local:8080/api/v1/session`
+  answers `{"state":"setup",...}`; after it, `unauthenticated`.
+- After the claim, as root ([SSH](../operate/ssh.md)), `mica status` shows the
+  product, the running deployment and DATA grown to the disk.
+
+> status: board-dependent — evidence: `docs/start/flashing.md`, `docs/start/download.md`, `mica-build:boards/uefi-x64/board.env`
+

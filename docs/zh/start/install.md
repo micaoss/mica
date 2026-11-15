@@ -59,3 +59,42 @@ sha256 以及解压后镜像的 sha256：[获取发布版](download.md)。自己
 [存储](../operate/storage.md)。
 
 > status: shipped — evidence: `mica-core:crates/mica-deploy`, `mica-system-base:debs/mica-system`, `docs/reference/recovery.md`
+
+## 5. 完整示例：把 `uefi-x64.full` 写到 USB 磁盘
+
+一个产品从发布到已认领设备的完整顺序。写入这一步本项目还没有在物理机器上执行过（[刷写](flashing.md)第 3 节）。
+
+```sh
+# 1. 从发布目录获取镜像及其摘要
+PRODUCT=uefi-x64.full
+curl -fsS https://res.micaos.dev/update/products/v1/uefi-x64.json -o products.json
+BASE=$(jq -r .baseUrl products.json)
+jq -r --arg p "$PRODUCT" '.products[] | select(.product == $p) | .latest.files[]
+      | select(.kind == "image" and .form == "disk") | "\(.path) \(.sha256)"' products.json |
+while read -r path sha256; do
+  curl -fsSLO "$BASE$path"
+  echo "$sha256  ${path##*/}" | sha256sum -c -        # 应输出：OK
+done
+
+# 2. 在插入前后识别目标设备
+lsblk -o NAME,SIZE,TYPE,TRAN,MODEL,MOUNTPOINTS
+
+# 3. 写整个设备，不要写分区
+gzip -dc mica-uefi-x64.full-*.img.gz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+sync
+sudo sfdisk -d /dev/sdX | grep start=                 # 应为 2048、1050624、3147776
+```
+
+4. 把发布的启动证书登记到机器固件中，或关闭 Secure Boot（第 2 节）。
+5. 从该磁盘启动机器，`eth0` 接上网线。
+6. 在 `http://mica-xxxxxxxx.local:8080` 认领它（[首次启动](first-run.md)）。
+
+**检查是否生效：**
+
+- 在串口控制台（`ttyS0`，115200 波特）上，启动以
+  `mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)` 结束。
+- 认领前，`curl http://mica-xxxxxxxx.local:8080/api/v1/session` 返回 `{"state":"setup",...}`；认领后为 `unauthenticated`。
+- 认领后以 root（[SSH](../operate/ssh.md)）运行 `mica status`，显示产品、运行中的部署，以及已扩展到整个磁盘的 DATA。
+
+> status: board-dependent — evidence: `docs/start/flashing.md`, `docs/start/download.md`, `mica-build:boards/uefi-x64/board.env`
+

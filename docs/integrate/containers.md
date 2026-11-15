@@ -57,7 +57,7 @@ cat >compose.yaml <<'YAML'
 services:
   web:
     image: docker.io/library/nginx:1.27@sha256:<digest>
-    ports: ["8080:80"]
+    ports: ["8081:80"]
     volumes: ["./html:/usr/share/nginx/html:ro"]
     restart: unless-stopped
 YAML
@@ -223,7 +223,111 @@ on its set is what the engine runs.
 
 > status: shipped — evidence: `docs/reference/recovery.md`, `docs/reference/storage.md`, `mica-podman:README.md`, `mica-docker:README.md`
 
-## 7. Limits
+## 7. End to end on podman
+
+`uefi-x64.full`, `s905x5m.sd-full` or `s905x5m.emmc-full`, as root on the
+device. A web server publishing a page from `/srv`, which no reset tier
+clears:
+
+```sh
+mica container on                      # switches container.enabled on and waits
+mkdir -p /srv/web/html && cd /srv/web
+echo '<h1>hello from mica</h1>' > html/index.html
+cat > compose.yaml <<'YAML'
+name: web
+services:
+  nginx:
+    image: docker.io/library/nginx:1.27
+    ports: ["8081:80"]
+    volumes: ["./html:/usr/share/nginx/html:ro"]
+    restart: unless-stopped
+YAML
+mica container check                   # the problems, if any; exit 1 when refused
+mica container up                      # stores project "web" with /srv/web as its directory
+mica container list                    # web  nginx  web-nginx-1  running ...
+```
+
+Pin the image by digest (`nginx:1.27@sha256:...`) for anything you keep, so
+an update of the tag does not change what runs. Port 8081, not 8080: the
+device's console holds 8080.
+
+**Check it worked:**
+
+```sh
+curl -s http://mica-a4e2e69e.local:8081/      # from the workstation: <h1>hello from mica</h1>
+mica container logs web/nginx --tail 5
+mica reboot                                   # then, after the boot:
+mica container list                           # web-nginx-1 running again
+```
+
+**Change it:** edit `compose.yaml`, `mica container up` again; a changed
+service's container is recreated. **Stop it for a while:**
+`mica container stop web` (it stays stopped across a supervisor restart,
+and starts again at the next boot). **Remove it:** `mica container down`;
+the container and its network go, `/srv/web` stays.
+
+The same through the API, from the workstation, with the Compose file
+beside you:
+
+```sh
+jq -n --rawfile text compose.yaml '{compose: $text}' |
+  curl -s -H "$AUTH" -X POST $DEV/api/v1/container-projects/web/check \
+    -H 'content-type: application/json' -d @-          # {"ok":true,...} or the problems
+jq -n --rawfile text compose.yaml '{compose: $text}' |
+  curl -s -H "$AUTH" -X PUT $DEV/api/v1/container-projects/web \
+    -H 'content-type: application/json' -d @-          # 202 {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/containers              # each service's container, phase, health
+```
+
+A project declared through the API has no project directory of its own: its
+relative paths (`./html`) resolve in `/mica/volumes/web/`, so put the page
+there. The other project routes are in [the HTTP API](../reference/http-api.md).
+
+> status: shipped — evidence: `mica-core:crates/micad/src/ctr_cli.rs`, `mica-podman:README.md`
+
+## 8. End to end on Docker
+
+`cx3576.full`, `uefi-x64.docker` and `uefi-x64.gcp` run Docker. Nothing is
+declared to micad; you use `docker compose`, and micad only switches dockerd
+and shows its containers.
+
+```sh
+mica container on                      # starts docker.service and waits for dockerd
+mkdir -p /srv/web/html && cd /srv/web
+echo '<h1>hello from mica</h1>' > html/index.html
+cat > compose.yaml <<'YAML'
+services:
+  nginx:
+    image: docker.io/library/nginx:1.27
+    ports: ["8081:80"]
+    volumes: ["./html:/usr/share/nginx/html:ro"]
+    restart: unless-stopped
+YAML
+docker compose up -d
+docker compose ps
+mica container list                    # the same container, under project web, service nginx
+```
+
+`restart: unless-stopped` (or `always`) is what brings it back after a
+reboot: dockerd starts again at boot and applies each container's restart
+policy, and a container with none stays down. `mica container up`, `down`
+and `check` are refused on these products and say to use `docker compose`.
+
+**Check it worked:**
+
+```sh
+curl -s http://mica-a4e2e69e.local:8081/      # <h1>hello from mica</h1>
+mica reboot                                   # then:
+docker compose -f /srv/web/compose.yaml ps    # running again
+```
+
+**Remove it:** `docker compose down` in `/srv/web`. Images and containers are
+on DATA under `/mica/containers/docker`; to keep them off DATA, mount a disk
+there ([storage](../operate/storage.md) section 3).
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-docker:README.md`, `mica-build:boards/uefi-x64/products/docker/product.env`
+
+## 9. Limits
 
 - No orchestration across devices, no service discovery beyond one device's
   project networks, no rolling update of a project.

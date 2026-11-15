@@ -96,6 +96,18 @@ curl -X POST -H 'content-type: application/json' \
 成功返回 `201` 并建立浏览器会话；对已认领的设备返回 `409 already_configured`。完全没有网络的设备改用
 `mica-provisioning.toml` 文档认领，见[首次启动](first-run.md)和[配置](../operate/configuration.md)。
 
+**检查是否生效。**改用 cookie jar 进行上面的认领，保留它返回的会话，再用这个会话读回设备：
+
+```sh
+curl -s -c jar -X POST -H 'content-type: application/json' \
+  -d '{"password":"at-least-eight-bytes"}' http://127.0.0.1:8080/api/v1/setup
+curl -s -b jar http://127.0.0.1:8080/api/v1/system/info | jq .      # 板卡、镜像、部署
+curl -s http://127.0.0.1:8080/api/v1/session                       # {"state":"unauthenticated",...}：已认领
+```
+
+最后一行不带 cookie，现在显示 `unauthenticated` 而不是 `setup`：设备已认领，每个路由都需要密码或令牌。在控制台中，
+第一页已变成登录页。供脚本使用的令牌在控制台的访问页创建（[SSH](../operate/ssh.md) 等运维指南都使用令牌）。
+
 > status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `mica-core:crates/mica-apid`, `docs/integrate/provisioning.md`
 
 ## 6. 继续

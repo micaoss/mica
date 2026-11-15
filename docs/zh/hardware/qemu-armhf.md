@@ -70,6 +70,10 @@ qemu-system-arm -M virt,highmem=off -cpu cortex-a15 -m 128M -nographic -no-reboo
 机器参数和闪存拆分来自板卡的启动测试，它用测试 initramfs 启动 U-Boot 和内核；还没有
 套件这样启动过产品镜像。
 
+**检查是否生效。**QEMU 终端依次显示 U-Boot、内核，然后是带主机名的登录提示。上面的命令没有给机器网络；加上
+`-netdev user,id=net0,hostfwd=tcp:127.0.0.1:8080-:8080 -device virtio-net-device,netdev=net0` 才能访问
+`http://127.0.0.1:8080`（[刷写](../start/flashing.md#检查是否生效)）。
+
 > status: unsupported
 
 ## 首次启动

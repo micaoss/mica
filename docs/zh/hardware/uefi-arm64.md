@@ -86,6 +86,11 @@ Secure Boot 的情况下运行这条命令的；像这里这样用原样的变�
 的 UEFI，并且要么信任该发布的启动证书，要么关闭 Secure Boot。没有任何实体 arm64 机器被
 验证过。
 
+**检查是否生效。**PL011 控制台以
+`mica-health: booted slot <id> marked good (PENDING_CONFIRM -> CONFIRMED)` 结束首次启动，
+`curl http://127.0.0.1:8080/api/v1/session` 返回 `{"state":"setup",...}`。认领后以 root 运行 `mica status`，显示产品和
+运行中的部署（[刷写](../start/flashing.md#检查是否生效)）。
+
 > status: unsupported
 
 ## 首次启动

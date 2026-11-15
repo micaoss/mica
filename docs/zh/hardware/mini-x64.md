@@ -73,6 +73,11 @@ qemu-system-x86_64 -machine q35 -cpu max -m 1024 -smp 2 -nographic -no-reboot \
 一个分区，然后 `sync` 并回读比对（[刷写](../start/flashing.md)第 3 节）。介质在另一个
 系统上写好；从 U 盘启动这个镜像未经验证。
 
+**检查是否生效。**`mini-x64.basic` 运行 OpenRC：控制台（`ttyS0`，115200 波特；QEMU 下是终端）以显示主机名和
+控制台地址的登录提示结束首次启动，`curl http://127.0.0.1:8080/api/v1/session`（QEMU 下）返回
+`{"state":"setup",...}`。认领后以 root 运行 `mica status`，显示产品和运行中的部署
+（[刷写](../start/flashing.md#检查是否生效)）。
+
 > status: unsupported
 
 ## 首次启动
