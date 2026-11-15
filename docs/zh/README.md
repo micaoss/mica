@@ -37,6 +37,9 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`native-applications.md`](integrate/native-applications.md) — 原生 `.deb` 应用：unit、账户、可写状态、健康闸门、设备、上限与回滚的局限
   - [`services.md`](integrate/services.md) — 操作指南：在 systemd 和 OpenRC 上用 `mica unit` 运行自己的服务、服务账户、定时器、挂载、各种重置后保留什么
   - [`drivers.md`](integrate/drivers.md) — 操作指南：所有者证书与驱动扩展，从签名身份和 KDK 到内核更新
+  - [`mqtt.md`](integrate/mqtt.md) — 操作指南：打开 broker 并用密码对网络开放、客户端、主题、应用的值上 MQTT
+  - [`discovery.md`](integrate/discovery.md) — 操作指南：mDNS 与 SSDP 通告什么、从电脑查找设备、开关、自己的服务记录
+  - [`cloud.md`](integrate/cloud.md) — 操作指南：Compute Engine，从发布文件或测试系列到已认领、可更新的实例
   - [`provisioning.md`](integrate/provisioning.md) — 首次启动的自我配置、设备生成的秘密、没有网络时的四种配置方式、配置文档的规则
   - [`console.md`](integrate/console.md) — 内置管理控制台：导航与归属、状态与交互、自定义与开发验收
   - [`bus.md`](integrate/bus.md) — 设备总线与 MQTT 应用数据契约：管理与应用的边界、Item1 接口、发现与策略、MQTT 语法、注册表
@@ -132,6 +135,9 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../integrate/native-applications.md` | current |
 | `../integrate/services.md` | current |
 | `../integrate/drivers.md` | current |
+| `../integrate/mqtt.md` | current |
+| `../integrate/discovery.md` | current |
+| `../integrate/cloud.md` | current |
 | `../integrate/provisioning.md` | current |
 | `../hardware/README.md` | current |
 | `../hardware/assurance.md` | current |

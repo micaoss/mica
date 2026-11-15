@@ -101,6 +101,9 @@ current product only; history is in Git.
   - `native-applications.md` — integrator's guide to native `.deb` applications: units, accounts, writable state, the health gate, devices, ceilings and rollback limits
   - `services.md` — how-to: your own services with `mica unit` on systemd and OpenRC, service accounts, timers, mounts, what survives which reset
   - `drivers.md` — how-to: owner certificates and driver extensions, from the signing identity and the KDK to a kernel update
+  - `mqtt.md` — how-to: the broker on and open to the network with passwords, a client, the topics, an application's values on MQTT
+  - `discovery.md` — how-to: what mDNS and SSDP announce, finding a device from a computer, switching them, your own service records
+  - `cloud.md` — how-to: Compute Engine from the release files or the test family to a claimed, updated instance
   - `provisioning.md` — configuration without a network: first-boot identity, provisioning documents and credentials
 - `hardware/` — the supported boards: one page per board, the status table and support tiers, assurance and qualification
   - `README.md` — the board list, a dated state snapshot and the route into each board's page
