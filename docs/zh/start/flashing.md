@@ -6,7 +6,7 @@
 步骤目前还不是已验证的流程。
 
 - 选发布、核对摘要：[获取发布版](download.md)。
-- 镜像里有什么、每个分区多大：[存储](../../reference/storage.md)。
+- 镜像里有什么、每个分区多大：[存储](../reference/storage.md)。
 - 板子起来之后：[首次启动](first-run.md)。
 - 不整盘重写、而是替换运行中的系统：[更新](../operate/updates.md)。
 
@@ -285,7 +285,7 @@ virt-fw-vars --input /usr/share/OVMF/OVMF_VARS_4M.fd --output vars.fd \
 从镜像里读出的证书只能证明加载器是用它签名的。要知道是谁签的，请把它的指纹和发布方
 通过其他渠道给出的指纹对比。到目前为止的发布都用开发证书
 `CN=MICA-development-boot` 签名，它不建立任何生产信任
-（[安全生命周期](../../security/lifecycle.md)，英文）。
+（[安全生命周期](../security/lifecycle.md)，英文）。
 
 ### 4.6 arm64
 
@@ -467,7 +467,7 @@ USB Burning Tool，而不是启动；上电前松开恢复键则正常启动。
 - **只有一种厂商格式。** 一个发布携带它的镜像和更新归档；唯一的厂商格式是 Amlogic USB
   烧录包，`s905x5m` 用它发布 eMMC 产品和引导加载器。
 - **没有分区级 A/B。** 两个部署都是 SYSTEM 上的文件，所以不存在“另一个槽”可刷
-  （[更新](../../reference/updates.md)）。
+  （[更新](../reference/updates.md)）。
 - **不能靠重刷来升级。** 写镜像会抹掉 DATA。要把运行中的设备带到新发布，用更新归档
   （[更新](../operate/updates.md)）。
 

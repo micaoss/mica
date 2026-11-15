@@ -34,8 +34,13 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`s905x5m.md`](hardware/s905x5m.md) — BM201 / Amlogic S905X5M
   - [`mini-x64.md`](hardware/mini-x64.md) — 带 128 MB 闪存的小型 amd64 UEFI 机器
   - [`qemu-armhf.md`](hardware/qemu-armhf.md) — 带 NOR 闪存的 QEMU 32 位 Arm virt 机器
+  - [`assurance.md`](hardware/assurance.md) — I1–I4 启动保证在板卡上的证据与声明的记录方式
+  - [`qualification.md`](hardware/qualification.md) — 现场可靠性验收：具名版本规则、行的写法、13 行矩阵与证据标准
 - `security/` — 安全
   - [`overview.md`](security/overview.md) — 安全姿态与点名的缺口
+  - [`model.md`](security/model.md) — 威胁与物理接触边界、I1–I4 启动保证阶梯与诚实的限度
+  - [`signing.md`](security/signing.md) — 启动、内容与元数据三个独立的信任域、归档格式、轮换与固件维护
+  - [`lifecycle.md`](security/lifecycle.md) — 信任材料及其保管、角色、发布与安全响应
 - `releases/` — 发布：如何标识、制作、分发与支持
   - [`release-notes.md`](releases/release-notes.md) — 发布版标识与发布说明政策
   - [`how-releases-work.md`](releases/how-releases-work.md) — release 如何切、携带什么、什么决定重建
@@ -96,19 +101,19 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../integrate/native-applications.md` | not-translated |
 | `../integrate/provisioning.md` | not-translated |
 | `../hardware/README.md` | current |
-| `../hardware/assurance.md` | not-translated |
+| `../hardware/assurance.md` | current |
 | `../hardware/cx3576.md` | current |
 | `../hardware/board-template.md` | not-translated |
 | `../hardware/mini-x64.md` | current |
 | `../hardware/qemu-armhf.md` | current |
-| `../hardware/qualification.md` | not-translated |
+| `../hardware/qualification.md` | current |
 | `../hardware/s905x5m.md` | current |
 | `../hardware/uefi-arm64.md` | current |
 | `../hardware/uefi-x64.md` | current |
-| `../security/lifecycle.md` | not-translated |
-| `../security/model.md` | not-translated |
+| `../security/lifecycle.md` | current |
+| `../security/model.md` | current |
 | `../security/overview.md` | current |
-| `../security/signing.md` | not-translated |
+| `../security/signing.md` | current |
 | `../releases/how-releases-work.md` | current |
 | `../releases/release-notes.md` | current |
 | `../releases/support.md` | current |

@@ -18,7 +18,7 @@ sha256 以及解压后镜像的 sha256：[获取发布版](download.md)。自己
 `make product-verify PRODUCT=<name>`。
 
 校验和只能证明文件完整到达，它不说明谁签的名：发布的启动证书指纹要从发布方经其他
-渠道取得，而不是从下载文件旁边取（[安全生命周期](../../security/lifecycle.md)，英文）。
+渠道取得，而不是从下载文件旁边取（[安全生命周期](../security/lifecycle.md)，英文）。
 
 > status: shipped — evidence: `docs/start/download.md`, `mica-build:make product-verify`
 

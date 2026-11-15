@@ -67,7 +67,7 @@ runkit 不按名字认识任何板卡：板卡就是签名启动策略里的 `bo
   换掉。
 
 内核以 `dm_verity.require_signatures=1` 运行：根、support 镜像、core 组件或驱动扩展，没有它接受的
-根哈希签名就不会被映射。密钥在内核里，从来不在设置里（[签名](../../security/signing.md)）。
+根哈希签名就不会被映射。密钥在内核里，从来不在设置里（[签名](../security/signing.md)）。
 
 ## 4. `mica-runkit init` 的各个阶段
 
@@ -266,7 +266,7 @@ FIT 校验使用随 U-Boot 控制 FDT 一起发布的公钥。签名流程从实
 提供。`bin/bun.sh src/cli.ts components` 用明确的输入打包签名 FIT、固件、根、部署和完整的出厂磁盘。
 
 整镜像刷写前检查当前 GPT 和加载器位置，然后才进行 USB 写入。复位前回读比对整个刷写的镜像。
-独立的固件维护是明确的离线操作，见[发布签名](../../security/signing.md)；它不进入普通部署目录，
+独立的固件维护是明确的离线操作，见[发布签名](../security/signing.md)；它不进入普通部署目录，
 也不执行不可逆的登记。
 
 ### 验收

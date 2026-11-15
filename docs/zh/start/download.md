@@ -125,7 +125,7 @@ lock 是一份 `mica-lock v1` 文件，写明发布的提交，以及进入它�
 （[发布锁](../../reference/release-lock.md) 1.2.2）。
 
 文件旁边的校验和只证明文件完整到达。让一份镜像可信的，是它里面的签名链
-（[发布签名](../../security/signing.md)）以及平台信任那个签名者；上面的哈希
+（[发布签名](../security/signing.md)）以及平台信任那个签名者；上面的哈希
 是完整性的一半，不是真实性的一半。
 
 > status: shipped — evidence: `docs/reference/release-lock.md`, `docs/security/signing.md`

@@ -56,7 +56,7 @@ Mica OS 是产品构建于其上的操作系统，因此支持是共担的责任
   支持负责人、制造负责人——并写明每项程序的真实成熟度：密钥仪式与保管、凭据
   生命周期、漏洞接收、带分诊与修复目标的严重级别、公告发布、事件响应，以及
   支持窗口与生命周期终止。代表 Mica OS 承诺任何事之前先读它
-  （[../../security/lifecycle.md](../../security/lifecycle.md)）。
+  （[../../security/lifecycle.md](../security/lifecycle.md)）。
 
 > status: shipped — evidence: `docs/security/lifecycle.md`
 

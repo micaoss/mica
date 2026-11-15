@@ -61,6 +61,7 @@ describe('the publishing allowlist', () => {
       'operating',
       'trouble',
       'concepts',
+      'security',
       'reference',
     ])
   })

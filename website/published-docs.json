@@ -21,7 +21,9 @@
         { "name": "cx3576", "dir": "hardware" },
         { "name": "s905x5m", "dir": "hardware" },
         { "name": "mini-x64", "dir": "hardware" },
-        { "name": "qemu-armhf", "dir": "hardware" }
+        { "name": "qemu-armhf", "dir": "hardware" },
+        { "name": "assurance", "dir": "hardware" },
+        { "name": "qualification", "dir": "hardware" }
       ]
     },
     {
@@ -53,11 +55,19 @@
       ]
     },
     {
+      "id": "security",
+      "docs": [
+        { "name": "overview", "dir": "security", "slug": "security" },
+        { "name": "model", "dir": "security" },
+        { "name": "signing", "dir": "security" },
+        { "name": "lifecycle", "dir": "security" }
+      ]
+    },
+    {
       "id": "reference",
       "docs": [
         { "name": "architecture" },
         { "name": "contributing" },
-        { "name": "overview", "dir": "security", "slug": "security" },
         { "name": "api", "dir": "operate" },
         { "name": "http-api", "dir": "reference" },
         { "name": "errors", "dir": "reference" },

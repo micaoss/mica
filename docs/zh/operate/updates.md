@@ -1,7 +1,7 @@
 # 更新与回滚
 
 设备怎样接收一个新发布、留下什么作为回退，以及操作者一路上会遇到的每一种拒绝。
-本页背后的契约是[更新设计](../../reference/updates.md)（英文）；格式属于 `mica-core`
+本页背后的契约是[更新引擎](../reference/updates.md)；格式属于 `mica-core`
 （`mica-core:docs/mica-core.md` 第 6 节）。
 
 **其中多少真正跑过。** 生产侧在每次发布时都会执行；设备侧在 QEMU 里由 UEFI 产品上的
@@ -192,7 +192,7 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 ## 9. 限制
 
 - 任何更新归档都不携带引导加载器。固件只经由各板卡的离线维护途径变动
-  （[恢复](recovery.md)、[签名](../../security/signing.md)（英文））。
+  （[恢复](recovery.md)、[签名](../security/signing.md)（英文））。
 - 轮换 verity 密钥会重新签名根，所以那次发布只发布 `full`。
 - `dev` 产品从不发布，所以没有更新归档。
 
@@ -228,6 +228,6 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 
 `GET /api/v1/update` 报告设备持有的集合，以及试运行中的集合还剩几次启动；
 `mica-deploy status` 在 `sets.core` 下报告它们。契约见
-[部署生命周期](../../reference/updates.md#core-sets)（英文）。
+[更新引擎](../reference/updates.md#core-集合)。
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/mica-deploy/src/core_set.rs`, `mica-build:src/release/core.ts`

@@ -123,7 +123,7 @@ U-Boot 板： ROM ─▶ U-Boot `micaboot`（记录、试运行计数）─▶ F
   引导加载器在启动任何东西之前先把尝试次数减一并写回。UEFI 板把记录放在 ESP 上
   （带持久启动尝试的 systemd-boot，即 `mica-system-base` 的 `mica-systemd-boot`）；
   U-Boot 板把记录放在 FIRMWARE 分区的两份 64 KiB 副本里，或两个 UBI 卷里，由
-  `micaboot` 命令读取（[cx3576 启动](../reference/boot.md)）。
+  `micaboot` 命令读取（[cx3576 启动](reference/boot.md)）。
 - **内核是签名的。**开启 Secure Boot 的固件校验 UKI；U-Boot 用其控制设备树中的
   密钥校验 FIT 的签名。`qemu-armhf` 与 `ssd202d` 是 `bootTrust: none`：它们的引导
   加载器只校验 FIT 的哈希，因此没有验证启动，下面其余的检查照样成立。
@@ -335,7 +335,7 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
   打开 DATA，由封存到 PCR 7 和 15 的 TPM2 密钥解锁，并带恢复口令。目前没有发布的产品
   打开它。
 
-细节与证据边界见[发布签名](../security/signing.md)和[安全模型](../security/model.md)。
+细节与证据边界见[发布签名](security/signing.md)和[安全模型](security/model.md)。
 
 ## 10. 资源服务
 
@@ -369,9 +369,9 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
 | 有哪些产品，各带什么？ | [概览](start/overview.md)、[获取发布版](start/download.md) |
 | 没有 micad 时运行什么，读哪个文件？ | 第 7 节、[没有 micad 时](../operate/without-micad.md) |
 | 设置树里有什么？ | [配置](operate/configuration.md)、`mica-core:docs/mica-core.md` 3.3 |
-| API 提供什么？ | [API](operate/api.md)、[API 参考](../reference/api.md) |
-| 写入去了哪里，我能把磁盘挂在哪里？ | [存储](operate/storage.md)、[只读根](../reference/ro-root.md) |
-| 更新如何安装、确认或回滚？ | [更新](operate/updates.md)、[更新参考](../reference/updates.md) |
-| 发布由谁、如何签名？ | [发布签名](../security/signing.md) |
+| API 提供什么？ | [API](operate/api.md)、[API 参考](reference/api.md) |
+| 写入去了哪里，我能把磁盘挂在哪里？ | [存储](operate/storage.md)、[只读根](reference/ro-root.md) |
+| 更新如何安装、确认或回滚？ | [更新](operate/updates.md)、[更新参考](reference/updates.md) |
+| 发布由谁、如何签名？ | [发布签名](security/signing.md) |
 | 设备如何获得最初的凭据？ | [首次启动](start/first-run.md)、[配网](../integrate/provisioning.md) |
 | 如何运行我自己的软件？ | [应用](integrate/applications.md)、[容器](../integrate/containers.md) |
