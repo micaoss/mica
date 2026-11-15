@@ -69,3 +69,55 @@
 | 4 | 密码错误或缺失，或输错之后的退避 |
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`
+
+## 4. 完整示例：第一次会话
+
+一台已认领的 `uefi-x64.full` 设备，SSH 已打开并加了你的密钥
+（[SSH](ssh.md)）：
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica status
+# board      <板卡型号>
+# system     <版本> (<id，12 位十六进制>)
+# core       0.0.8 (channel general)
+# state      succeeded: The boot health gate confirmed this deployment
+# uptime     2h 14m
+# network    eth0 routable 192.168.1.40/24
+# time       synchronized
+# data       1.2 GiB of 28.9 GiB used
+mica help update                     # 一个动词的用法
+mica tokens create laptop            # token 输出到标准输出，只此一次
+# mica_<id>_<secret>
+# token <id> (laptop): shown once, keep it now        （在标准错误上）
+mica set time.timezone Europe/Athens
+# time.timezone is "Europe/Athens"
+mica status --json | jq -r .update.lifecycle.state
+# succeeded
+```
+
+这个 token 给工作站上的脚本用（[API](api.md) 第 6 节）；现在就复制下来，之后
+不会再显示。`mica status --json` 是一个对象，成员为 `system`、`update`、
+`network`、`time` 和 `storage`，每个都是 micad 的应答，答不上来的地方是一个
+`error` 对象。
+
+### 检查是否生效
+
+```sh
+mica tokens list                     # <id> laptop <created>
+mica get time.timezone; echo "exit $?"
+# Europe/Athens
+# exit 0
+mica set time.zone Europe/Athens; echo "exit $?"
+# mica set: ...                      （拒绝原因，写明路径）
+# exit 1
+mica tim; echo "exit $?"
+# exit 2                             （没有简写：动词都是完整的词）
+```
+
+退出码就是第 3 节的那些，所以脚本能区分拒绝（1）、调用写错（2）、连不上
+micad 或 apid（3）和密码错误（4）。在 Web 模式为 `off` 的设备上，经 apid 的
+动词（`tokens`、`get`、`set` 以及其他设置）会以 3 退出，`mica web local` 可以
+恢复本地套接字。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/cli.rs`, `mica-core:crates/micad/src/cli/status.rs`, `mica-core:crates/micad/src/cli/account.rs`, `mica-core:crates/micad/src/cli/settings.rs`

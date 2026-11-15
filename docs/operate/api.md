@@ -31,7 +31,9 @@ Two credential shapes, both defined in the contract:
   `HttpOnly; Secure` cookie plus a per-session CSRF token; session-based
   mutations must send the token in `X-CSRF-Token`.
 - **Bearer token** — for automation; stored tokens authenticate API calls
-  without CSRF. Setup returns the one-time token for API-only clients.
+  without CSRF. Setup mints none: it answers with a browser session and its
+  CSRF token, and a token is made afterwards (`POST /api/v1/tokens`, the
+  console's Access page, or `mica tokens create` as root on the device).
 
 Setup discovery and session state (`GET /api/v1/session`) are the narrow
 unauthenticated operations; everything that reads or changes appliance state
@@ -72,7 +74,57 @@ of the contract over a real socket — it is also the reference for how the
 surface behaves end to end, including TLS, redirects and auth gating:
 
 ```sh
-bash micad:tests/suites/apid-api/run.sh
+bash tests/suites/apid-api/run.sh      # in a mica-build checkout
 ```
 
 > status: shipped — evidence: `mica-build:tests/suites/apid-api/run.sh`
+
+## 6. A worked example: a script against the API
+
+A claimed device on the LAN and a token made for the script
+([first run](../start/first-run.md) section 7, or `mica tokens create laptop`
+as root on the device):
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+
+curl -s $DEV/healthz                                  # apid is listening, nothing more
+curl -s $DEV/api/v1/system/info | jq .error           # without the token
+# {"code":"not_authenticated","message":"...","source":"apid"}
+curl -s -H "$AUTH" $DEV/api/v1/system/info | jq '{board, uptime}'
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/time.timezone \
+  -H 'content-type: application/json' -d '"Europe/Athens"'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/tasks/<id>
+# ... "phase":"applied", "outcome":"succeeded" ...
+```
+
+Every failure under `/api` is that one envelope: `error.code` is the stable
+word a script branches on, `error.message` is for a person, `error.source`
+says whether apid or micad refused, and `error.path` names the setting when
+there is one. A write with a token needs no CSRF header; the same write with
+a browser cookie needs `X-CSRF-Token`.
+
+### Check it worked
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' -H "$AUTH" $DEV/api/v1/settings/time.timezone   # 200
+curl -s -H "$AUTH" $DEV/api/v1/settings/time.timezone                                     # "Europe/Athens"
+curl -s -H "$AUTH" $DEV/api/v1/tokens | jq -r '.[].name'                                  # laptop, and the others
+```
+
+| What you see | Why, and what to do |
+|---|---|
+| `401` `not_authenticated` | no token, a mistyped one, or one that was revoked: make a new one |
+| `403` `csrf_invalid` | a cookie session without `X-CSRF-Token`; use the token instead |
+| `409` `rotation_required` | the device was claimed by a provisioning document: change the password first ([first run](../start/first-run.md) section 4) |
+| `422` `validation_failed` | the value was refused; `error.path` names the setting |
+| `503` `micad_unreachable`, `504` `micad_timeout` | apid is up and micad did not answer; retry after `Retry-After` |
+| connection refused on 8080 | the web mode is `local` or `off`: `mica web status` on the device; with HTTPS on, 8080 only redirects to 8443 (`curl -L`, or `https://...:8443`) |
+
+The routes and their bodies are the contract, not this page:
+`mica-core:crates/mica-apid/openapi.json`, and [HTTP API](../reference/http-api.md)
+lists them.
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/error.rs`, `mica-core:crates/mica-apid/src/routes/credential.rs`, `mica-core:crates/mica-apid/src/routes/tokens.rs`, `mica-core:crates/mica-apid/openapi.json`

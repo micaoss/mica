@@ -27,7 +27,9 @@ HTTP 随之只做重定向；`/api` 是完整的管理协议：
   `HttpOnly; Secure` cookie 加每会话 CSRF token；基于会话的变更操作必须
   在 `X-CSRF-Token` 里携带该 token。
 - **Bearer token**——面向自动化；存储的 token 认证 API 调用，无需 CSRF。
-  初始设置为纯 API 客户端返回一次性 token。
+  初始设置不生成 token：它返回一个浏览器会话及其 CSRF 令牌，token 之后再生成
+  （`POST /api/v1/tokens`、控制台的访问页，或在设备上以 root 执行
+  `mica tokens create`）。
 
 设置状态发现与会话状态（`GET /api/v1/session`）是仅有的免认证操作；读取
 或改变设备状态的一切都需要上述凭据之一。登录尝试有持久退避的限速并被
@@ -63,7 +65,54 @@ API 验收套件在 QEMU 里启动 uefi-x64 镜像，通过真实套接字驱动
 它也是这个面端到端行为（包括 TLS、重定向与认证门控）的参考：
 
 ```sh
-bash micad:tests/suites/apid-api/run.sh
+bash tests/suites/apid-api/run.sh      # 在 mica-build 检出目录中
 ```
 
 > status: shipped — evidence: `mica-build:tests/suites/apid-api/run.sh`
+
+## 6. 完整示例：用脚本调用 API
+
+一台在局域网上已认领的设备，以及给脚本生成的 token（[首次启动](../start/first-run.md)
+第 7 节，或在设备上以 root 执行 `mica tokens create laptop`）：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+
+curl -s $DEV/healthz                                  # 只说明 apid 在监听
+curl -s $DEV/api/v1/system/info | jq .error           # 不带 token
+# {"code":"not_authenticated","message":"...","source":"apid"}
+curl -s -H "$AUTH" $DEV/api/v1/system/info | jq '{board, uptime}'
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/time.timezone \
+  -H 'content-type: application/json' -d '"Europe/Athens"'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" $DEV/api/v1/tasks/<id>
+# ... "phase":"applied", "outcome":"succeeded" ...
+```
+
+`/api` 下的每个失败都是这一种信封：`error.code` 是脚本据以分支的稳定词，
+`error.message` 给人看，`error.source` 说明是 apid 还是 micad 拒绝的，有对应
+设置时 `error.path` 会写明。用 token 的写操作不需要 CSRF 头；用浏览器 cookie
+做同样的写操作需要 `X-CSRF-Token`。
+
+### 检查是否生效
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' -H "$AUTH" $DEV/api/v1/settings/time.timezone   # 200
+curl -s -H "$AUTH" $DEV/api/v1/settings/time.timezone                                     # "Europe/Athens"
+curl -s -H "$AUTH" $DEV/api/v1/tokens | jq -r '.[].name'                                  # laptop 以及其他
+```
+
+| 你看到的 | 原因与处理 |
+|---|---|
+| `401` `not_authenticated` | 没带 token、token 打错或已被吊销：重新生成一个 |
+| `403` `csrf_invalid` | cookie 会话没带 `X-CSRF-Token`；改用 token |
+| `409` `rotation_required` | 设备是用配置文档认领的：先改密码（[首次启动](../start/first-run.md) 第 4 节） |
+| `422` `validation_failed` | 值被拒绝；`error.path` 写明是哪个设置 |
+| `503` `micad_unreachable`、`504` `micad_timeout` | apid 在运行而 micad 没有应答；按 `Retry-After` 重试 |
+| 8080 连接被拒绝 | Web 模式是 `local` 或 `off`：在设备上执行 `mica web status`；开启 HTTPS 后 8080 只会重定向到 8443（`curl -L`，或 `https://...:8443`） |
+
+路由与请求体以契约为准，而不是本页：`mica-core:crates/mica-apid/openapi.json`，
+[HTTP API](../reference/http-api.md) 列出了它们。
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/error.rs`, `mica-core:crates/mica-apid/src/routes/credential.rs`, `mica-core:crates/mica-apid/src/routes/tokens.rs`, `mica-core:crates/mica-apid/openapi.json`

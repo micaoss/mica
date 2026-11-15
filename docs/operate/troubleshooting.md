@@ -230,3 +230,70 @@ reboot — each branching on the snapshot member that decides it.
 A device in a reboot loop with all deployments exhausted, or one whose credentials
 are lost, is past troubleshooting: go to [recovery.md](recovery.md), and
 capture what evidence you can first.
+
+## 8. A worked example: an update check that fails
+
+A claimed device whose console says the update check failed. SSH is on with
+your key, and the workstation has a token:
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+```
+
+**Identify and read** (sections 2 and 3), on the device:
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica status                          # board, system, state, network, time, data at a glance
+mica update check; echo "exit $?"
+# mica update: <reason>
+# exit 1
+mica update                          # the same reason on its "refused" or "state ... failed" line
+mica status --json | jq '.update.lifecycle | {state, code, last_refusal_code}'
+# {"state":"succeeded","code":null,"last_refusal_code":"network-offline"}
+mica network                         # is there a routable interface?
+mica time                            # is the clock synchronized?
+journalctl -u micad -b | tail -n 50  # on systemd; the console's Diagnostics tab elsewhere
+```
+
+A refusal before anything ran is `last_refusal_code`; a check that ran and
+failed is `"state":"failed"` with its `code`. Either is one word from a
+closed list, and it decides the next step: `network-offline` and
+`network-metered` are the link ([network](network.md)),
+`no-source-configured` is the update source ([updates](updates.md) section
+3), and `"state":"update-unavailable"` with a `workspace.status` other than
+`ready` is DATA ([storage](storage.md)). The full list is in the contract of
+`GET /api/v1/update`.
+
+**Collect the evidence** before changing anything (section 6):
+
+```sh
+mica doctor
+# /mica/diagnostics/<snapshot file>
+```
+
+or from the workstation, which also downloads it:
+
+```sh
+curl -s -H "$AUTH" -X POST $DEV/api/v1/diagnostics/snapshots | jq '{id: .snapshot.id, sections}'
+# {"id":"<id>","sections":{"<source>":"ok", ... }}
+curl -s -OJ -H "$AUTH" $DEV/api/v1/diagnostics/snapshots/<id>
+curl -s -H "$AUTH" $DEV/api/v1/system/support-info > support-info.json
+```
+
+### Check it worked
+
+After the fix, run the check again and read the state:
+
+```sh
+mica update check                    # available: system <version>, or: up to date
+mica update                          # no "failed" line; a "checked" line with the new time
+```
+
+A snapshot is complete when every `sections` value is `ok`; `unavailable` or
+`timeout` is evidence about that source, not a pass. Attach the snapshot and
+the support summary to the case ([support](../releases/support.md) section 4),
+and delete the snapshot when the case closes.
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/micad/src/update_lifecycle/snapshot.rs`, `mica-core:crates/mica-apid/src/diag_cli.rs`, `mica-core:crates/mica-apid/src/routes/snapshots.rs`

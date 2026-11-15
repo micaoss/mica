@@ -81,3 +81,56 @@ empty and standard error is one object, `{"error": {"code", "message"}}`.
 | 4 | a wrong or missing password, or the backoff after one |
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`
+
+## 4. A worked example: a first session
+
+A claimed `uefi-x64.full` device with SSH on and your key added
+([SSH](ssh.md)):
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica status
+# board      <board model>
+# system     <version> (<id, 12 hex>)
+# core       0.0.8 (channel general)
+# state      succeeded: The boot health gate confirmed this deployment
+# uptime     2h 14m
+# network    eth0 routable 192.168.1.40/24
+# time       synchronized
+# data       1.2 GiB of 28.9 GiB used
+mica help update                     # one verb's usage
+mica tokens create laptop            # the token on standard output, once
+# mica_<id>_<secret>
+# token <id> (laptop): shown once, keep it now        (on standard error)
+mica set time.timezone Europe/Athens
+# time.timezone is "Europe/Athens"
+mica status --json | jq -r .update.lifecycle.state
+# succeeded
+```
+
+The token is for the workstation's scripts ([API](api.md) section 6); copy
+it now, because nothing shows it again. `mica status --json` is one object
+with the members `system`, `update`, `network`, `time` and `storage`, each
+the answer micad gave, or an `error` object where it could not answer.
+
+### Check it worked
+
+```sh
+mica tokens list                     # <id> laptop <created>
+mica get time.timezone; echo "exit $?"
+# Europe/Athens
+# exit 0
+mica set time.zone Europe/Athens; echo "exit $?"
+# mica set: ...                      (the refusal, naming the path)
+# exit 1
+mica tim; echo "exit $?"
+# exit 2                             (no short forms: the verbs are full words)
+```
+
+The exit codes are section 3's, so a script can tell a refusal (1) from a
+mistake in the call (2), an unreachable micad or apid (3) and a wrong
+password (4). On a device whose web mode is `off`, the verbs that go
+through apid (`tokens`, `get`, `set` and the other settings) exit 3, and
+`mica web local` brings the local socket back.
+
+> status: shipped — evidence: `mica-core:crates/micad/src/cli.rs`, `mica-core:crates/micad/src/cli/status.rs`, `mica-core:crates/micad/src/cli/account.rs`, `mica-core:crates/micad/src/cli/settings.rs`

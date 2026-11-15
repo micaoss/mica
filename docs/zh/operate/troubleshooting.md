@@ -186,3 +186,67 @@ Mica OS 工具链选择大声、点名地拒绝而不是降级运行，所以拒
 
 所有部署都耗尽、陷入重启循环的设备，或凭据已丢失的设备，已经超出故障排查
 的范围：去 [recovery.md](recovery.md)，并先捕获你还能拿到的证据。
+
+## 8. 完整示例：更新检查失败
+
+控制台显示更新检查失败的一台已认领设备。SSH 已用你的密钥打开，工作站上有
+一个 token：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+```
+
+**识别并读取**（第 2、3 节），在设备上：
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica status                          # 板卡、系统、状态、网络、时间、数据，一屏看完
+mica update check; echo "exit $?"
+# mica update: <原因>
+# exit 1
+mica update                          # 同一原因出现在 "refused" 行或 "state ... failed" 行
+mica status --json | jq '.update.lifecycle | {state, code, last_refusal_code}'
+# {"state":"succeeded","code":null,"last_refusal_code":"network-offline"}
+mica network                         # 有可路由的接口吗？
+mica time                            # 时钟同步了吗？
+journalctl -u micad -b | tail -n 50  # systemd 上；其他情况用控制台的诊断页
+```
+
+还没运行就被拒绝的是 `last_refusal_code`；运行了但失败的是
+`"state":"failed"` 加它的 `code`。两者都是封闭列表里的一个词，决定下一步：
+`network-offline` 和 `network-metered` 是链路问题（[网络](network.md)），
+`no-source-configured` 是更新源（[更新](updates.md) 第 3 节），
+`"state":"update-unavailable"` 且 `workspace.status` 不是 `ready` 则是 DATA
+（[存储](storage.md)）。完整列表见 `GET /api/v1/update` 的契约。
+
+**先收集证据**，再做任何改动（第 6 节）：
+
+```sh
+mica doctor
+# /mica/diagnostics/<快照文件>
+```
+
+或者在工作站上收集，顺便下载：
+
+```sh
+curl -s -H "$AUTH" -X POST $DEV/api/v1/diagnostics/snapshots | jq '{id: .snapshot.id, sections}'
+# {"id":"<id>","sections":{"<来源>":"ok", ... }}
+curl -s -OJ -H "$AUTH" $DEV/api/v1/diagnostics/snapshots/<id>
+curl -s -H "$AUTH" $DEV/api/v1/system/support-info > support-info.json
+```
+
+### 检查是否生效
+
+修好之后再检查一次并读状态：
+
+```sh
+mica update check                    # available: system <版本>，或：up to date
+mica update                          # 没有 "failed" 行；"checked" 行是新的时间
+```
+
+快照里每个 `sections` 值都是 `ok` 才算完整；`unavailable` 或 `timeout` 是关于
+那个来源的证据，不是通过。把快照和支持摘要附到工单上
+（[支持](../releases/support.md) 第 4 节），工单关闭后删除快照。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/micad/src/update_lifecycle/snapshot.rs`, `mica-core:crates/mica-apid/src/diag_cli.rs`, `mica-core:crates/mica-apid/src/routes/snapshots.rs`
