@@ -352,3 +352,99 @@ state, the storage status, and the device identity from
 from 3 down destroys the fault along with the state, and a support case opened
 after a reflash has nothing in it. [../releases/support.md](../releases/support.md) section 4 lists
 what a report needs.
+
+## 9. A worked example: a rollback, then a configuration reset
+
+A claimed `uefi-x64.full` device that took an update yesterday
+([updates](updates.md) section 11), SSH on with your key, and an API token:
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+```
+
+### Step 1, then step 2: read, and go back one release
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica update
+# system     <new version> (<new id>)
+# state      succeeded: The boot health gate confirmed this deployment
+mica update rollback --reboot
+# rolled back to <previous id, 12 hex>; rebooting
+```
+
+Without `--reboot` it says `rolled back to <id>; reboot to run it (or run
+again with --reboot)`, and `mica reboot` finishes it. A device that cannot
+roll back says why and changes nothing: `rollback is not possible:
+candidate_pending`, `running_not_confirmed` or `no_usable_fallback`.
+
+Over the API the same step names its target, so it is refused if the target
+changed in between:
+
+```sh
+T=$(curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .rollback.target)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/update/rollback \
+  -H 'content-type: application/json' -d "{\"expectedTarget\":\"$T\"}"
+# {"deploymentId":"<running>","target":"<T>","nextStep":"POST /api/v1/actions/reboot"}
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot
+```
+
+**The release you leave is condemned.** It is marked failed, so it is never
+installed again; to move forward, wait for the next release
+([updates](updates.md) section 6).
+
+#### Check it worked
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/update | jq .lastRollback
+# {"target":"<T>","targetGeneration":<n>,"targetVersion":"<previous version>","outcome":"rolled_back"}
+ssh root@mica-a4e2e69e.local mica update
+# state      rolled-back: The system is running a retained deployment after a failed update
+```
+
+`lastRollback` is reported once, in the first boot after the rollback.
+`"outcome":"did_not_take"` names the deployment that booted instead and a
+`reason` (`target_failed`, `target_exhausted` or `target_missing`): the
+fallback did not come up, and the device is on whatever booted. Read section 2
+before going further.
+
+### Step 3: a configuration reset
+
+Here a time zone stands in for settings that went wrong. Read the update
+source first, because the reset puts it back to the image's
+(section 5, step 3):
+
+```sh
+ssh root@mica-a4e2e69e.local mica time zone Europe/Athens
+# time.timezone is Europe/Athens
+curl -s -H "$AUTH" $DEV/api/v1/provisioning/status | jq .
+curl -s -H "$AUTH" -X POST $DEV/api/v1/reset \
+  -H 'content-type: application/json' -d '{"tier":"configuration"}'
+# {"tier":"configuration","applies":"next-boot"}                     (202)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot
+```
+
+Nothing changes until that reboot, and a second request before it replaces
+the first. `{"tier":"application-data"}` stages step 4 the same way.
+
+#### Check it worked
+
+The reset returns SSH to off and drops its keys with the other access
+settings, so check over the API, with the token, which the reset keeps:
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/settings/time.timezone        # "UTC"
+curl -s -H "$AUTH" $DEV/api/v1/settings/access.ssh.enabled   # false
+curl -s -H "$AUTH" $DEV/api/v1/claim | jq .state             # "claimed"
+```
+
+The device is still claimed and the token still works; everything else is at
+its default, and the hostname is the one drawn from the device id again. Put
+back what you need (SSH: [SSH](ssh.md) section 1).
+
+No worked example is given for steps 5 to 8: step 5 cannot run on any board
+(section 7), step 6 is worked through in the console or with
+`mica factory-reset` (section 5) and step 7 is [install](../start/install.md).
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/mica-apid/src/update_api/deployment.rs`, `mica-core:crates/micad/src/rollback_outcome.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:crates/micad/src/deployment.rs`

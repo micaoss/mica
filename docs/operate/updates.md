@@ -311,3 +311,86 @@ trial has left; `mica-deploy status` reports them under `sets.core`. The
 contract is [deployment lifecycle](../reference/updates.md#core-sets).
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/mica-deploy/src/core_set.rs`, `mica-build:src/release/core.ts`
+
+## 11. A worked example: one update online, one offline
+
+A claimed `uefi-x64.full` device on a network, the update policy at its
+default, SSH on with your key ([SSH](ssh.md)), and an API token for the
+offline half:
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"   # from: mica tokens create laptop
+```
+
+### Online, from the device
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica update
+# system     <version> (<id, 12 hex>)
+# core       0.0.8 (channel general)
+# state      succeeded: The boot health gate confirmed this deployment
+mica update check
+# available: system <newer version>          (or: up to date)
+mica update install --reboot
+# checking...
+# downloading...
+# installing...
+# installed; rebooting
+```
+
+`install` without `--reboot` stops at `installed; reboot to run it (or run
+again with --reboot)`; `mica update` then shows `state reboot-required` and
+`reboot needed to run what is installed`, and `mica reboot` finishes it. The
+check offers a core set the same way (`available: core <version>`), and the
+install takes it.
+
+### Offline, with the archive
+
+Download the product's `.micaupd` and check its digest
+([download](../start/download.md)), then from the workstation:
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' -H "$AUTH" -X POST $DEV/api/v1/update/import \
+  -H 'content-type: application/octet-stream' \
+  --data-binary @mica-uefi-x64.full-<stamp>.micaupd           # 202
+curl -s -H "$AUTH" $DEV/api/v1/update | jq '.lifecycle | {state, deploymentId, stagedKind}'
+# {"state":"importing",...} while the objects are checked, then
+# {"state":"ready","deploymentId":"<64 hex>","stagedKind":"deployment"}
+ID=$(curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .lifecycle.deploymentId)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/update/install \
+  -H 'content-type: application/json' -d "{\"deploymentId\":\"$ID\"}"
+# {"deploymentId":"<64 hex>"}                               (202)
+curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .lifecycle.state      # reboot-required
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot               # 202
+```
+
+A refused import ends as `"state":"failed"` with a `reason` from section 7
+and a `code`; nothing was staged.
+
+### Check it worked
+
+After the reboot, give the health gate a minute:
+
+```sh
+mica update
+# system     <newer version> (<new id>)
+# state      validating: The running deployment awaits health confirmation
+# ...and then
+# state      succeeded: The boot health gate confirmed this deployment
+mica-deploy booted        # one JSON object: the running deployment's id
+```
+
+Over the API, `.lifecycle.state` goes the same way and `.boot.deploymentId` is
+the new id. The retained deployment is now the one you came from, which
+`.rollback` names as its `target` ([recovery](recovery.md) step 2).
+
+If the device comes back on the old version instead, the candidate failed its
+trial and the retained deployment booted (section 5): `mica update` shows
+`state rolled-back: The system is running a retained deployment after a failed
+update`, and the failed release is never installed again (section 6). Keep the
+serial trace and the update state for a report
+([troubleshooting](troubleshooting.md)).
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-apid/src/update_api/deployment.rs`, `mica-core:crates/micad/src/update_lifecycle/snapshot.rs`, `mica-core:crates/micad/src/deployment.rs`

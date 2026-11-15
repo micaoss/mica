@@ -314,3 +314,76 @@ code that `sudo mica internal device-code` prints
 ([uefi-x64](../hardware/uefi-x64.md)).
 
 > status: board-dependent — evidence: `mica-build:boards/products.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-core:docs/factory-ap-key.md`
+
+## 7. A worked example: claiming a device on your LAN
+
+A `uefi-x64.full` device has just booted for the first time on a wired DHCP
+network. From a Linux workstation on the same network, with `curl`, `jq` and
+`avahi-browse`:
+
+1. **Find it.** The device announces itself under `_mica._tcp`:
+
+   ```sh
+   avahi-browse -rt _mica._tcp      # mica-a4e2e69e, its address and port 8080
+   DEV=http://mica-a4e2e69e.local:8080
+   curl -s $DEV/api/v1/session      # {"state":"setup","deviceCode":"off"}
+   ```
+
+   `setup` means nobody has claimed it yet; `deviceCode` says whether the
+   claim must carry the label's code (`off` on every released product but
+   `uefi-x64.gcp`).
+
+2. **Claim it** and keep the browser session the answer carries. The body is
+   that session's CSRF token, which every write made with the cookie needs:
+
+   ```sh
+   CSRF=$(curl -s -c jar -X POST $DEV/api/v1/setup \
+     -H 'content-type: application/json' \
+     -d '{"password":"a-long-admin-password"}' | jq -r .csrfToken)
+   ```
+
+3. **Make an API token** for scripts, so the cookie is no longer needed. The
+   plaintext is in this answer only:
+
+   ```sh
+   TOKEN=$(curl -s -b jar -H "X-CSRF-Token: $CSRF" -X POST $DEV/api/v1/tokens \
+     -H 'content-type: application/json' -d '{"name":"laptop"}' | jq -r .token)
+   AUTH="Authorization: Bearer $TOKEN"     # mica_<id>_<secret>
+   ```
+
+4. **Open SSH** with your key ([SSH](../operate/ssh.md) section 1) and log in:
+
+   ```sh
+   curl -s -H "$AUTH" -X POST $DEV/api/v1/ssh/authorized-keys \
+     -H 'content-type: application/json' \
+     -d "{\"key\": \"$(cat ~/.ssh/id_ed25519.pub)\"}"
+   curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/access.ssh.enabled \
+     -H 'content-type: application/json' -d 'true'
+   ssh root@mica-a4e2e69e.local mica status
+   ```
+
+The same claim in the console is its first page: the password, then
+the login page. On a product with WiFi, step 1 is joining the factory access
+point from the label and `DEV=http://192.168.4.1:8080`; the rest is the same.
+
+### Check it worked
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/claim
+# {"state":"claimed","via":"setup","at":<seconds>,"rotationRequired":false}
+curl -s $DEV/api/v1/session
+# {"state":"unauthenticated"}
+```
+
+`via` is `setup` for this route and `provisioning-document` for a claim by
+document, which also shows `"rotationRequired":true` until the password is
+changed (section 4). A session that still answers `setup` was not claimed:
+read the setup call's answer. `409 already_configured` means somebody else
+claimed it first, and a device you cannot sign in to after that is a reflash
+([recovery](../operate/recovery.md) step 7).
+
+No worked example is given for the provisioning document: its transports
+have never been run on hardware (section 3), so an example would claim more
+than has been tested.
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/setup.rs`, `mica-core:crates/mica-apid/src/routes/login.rs`, `mica-core:crates/mica-apid/src/routes/tokens.rs`, `mica-core:crates/mica-apid/src/routes/claim.rs`, `mica-core:crates/mica-apid/src/routes/ssh.rs`

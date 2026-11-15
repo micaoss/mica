@@ -273,3 +273,94 @@ sanitize、NVMe format-NVM），而它在这些板卡上的真实行为没有人
 状态，以及 `/usr/share/mica/manifest.tsv` 里的设备身份。从第 3 步往下的每一步
 都会把故障连同状态一起销毁，而重刷之后才开的支持工单里什么都没有。
 [../releases/support.md](../releases/support.md) 第 4 节列出一份报告需要包含什么。
+
+## 9. 完整示例：一次回滚，然后一次配置重置
+
+一台已认领的 `uefi-x64.full` 设备，昨天刚做过一次更新（[更新](updates.md)
+第 11 节），SSH 已用你的密钥打开，并有一个 API 令牌：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+```
+
+### 第 1 步，然后第 2 步：读状态，退回上一个版本
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica update
+# system     <新版本> (<新 id>)
+# state      succeeded: The boot health gate confirmed this deployment
+mica update rollback --reboot
+# rolled back to <上一个 id，12 位十六进制>; rebooting
+```
+
+不带 `--reboot` 时它输出 `rolled back to <id>; reboot to run it (or run
+again with --reboot)`，再执行 `mica reboot` 完成。不能回滚的设备会说明原因，
+并且不做任何改动：`rollback is not possible: candidate_pending`、
+`running_not_confirmed` 或 `no_usable_fallback`。
+
+通过 API 做同一步时要写明目标，目标在这期间变了就会被拒绝：
+
+```sh
+T=$(curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .rollback.target)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/update/rollback \
+  -H 'content-type: application/json' -d "{\"expectedTarget\":\"$T\"}"
+# {"deploymentId":"<正在运行的>","target":"<T>","nextStep":"POST /api/v1/actions/reboot"}
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot
+```
+
+**你离开的那个版本就此作废。** 它被标记为失败，永远不会再被安装；要往前走，
+等下一个版本（[更新](updates.md) 第 6 节）。
+
+#### 检查是否生效
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/update | jq .lastRollback
+# {"target":"<T>","targetGeneration":<n>,"targetVersion":"<上一个版本>","outcome":"rolled_back"}
+ssh root@mica-a4e2e69e.local mica update
+# state      rolled-back: The system is running a retained deployment after a failed update
+```
+
+`lastRollback` 只在回滚后的第一次启动里报告一次。`"outcome":"did_not_take"`
+会给出实际启动的部署和一个 `reason`（`target_failed`、`target_exhausted`
+或 `target_missing`）：回退目标没有起来，设备运行的是实际启动的那个。继续之前
+先读第 2 节。
+
+### 第 3 步：配置重置
+
+这里用时区代表出了问题的设置。先读更新源，因为重置会把它恢复成镜像里的值
+（第 5 节第 3 步）：
+
+```sh
+ssh root@mica-a4e2e69e.local mica time zone Europe/Athens
+# time.timezone is Europe/Athens
+curl -s -H "$AUTH" $DEV/api/v1/provisioning/status | jq .
+curl -s -H "$AUTH" -X POST $DEV/api/v1/reset \
+  -H 'content-type: application/json' -d '{"tier":"configuration"}'
+# {"tier":"configuration","applies":"next-boot"}                     (202)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot
+```
+
+在这次重启之前什么都不会变；重启前再发一次请求会替换前一次。
+`{"tier":"application-data"}` 以同样方式暂存第 4 步。
+
+#### 检查是否生效
+
+重置会把 SSH 恢复为关闭，并和其他访问设置一起丢掉它的密钥，所以用 API 检查，
+用令牌——重置会保留令牌：
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/settings/time.timezone        # "UTC"
+curl -s -H "$AUTH" $DEV/api/v1/settings/access.ssh.enabled   # false
+curl -s -H "$AUTH" $DEV/api/v1/claim | jq .state             # "claimed"
+```
+
+设备仍是已认领状态，令牌仍然有效；其余都回到默认值，主机名重新取自设备 id。
+把需要的设置加回来（SSH：[SSH](ssh.md) 第 1 节）。
+
+第 5 到第 8 步没有给完整示例：第 5 步在任何板子上都不能执行（第 7 节），第 6
+步在控制台里或用 `mica factory-reset` 完成（第 5 节），第 7 步就是
+[安装](../start/install.md)。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/mica-apid/src/update_api/deployment.rs`, `mica-core:crates/micad/src/rollback_outcome.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:crates/micad/src/deployment.rs`

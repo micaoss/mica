@@ -245,3 +245,82 @@ micad 的原因，即第 7 节中的一种；在所有维护窗口之外的安�
 [更新引擎](../reference/updates.md#core-集合)。
 
 > status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:crates/mica-deploy/src/core_set.rs`, `mica-build:src/release/core.ts`
+
+## 11. 完整示例：一次在线更新，一次离线更新
+
+一台已认领的 `uefi-x64.full` 设备，在网络上，更新策略保持默认，SSH 已用你的
+密钥打开（[SSH](ssh.md)），离线那一半还要一个 API 令牌：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"   # 来自：mica tokens create laptop
+```
+
+### 在线，在设备上
+
+```sh
+ssh root@mica-a4e2e69e.local
+mica update
+# system     <版本> (<id，12 位十六进制>)
+# core       0.0.8 (channel general)
+# state      succeeded: The boot health gate confirmed this deployment
+mica update check
+# available: system <更新的版本>          （或：up to date）
+mica update install --reboot
+# checking...
+# downloading...
+# installing...
+# installed; rebooting
+```
+
+不带 `--reboot` 时 `install` 停在 `installed; reboot to run it (or run
+again with --reboot)`；此时 `mica update` 显示 `state reboot-required` 和
+`reboot needed to run what is installed`，再执行 `mica reboot` 完成。检查也会
+以同样方式提供 core 集合（`available: core <版本>`），安装会一并取用。
+
+### 离线，用归档
+
+下载产品的 `.micaupd` 并核对摘要（[下载](../start/download.md)），然后在
+工作站上：
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' -H "$AUTH" -X POST $DEV/api/v1/update/import \
+  -H 'content-type: application/octet-stream' \
+  --data-binary @mica-uefi-x64.full-<stamp>.micaupd           # 202
+curl -s -H "$AUTH" $DEV/api/v1/update | jq '.lifecycle | {state, deploymentId, stagedKind}'
+# 校验对象期间是 {"state":"importing",...}，然后是
+# {"state":"ready","deploymentId":"<64 位十六进制>","stagedKind":"deployment"}
+ID=$(curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .lifecycle.deploymentId)
+curl -s -H "$AUTH" -X POST $DEV/api/v1/update/install \
+  -H 'content-type: application/json' -d "{\"deploymentId\":\"$ID\"}"
+# {"deploymentId":"<64 位十六进制>"}                          (202)
+curl -s -H "$AUTH" $DEV/api/v1/update | jq -r .lifecycle.state      # reboot-required
+curl -s -H "$AUTH" -X POST $DEV/api/v1/actions/reboot               # 202
+```
+
+被拒绝的导入以 `"state":"failed"` 结束，带一个第 7 节里的 `reason` 和一个
+`code`；什么都没有暂存。
+
+### 检查是否生效
+
+重启后给健康检查一分钟：
+
+```sh
+mica update
+# system     <更新的版本> (<新 id>)
+# state      validating: The running deployment awaits health confirmation
+# ……然后
+# state      succeeded: The boot health gate confirmed this deployment
+mica-deploy booted        # 一个 JSON 对象：正在运行的部署的 id
+```
+
+通过 API，`.lifecycle.state` 也是这样变化，`.boot.deploymentId` 是新的 id。
+保留的部署现在是你原来那个，`.rollback` 把它列为 `target`
+（[恢复](recovery.md) 第 2 步）。
+
+如果设备回到了旧版本，说明候选部署没通过试运行，启动的是保留的部署（第 5
+节）：`mica update` 显示 `state rolled-back: The system is running a
+retained deployment after a failed update`，失败的版本永远不会再被安装（第
+6 节）。保留串口记录和更新状态用于报告（[故障排查](troubleshooting.md)）。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/update_cli.rs`, `mica-core:crates/mica-apid/src/update_api.rs`, `mica-core:crates/mica-apid/src/update_api/deployment.rs`, `mica-core:crates/micad/src/update_lifecycle/snapshot.rs`, `mica-core:crates/micad/src/deployment.rs`

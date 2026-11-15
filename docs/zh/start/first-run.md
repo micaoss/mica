@@ -256,3 +256,72 @@ U 盘送进一次真实启动，其中引导分区通道尤其从未在物理板
 （[uefi-x64](../hardware/uefi-x64.md)）。
 
 > status: board-dependent — evidence: `mica-build:boards/products.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-core:docs/factory-ap-key.md`
+
+## 7. 完整示例：在局域网里认领一台设备
+
+一台 `uefi-x64.full` 设备刚在有线 DHCP 网络上第一次启动。在同一网络的一台
+Linux 工作站上，用 `curl`、`jq` 和 `avahi-browse`：
+
+1. **找到它。** 设备以 `_mica._tcp` 通告自己：
+
+   ```sh
+   avahi-browse -rt _mica._tcp      # mica-a4e2e69e，它的地址和端口 8080
+   DEV=http://mica-a4e2e69e.local:8080
+   curl -s $DEV/api/v1/session      # {"state":"setup","deviceCode":"off"}
+   ```
+
+   `setup` 表示还没有人认领；`deviceCode` 说明认领是否要带标签上的设备码
+   （除 `uefi-x64.gcp` 外，所有已发布产品都是 `off`）。
+
+2. **认领它**，并保留应答带来的浏览器会话。应答体是这个会话的 CSRF 令牌，
+   每个带 cookie 的写操作都要它：
+
+   ```sh
+   CSRF=$(curl -s -c jar -X POST $DEV/api/v1/setup \
+     -H 'content-type: application/json' \
+     -d '{"password":"a-long-admin-password"}' | jq -r .csrfToken)
+   ```
+
+3. **生成一个 API 令牌**给脚本用，之后就不再需要 cookie。明文只出现在这一次
+   应答里：
+
+   ```sh
+   TOKEN=$(curl -s -b jar -H "X-CSRF-Token: $CSRF" -X POST $DEV/api/v1/tokens \
+     -H 'content-type: application/json' -d '{"name":"laptop"}' | jq -r .token)
+   AUTH="Authorization: Bearer $TOKEN"     # mica_<id>_<secret>
+   ```
+
+4. **用你的密钥打开 SSH**（[SSH](../operate/ssh.md) 第 1 节）并登录：
+
+   ```sh
+   curl -s -H "$AUTH" -X POST $DEV/api/v1/ssh/authorized-keys \
+     -H 'content-type: application/json' \
+     -d "{\"key\": \"$(cat ~/.ssh/id_ed25519.pub)\"}"
+   curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/access.ssh.enabled \
+     -H 'content-type: application/json' -d 'true'
+   ssh root@mica-a4e2e69e.local mica status
+   ```
+
+在控制台里做同样的认领，就是它的第一页：设置密码，然后进入登录页。在带
+WiFi 的产品上，第 1 步换成加入标签上的出厂热点，并设
+`DEV=http://192.168.4.1:8080`；其余相同。
+
+### 检查是否生效
+
+```sh
+curl -s -H "$AUTH" $DEV/api/v1/claim
+# {"state":"claimed","via":"setup","at":<秒>,"rotationRequired":false}
+curl -s $DEV/api/v1/session
+# {"state":"unauthenticated"}
+```
+
+经这条路由认领时 `via` 是 `setup`；经配置文档认领时是
+`provisioning-document`，并且在改密码之前显示 `"rotationRequired":true`
+（第 4 节）。会话仍然回答 `setup`，说明没有认领成功：看 setup 调用的应答。
+`409 already_configured` 表示别人先认领了；之后你登录不进去的设备只能重刷
+（[恢复](../operate/recovery.md) 第 7 步）。
+
+配置文档没有给完整示例：它的传输方式从未在硬件上跑过（第 3 节），给示例就
+等于声称测过了没测过的东西。
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/setup.rs`, `mica-core:crates/mica-apid/src/routes/login.rs`, `mica-core:crates/mica-apid/src/routes/tokens.rs`, `mica-core:crates/mica-apid/src/routes/claim.rs`, `mica-core:crates/mica-apid/src/routes/ssh.rs`
