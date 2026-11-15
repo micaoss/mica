@@ -110,6 +110,6 @@ em dash，每个证据引用放在反引号里，多个引用以 `, ` 分隔：
 |---|---|
 | `make docs-verify` | 目录与文件树、链接、status 行及其证据、中文覆盖表、板卡页与模板 |
 | `make docs-verify-test` | 上述每项检查在其事实为假的夹具上确实会失败；并对脚本做 lint |
-| `make docs-verify-world` | 关于其他仓库的声明，以及每一条 `<repository>:<path>` 引用，对照那些仓库核对 |
+| `make docs-verify-world` | 关于其他仓库的声明，以及每一条 `<repository>:<path>` 引用，对照那些仓库核对；`reference/http-api`、`reference/settings` 和 `reference/cli`（中英文）对照 `tools/docs/reference-core.pin` 中的 mica-core 发布：路由对照 `openapi.json`，设置键对照 micad-settings 模型，动词、退出码和 `mica set` 路径对照 CLI 源码 |
 
-> status: shipped — evidence: `tools/docs/verify-index.sh`, `tools/docs/verify-status.sh`, `tools/docs/verify-citations.sh`
+> status: shipped — evidence: `tools/docs/verify-index.sh`, `tools/docs/verify-status.sh`, `tools/docs/verify-citations.sh`, `tools/docs/verify-reference.sh`

@@ -5,6 +5,29 @@
 到达设备。本页说明 micad 做什么、按什么顺序、用哪些文件；它持有的设置见[设置树](settings.md)，它前面的
 API 见 [API](api.md)。设计、总线接口和每一条路径见 `mica-core:docs/mica-core.md` 第 3 节。
 
+```text
+  浏览器 / HTTP 客户端             设备上的 root
+          |                          |            |
+          | :8080 / :8443            | mica       | mica
+          v                          v            |
+  +--------------------------------------+        |
+  | mica-apid（micad 的可执行文件）      |        |
+  |  /_ui/  控制台，静态文件             |        |
+  |  /api   认证、校验、审计             |<-- /run/mica/apid.sock（root）
+  +--------------------------------------+        |
+          | D-Bus com.mica.micad1（仅 root）      | D-Bus
+          v                                       v
+  +-------------------------------------------------------+
+  | micad daemon：设置树、任务、实时状态                  |
+  |   /mica/config/*.json   DATA/state                     |
+  |   调和器 -> 渲染的文件、unit（systemd 或 OpenRC）、    |
+  |             networkd、wpa_supplicant ...               |
+  +-------------------------------------------------------+
+```
+
+apid 不持有配置：每次读写都是对 micad 的调用。控制台是 apid 提供的静态代码；`mica` 经总线访问 micad，
+对规则属于 apid 的动词则经其本地套接字访问 apid（[`mica`](cli.md#2-两个通道)）。
+
 ## 固定不变的部分
 
 - **配置只有一个所有者。** 每次读取和修改都经过 micad。API 自己不持有配置，其他服务也不写系统配置。

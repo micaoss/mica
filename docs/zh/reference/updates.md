@@ -46,6 +46,41 @@ Mica OS 把各自签名的内核/support 和根组件作为部署安装，把 co
 获取依次经过检查、下载、就绪和安装，并有明确的不可用/失败状态。启动观测区分校验、确认、待重启和
 回退。API 不会从不受信任的根元数据或可编辑的版本标签推断已安装的内容。
 
+`lifecycle.state` 是一个词，按优先级选出：`installing`，然后是正在运行的操作（`checking`、`downloading`、
+`discarding`），然后是 `update-unavailable`（工作区未就绪），然后是 `failed`（这两种带 `code`），然后是
+`ready`（已暂存经校验的描述符），然后是启动给出的阶段，最后是 `idle`
+（`mica-core:crates/micad/src/update_lifecycle/snapshot.rs`、`crates/micad/src/deployment.rs`）：
+
+```text
+   idle / succeeded
+        |  检查（策略计划、控制台、mica update check）
+        v
+    checking ---> idle（没有更新的，或在 lifecycle.available 中报告了更新的发布：
+        |               策略为 check 时到此为止）
+        |  安装请求（控制台、mica update install），
+        |  或策略 auto 在维护窗口内
+        v
+   downloading --> ready（已暂存经校验的描述符）
+                     |
+                     v
+                 installing
+                     |
+                     v
+              reboot-required（候选已安装，等待重启）
+                     |  重启：加载器启动候选，3 次尝试
+                     v
+                 validating（运行中的候选等待健康闸门）
+                  |        \
+     闸门通过     |         \  尝试用完（被拒绝的候选在重启前读作
+                  |          \  reboot-required）
+                  v          v
+              succeeded    加载器启动保留的回退
+                            --> rolled-back（更新失败后运行保留的部署）
+
+   任何一步都可能以 failed（带 code）结束；工作区未就绪时为 update-unavailable；
+   待定的 core 集合为该集合给出同样的 reboot-required / validating 阶段
+```
+
 ## 获取与安装
 
 来源是一个**更新根**，即以 `/` 结尾的 URL，例如 `https://res.micaos.dev/update/`。客户端在其下先读

@@ -46,6 +46,7 @@ docs-verify:
 docs-verify-world:
 	bash tools/docs/verify-world.sh
 	bash tools/docs/verify-citations.sh
+	bash tools/docs/verify-reference.sh
 
 docs-verify-test:
 	bash tools/docs/verify-index-test.sh
@@ -55,6 +56,7 @@ docs-verify-test:
 	bash tools/docs/verify-board-test.sh
 	bash tools/docs/verify-world-test.sh
 	bash tools/docs/verify-citations-test.sh
+	bash tools/docs/verify-reference-test.sh
 	bash tools/docs/record-test.sh
 	bash tools/docs/shell-lint.sh
 	bash tools/docs/shell-lint-test.sh

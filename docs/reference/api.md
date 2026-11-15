@@ -21,6 +21,20 @@ through the bus. See [management](management.md) and [bus](../integrate/bus.md).
 `/_ui/` always serves the embedded dashboard. `/` serves a valid selected
 custom UI or redirects to the built-in dashboard.
 
+One request, from the client to the applied change:
+
+```text
+client --HTTP--> listener (network mode: :8080, or :8443 with HTTPS; local: the socket only)
+         --> /api route --> credential: session cookie (+ X-CSRF-Token on writes),
+                            bearer token, or uid 0 on the socket
+         --> validation (apid's rules) --> audit line (writes)
+         --> D-Bus call to micad --> read: 200 with the document
+                                 \-> write: stored, 202 {"taskId"}
+                                       --> micad applies --> GET /api/v1/tasks/{id}
+                                           phase applied, outcome succeeded or failed
+         errors: {"error": {"code", "message", ...}} with the status of 2.2
+```
+
 ### 1.1 Who reaches it: the web mode
 
 `access.web.mode` decides it, and `GET /api/v1/meta` reports it as `webMode`:

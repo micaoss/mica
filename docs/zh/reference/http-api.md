@@ -13,7 +13,7 @@
   回答任何调用方；其余路由都需要浏览器会话（写操作带 `X-CSRF-Token`）或 bearer 令牌
   `Authorization: Bearer mica_<id>_<secret>`。
 - **稍后生效的写入**返回 `202` 和 `{"taskId"}`；在 `GET /api/v1/tasks/{id}` 跟进，直到其 `phase` 为
-  `applied` 或失败。
+  `applied`，然后读取其 `outcome`（不论结果如何，`phase` 最终都是 `applied`）。
 - **模式本身。** 在设备上运行 `mica-apid --openapi` 会打印同一份文档；闸门保证它与处理程序一致。
 - **错误**始终是 `{"error": {"code", "message", "source", …}}`（[状态码](api.md#22-错误与遮蔽)）。
 

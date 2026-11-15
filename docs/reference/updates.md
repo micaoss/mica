@@ -64,6 +64,45 @@ explicit unavailable/failure states. Boot observations distinguish validation,
 confirmation, a pending reboot and fallback. The API does not infer installed
 content from untrusted root metadata or an editable version label.
 
+`lifecycle.state` is one word, chosen by precedence: `installing`, then a
+running operation (`checking`, `downloading`, `discarding`), then
+`update-unavailable` (the workspace is not ready), then `failed` (both of these
+carry a `code`), then `ready` (a verified descriptor is staged), then the phase
+the boot gives, then `idle` (`mica-core:crates/micad/src/update_lifecycle/snapshot.rs`,
+`crates/micad/src/deployment.rs`):
+
+```text
+   idle / succeeded
+        |  check (policy schedule, console, mica update check)
+        v
+    checking ---> idle  (nothing newer, or a newer release reported in
+        |               lifecycle.available: under policy check, nothing more)
+        |  install request (console, mica update install),
+        |  or policy auto inside a maintenance window
+        v
+   downloading --> ready  (verified descriptor staged)
+                     |
+                     v
+                 installing
+                     |
+                     v
+              reboot-required  (candidate installed, awaits reboot)
+                     |  reboot: the loader boots the candidate, 3 attempts
+                     v
+                 validating  (running candidate awaits the health gate)
+                  |        \
+     gate passes  |         \  attempts run out (a rejected candidate reads
+                  |          \  reboot-required until the reboot)
+                  v          v
+              succeeded    the loader boots the retained fallback
+                            --> rolled-back  (running a retained deployment
+                                              after a failed update)
+
+   any step can end in failed (with a code); a workspace that is not ready
+   reads update-unavailable; a pending core set gives the same
+   reboot-required / validating phases for the set
+```
+
 ## Acquisition and installation
 
 The source is an **update root**, a URL ending in `/` such as

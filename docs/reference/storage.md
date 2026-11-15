@@ -15,6 +15,28 @@ boot it extends to the end of the medium (`mica-grow-data` with
 `systemd-repart`, or its OpenRC twin), and the factory sizes below are what the
 image carries.
 
+```text
+one disk (GPT)
++------------------------+--------------------+---------------------------------------->
+| 1: ESP or FIRMWARE     | 2: SYSTEM          | 3: DATA  (grows to the end at first boot)
+|  loader, boot records  |  read-only at      |  /mnt/data
+|  (FIRMWARE: raw)       |  /mnt/system       |
++------------------------+--------------------+---------------------------------------->
+                          deployments/         state/       -> /var/lib/mica, /etc/hostname,
+                          kernels/  roots/                     /etc/machine-id (ro), /usr/local/...
+                          sets/core/           meta/        -> update transactions, receipts
+                          extensions/          mica/        -> /mica  (config, updates, volumes,
+                          owner-certs/                          compose, diagnostics, ui),
+                          factory-reset/                        /root, /home
+                                               containers/  -> /mica/containers
+                                               srv/         -> /srv  (no reset tier opens it)
+                                               var/         -> /var
+                                               cache/, tmp/ -> internal
+```
+
+`qemu-armhf` holds the same SYSTEM and DATA as UBIFS volumes on NOR flash,
+beside one static volume per signed object (below).
+
 | Board | Partition 1 | Partition 2: SYSTEM | Partition 3: DATA (factory size) |
 |---|---|---|---|
 | `uefi-x64`, `uefi-arm64` | ESP, 512 MiB | 1 GiB | 256 MiB |

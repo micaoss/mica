@@ -10,6 +10,27 @@ Mica OS 设备把什么放在哪里：每块板的分区或 UBI 卷、SYSTEM 和
 每块磁盘板卡有三个 GPT 分区。只有 DATA 会增长：首次启动后它扩展到介质末尾（`mica-grow-data`
 配合 `systemd-repart`，或 OpenRC 上的对应工具），下表是镜像出厂时的大小。
 
+```text
+一块磁盘（GPT）
++------------------------+--------------------+---------------------------------------->
+| 1：ESP 或 FIRMWARE     | 2：SYSTEM          | 3：DATA（首次启动时扩展到末尾）
+|  加载器、启动记录      |  只读挂载于        |  /mnt/data
+|  （FIRMWARE：裸分区）  |  /mnt/system       |
++------------------------+--------------------+---------------------------------------->
+                          deployments/         state/       -> /var/lib/mica、/etc/hostname、
+                          kernels/  roots/                     /etc/machine-id（只读）、/usr/local/...
+                          sets/core/           meta/        -> 更新事务、回执
+                          extensions/          mica/        -> /mica（config、updates、volumes、
+                          owner-certs/                          compose、diagnostics、ui）、
+                          factory-reset/                        /root、/home
+                                               containers/  -> /mica/containers
+                                               srv/         -> /srv（任何重置层级都不打开它）
+                                               var/         -> /var
+                                               cache/、tmp/ -> 内部使用
+```
+
+`qemu-armhf` 把同样的 SYSTEM 和 DATA 作为 NOR 闪存上的 UBIFS 卷保存，每个签名对象另有一个静态卷（见下）。
+
 | 板卡 | 分区 1 | 分区 2：SYSTEM | 分区 3：DATA（出厂大小） |
 |---|---|---|---|
 | `uefi-x64`、`uefi-arm64` | ESP，512 MiB | 1 GiB | 256 MiB |

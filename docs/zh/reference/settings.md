@@ -182,6 +182,14 @@ base64 的 32 字节，`allowedIps` 是地址或 CIDR，`endpoint` 是 `host:por
 文本所针对的 init；只应用产品自己的那种。限制：32 个 unit，每份文本 64 KiB，每份 `conf` 16 KiB（仅
 OpenRC），合计 256 KiB。启用模板会被拒绝。见[原生应用](../../integrate/native-applications.md)。
 
+| 键 | 类型 | 默认值 | 限制 |
+|---|---|---|---|
+| `units` | 名称 → unit 的映射 | `{}` | 最多 32 个；所有文本和 conf 合计 ≤ 256 KiB |
+| `units.<name>.kind` | `systemd`、`openrc` | 必填 | 只应用产品自己的 init |
+| `units.<name>.text` | 字符串 | 必填 | unit 文件或 openrc-run 脚本，≤ 64 KiB |
+| `units.<name>.conf` | 字符串或缺省 | 缺省 | 脚本的 `conf.d` 文件，仅 OpenRC，≤ 16 KiB |
+| `units.<name>.enabled` | 布尔值 | `false` | 立即启动并在每次启动时启动；模板不允许启用 |
+
 ## `mqtt`
 
 | 键 | 类型 | 默认值 |

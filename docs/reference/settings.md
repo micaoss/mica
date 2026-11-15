@@ -213,6 +213,14 @@ text is for; only the product's own is applied. Limits: 32 units, 64 KiB per
 text, 16 KiB per `conf` (OpenRC only), 256 KiB in all. An enabled template is
 refused. See [native applications](../integrate/native-applications.md).
 
+| Key | Type | Default | Limits |
+|---|---|---|---|
+| `units` | map name → unit | `{}` | at most 32; all texts and confs together ≤ 256 KiB |
+| `units.<name>.kind` | `systemd`, `openrc` | required | only the product's own init is applied |
+| `units.<name>.text` | string | required | the unit file or openrc-run script, ≤ 64 KiB |
+| `units.<name>.conf` | string or absent | absent | the script's `conf.d` file, OpenRC only, ≤ 16 KiB |
+| `units.<name>.enabled` | boolean | `false` | started now and at every boot; refused for a template |
+
 ## `mqtt`
 
 | Key | Type | Default |

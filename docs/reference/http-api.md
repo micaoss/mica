@@ -17,7 +17,8 @@ are [the settings tree](settings.md).
   route needs a browser session (with `X-CSRF-Token` on writes) or a bearer
   token `Authorization: Bearer mica_<id>_<secret>`.
 - **Writes that apply later** answer `202` with `{"taskId"}`; follow it at
-  `GET /api/v1/tasks/{id}` until its `phase` is `applied` or it fails.
+  `GET /api/v1/tasks/{id}` until its `phase` is `applied`, then read its
+  `outcome` (`phase` is `applied` whatever the outcome).
 - **The schema itself.** `mica-apid --openapi` on the device prints the same
   document; the gate holds it to the handlers.
 - **Errors** are always `{"error": {"code", "message", "source", …}}`

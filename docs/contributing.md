@@ -136,6 +136,6 @@ the same status lines, in the same order, as its English source.
 |---|---|
 | `make docs-verify` | the catalogue against the tree, links, status lines and their evidence, the Chinese coverage table, the board pages against the template |
 | `make docs-verify-test` | that each of those checks fails on a fixture where its fact is false; lints the scripts |
-| `make docs-verify-world` | claims about other repositories, and every `<repository>:<path>` citation, against those repositories |
+| `make docs-verify-world` | claims about other repositories, and every `<repository>:<path>` citation, against those repositories; `reference/http-api`, `reference/settings` and `reference/cli` (en and zh) against the mica-core release in `tools/docs/reference-core.pin`: routes against `openapi.json`, settings keys against the micad-settings model, verbs, exit codes and `mica set` paths against the CLI source |
 
-> status: shipped — evidence: `tools/docs/verify-index.sh`, `tools/docs/verify-status.sh`, `tools/docs/verify-citations.sh`
+> status: shipped — evidence: `tools/docs/verify-index.sh`, `tools/docs/verify-status.sh`, `tools/docs/verify-citations.sh`, `tools/docs/verify-reference.sh`

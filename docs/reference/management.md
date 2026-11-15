@@ -9,6 +9,30 @@ what micad does, in what order and with which files; the settings it holds are
 The design, the bus interface and every path are
 `mica-core:docs/mica-core.md` section 3.
 
+```text
+  browser / HTTP client            root on the device
+          |                          |            |
+          | :8080 / :8443            | mica       | mica
+          v                          v            |
+  +--------------------------------------+        |
+  | mica-apid  (micad's executable)      |        |
+  |  /_ui/  console, static              |        |
+  |  /api   auth, validation, audit      |<-- /run/mica/apid.sock (root)
+  +--------------------------------------+        |
+          | D-Bus com.mica.micad1 (root only)     | D-Bus
+          v                                       v
+  +-------------------------------------------------------+
+  | micad daemon: the settings tree, tasks, live state     |
+  |   /mica/config/*.json   DATA/state                     |
+  |   reconcilers -> rendered files, units (systemd or     |
+  |                  OpenRC), networkd, wpa_supplicant ... |
+  +-------------------------------------------------------+
+```
+
+apid holds no configuration: every read and write is a call to micad. The
+console is static code served by apid; `mica` reaches micad on the bus, or apid
+on its local socket for the verbs whose rules are apid's ([`mica`](cli.md#2-two-channels)).
+
 ## What is fixed
 
 - **One owner of configuration.** Every read and change goes through micad.

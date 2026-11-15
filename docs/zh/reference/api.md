@@ -15,6 +15,20 @@
 `/api` 负责管理操作、发现、认证和 API 错误。`/healthz` 只检查监听器，不是设备健康的结论。`/_ui/` 始终
 提供内置控制台。`/` 提供有效的已选自定义 UI，否则重定向到内置控制台。
 
+一次请求，从客户端到变更生效：
+
+```text
+客户端 --HTTP--> 监听器（network 模式：:8080，开启 HTTPS 时 :8443；local：只有套接字）
+         --> /api 路由 --> 凭据：会话 cookie（写入时加 X-CSRF-Token）、
+                           bearer 令牌，或套接字上的 uid 0
+         --> 校验（apid 的规则）--> 审计行（写入）
+         --> 对 micad 的 D-Bus 调用 --> 读取：200 和文档
+                                    \-> 写入：已保存，202 {"taskId"}
+                                          --> micad 应用 --> GET /api/v1/tasks/{id}
+                                              phase 为 applied，outcome 为 succeeded 或 failed
+         错误：{"error": {"code", "message", ...}}，状态码见 2.2
+```
+
 ### 1.1 谁能访问：Web 模式
 
 由 `access.web.mode` 决定，`GET /api/v1/meta` 以 `webMode` 报告：
