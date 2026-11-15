@@ -113,7 +113,7 @@ that boot. An interrupted reset is replayable: the next boot finishes it.
   or policy settings, and any settings state too tangled to unpick.
 - **Costs irreversibly:** every modelled setting — network, access, time,
   update policy, all at once — and the HTTPS identity the console was served
-  with. There is no per-subtree reset.
+  with. There is no per-subtree reset. On a released device it also drops the declared user services, container projects and paired Bluetooth devices: at the next apply micad stops and removes the units it installed and the declared containers, while units installed by hand, service accounts, volumes and the STATE stores stay.
 - **Keeps:** the claim, the administrator credential and the API tokens — on
   purpose: a settings action that dropped them would be a lockout wearing a
   friendlier name.
