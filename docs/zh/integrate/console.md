@@ -44,3 +44,42 @@ UI 使用仓库固定版本的 Bun 构建、React、TanStack Router/Query、Tail
 
 组件测试覆盖状态和操作行为。浏览器验收检查渲染出的流程，完整镜像的 API 验收检查真实的服务契约。硬件行为与
 浏览器和 mock 证据分开。
+
+## 完整示例：通过 HTTPS 访问控制台
+
+一台在局域网上已认领的设备和一个 API token（或者用控制台的访问页，它发出的是同样
+的请求）：
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+curl -s -H "$AUTH" $DEV/api/v1/web
+# {"mode":"network","httpPort":8080,"httpsEnabled":false,"httpsPort":8443}
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/web -H 'content-type: application/json' \
+  -d '{"mode":"network","httpPort":8080,"httpsEnabled":true,"httpsPort":8443}'
+# {"taskId":"<id>"}
+```
+
+`PUT` 会替换整个 `access.web` 子树，所以每个字段都要发。apid 会在新的监听上重启，
+当前连接随之断开；之后控制台在 `https://mica-a4e2e69e.local:8443/_ui/`，使用设备
+自己生成的证书，浏览器首次访问时会警告。
+
+### 检查是否生效
+
+```sh
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $DEV/_ui/
+# 一个重定向（3xx）到 https://...:8443
+curl -sk -H "$AUTH" https://mica-a4e2e69e.local:8443/api/v1/web/certificate \
+  | jq '{serving, selfSigned: .certificate.selfSigned, sha256: .certificate.sha256}'
+# {"serving":true,"selfSigned":true,"sha256":"<摘要>"}
+```
+
+在接受警告之前，把这个摘要和浏览器显示的证书摘要对比：一致说明是设备自己的证书，
+而不是路上的某个证书。`PUT /api/v1/web/certificate` 可以换成你自己的证书和密钥
+（[HTTP API](../reference/http-api.md)）。
+
+要改回来，发同样的 `PUT`，把 `"httpsEnabled"` 设为 `false`，发往
+`https://...:8443`。设备无法监听的端口会让任务失败，而不会让设备出问题：读任务，或在
+设备上执行 `mica web status`。
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/web.rs`, `mica-core:crates/mica-apid/src/tls.rs`

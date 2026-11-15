@@ -175,3 +175,10 @@ DATA/state 镜像到另一台上以"保住"它的身份；序列号的连续性�
 硬件的行都是 `not tested`。
 
 > status: board-dependent — evidence: `docs/hardware/cx3576.md`, `docs/hardware/qualification.md`
+
+## 7. 完整示例
+
+没有，因为没有可运行的工厂工具（见本页开头）。产线今天能做的步骤就是单台设备的
+步骤：写入镜像（[安装](../start/install.md)），可选地在镜像上放一份配置文档
+（[配置下发](provisioning.md) 第 8 节），以及读回首次启动生成的身份
+（`GET /api/v1/system/info`）。

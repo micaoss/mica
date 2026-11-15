@@ -218,3 +218,11 @@ Nothing in this sequence has been executed on physical hardware from this
 tree; the board page carries every hardware-dependent row as `not tested`.
 
 > status: board-dependent — evidence: `docs/hardware/cx3576.md`, `docs/hardware/qualification.md`
+
+## 7. Worked example
+
+None, because there is no factory tooling to run (the headline of this
+page). The steps a line can take today are the ones a single device takes:
+writing the image ([install](../start/install.md)), an optional provisioning
+document on it ([provisioning](provisioning.md) section 8), and reading back
+the identity the first boot minted (`GET /api/v1/system/info`).

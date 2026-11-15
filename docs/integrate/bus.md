@@ -308,3 +308,11 @@ sequence numbers, metric aliases, and host coordination are a different wire
 contract. A future Sparkplug publisher should sit beside this bridge and reuse
 the same exact-enrollment boundary and structural micad exclusion; it must not
 reintroduce the system management tree as telemetry.
+
+## 9. Worked example
+
+The run that exercises this contract end to end is on the MQTT page: the
+broker switched on, a client connected, the keepalive answered and an
+application enrolled under `com.mica.<class>`
+([MQTT](mqtt.md) sections 1, 3 and 5). This page is the contract that run
+relies on, and repeats none of it.

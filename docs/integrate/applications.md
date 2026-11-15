@@ -204,3 +204,11 @@ rollback are not part of Mica OS: an application is a container or a user
 service, as the guides above describe.
 
 > status: unsupported
+
+## 7. Worked examples
+
+This page chooses between the two paths and runs neither. The runs are on
+the pages for each: a Compose project end to end on podman and on Docker
+([containers](containers.md) sections 7 and 8), and a service of your own
+on either init ([services](services.md)). A native package is a build-tree
+change ([native applications](native-applications.md) section 12).

@@ -163,3 +163,10 @@ registry 凭据和应用密钥都是有人放在 DATA/state 上、root 可读的
 容器或用户服务，如上面的指南所述。
 
 > status: unsupported
+
+## 7. 完整示例
+
+本页只帮你在两条路径之间做选择，哪条都不跑。运行示例在各自的页面上：podman 和
+Docker 上的 Compose 项目端到端（[容器](containers.md) 第 7、8 节），以及任一 init
+上你自己的服务（[服务](services.md)）。原生软件包是对构建树的改动
+（[原生应用](native-applications.md) 第 12 节）。

@@ -58,3 +58,44 @@ is supplied to the Rust/package producer; it is not checked into the source.
 Component tests cover state and action behavior. Browser acceptance checks the
 rendered flows, and full-image API acceptance checks the real service contract.
 Keep hardware behavior separate from browser and mock evidence.
+
+## A worked example: the console over HTTPS
+
+A claimed device on the LAN and an API token (or the console's Access page,
+which makes the same request):
+
+```sh
+DEV=http://mica-a4e2e69e.local:8080
+AUTH="Authorization: Bearer mica_<id>_<secret>"
+curl -s -H "$AUTH" $DEV/api/v1/web
+# {"mode":"network","httpPort":8080,"httpsEnabled":false,"httpsPort":8443}
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/web -H 'content-type: application/json' \
+  -d '{"mode":"network","httpPort":8080,"httpsEnabled":true,"httpsPort":8443}'
+# {"taskId":"<id>"}
+```
+
+A `PUT` replaces the whole `access.web` subtree, so send every field. apid
+restarts on the new listeners and this connection ends; the console is then at
+`https://mica-a4e2e69e.local:8443/_ui/` with a certificate the device made
+for itself, and a browser warns about it on the first visit.
+
+### Check it worked
+
+```sh
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $DEV/_ui/
+# a redirect (3xx) to https://...:8443
+curl -sk -H "$AUTH" https://mica-a4e2e69e.local:8443/api/v1/web/certificate \
+  | jq '{serving, selfSigned: .certificate.selfSigned, sha256: .certificate.sha256}'
+# {"serving":true,"selfSigned":true,"sha256":"<digest>"}
+```
+
+Compare that digest with the one the browser shows for the certificate
+before you accept the warning: it is the device's own, not one on the way.
+`PUT /api/v1/web/certificate` puts your own certificate and key in its place
+([HTTP API](../reference/http-api.md)).
+
+To go back, the same `PUT` with `"httpsEnabled":false`, sent to
+`https://...:8443`. A port the device cannot listen on fails the task
+rather than the device: read the task, or `mica web status` on the device.
+
+> status: shipped — evidence: `mica-core:crates/mica-apid/src/routes/web.rs`, `mica-core:crates/mica-apid/src/tls.rs`
