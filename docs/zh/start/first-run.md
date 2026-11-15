@@ -219,3 +219,40 @@ U 盘送进一次真实启动，其中引导分区通道尤其从未在物理板
 
 **尚未在硬件上执行过的部分。**协议、设备端和网页都用对方的参考实现做了测试，
 网页也已部署；还没有在实体板卡上运行的记录。
+
+## 6. 首次运行，按产品
+
+每个已发布的产品都是同样的三步：找到设备，认领它，然后决定以后如何进入。不同的是进入的途径。
+
+| 产品 | 找到它 | 认领 | 本地登录 |
+|---|---|---|---|
+| `cx3576.full` | 任一网口的有线 DHCP；出厂接入点（`http://192.168.4.1:8080`）；手机经蓝牙（第 5 节） | 控制台的首页，不需要设备码 | 串口 `ttyFIQ0`，1500000 波特；HDMI 加 USB 键盘，Alt+F2 进入 `tty2`（[cx3576](../hardware/cx3576.md#控制台)） |
+| `s905x5m.sd-full`、`s905x5m.emmc-full` | 有线 DHCP；出厂接入点；手机经蓝牙 | 控制台的首页，不需要设备码 | 串口 `ttyS0`，921600 波特（[s905x5m](../hardware/s905x5m.md#控制台)） |
+| `uefi-x64.full`、`uefi-x64.docker` | `eth0` 上的有线 DHCP | 控制台的首页，不需要设备码 | 串口 `ttyS0`，115200 波特 |
+| `mini-x64.basic` | `eth0` 上的有线 DHCP | 控制台的首页，不需要设备码 | 串口 `ttyS0`，115200 波特 |
+| `qemu-armhf.basic` | 经你给 QEMU 机器的网络访问 8080 端口 | 控制台的首页，不需要设备码 | QEMU 终端（`ttyAMA0`） |
+| `uefi-x64.gcp` | 从首次启动起即可 SSH，登录来自实例的元数据；控制台经 SSH 隧道 | 设备码，或 `sudo mica setup` | SSH；没有局域网发现 |
+
+在局域网上，设备以 `mica-xxxxxxxx.local` 应答（mDNS），并出现在电脑的网络视图中（SSDP），`uefi-x64.gcp` 除外；
+否则从 DHCP 服务器获取它的地址。本地登录需要临时 root 密码，而只有管理员能设置它（控制台的访问页，或以 root
+运行 `mica root-password`），所以它们用于认领之后。
+
+**在你网络上的设备：**
+
+1. 打开 `http://mica-xxxxxxxx.local:8080`（或其地址），在首页设置管理员密码。要尽快：在此之前，第一个访问者
+   就会认领这台设备。
+2. 要使用 SSH，在控制台的访问页打开它并添加你的密钥。
+3. 以 root 登录，用 [`mica`](../operate/mica.md) 工作：
+
+   ```sh
+   ssh root@mica-xxxxxxxx.local
+   mica status
+   mica update check
+   ```
+
+**在 `uefi-x64.gcp` 上：**用 `gcloud compute ssh <vm>` 登录；元数据中的登录是云管理员，经 `sudo` 获得 root。
+在那里用 `sudo mica setup` 认领，它只询问密码，不需要设备码；或经隧道打开控制台
+（`gcloud compute ssh <vm> -- -L 8080:localhost:8080`），并输入 `sudo mica internal device-code` 打印的设备码
+（[uefi-x64](../hardware/uefi-x64.md)）。
+
+> status: board-dependent — evidence: `mica-build:boards/products.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-core:docs/factory-ap-key.md`

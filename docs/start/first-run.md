@@ -270,3 +270,47 @@ advertises only while a **provisioning window** is open:
 **What has never been executed on hardware.** The protocol, the device side
 and the page are covered by tests against each other's reference, and the
 page is deployed; no run on a physical board is recorded yet.
+
+## 6. The first run, product by product
+
+The same three steps on every released product: reach the device, claim it,
+then decide how you will get back in. What differs is the way in.
+
+| Product | Reach it | Claim | Local login |
+|---|---|---|---|
+| `cx3576.full` | wired DHCP on either port; the factory access point (`http://192.168.4.1:8080`); a phone over Bluetooth (section 5) | the console's first page, no device code | serial `ttyFIQ0` at 1500000 baud; HDMI with a USB keyboard, Alt+F2 for `tty2` ([cx3576](../hardware/cx3576.md#console)) |
+| `s905x5m.sd-full`, `s905x5m.emmc-full` | wired DHCP; the factory access point; a phone over Bluetooth | the console's first page, no device code | serial `ttyS0` at 921600 baud ([s905x5m](../hardware/s905x5m.md#console)) |
+| `uefi-x64.full`, `uefi-x64.docker` | wired DHCP on `eth0` | the console's first page, no device code | serial `ttyS0` at 115200 baud |
+| `mini-x64.basic` | wired DHCP on `eth0` | the console's first page, no device code | serial `ttyS0` at 115200 baud |
+| `qemu-armhf.basic` | port 8080 through the network you give the QEMU machine | the console's first page, no device code | the QEMU terminal (`ttyAMA0`) |
+| `uefi-x64.gcp` | SSH from the first boot, with the logins in the instance's metadata; the console through an SSH tunnel | the device code, or `sudo mica setup` | SSH; no LAN discovery |
+
+On a LAN the device answers as `mica-xxxxxxxx.local` (mDNS) and appears in a
+computer's network view (SSDP), except on `uefi-x64.gcp`; otherwise take its
+address from the DHCP server. The local logins need the transient root
+password, which only an administrator sets (the console's access page, or
+`mica root-password` as root), so they are for after the claim.
+
+**On a device on your network:**
+
+1. Open `http://mica-xxxxxxxx.local:8080` (or the address) and set the
+   administrator password on the first page. Do it promptly: until then the
+   first visitor claims the device.
+2. To use SSH, turn it on and add your key on the console's access page.
+3. Log in as root and work with [`mica`](../operate/mica.md):
+
+   ```sh
+   ssh root@mica-xxxxxxxx.local
+   mica status
+   mica update check
+   ```
+
+**On `uefi-x64.gcp`:** log in with `gcloud compute ssh <vm>`; the metadata
+logins are cloud administrators and get root through `sudo`. Claim it from
+there with `sudo mica setup`, which asks for the password and no device code,
+or open the console through a tunnel
+(`gcloud compute ssh <vm> -- -L 8080:localhost:8080`) and give it the device
+code that `sudo mica internal device-code` prints
+([uefi-x64](../hardware/uefi-x64.md)).
+
+> status: board-dependent — evidence: `mica-build:boards/products.md`, `mica-build:boards/uefi-x64/products/gcp/product.env`, `mica-core:docs/factory-ap-key.md`

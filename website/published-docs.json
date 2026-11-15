@@ -9,7 +9,9 @@
         { "name": "download", "dir": "start" },
         { "name": "install", "dir": "start" },
         { "name": "flashing", "dir": "start" },
-        { "name": "first-run", "dir": "start" }
+        { "name": "first-run", "dir": "start" },
+        { "name": "build", "dir": "start" },
+        { "name": "faq", "dir": "start" }
       ]
     },
     {
@@ -97,6 +99,7 @@
         { "name": "kernel-features", "dir": "reference" },
         { "name": "release-lock", "dir": "reference" },
         { "name": "glossary", "dir": "reference" },
+        { "name": "how-releases-work", "dir": "releases" },
         { "name": "release-notes", "dir": "releases" },
         { "name": "support", "dir": "releases" }
       ]

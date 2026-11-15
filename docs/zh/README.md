@@ -16,6 +16,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`install.md`](start/install.md) — 安装的操作顺序：从选镜像到首次启动
   - [`first-run.md`](start/first-run.md) — 首次启动、离线配置文档、认领设备
   - [`build.md`](start/build.md) — 从源码构建：在线按固定 release，离线按并排检出
+  - [`faq.md`](start/faq.md) — 最先被问到的问题：每条几行回答，并指向完整说明的页面
 - `operate/` — 运维：配置、更新、恢复、存储、API
   - [`configuration.md`](operate/configuration.md) — 配置模型与所有受支持的修改方式
   - [`updates.md`](operate/updates.md) — 该用哪个更新归档、在线/离线/U 盘更新、维护窗口、确认、回滚以及每一种拒绝
@@ -96,6 +97,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 |---|---|
 | `../start/build.md` | current |
 | `../start/download.md` | current |
+| `../start/faq.md` | current |
 | `../start/first-run.md` | current |
 | `../start/flashing.md` | current |
 | `../start/install.md` | current |
