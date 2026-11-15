@@ -114,6 +114,20 @@ generation，并按描述符逐字节校验。产品没有通道（core 集合�
 才重启。更底层的步骤是 `mica-deploy install`、`confirm`、`status` 和 `booted`，每条都输出
 一个 JSON 对象。
 
+```text
+$ mica update check
+available: system <version>
+$ mica update install --reboot
+checking...
+downloading...
+installing...
+installed; rebooting
+```
+
+重启之后，`mica update` 显示状态（健康门确认之前是 `validating`，之后是 `succeeded`）。拒绝以 1 退出并带
+micad 的原因，即第 7 节中的一种；在所有维护窗口之外的安装会立即被拒绝（`outside-window`）。每一步的输出和退出码见
+[`mica` 参考](../reference/cli.md#update)。
+
 **新内核要等它的驱动扩展。** 在装有驱动扩展的设备上，只要还有扩展没有对应新内核的构建，
 换了内核的部署就不会被安装：检查会把它报告为 `waitsForExtension`，安装被拒绝，错误以
 `waitsForExtension:` 开头并列出这些扩展。带来新内核的构建，或者放弃该扩展，两者就作为

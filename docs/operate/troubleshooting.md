@@ -19,7 +19,8 @@ In order of preference:
    without a shell.
 2. **SSH** — off by default (on from the first boot on the cloud products and
    `uefi-x64.base`); an authenticated administrator enables it and
-   installs a key through the API. Every authorized key is a root key. For an
+   installs a key through the API (or, as root on the device, `mica ssh on`
+   and `mica ssh keys add <file>`). Every authorized key is a root key. For an
    operator standing at a device with no key installed, the transient root
    password (set through the UI, valid until the next boot) is the intended
    one-session path.
@@ -51,7 +52,19 @@ in every support case.
 devices and a reset reason classified from generic kernel evidence;
 `GET /api/v1/network/status` adds what networkd, wpa_supplicant and resolved
 observe right now, which is the answer to "the device thinks its network is
-X". In a shell, `/usr/share/mica/manifest.tsv` is the same bill of materials
+X". In a shell, `mica status` prints the same facts at a glance (board, running
+system and core set, update state, uptime, addresses, time, DATA usage), and
+each one that could not be read says why:
+
+```sh
+mica status          # one line per fact; --json for the five answers
+mica update          # the running system, the update state and its refusal
+mica network         # one line per interface: state and addresses
+mica time            # synchronized or not, the server, the offset
+mica web status      # where the API listens
+```
+
+`/usr/share/mica/manifest.tsv` is the same bill of materials
 the API reads, and `hostnamectl` gives the hostname (which encodes the first
 eight hex characters of the device id) and the machine id.
 
@@ -94,9 +107,11 @@ escalation carrying the board identity, never a green result.
   is reported at live-state `health.units` and read with `GET
   /api/v1/state/health` or out of a diagnostic snapshot. What the gate requires
   is `/etc/mica/health.conf`, inside the read-only root.
-- **Update state:** `mica-deploy status` reports current/candidate/fallback
-  deployments, attempt state, component verification and failed deployments.
-  Capture `GET /api/v1/update` for the management view as well.
+- **Update state:** `mica update` (or `GET /api/v1/update`) is the
+  management view: the lifecycle state, what is available, a pending reboot
+  and the last refusal. `mica-deploy status` reports the deployments under it:
+  current/candidate/fallback, attempt state, component verification and failed
+  deployments. Capture both.
 
 - **Containers:** `mica container list` shows every project's containers and
   their phase and health, and `mica container logs <project>/<service>` a log; a

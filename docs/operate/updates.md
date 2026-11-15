@@ -148,6 +148,22 @@ the newest release through the same gates and reboots only with `--reboot`.
 The lower-level steps are `mica-deploy install`, `confirm`, `status` and
 `booted`; every one of those prints one JSON object.
 
+```text
+$ mica update check
+available: system <version>
+$ mica update install --reboot
+checking...
+downloading...
+installing...
+installed; rebooting
+```
+
+After the reboot, `mica update` shows the state (`validating` until the
+health gate confirms, then `succeeded`). A refusal exits 1 with micad's
+reason, one of section 7's; an install outside every maintenance window is
+refused at once (`outside-window`). Each step's output and exit code is in
+[the `mica` reference](../reference/cli.md#update).
+
 **A new kernel waits for its driver extensions.** On a device with driver
 extensions, a deployment with another kernel is not installed while an
 extension has no build for that kernel: the check reports it as

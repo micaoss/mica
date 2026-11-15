@@ -44,16 +44,19 @@ bootable deployment is unusable. Do not edit counters or import boot commands.
 | 3 | configuration reset | yes | **no** | every modelled setting the tier reaches |
 | 4 | application-data reset | yes | **no** | every container with its images and volumes, the user's services and the service accounts; not `/srv`, nothing on a disk mounted in |
 | 5 | credential recovery | **no** — unsupported in the field | **no** | the previous credential and every API token |
-| 6 | factory reset | yes, with the administrator password | **no** | everything on DATA: settings, the claim, keys, containers, `/srv`; and the fallback deployment |
+| 6 | factory reset | yes: the administrator password, or root on the device | **no** | everything on DATA: settings, the claim, keys, containers, `/srv`; and the fallback deployment |
 | 7 | whole-disk reflash | yes, with physical access | **no** | every partition, **and the device's identity** |
 | 8 | secure wipe | **no** — unsupported, and not planned | **terminal** | the device, as a configured unit |
 
 **Six of the eight are steps you can take.** Step 5 is gated on a physical
 presence assertion that **no shipped board can produce**, so it is refused on
-every fielded device; step 6 needs the administrator password; step 8 has no
+every fielded device; step 6 needs the administrator password or root on the
+device; step 8 has no
 implementation at all. Section 7 states
-each absence and what to do instead. A device whose operator has lost the
-credential and every key is recovered by step 7 and by nothing else.
+each absence and what to do instead. An operator who has lost the administrator
+password but still has an authorized SSH key logs in as root and sets a new
+one with `mica password set`; one who has lost the credential and every key
+is recovered by step 7 and by nothing else.
 
 **The line is between steps 2 and 3.** Everything above it can be undone by
 rebooting. Everything below it destroys something that was on the device, and
@@ -75,7 +78,8 @@ Mica OS currently offers.
 - **What to read:** `GET /api/v1/update` for the update lifecycle, both deployments,
   the running deployment and whether a rollback is permitted; `GET
   /api/v1/storage/status` for tier readiness and media health; the diagnostics
-  snapshot and the audit trail. [troubleshooting.md](troubleshooting.md) is
+  snapshot and the audit trail. As root on the device, `mica status`,
+  `mica update` and `mica doctor` read the same. [troubleshooting.md](troubleshooting.md) is
   the diagnosis page proper.
 
 ### Step 2 — Guarded manual rollback
@@ -84,7 +88,9 @@ Use authenticated `POST /api/v1/update/rollback` with the required CSRF token.
 The native backend validates the running receipt and retained authenticated
 fallback. It marks the running deployment failed, changes boot selection, and
 returns the running/target identities and explicit reboot next step. A repeat
-request or unavailable/invalid fallback is refused with a reason.
+request or unavailable/invalid fallback is refused with a reason. As root on
+the device, `mica update rollback` makes the same request and names the
+target; `--reboot` reboots into it.
 
 The action preserves DATA, including configuration, credentials and application
 data. It cannot recover a lost credential or undo persistent writes. Reboot is a
@@ -206,9 +212,11 @@ spends every setting to recover one. See
   image was built with — Step 3's warning applies here unchanged, including
   the case where the built-in address is *none* and the device is left with
   no update server at all.
-- **Does not recover:** a lost administrator password, since every way to ask
-  for it needs that password; a device that cannot boot; a corrupted
-  deployment.
+- **Does not recover:** a lost administrator password where nobody can be
+  root on the device, since the console and the API ask for that password;
+  a device that cannot boot; a corrupted deployment. Root on the device is
+  asked for none, and is better served by `mica password set` than by a
+  reset.
 - **How:** the console's System page, `POST /api/v1/system/factory-reset` with
   `{"password": "..."}`, or `mica factory-reset` as root on the device. The
   console and the API ask for the administrator password, even from a
@@ -316,8 +324,9 @@ a recovery that does not exist.
 - **So an operator locked out today has one answer, and it is step 7.** Losing
   the administrator credential and every authorized key still leaves no
   software path back into the appliance: apid is the only thing that can
-  enable SSH, add a key or set a password, and it needs the credential; SSH is
-  off or keyless; the serial console shows a login prompt with no account that
+  enable SSH, add a key or set a password, and it needs the credential or root
+  on the device (`mica`, over its local socket), and nobody is root: SSH is
+  off or keyless, the transient root password is set only through apid; the serial console shows a login prompt with no account that
   accepts one. That is the position `docs/reference/access.md` section 9.1
   records, and it is still the shipped truth on every board. The way back is
   the whole-disk reflash, paying the device's identity for a forgotten

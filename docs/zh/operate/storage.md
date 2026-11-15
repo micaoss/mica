@@ -34,7 +34,7 @@ FIRMWARE/SYSTEM/DATA；裸 NAND 板（qemu-armhf、ssd202d）是 UBI 卷 `system
 
 ## 2. 容量与清理
 
-所有 DATA 绑定共享一个文件系统。存储 API 与控制台的 Storage 页面只报告一次容量，并同时
+所有 DATA 绑定共享一个文件系统。存储 API 与控制台的 Storage 页面只报告一次容量（`mica status` 在 `data` 一行打印已用与总量），并同时
 给出目录/项目统计和绑定就绪状态。在 ext4 上，`/mica` 与 `/srv`、可丢弃的缓存、`/tmp` 与
 `/var`（DATA 的八分之一，32 到 256 MiB），以及容器存储分属不同的配额项目，所以大量写入或
 可丢弃的写入方占不走关键状态需要的空间。普通服务不能借 `CAP_SYS_RESOURCE` 绕过这些限制。

@@ -39,6 +39,34 @@ validated against the typed schema. A rejected write leaves the tree
 untouched, and a settings write returns a task you can observe until the
 matching reconciler has applied it.
 
+### On the device: `mica`
+
+Root on the device makes the same requests with [`mica`](mica.md), over SSH
+or a local console, without a browser. The writes are API calls on apid's
+local socket, so they are validated and audited like the console's and wait
+for the reconciler's task:
+
+```sh
+mica get access.ssh                  # one setting, secrets redacted
+mica set time.timezone Europe/Athens # one setting, typed by the setting
+mica hostname boat-01
+mica time servers ntp1.example.net ntp2.example.net
+mica wifi add Marina-Guest           # the key is asked twice
+mica wifi on
+mica ssh on
+mica web local                       # the API on the local socket only
+```
+
+`mica set` writes the 14 paths the generic settings route takes: the
+hostname, the switches for SSH, mDNS, SSDP, cloud administrators, containers,
+MQTT and the Wi-Fi station, the access point's mode, the time zone and NTP
+servers, and the logging settings ([the list](../reference/cli.md#set)).
+Interfaces, routes, WireGuard, DNS, Bluetooth, the access point's key, the
+MQTT broker and the update settings are the console's and the API's.
+`mica network` and `mica status` read what the device observes. With
+`access.web.mode` `off` the socket is closed and these verbs exit 3; `mica web
+local` (over the bus) brings it back.
+
 **Where settings are stored, and what that means for resets.** System
 configuration — hostname, network, WiFi, SSH, MQTT, time, the container
 switch and the update settings — is written as one JSON document per subsystem

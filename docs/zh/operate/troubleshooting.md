@@ -13,7 +13,8 @@ Mica OS 上的诊断遵循一个顺序：获得访问，精确识别正在运行
    有握手但没有流量），并链接到本文档。实时网络观察（每接口的
    载波、地址、DNS、路由）是 API 面的一部分，这让"设备认为自己的网络是
    什么样"不需要 shell 就能读到。
-2. **SSH**——默认关闭（云产品与 `uefi-x64.base` 从首次启动起开启）；经过认证的管理员通过 API 启用它并安装密钥。每个
+2. **SSH**——默认关闭（云产品与 `uefi-x64.base` 从首次启动起开启）；经过认证的管理员通过 API 启用它并安装密钥（或在设备上以 root 运行 `mica ssh on` 和
+   `mica ssh keys add <file>`）。每个
    授权密钥都是 root 密钥。对于站在设备前、没有安装密钥的操作员，临时
    root 密码（通过 UI 设置，到下次启动前有效）是设计中的单次会话路径。
 3. **串口控制台**——cx3576 上存在（`ttyFIQ0`，1500000 波特），显示登录
@@ -39,7 +40,18 @@ Mica OS 上的诊断遵循一个顺序：获得访问，精确识别正在运行
 `GET /api/v1/system/telemetry` 再加上板卡的温度区、看门狗设备，以及一个由
 通用内核证据分类出的复位原因；`GET /api/v1/network/status` 加上 networkd、
 wpa_supplicant 与 resolved 此刻实际观察到的状态，也就是"设备认为自己的网络
-是什么样"的答案。在 shell 里，`/usr/share/mica/manifest.tsv` 就是 API 读的
+是什么样"的答案。在 shell 里，`mica status` 一眼列出同样的事实（板卡、运行的系统与 core 集、更新状态、运行时长、地址、时间、
+DATA 用量），读不到的每一项都说明原因：
+
+```sh
+mica status          # 每个事实一行；--json 输出五份回答
+mica update          # 运行的系统、更新状态及其拒绝
+mica network         # 每个接口一行：状态与地址
+mica time            # 是否同步、服务器、偏差
+mica web status      # API 在哪里监听
+```
+
+`/usr/share/mica/manifest.tsv` 就是 API 读的
 同一份物料清单，`hostnamectl` 给出主机名（编码了设备 id 的前八个十六进制
 字符）和 machine id。
 
@@ -72,8 +84,9 @@ Information、Diagnostics、Help 页上的复制与下载按钮。它包含板�
   unit **不会**让部署回滚；它被上报到 live-state 的 `health.units`，用
   `GET /api/v1/state/health` 或从一份诊断快照里读。健康门要求什么写在只读根里的
   `/etc/mica/health.conf`。
-- **更新状态：**`mica-deploy status` 报告 current/candidate/fallback 部署、尝试次数、
-  组件验证及失败部署。另保存 `GET /api/v1/update` 的管理视图。
+- **更新状态：**`mica update`（或 `GET /api/v1/update`）是管理视图：生命周期状态、可用的发布、待执行的
+  重启和最近的拒绝。`mica-deploy status` 报告其下的部署：current/candidate/fallback、尝试次数、组件验证及
+  失败部署。两者都保存。
 
 - **容器：**`mica container list` 显示每个项目的容器及其阶段和健康状态，
   `mica container logs <project>/<service>` 显示日志；检查不通过的项目会在携带它的那次写入里

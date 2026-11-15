@@ -41,7 +41,8 @@ console's Logging section changes it.
 ## 2. Capacity and cleanup
 
 All DATA binds share one filesystem. The storage API and the console's Storage
-page report its capacity once, with directory/project accounting and bind
+page report its capacity once (`mica status` prints the used and total on its
+`data` line), with directory/project accounting and bind
 readiness alongside it. On ext4, `/mica` and `/srv`, the disposable cache,
 `/tmp` and `/var` (an eighth of DATA, 32 to 256 MiB), and container storage are
 separate quota projects, so a bulk or disposable writer cannot take the room

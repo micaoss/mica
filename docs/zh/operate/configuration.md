@@ -30,6 +30,28 @@ apid 持有浏览器会话和 API 支持状态；设置修改通过本地系统�
 schema 校验。被拒绝的写入不会触碰设置树，而一次设置写入会返回一个任务，
 你可以观察它直到对应的协调器完成应用。
 
+### 在设备上：`mica`
+
+设备上的 root 用 [`mica`](mica.md) 发出同样的请求，通过 SSH 或本地控制台，不需要浏览器。写入是 apid 本地
+socket 上的 API 调用，所以和控制台的一样被校验、审计，并等待协调器的任务完成：
+
+```sh
+mica get access.ssh                  # 读一个设置，秘密已遮蔽
+mica set time.timezone Europe/Athens # 写一个设置，类型由设置决定
+mica hostname boat-01
+mica time servers ntp1.example.net ntp2.example.net
+mica wifi add Marina-Guest           # 密钥会询问两次
+mica wifi on
+mica ssh on
+mica web local                       # API 只在本地 socket 上
+```
+
+`mica set` 写通用设置路由接受的 14 个路径：主机名，SSH、mDNS、SSDP、云管理员、容器、MQTT 和 Wi-Fi 客户端
+的开关，接入点的模式，时区和 NTP 服务器，以及日志设置（[列表](../reference/cli.md#set)）。接口、路由、
+WireGuard、DNS、蓝牙、接入点的密钥、MQTT 代理和更新设置归控制台和 API。`mica network` 和 `mica status`
+读取设备观测到的状态。`access.web.mode` 为 `off` 时 socket 关闭，这些动词以 3 退出；`mica web local`（走
+总线）把它恢复。
+
 **设置存在哪里，以及这对复位意味着什么。**系统配置——hostname、网络、WiFi、
 SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一个 JSON 文档，放在数据
 分区的 `/mica/config/` 下。设备关于*自身*铸出或观测到的东西留在 DATA/state 上：设备
