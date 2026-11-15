@@ -48,6 +48,12 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`ro-root.md`](reference/ro-root.md) — 经认证的不可变根：squashfs 与 dm-verity、启动接线、可写路径、关机与检查
   - [`management.md`](reference/management.md) — 管理平面 micad：启动顺序、产品文件、调和器及其写入的文件、总线接口、任务、观测、生命周期与出厂重置拒绝、OpenRC 交接、登录提示
   - [`settings.md`](reference/settings.md) — 设置树：每棵子树的键、类型、默认值与限制，`/mica/config/` 下的文档，以及一次写入如何被检查和应用
+  - [`http-api.md`](reference/http-api.md) — 每个 HTTP API 路由（103 个路径、134 个操作），按领域分组，由 openapi.json 生成
+  - [`errors.md`](reference/errors.md) — 每个 API 错误代码的状态与含义、网络规则代码、D-Bus 错误名、更新的拒绝
+  - [`files.md`](reference/files.md) — 文件地图：标识、启动状态、配置、渲染文件、数据和签名对象在哪里，以及在重启、更新、回滚或重置后是否保留
+  - [`products.md`](reference/products.md) — 已发布的产品：板卡、init、特性、容器引擎、SSH 服务器、镜像、各产品设置、板卡事实
+  - [`kernel-features.md`](reference/kernel-features.md) — 每个内核特性打开了什么、哪块板卡有它
+  - [`glossary.md`](reference/glossary.md) — 本文档中含义固定的词
   - [`api.md`](reference/api.md) — 管理 API（apid）：Web 模式、监听器与 HTTPS 身份、URL 空间、本地套接字、错误封套与状态码、认领/登录/令牌示例、出厂重置、owner 证书与驱动扩展、WireGuard 对端、介质、UI 托管
   - [`built-in-ui-design.md`](reference/built-in-ui-design.md) — 面向产品/UI 设计师的内置 UI 功能、页面、流程、状态与原型指南
 

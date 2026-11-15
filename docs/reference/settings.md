@@ -50,7 +50,8 @@ A `configuration` reset clears `/mica/config/` and keeps STATE
    `access.ssdp.enabled`, `access.cloudAdmins.enabled`, `container.enabled`,
    `mqtt.enabled`, `wifi.client.enabled`, `wifi.ap.mode`, `time.ntp.servers`,
    `time.timezone`, `logging.persistent`, `logging.maxSizeKiB` and
-   `logging.remote`. Every other subtree has its own route, which checks more
+   `logging.remote`; `PATCH /api/v1/settings` writes several of them at once.
+   Every other subtree has its own route, which checks more
    than the type: `/api/v1/network/{iface}` and its peers, `/api/v1/dns/…`,
    `/api/v1/wifi/…`, `/api/v1/ssh/authorized-keys`, `/api/v1/web`,
    `/api/v1/container-projects/{project}`, `/api/v1/units/{name}`,
@@ -268,7 +269,7 @@ reset API, not through settings writes.
 
 | Do | Expect |
 |---|---|
-| `GET /api/v1/settings` | the whole tree, secrets redacted |
+| `GET /api/v1/settings/` (an empty path) | the whole tree, secrets redacted |
 | `GET /api/v1/settings/network.eth0` | one entry; 404 when the path names nothing, 422 when it is not a dot-path |
 | `PUT /api/v1/settings/time.timezone` with `"Europe/Athens"` | `202` with the task id; the task reaches `applied` |
 | `PUT /api/v1/settings/network.eth0` | refused: the network is written through `/api/v1/network/eth0` |

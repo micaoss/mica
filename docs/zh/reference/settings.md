@@ -37,8 +37,8 @@
    被创建（写 `network.eth1.dhcp` 会创建 `eth1`）。通过 API，通用的 `PUT /api/v1/settings/<path>` 只接受
    十四个路径：`hostname`、`access.ssh.enabled`、`access.mdns.enabled`、`access.ssdp.enabled`、
    `access.cloudAdmins.enabled`、`container.enabled`、`mqtt.enabled`、`wifi.client.enabled`、`wifi.ap.mode`、
-   `time.ntp.servers`、`time.timezone`、`logging.persistent`、`logging.maxSizeKiB` 和 `logging.remote`。其他
-   子树各有自己的路由，检查的不只是类型：`/api/v1/network/{iface}` 及其 peers、`/api/v1/dns/…`、
+   `time.ntp.servers`、`time.timezone`、`logging.persistent`、`logging.maxSizeKiB` 和 `logging.remote`；
+   `PATCH /api/v1/settings` 一次写入其中多个。其他子树各有自己的路由，检查的不只是类型：`/api/v1/network/{iface}` 及其 peers、`/api/v1/dns/…`、
    `/api/v1/wifi/…`、`/api/v1/ssh/authorized-keys`、`/api/v1/web`、`/api/v1/container-projects/{project}`、
    `/api/v1/units/{name}`、`/api/v1/bluetooth/…`、`/api/v1/mqtt`（[API](api.md)）。
 2. 带着新值对整棵树做校验：类型、限制和交叉检查（VLAN 的父接口必须已声明，静态网关必须在其子网内）。
@@ -235,7 +235,7 @@ OpenRC），合计 256 KiB。启用模板会被拒绝。见[原生应用](../../
 
 | 操作 | 预期 |
 |---|---|
-| `GET /api/v1/settings` | 整棵树，秘密被遮蔽 |
+| `GET /api/v1/settings/`（空路径） | 整棵树，秘密被遮蔽 |
 | `GET /api/v1/settings/network.eth0` | 一个条目；路径不指向任何东西时 404，不是合法点路径时 422 |
 | `PUT /api/v1/settings/time.timezone`，值为 `"Europe/Athens"` | `202` 和任务 id；任务到达 `applied` |
 | `PUT /api/v1/settings/network.eth0` | 被拒绝：网络通过 `/api/v1/network/eth0` 写入 |

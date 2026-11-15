@@ -59,6 +59,12 @@
         { "name": "contributing" },
         { "name": "overview", "dir": "security", "slug": "security" },
         { "name": "api", "dir": "operate" },
+        { "name": "http-api", "dir": "reference" },
+        { "name": "errors", "dir": "reference" },
+        { "name": "files", "dir": "reference" },
+        { "name": "products", "dir": "reference" },
+        { "name": "kernel-features", "dir": "reference" },
+        { "name": "glossary", "dir": "reference" },
         { "name": "release-notes", "dir": "releases" },
         { "name": "support", "dir": "releases" }
       ]
