@@ -118,7 +118,7 @@ check_status_line() {
         # `<repository>:make <target>`): the code lives there, not here, so the
         # reference is accepted by shape; that repository's own gates prove it.
         # The kernel trees live on per-board branches: `mica-linux@<branch>:<path>`.
-        if [[ $ref =~ ^(mica-build|mica-build-env|mica-build-tools|mica-core|mica-pkgs|mica-podman|mica-docker|mica-res|mica-system-base|mica-linux@[^:]+):.+$ ]]; then
+        if [[ $ref =~ ^(mica-build|mica-build-env|mica-build-tools|mica-core|mica-pkgs|mica-podman|mica-docker|mica-res|mica-system-base|mica-app|mica-linux@[^:]+):.+$ ]]; then
             ok; continue
         fi
         if ref_exists "$ref"; then

@@ -76,6 +76,7 @@ current product only; history is in Git.
   - `install.md` — the order of operations for an installation, from choosing an image to first boot
   - `first-run.md` — first boot, the offline provisioning document, and claiming the device
   - `build.md` — building a product image from source, online from the pinned releases or offline from the checkouts
+  - `mica-app.md` — the Mica app for Android: Bluetooth setup and managing a device over the network
   - `faq.md` — the questions people ask first, each answered in a few lines with the page that holds the rest
 - `operate/` — running a device: configuration, updates, recovery, storage, the API
   - `configuration.md` — the configuration model and every supported way to change settings

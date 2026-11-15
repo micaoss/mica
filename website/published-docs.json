@@ -10,6 +10,7 @@
         { "name": "install", "dir": "start" },
         { "name": "flashing", "dir": "start" },
         { "name": "first-run", "dir": "start" },
+        { "name": "mica-app", "dir": "start" },
         { "name": "build", "dir": "start" },
         { "name": "faq", "dir": "start" }
       ]
