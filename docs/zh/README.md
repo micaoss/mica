@@ -35,6 +35,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`applications.md`](integrate/applications.md) — 原生软件包与容器两条交付路径
   - [`containers.md`](integrate/containers.md) — 容器引擎、向 micad 声明 Compose 项目、引擎如何执行它们、持久化
   - [`native-applications.md`](integrate/native-applications.md) — 原生 `.deb` 应用：unit、账户、可写状态、健康闸门、设备、上限与回滚的局限
+  - [`services.md`](integrate/services.md) — 操作指南：在 systemd 和 OpenRC 上用 `mica unit` 运行自己的服务、服务账户、定时器、挂载、各种重置后保留什么
+  - [`drivers.md`](integrate/drivers.md) — 操作指南：所有者证书与驱动扩展，从签名身份和 KDK 到内核更新
   - [`provisioning.md`](integrate/provisioning.md) — 首次启动的自我配置、设备生成的秘密、没有网络时的四种配置方式、配置文档的规则
   - [`console.md`](integrate/console.md) — 内置管理控制台：导航与归属、状态与交互、自定义与开发验收
   - [`bus.md`](integrate/bus.md) — 设备总线与 MQTT 应用数据契约：管理与应用的边界、Item1 接口、发现与策略、MQTT 语法、注册表
@@ -128,6 +130,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../integrate/display.md` | not-translated |
 | `../integrate/manufacturing.md` | current |
 | `../integrate/native-applications.md` | current |
+| `../integrate/services.md` | current |
+| `../integrate/drivers.md` | current |
 | `../integrate/provisioning.md` | current |
 | `../hardware/README.md` | current |
 | `../hardware/assurance.md` | current |
