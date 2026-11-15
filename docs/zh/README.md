@@ -45,6 +45,10 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`boot.md`](reference/boot.md) — 启动与 runkit：各板卡的启动链、部署与试运行、`mica-runkit init` 各阶段、core 组件、owner 密钥环、健康确认、故障与 cx3576 签名 FIT 路径
   - [`storage.md`](reference/storage.md) — 各板卡分区、SYSTEM 与 DATA 的内容、可写路径、配额、用户挂载、外接介质、容量与故障
   - [`updates.md`](reference/updates.md) — 更新引擎：一次更新如何进行、状态、获取与增量传输、安装、策略文档、重启闸门、驱动扩展与 core 集合
+  - [`ro-root.md`](reference/ro-root.md) — 经认证的不可变根：squashfs 与 dm-verity、启动接线、可写路径、关机与检查
+  - [`management.md`](reference/management.md) — 管理平面 micad：启动顺序、产品文件、调和器及其写入的文件、总线接口、任务、观测、生命周期与出厂重置拒绝、OpenRC 交接、登录提示
+  - [`settings.md`](reference/settings.md) — 设置树：每棵子树的键、类型、默认值与限制，`/mica/config/` 下的文档，以及一次写入如何被检查和应用
+  - [`api.md`](reference/api.md) — 管理 API（apid）：Web 模式、监听器与 HTTPS 身份、URL 空间、本地套接字、错误封套与状态码、认领/登录/令牌示例、出厂重置、owner 证书与驱动扩展、WireGuard 对端、介质、UI 托管
   - [`built-in-ui-design.md`](reference/built-in-ui-design.md) — 面向产品/UI 设计师的内置 UI 功能、页面、流程、状态与原型指南
 
 ## 与英文文档的关系

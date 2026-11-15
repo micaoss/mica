@@ -59,3 +59,17 @@ products have full-runtime shutdown evidence, and the gate rejects incomplete
 loop/DM teardown rather than treating the final poweroff line alone as
 success. An OpenRC root and a UBI board have no exit ramdisk: the init leaves
 DATA read-only and reboots.
+
+## Checking it
+
+| Check on the device | Expect |
+|---|---|
+| `cat /run/mica/boot.json` | `contentVerified: true`, the running `deploymentId`, `rootfsId` and `kernelId` ([boot](boot.md#11-checking-a-boot)) |
+| `grep ' / ' /proc/mounts` | a `squashfs` mount with `ro` |
+| `touch /usr/x` | `Read-only file system`: write under the [writable paths](storage.md#the-write-map) instead |
+| `cat /etc/machine-id` | the same id across reboots; changed only by a factory reset |
+
+A root whose verity check fails at a read returns an I/O error to the reader.
+When that keeps the health gate from passing, the deployment is not confirmed,
+and after its three attempts the loader boots the fallback
+([updates](updates.md#confirmation-failure-and-rollback)).

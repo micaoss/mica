@@ -45,7 +45,11 @@
       "docs": [
         { "name": "boot", "dir": "reference" },
         { "name": "storage", "dir": "reference" },
-        { "name": "updates", "dir": "reference" }
+        { "name": "updates", "dir": "reference" },
+        { "name": "ro-root", "dir": "reference" },
+        { "name": "management", "dir": "reference" },
+        { "name": "settings", "dir": "reference" },
+        { "name": "api", "dir": "reference" }
       ]
     },
     {
