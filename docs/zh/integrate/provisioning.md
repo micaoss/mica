@@ -92,7 +92,7 @@ servers = ["0.pool.ntp.org"]
 
 - **整体校验，整体应用。**一个字段有误就什么都不应用。拒绝会指出键和原因，从不显示值，并让设备保持未认领、
   可配置：一个坏文件不会让设备变砖。
-- **只在未认领的设备上。**一旦存在管理员凭据，文档就以 `already-claimed` 被拒绝。这正是未签名文件安全的原因：
+- **只在未认领的设备上。**一旦存在管理员凭据，文档就被拒绝（`rejected`，原因以 `this device is already claimed` 开头）。这正是未签名文件安全的原因：
   插进已部署设备的 U 盘不会重新配置任何东西。
 - **幂等。**同一份文档在之后的启动中为 `unchanged`，不论其注释或键的顺序如何。
 - **不签名。**授权依据是对介质的物理持有，受上面那条规则约束。
@@ -137,3 +137,87 @@ servers = ["0.pool.ntp.org"]
 批量配置，连同工厂记录和隔离，见[量产](manufacturing.md)。
 
 > status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `docs/reference/recovery.md`
+
+## 8. 完整示例：开箱即已配置好的设备
+
+要让一个 `uefi-x64.full` 镜像启动时就已认领、装好 SSH 密钥、接入有线网络、时区
+为雅典，全程无人值守。配置文档在写盘之前放进镜像自己的 ESP，首次启动从 `boot`
+传输读取它。
+
+**跑过什么。** 解析器、校验器和状态路由有测试；传输方式没有在硬件上跑过（第 4
+节和[首次启动](../start/first-run.md)第 3 节）。下面每一步都依据源码；你第一台
+照做的设备就是测试。
+
+1. **在工作站上写文档**：
+
+   ```toml
+   # mica-provisioning.toml
+   version = 1
+
+   [admin]
+   password = "a-long-bootstrap-password"
+   authorizedKeys = ["ssh-ed25519 AAAA... ops@laptop"]
+
+   [network.eth0]
+   dhcp = true
+
+   [time]
+   timezone = "Europe/Athens"
+   ```
+
+2. **放进镜像的 ESP**，在下载并核对摘要之后（[安装](../start/install.md)），
+   在一台 Linux 工作站上以 root 执行：
+
+   ```sh
+   gzip -dc mica-uefi-x64.full-<stamp>.img.gz > disk.img
+   LOOP=$(losetup -fP --show disk.img)
+   lsblk -o NAME,PARTLABEL "$LOOP"          # 卷标为 esp 的分区
+   mount "${LOOP}p1" /mnt                    # lsblk 显示的 esp 分区
+   cp mica-provisioning.toml /mnt/
+   umount /mnt && losetup -d "$LOOP"
+   ```
+
+3. **写盘并启动**（[安装](../start/install.md)第 5 节）。文档在任何服务监听
+   之前读取一次。
+
+4. **用引导密码登录并更换它。** 设备是被文档认领的，所以在改密码之前，除改密码
+   以外的写操作都会被拒绝：
+
+   ```sh
+   DEV=http://mica-a4e2e69e.local:8080
+   curl -s $DEV/api/v1/session                         # {"state":"unauthenticated"}：已认领
+   CSRF=$(curl -s -c jar -X POST $DEV/api/v1/session \
+     -H 'content-type: application/json' \
+     -d '{"password":"a-long-bootstrap-password"}' | jq -r .csrfToken)
+   curl -s -o /dev/null -w '%{http_code}\n' -b jar -H "X-CSRF-Token: $CSRF" \
+     -X POST $DEV/api/v1/actions/change-password -H 'content-type: application/json' \
+     -d '{"currentPassword":"a-long-bootstrap-password","newPassword":"the-real-admin-password"}'
+   # 204
+   ```
+
+   密钥已存好，SSH 在打开之前一直是关闭的（[SSH](../operate/ssh.md) 第 1 节）。
+
+### 检查是否生效
+
+用新密码重新登录（改密码会丢掉其他所有会话），然后：
+
+```sh
+curl -s -b jar $DEV/api/v1/provisioning/status | jq '{documentVersion, lastImport, unclaimed}'
+# {"documentVersion":1,"lastImport":{"source":"boot","outcome":"applied",...},"unclaimed":false}
+curl -s -b jar $DEV/api/v1/claim
+# {"state":"claimed","via":"provisioning-document",...,"rotationRequired":false}
+curl -s -b jar $DEV/api/v1/settings/time.timezone   # "Europe/Athens"
+```
+
+| 你看到的 | 原因与处理 |
+|---|---|
+| 会话回答 `{"state":"setup",...}` | 没有应用任何文档：在设备上看 `journalctl -u mica-provisioning-import`，认领后再看 `lastImport` |
+| `"outcome":"rejected"` 带一个 `reason` | 原因写明了是哪个键；什么都没应用，设备未认领：在 setup 中认领，或改好文件后重刷 |
+| `"outcome":"rejected"`，`this device is already claimed: ...` | 读取文档之前设备已被认领；已认领的设备从不接受文档 |
+| 写操作返回 `409 rotation_required` | 仍在使用引导密码：先改密码（第 4 步） |
+
+文档留在 ESP 上，所以之后每次启动都会再读一次，并记录 `"outcome":"unchanged"`，
+不写任何东西。介质上的文件保持原样，所以你在第 2 步做出的镜像文件带着引导密码：
+删掉它，或把它当作凭据材料保管。
+
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/micad/src/provisioning_doc/import.rs`, `mica-core:crates/mica-apid/src/provisioning_api.rs`, `mica-core:crates/mica-apid/src/routes/login.rs`, `mica-core:crates/mica-apid/src/routes/password.rs`

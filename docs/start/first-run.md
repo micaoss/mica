@@ -91,8 +91,8 @@ during the first boot and applied before anything else.
 **Read this first, because it is where the feature is most often assumed to be
 broken: a provisioning document is honoured ONLY while the device has no
 administrator credential.** Once a device is claimed — by setup, or by an
-earlier document — a document offered on a medium is refused with
-`already-claimed` and nothing on it is applied. **A fielded device cannot be
+earlier document — a document offered on a medium is refused as
+`rejected`, the reason beginning `this device is already claimed`, and nothing on it is applied. **A fielded device cannot be
 re-provisioned from a stick.** That is the rule that makes an unsigned
 transport safe, and it is not a defect to be worked around: reconfiguring a
 claimed device goes through the authenticated API. An operator who pushes a

@@ -110,7 +110,8 @@ Every mount is read-only, and the file must be a regular file.
   names the key and a reason, never the value, and leaves the device unclaimed
   and configurable: a bad file cannot brick a device.
 - **Only on an unclaimed device.** Once an administrator credential exists the
-  document is refused as `already-claimed`. This is what makes an unsigned file
+  document is refused as
+  `rejected`, the reason beginning `this device is already claimed`. This is what makes an unsigned file
   safe: a stick pushed into a fielded device reconfigures nothing.
 - **Idempotent.** The same document on a later boot is `unchanged`, whatever
   its comments or key order.
@@ -174,3 +175,94 @@ Volume provisioning, with its factory records and quarantine, is
 [manufacturing](manufacturing.md).
 
 > status: shipped — evidence: `mica-core:crates/micad/src/provisioning.rs`, `docs/reference/recovery.md`
+
+## 8. A worked example: a configured device out of the box
+
+A `uefi-x64.full` image is to boot claimed, with SSH keys in place, on a
+wired network, in the Athens time zone, with nobody at a console. The
+document goes onto the image's own ESP before the image is written, so the
+first boot reads it from the `boot` transport.
+
+**What has been run.** The parser, the validators and the status route are
+tested; the transport has not been run on hardware (section 4 and
+[first run](../start/first-run.md) section 3). Every step below follows the
+source; the first device you run it on is the test.
+
+1. **Write the document** on the workstation:
+
+   ```toml
+   # mica-provisioning.toml
+   version = 1
+
+   [admin]
+   password = "a-long-bootstrap-password"
+   authorizedKeys = ["ssh-ed25519 AAAA... ops@laptop"]
+
+   [network.eth0]
+   dhcp = true
+
+   [time]
+   timezone = "Europe/Athens"
+   ```
+
+2. **Put it on the image's ESP**, after the download and its digest check
+   ([install](../start/install.md)), on a Linux workstation as root:
+
+   ```sh
+   gzip -dc mica-uefi-x64.full-<stamp>.img.gz > disk.img
+   LOOP=$(losetup -fP --show disk.img)
+   lsblk -o NAME,PARTLABEL "$LOOP"          # the partition labelled esp
+   mount "${LOOP}p1" /mnt                    # the esp partition from lsblk
+   cp mica-provisioning.toml /mnt/
+   umount /mnt && losetup -d "$LOOP"
+   ```
+
+3. **Write the image and boot it** ([install](../start/install.md) section 5).
+   The document is read once, before anything listens.
+
+4. **Sign in with the bootstrap password and rotate it.** The device was
+   claimed by the document, so every write but the password change is refused
+   until it is changed:
+
+   ```sh
+   DEV=http://mica-a4e2e69e.local:8080
+   curl -s $DEV/api/v1/session                         # {"state":"unauthenticated"}: claimed
+   CSRF=$(curl -s -c jar -X POST $DEV/api/v1/session \
+     -H 'content-type: application/json' \
+     -d '{"password":"a-long-bootstrap-password"}' | jq -r .csrfToken)
+   curl -s -o /dev/null -w '%{http_code}\n' -b jar -H "X-CSRF-Token: $CSRF" \
+     -X POST $DEV/api/v1/actions/change-password -H 'content-type: application/json' \
+     -d '{"currentPassword":"a-long-bootstrap-password","newPassword":"the-real-admin-password"}'
+   # 204
+   ```
+
+   The keys are stored, and SSH stays off until it is switched on
+   ([SSH](../operate/ssh.md) section 1).
+
+### Check it worked
+
+Sign in again with the new password (the change drops every other session),
+then:
+
+```sh
+curl -s -b jar $DEV/api/v1/provisioning/status | jq '{documentVersion, lastImport, unclaimed}'
+# {"documentVersion":1,"lastImport":{"source":"boot","outcome":"applied",...},"unclaimed":false}
+curl -s -b jar $DEV/api/v1/claim
+# {"state":"claimed","via":"provisioning-document",...,"rotationRequired":false}
+curl -s -b jar $DEV/api/v1/settings/time.timezone   # "Europe/Athens"
+```
+
+| What you see | Why, and what to do |
+|---|---|
+| the session answers `{"state":"setup",...}` | no document was applied: `journalctl -u mica-provisioning-import` on the device, then `lastImport` after a claim |
+| `"outcome":"rejected"` with a `reason` | the reason names the key; nothing was applied and the device is unclaimed: claim it in setup, or fix the file and reflash |
+| `"outcome":"rejected"`, `this device is already claimed: ...` | the device was claimed before the document was read; a claimed device never takes one |
+| `409 rotation_required` on a write | the bootstrap password is still in use: change it first (step 4) |
+
+The document stays on the ESP, so every later boot reads it again and records
+`"outcome":"unchanged"` without writing anything. The medium keeps the file
+exactly as written, so the image file you made in
+step 2 carries the bootstrap password: delete it, or keep it as credential
+material.
+
+> status: shipped — evidence: `mica-core:crates/micad/src/provisioning_doc.rs`, `mica-core:crates/micad/src/provisioning_doc/import.rs`, `mica-core:crates/mica-apid/src/provisioning_api.rs`, `mica-core:crates/mica-apid/src/routes/login.rs`, `mica-core:crates/mica-apid/src/routes/password.rs`

@@ -176,3 +176,12 @@ transient root password, mDNS and SSDP announcements, and the console and API
 are micad's alone.
 
 > status: unsupported
+
+## 9. Worked examples
+
+There is no released product without micad, and on a device that runs it,
+micad owns the files above and rewrites them from its settings, so a run on
+a released device would show the files being replaced. Each section above
+is the procedure for a product built without the `micad` feature
+(`mica-build:boards/products.md`); [the operating guides](mica.md) cover
+the released products.

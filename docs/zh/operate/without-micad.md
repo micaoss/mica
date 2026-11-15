@@ -150,3 +150,10 @@ mica-units enable mica-mqttd
 接入点、蓝牙配对、设备码和认领、临时 root 密码、mDNS 和 SSDP 通告，以及控制台和 API，都只属于 micad。
 
 > status: unsupported
+
+## 9. 完整示例
+
+没有不带 micad 的已发布产品；而在运行 micad 的设备上，上面这些文件归 micad 所有，
+它会按自己的设置重写它们，所以在已发布设备上跑一遍只会看到文件被替换。上面每一节
+就是不带 `micad` 功能构建的产品（`mica-build:boards/products.md`）的操作步骤；
+已发布产品见[操作指南](mica.md)。

@@ -308,3 +308,14 @@ convention rather than a mechanism that refuses:
 The controls that would change these answers — signed independent bundles,
 admission that can refuse a unit, non-bypassable ceilings, a protected secret
 store, per-application health-gated rollback — are not part of Mica OS.
+
+## 12. Worked examples
+
+This page has no run of its own, on purpose. A native application is a
+change to the build tree: a producer whose contract is
+`mica-build:docs/design/packages.md`, built into an image and shipped as a
+release, so a worked example here would restate that contract and age
+with it. The on-device path, a service of your own installed with
+`mica unit` and checked step by step, is worked through in
+[services](services.md); that is also the way to try an application on a
+device before packaging it.
