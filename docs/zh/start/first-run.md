@@ -23,7 +23,7 @@ DNS，甚至可能没有网线。这个性质是设计出来的，不是碰巧�
   网络（第 2 节）。
 
 持久化回滚记录覆盖 DATA 上的配置文档与 DATA/state 上的身份记录；未完成的恢复必须在
-下一次启动读取设置前完成（[../../integrate/provisioning.md](../../integrate/provisioning.md)）。
+下一次启动读取设置前完成（[../../integrate/provisioning.md](../integrate/provisioning.md)）。
 播种失败会大声中止，下一次启动从头重试；一台看起来配置好了、其实只配了
 一半的设备正是这个设计要拒绝的失败。SSH 主机密钥在设备上于首次启动时生成，
 DATA 也在此时扩展到占满磁盘（见 [install.md](install.md)）。

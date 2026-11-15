@@ -52,7 +52,7 @@ interaction ideas with maturity markers. It does not define shipped capability.
 
 The UI uses the repository's pinned Bun build, React, TanStack Router/Query,
 Tailwind and shadcn components. Locale resources own user-facing copy.
-Run `bash apid/ui/build.sh --check` (in `micad`) for the frontend gate. Build output
+Run `bash crates/mica-apid/ui/build.sh --check` (in `mica-core`) for the frontend gate. Build output
 is supplied to the Rust/package producer; it is not checked into the source.
 
 Component tests cover state and action behavior. Browser acceptance checks the

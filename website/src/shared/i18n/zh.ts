@@ -189,6 +189,7 @@ export const zh = {
       hardware: '支持硬件',
       operating: '日常运维',
       trouble: '出问题的时候',
+      integrate: '集成开发',
       concepts: '工作原理',
       security: '安全',
       reference: '参考',

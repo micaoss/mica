@@ -43,6 +43,15 @@
       ]
     },
     {
+      "id": "integrate",
+      "docs": [
+        { "name": "provisioning", "dir": "integrate" },
+        { "name": "console", "dir": "integrate" },
+        { "name": "bus", "dir": "integrate" },
+        { "name": "manufacturing", "dir": "integrate" }
+      ]
+    },
+    {
       "id": "concepts",
       "docs": [
         { "name": "boot", "dir": "reference" },

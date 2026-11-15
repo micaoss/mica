@@ -39,7 +39,7 @@
 - **丢失管理员凭据没有软件恢复手段。**丢失管理员密码、全部令牌和全部密钥的运维者只能重刷设备，代价是
   设备上的一切（[访问](../reference/access.md) 第 7 节）。支持人员会事先说明这一点。
 - 首次启动时生成的设备密码不认证任何东西，也从不作为凭据提供给客户
-  （[配置](../../integrate/provisioning.md) 第 2 节）。
+  （[配置](../integrate/provisioning.md) 第 2 节）。
 
 > status: shipped — evidence: `docs/security/signing.md`, `mica-core:docs/mica-core.md`, `mica-build:README.md`
 

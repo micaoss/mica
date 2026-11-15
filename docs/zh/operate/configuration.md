@@ -8,7 +8,7 @@ Mica OS 的配置是一棵单一的类型化设置树，由管理守护进程（
 
 ## 1. 模型：三层
 
-配置设计（其记录是 [../../integrate/provisioning.md](../../integrate/provisioning.md)）
+配置设计（其记录是 [../../integrate/provisioning.md](../integrate/provisioning.md)）
 把配置组织为三层：
 
 1. **第 1 层——首次启动自我配置。**从空的 DATA/state 出发，设备离线、恰好一次地

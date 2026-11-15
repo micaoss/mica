@@ -51,7 +51,7 @@ API 当前使用 `/api/v1/...`。系统开发阶段默认不保证不同构建�
   通过 HTTPS 集成。
 - **MQTT** 是应用数据面，不是管理通道：只有由软件包登记的应用服务被
   桥接，管理状态与动作在结构上被排除。语法与登记契约见
-  [../../integrate/bus.md](../../integrate/bus.md)。
+  [../../integrate/bus.md](../integrate/bus.md)。
 - **`/_ui` 与自定义 UI 资源**是静态内容，不是契约；自定义 bundle 无法
   遮蔽 `/api` 路由。
 

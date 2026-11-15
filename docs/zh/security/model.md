@@ -109,7 +109,7 @@ uefi-x64 GCP 镜像。加密的 DATA 还不支持出厂重置。作为已发布�
 
 当前板卡都没有声明系统层面的物理在场恢复动作。cx3576 加载器的按键打开 rockusb；它并不授权经 apid 的凭据
 恢复。这些需要在场闸门的请求仍会被拒绝。尚未实现强制门户/串口配置向导。出厂重置会重建 DATA
-（[恢复](../operate/recovery.md)）；它不是经认证的擦除。见[配置](../../integrate/provisioning.md)和
+（[恢复](../operate/recovery.md)）；它不是经认证的擦除。见[配置](../integrate/provisioning.md)和
 [恢复](../operate/recovery.md)。
 
 ## 8. 边界 (f)：以 root 运行的应用和容器——**[implemented]**，附明确限制

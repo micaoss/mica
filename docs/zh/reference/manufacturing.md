@@ -8,8 +8,8 @@
 **Mica OS 不提供工厂工具。**工厂可依托的是：
 
 - 首次启动的自我配置：设备在首次启动时自己生成设备 id、主机名和秘密，从不放在镜像中
-  （[配置](../../integrate/provisioning.md)）；
-- 用于第一份配置的配置文档或产品种子（[配置](../../integrate/provisioning.md)第 4 和第 6 节）；
+  （[配置](../integrate/provisioning.md)）；
+- 用于第一份配置的配置文档或产品种子（[配置](../integrate/provisioning.md)第 4 和第 6 节）；
 - 每块板卡带回读的整盘写入，作为刷写和恢复的基本手段（[板卡页面](../hardware/README.md)）；
 - `GET /api/v1/system/info`，让工位查询刷写好的设备的部署，以及它信任生产密钥还是开发密钥。
 

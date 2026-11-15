@@ -10,7 +10,7 @@
 
 设备上分别运行 `micad` 和 `apid` 两个服务，systemd 或 OpenRC 均可。API 处理程序通过有类型的设置/总线
 客户端完成管理操作。MQTT 只承载由软件包登记的应用条目树，不能通过总线调用这个管理 API。见
-[管理平面](management.md)和[总线](../../integrate/bus.md)。
+[管理平面](management.md)和[总线](../integrate/bus.md)。
 
 `/api` 负责管理操作、发现、认证和 API 错误。`/healthz` 只检查监听器，不是设备健康的结论。`/_ui/` 始终
 提供内置控制台。`/` 提供有效的已选自定义 UI，否则重定向到内置控制台。

@@ -264,10 +264,10 @@ micad 不启动时先读它的日志：DATA 介质缺失、产品文件中未知
 
 | 边界 | 契约 |
 |---|---|
-| 运维者与自动化 | HTTP API 和控制台：[API](api.md)、[控制台](../../integrate/console.md) |
+| 运维者与自动化 | HTTP API 和控制台：[API](api.md)、[控制台](../integrate/console.md) |
 | Shell 访问 | [访问](access.md) |
 | 设置 | [设置树](settings.md) |
 | 更新 | micad 驱动部署客户端并加上运维者的策略：[更新](updates.md) |
 | 应用 | 设置树中声明的容器、用户服务和原生软件包：[容器](../../integrate/containers.md)、[原生应用](../../integrate/native-applications.md) |
-| 应用数据 | 本地总线和 MQTT 只承载应用数据，从不承载配置或凭据：[总线](../../integrate/bus.md) |
-| 首次启动 | 标识和凭据在设备上生成：[配置](../../integrate/provisioning.md) |
+| 应用数据 | 本地总线和 MQTT 只承载应用数据，从不承载配置或凭据：[总线](../integrate/bus.md) |
+| 首次启动 | 标识和凭据在设备上生成：[配置](../integrate/provisioning.md) |

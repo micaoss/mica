@@ -111,7 +111,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 `N/R/W/<deviceId>/<class>/<instance>/<path>` 语法。管理关注点——网络、
 SSH、凭据、更新、电源、容器启用——永远不是 MQTT item，桥在结构上无法
 寻址管理守护进程。完整契约，含登记、D-Bus 策略、冲突处理与默认只读桥
-模式，见 [../../integrate/bus.md](../../integrate/bus.md)。
+模式，见 [../../integrate/bus.md](bus.md)。
 
 > status: shipped — evidence: `docs/integrate/bus.md`, `mica-pkgs:crates/mica-mqttd`
 

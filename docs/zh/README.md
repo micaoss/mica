@@ -25,6 +25,9 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`api.md`](operate/api.md) — 管理 API：一份机器可读契约
 - `integrate/` — 集成：在它上面做产品
   - [`applications.md`](integrate/applications.md) — 原生软件包与容器两条交付路径
+  - [`provisioning.md`](integrate/provisioning.md) — 首次启动的自我配置、设备生成的秘密、没有网络时的四种配置方式、配置文档的规则
+  - [`console.md`](integrate/console.md) — 内置管理控制台：导航与归属、状态与交互、自定义与开发验收
+  - [`bus.md`](integrate/bus.md) — 设备总线与 MQTT 应用数据契约：管理与应用的边界、Item1 接口、发现与策略、MQTT 语法、注册表
   - [`manufacturing.md`](integrate/manufacturing.md) — 批量装机：谁生成身份与首个凭据、工厂记录、失败与重复配置的隔离
 - `hardware/` — 支持的硬件：按板卡讲清现状、刷机、更新与恢复
   - [`README.md`](hardware/README.md) — 板卡一览、现状快照与选板指引
@@ -102,13 +105,13 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../operate/updates.md` | current |
 | `../operate/without-micad.md` | not-translated |
 | `../integrate/applications.md` | current |
-| `../integrate/bus.md` | not-translated |
-| `../integrate/console.md` | not-translated |
+| `../integrate/bus.md` | current |
+| `../integrate/console.md` | current |
 | `../integrate/containers.md` | not-translated |
 | `../integrate/display.md` | not-translated |
 | `../integrate/manufacturing.md` | current |
 | `../integrate/native-applications.md` | not-translated |
-| `../integrate/provisioning.md` | not-translated |
+| `../integrate/provisioning.md` | current |
 | `../hardware/README.md` | current |
 | `../hardware/assurance.md` | current |
 | `../hardware/cx3576.md` | current |
