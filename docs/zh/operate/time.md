@@ -54,6 +54,8 @@ curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/time.ntp.servers \
 # {"taskId":"<id>"}
 ```
 
+在控制台中是“系统”下的时间页。
+
 列表的规则：最多 8 项，每项是主机名或 IP 地址（ASCII 字母、数字、`.`、`-`、`:`），不超过 253 个字符，不能为空，
 不能重复。
 

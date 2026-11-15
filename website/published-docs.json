@@ -35,6 +35,8 @@
         { "name": "configuration", "dir": "operate" },
         { "name": "network", "dir": "operate" },
         { "name": "time", "dir": "operate" },
+        { "name": "ssh", "dir": "operate" },
+        { "name": "logs", "dir": "operate" },
         { "name": "applications", "dir": "integrate" },
         { "name": "updates", "dir": "operate" },
         { "name": "storage", "dir": "operate" },

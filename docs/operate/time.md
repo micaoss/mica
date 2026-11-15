@@ -60,6 +60,8 @@ curl -s -H "$AUTH" -X PUT $DEV/api/v1/settings/time.ntp.servers \
 # {"taskId":"<id>"}
 ```
 
+In the console it is System, Time.
+
 Rules for the list: at most 8 entries, each a host name or an IP address
 (ASCII letters, digits, `.`, `-`, `:`), at most 253 characters, none empty and
 none listed twice.
