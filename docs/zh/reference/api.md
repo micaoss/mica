@@ -130,10 +130,10 @@ API 错误使用公布的 JSON 封套，包括未匹配的 API 路径和不支�
 
 `GET /api/v1/session` 报告会话/设置状态。密码登录创建签名的会话 cookie；浏览器的修改请求还需要每个会话
 的 `X-CSRF-Token`。存储的 bearer 令牌用于自动化，不使用 CSRF。凭据和令牌操作遵循生成的模式和
-[访问策略](../../reference/access.md)。
+[访问策略](access.md)。
 
 内置 SPA 使用相对根的 `/api/...` 请求，不在浏览器存储中保存会话或 bearer 凭据。持久的登录退避和有界的
-审计记录在服务重启后仍然保留。恢复流程在[在场闸门](../../reference/recovery.md#4-physical-presence)下轮换
+审计记录在服务重启后仍然保留。恢复流程在[在场闸门](recovery.md#4-物理在场)下轮换
 凭据，从不泄露凭据。安全相关的操作记入 apid 状态目录中的审计环。
 
 TLS 证书和私钥作为一个私有的 `identity.pem` 一起发布。在报告发布成功之前，文件和目录同步已经完成。cookie

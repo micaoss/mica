@@ -4,7 +4,7 @@
 检出互相构建。两者产出同一个产品镜像；发布走的是在线那条路。
 
 构建背后的契约是[构建设计](https://github.com/micaoss/mica-build/blob/main/docs/design/image.md)，固定规则是
-[发布锁](../../reference/release-lock.md)；本页是操作者穿过它们的路径。
+[发布锁](../reference/release-lock.md)；本页是操作者穿过它们的路径。
 
 ## 1. 前置条件
 

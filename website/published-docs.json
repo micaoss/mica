@@ -51,7 +51,12 @@
         { "name": "ro-root", "dir": "reference" },
         { "name": "management", "dir": "reference" },
         { "name": "settings", "dir": "reference" },
-        { "name": "api", "dir": "reference" }
+        { "name": "api", "dir": "reference" },
+        { "name": "access", "dir": "reference" },
+        { "name": "time", "dir": "reference" },
+        { "name": "wifi", "dir": "reference" },
+        { "name": "diagnostics", "dir": "reference" },
+        { "name": "recovery", "dir": "reference" }
       ]
     },
     {
@@ -60,7 +65,9 @@
         { "name": "overview", "dir": "security", "slug": "security" },
         { "name": "model", "dir": "security" },
         { "name": "signing", "dir": "security" },
-        { "name": "lifecycle", "dir": "security" }
+        { "name": "lifecycle", "dir": "security" },
+        { "name": "remote", "dir": "reference" },
+        { "name": "manufacturing", "dir": "reference" }
       ]
     },
     {
@@ -74,6 +81,7 @@
         { "name": "files", "dir": "reference" },
         { "name": "products", "dir": "reference" },
         { "name": "kernel-features", "dir": "reference" },
+        { "name": "release-lock", "dir": "reference" },
         { "name": "glossary", "dir": "reference" },
         { "name": "release-notes", "dir": "releases" },
         { "name": "support", "dir": "releases" }

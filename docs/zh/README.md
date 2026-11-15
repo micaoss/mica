@@ -59,6 +59,14 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`products.md`](reference/products.md) — 已发布的产品：板卡、init、特性、容器引擎、SSH 服务器、镜像、各产品设置、板卡事实
   - [`kernel-features.md`](reference/kernel-features.md) — 每个内核特性打开了什么、哪块板卡有它
   - [`glossary.md`](reference/glossary.md) — 本文档中含义固定的词
+  - [`access.md`](reference/access.md) — 访问：Web 模式、认领与登录、令牌、SSH 与串口控制台、mDNS/SSDP 发现、首次启动配置
+  - [`time.md`](reference/time.md) — 时间：NTP 服务器、时区只用于展示、可信时钟底线、启动顺序与同步状态
+  - [`wifi.md`](reference/wifi.md) — Wi-Fi 客户端与接入点：设置模型、两个调和器、单无线电冲突、凭据、镜像集成与已知局限
+  - [`diagnostics.md`](reference/diagnostics.md) — 诊断：系统信息、观测到的网络状态、板卡遥测、支持快照与脱敏、采集流程与排障树
+  - [`recovery.md`](reference/recovery.md) — 恢复与重置：故障边界、重置层级、出厂重置、物理在场、无法启动的系统与数据清除
+  - [`remote.md`](reference/remote.md) — 远程管理与 API 面：今天能访问设备的是什么、更新的控制流、安全态势
+  - [`manufacturing.md`](reference/manufacturing.md) — 量产与设备标识的生命周期：输入、校验、每台设备的记录、隔离与返修、端口与不可逆操作
+  - [`release-lock.md`](reference/release-lock.md) — 发布锁、固定版本与离线构建：规范在 mica-build-tools 中
   - [`api.md`](reference/api.md) — 管理 API（apid）：Web 模式、监听器与 HTTPS 身份、URL 空间、本地套接字、错误封套与状态码、认领/登录/令牌示例、出厂重置、owner 证书与驱动扩展、WireGuard 对端、介质、UI 托管
   - [`built-in-ui-design.md`](reference/built-in-ui-design.md) — 面向产品/UI 设计师的内置 UI 功能、页面、流程、状态与原型指南
 

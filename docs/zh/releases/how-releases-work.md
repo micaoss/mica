@@ -57,7 +57,7 @@ GitHub release 挂好之后，同一次运行会把发布推送到资源服务�
 | `mica-build-tools` | 无：消费方固定的是它的提交（`locks/mica-build-tools.pin`） | 无 |
 
 lock 用摘要指名每一个产物，所以校验了 `SHA256SUMS` 和 lock 的消费方就绑定了确切的
-字节（[发布锁](../../reference/release-lock.md)）。
+字节（[发布锁](../reference/release-lock.md)）。
 
 > status: shipped — evidence: `docs/reference/release-lock.md`, `mica-build:README.md`
 

@@ -14,7 +14,7 @@
 的身份，不在任何部署里。
 
 用该发布 `mica-build.lock` 的 `product` 行，可以把部署 ID 对应回一次发布
-（[release lock](../../reference/release-lock.md)，英文）。
+（[发布锁](../reference/release-lock.md)）。
 
 > status: shipped — evidence: `mica-build:src/image/components.ts`, `mica-core:crates/micad/src/system_info.rs`, `mica-build:src/product/build.ts`
 

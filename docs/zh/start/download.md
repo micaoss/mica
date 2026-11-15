@@ -90,7 +90,7 @@ awk -F'\t' '$1 == "asset" && $5 == "mica-'"$PRODUCT-$STAMP"'.img.gz" {print $6 "
 ```
 
 校验链是 `SHA256SUMS` → lock → `asset` 行的 sha256 → 文件
-（[发布锁](../../reference/release-lock.md) 1.2.2）。
+（[发布锁](../reference/release-lock.md) 1.2.2）。
 
 > status: shipped — evidence: `mica-build:src/release/scoped.ts`, `docs/reference/release-lock.md`
 
@@ -122,7 +122,7 @@ awk -F'\t' '$1 == "asset" && $5 == "mica-'"$PRODUCT-$STAMP"'.img.gz" {print $6 "
 lock 是一份 `mica-lock v1` 文件，写明发布的提交，以及进入它的每一项输入：板卡的池、
 软件包与组件，`mica-build-env`、`mica-system-base`、`mica-core`、`mica-pkgs`、`mica-podman` 与 `mica-docker` 的
 输入发布及其信任哈希，以及产品的签名部署、bundle 与资产
-（[发布锁](../../reference/release-lock.md) 1.2.2）。
+（[发布锁](../reference/release-lock.md) 1.2.2）。
 
 文件旁边的校验和只证明文件完整到达。让一份镜像可信的，是它里面的签名链
 （[发布签名](../security/signing.md)）以及平台信任那个签名者；上面的哈希

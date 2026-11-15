@@ -200,7 +200,7 @@ OpenRC），合计 256 KiB。启用模板会被拒绝。见[原生应用](../../
 | `ntp.servers` | 名称或地址列表 | `[]`（镜像的服务器池） | 最多 8 个，每个 ≤ 253 个字符 |
 | `timezone` | IANA 时区名 | `UTC` | 例如 `Europe/Athens`；只用于显示，时钟保持 UTC |
 
-见[时间](../../reference/time.md)。
+见[时间](time.md)。
 
 ## `logging`
 

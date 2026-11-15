@@ -159,7 +159,7 @@ Base 的 `mica-units` 在启动时启动其中列出的每个 unit，不论有�
 ## 生命周期
 
 - **配置。** 首次启动在设备上生成标识和每台设备自己的凭据；镜像里不烘入任何秘密。启动介质或可移动
-  介质上的配置文档被整体校验、原子应用并记录，所以应用两次不会有额外效果（[量产](../../reference/manufacturing.md)）。
+  介质上的配置文档被整体校验、原子应用并记录，所以应用两次不会有额外效果（[量产](manufacturing.md)）。
 - **板卡默认值。** 板卡可以提供 `/usr/share/mica/defaults/network.json`。STATE 的 `seeded-defaults.json`
   中尚未记录的条目会被添加一次（cx3576 提供 `can0`：250 000 bit/s、`restartMs` 100、`fd` false）；运维者
   删除的条目保持删除，`configuration` 重置会让默认值回来。
@@ -242,7 +242,7 @@ micad 不启动时先读它的日志：DATA 介质缺失、产品文件中未知
 | 边界 | 契约 |
 |---|---|
 | 运维者与自动化 | HTTP API 和控制台：[API](api.md)、[控制台](../../integrate/console.md) |
-| Shell 访问 | [访问](../../reference/access.md) |
+| Shell 访问 | [访问](access.md) |
 | 设置 | [设置树](settings.md) |
 | 更新 | micad 驱动部署客户端并加上运维者的策略：[更新](updates.md) |
 | 应用 | 设置树中声明的容器、用户服务和原生软件包：[容器](../../integrate/containers.md)、[原生应用](../../integrate/native-applications.md) |

@@ -72,7 +72,7 @@ mica-linux, mica-uboot ──┴────────────────
 
 锁格式、测试向量与版本规则见 `mica-build-tools:docs/spec/release-lock.md` 和
 `mica-build-tools:docs/spec/package-versions.md`
-（[发布锁](../reference/release-lock.md)）。
+（[发布锁](reference/release-lock.md)）。
 
 ## 4. 产品、镜像与核心集
 

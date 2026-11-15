@@ -21,7 +21,7 @@ Mica OS 上的诊断遵循一个顺序：获得访问，精确识别正在运行
    *读取*启动过程：固件的部署决策和内核输出会出现在那里。
 
 完整的访问模型，含每个通道能做什么、不能做什么，见
-[../../reference/access.md](../../reference/access.md)。
+[../../reference/access.md](../reference/access.md)。
 
 > status: shipped — evidence: `docs/reference/access.md`, `mica-core:crates/mica-apid/openapi.json`
 

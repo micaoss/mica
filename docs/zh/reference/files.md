@@ -87,4 +87,4 @@
 | SYSTEM 部署 | 是 | 一次替换一个 | 切换 | 保留 | 保留 | 除运行中的外全部删除 |
 
 `configuration` 重置还会删除 apid 的 HTTPS 身份。回滚从不承诺撤销此后写入的应用数据
-（[重置层级](../../reference/recovery.md#2-reset-tiers)）。
+（[重置层级](recovery.md#2-重置层级)）。

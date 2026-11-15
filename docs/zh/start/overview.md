@@ -31,7 +31,7 @@ Mica OS 是面向工业设备的嵌入式 Linux 系统：一个签名的只读 d
 ## 2. 发布链
 
 每个仓库都发布 release，每个消费方把自己所构建于的 release 固定为一份 lock 加一条
-pin 记录，而不是一个分支（[发布锁](../../reference/release-lock.md)）。每个 pin 都是
+pin 记录，而不是一个分支（[发布锁](../reference/release-lock.md)）。每个 pin 都是
 产出方的最新发布：`bin/mica-tools locks update` 一次移动全部 pin，加 `--check` 只报告
 哪些落后了。
 

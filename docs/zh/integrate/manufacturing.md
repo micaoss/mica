@@ -95,7 +95,7 @@ micad device-code                                        # 在设备上：设备
 比对。
 
 完整要求连同每一步的负责角色，见
-[../../reference/manufacturing.md](../../reference/manufacturing.md)。这里面的任何
+[../../reference/manufacturing.md](../reference/manufacturing.md)。这里面的任何
 一项，Mica OS 都不提供记录格式、schema 或工位工具，也没有任何在建的工作去做它：
 需要这些记录的产线自己建。
 

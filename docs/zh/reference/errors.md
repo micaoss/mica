@@ -25,7 +25,7 @@
 | `wrong_password` | 403 | apid | 修改密码时当前密码错误；计入退避 |
 | `not_allowed` | 403 | apid | 本地套接字上的非 root 调用方 |
 | `authenticated_session` | 403 | apid | 带着会话或令牌调用凭据恢复；凭据恢复只凭物理在场授权，请改用修改密码 |
-| `presence_required` | 403 | apid | 凭据恢复没有物理在场的证明（[恢复](../../reference/recovery.md#4-physical-presence)） |
+| `presence_required` | 403 | apid | 凭据恢复没有物理在场的证明（[恢复](recovery.md#4-物理在场)） |
 | `not_found`、`settings_not_found`、`task_not_found`、`snapshot_not_found` | 404 | apid、micad | 没有该路由、设置路径、任务或诊断快照；产品不具备的特性的所有路由也是如此 |
 | `media_not_found`、`media_device_not_found` | 404 | apid | 当前没有该 id 的卷或设备（设备重新插入后 id 会变） |
 | `method_not_allowed` | 405 | apid | 路径存在，方法不存在 |
