@@ -20,6 +20,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`faq.md`](start/faq.md) — 最先被问到的问题：每条几行回答，并指向完整说明的页面
 - `operate/` — 运维：配置、更新、恢复、存储、API
   - [`configuration.md`](operate/configuration.md) — 配置模型与所有受支持的修改方式
+  - [`network.md`](operate/network.md) — 操作指南：有线 DHCP 与静态地址、不作为出口的端口、路由、两条上行、VLAN 与网桥、Wi-Fi、DNS、端到端的 WireGuard
+  - [`time.md`](operate/time.md) — 操作指南：自己的 NTP 服务器、时区、在各 init 上检查同步
   - [`updates.md`](operate/updates.md) — 该用哪个更新归档、在线/离线/U 盘更新、维护窗口、确认、回滚以及每一种拒绝
   - [`recovery.md`](operate/recovery.md) — 从自动回退、重置层级、出厂重置到整盘重刷的恢复阶梯
   - [`storage.md`](operate/storage.md) — 分区、DATA 命名空间、数据归属规则、自己的磁盘与外接介质
@@ -110,6 +112,8 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../operate/recovery.md` | current |
 | `../operate/storage.md` | current |
 | `../operate/mica.md` | current |
+| `../operate/network.md` | current |
+| `../operate/time.md` | current |
 | `../operate/troubleshooting.md` | current |
 | `../operate/updates.md` | current |
 | `../operate/without-micad.md` | current |

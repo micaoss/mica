@@ -80,6 +80,8 @@ current product only; history is in Git.
   - `faq.md` — the questions people ask first, each answered in a few lines with the page that holds the rest
 - `operate/` — running a device: configuration, updates, recovery, storage, the API
   - `configuration.md` — the configuration model and every supported way to change settings
+  - `network.md` — how-to: wired DHCP and static, a port off the internet, routes, two uplinks, VLANs and bridges, Wi-Fi, DNS, WireGuard end to end
+  - `time.md` — how-to: your own NTP servers, the time zone, checking synchronization on each init
   - `updates.md` — which update archive applies, online, offline and USB updates, maintenance windows, confirmation, rollback and every refusal
   - `recovery.md` — what to do when a device does not boot, the reset tiers and the factory reset, and what recovery costs
   - `storage.md` — partitions, what survives what, where data belongs, your own disks and external media

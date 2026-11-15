@@ -33,6 +33,8 @@
       "id": "operating",
       "docs": [
         { "name": "configuration", "dir": "operate" },
+        { "name": "network", "dir": "operate" },
+        { "name": "time", "dir": "operate" },
         { "name": "applications", "dir": "integrate" },
         { "name": "updates", "dir": "operate" },
         { "name": "storage", "dir": "operate" },
