@@ -27,7 +27,7 @@
 | `ssh` | 一个 SSH 服务器，由 micad 以 `mica-sshd` 驱动 |
 | `tools` | busybox 之外的运维工具：GNU coreutils、findutils、grep、sed、diffutils、gzip、bash、进程与模块工具、device-mapper 工具、nftables 命令 |
 | `mqtt` | MQTT 代理和桥接（`mica-mqtt-broker`、`mica-mqttd`） |
-| `containers` | 容器引擎，Podman（经 `mica-containerd` 驱动）或 Docker（[容器](../../integrate/containers.md)） |
+| `containers` | 容器引擎，Podman（经 `mica-containerd` 驱动）或 Docker（[容器](../integrate/containers.md)） |
 | `iproute2` | `ip`、`ss`、`bridge`、`tc`，用于诊断链路和路由 |
 | `wifi`、`bluetooth` | 板卡具备时的无线电 |
 

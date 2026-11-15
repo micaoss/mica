@@ -168,7 +168,7 @@ auto 模式，其中 nft 前端的优先级高于旧版，并且这里没有任�
 文件位于只读根上，所以它也不是你能放自己规则的地方。
 
 **如果你要让一条规则熬过一次断电**，今天的路径是你自己的服务：写一个重新施加
-规则的服务，用 `mica-unit` 装到 DATA 上（[../../integrate/native-applications.md](../../integrate/native-applications.md)
+规则的服务，用 `mica-unit` 装到 DATA 上（[../integrate/native-applications.md](../integrate/native-applications.md)
 第 10 节）。这是对
 产品当下行为的陈述，不是关于该如何运行防火墙的建议。
 

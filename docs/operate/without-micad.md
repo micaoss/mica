@@ -7,7 +7,8 @@ service of the base starts at boot from its own file on DATA
 those files for you. This page is how to write them by hand, as root on the
 device. Each file is in the format its service reads, the same one micad
 writes, so a device that gains micad later keeps working; micad then owns the
-files and rewrites them from its settings.
+files and rewrites them from its settings. There is no `mica` command either:
+it is micad's ([the `mica` command](mica.md)).
 
 > status: shipped — evidence: `mica-system-base:docs/floor-and-options.md`, `mica-system-base:payload/usr/lib/mica/mica-units`
 

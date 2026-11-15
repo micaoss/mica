@@ -173,14 +173,14 @@ base64 的 32 字节，`allowedIps` 是地址或 CIDR，`endpoint` 是 `host:por
 | `projects` | 名称 → Compose 文本 | `{}` | 最多 32 个；名称为 1–40 个 `[a-z0-9_-]`，以字母或数字开头；每份文本 ≤ 64 KiB，合计 ≤ 256 KiB |
 | 项目目录 | 绝对路径 | `/mica/volumes/<project>/` | 相对主机路径的解析位置 |
 
-见[容器](../../integrate/containers.md)。
+见[容器](../integrate/containers.md)。
 
 ## `services`
 
 `units` 把 unit 文件名（systemd：`.service`、`.socket`、`.timer`、`.path`、`.target`、`.mount`、
 `.automount`、`.swap`；最多到模板）或 openrc-run 脚本名映射到 `{kind, text, conf?, enabled}`。`kind` 是
 文本所针对的 init；只应用产品自己的那种。限制：32 个 unit，每份文本 64 KiB，每份 `conf` 16 KiB（仅
-OpenRC），合计 256 KiB。启用模板会被拒绝。见[原生应用](../../integrate/native-applications.md)。
+OpenRC），合计 256 KiB。启用模板会被拒绝。见[原生应用](../integrate/native-applications.md)。
 
 | 键 | 类型 | 默认值 | 限制 |
 |---|---|---|---|

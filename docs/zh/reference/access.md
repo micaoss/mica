@@ -93,7 +93,7 @@ micad 用自己的两个应答器在本地网络上通告设备，作用于除�
 
   名称、端口和 TXT 记录的规则见 `mica-core:docs/mica-core.md` 3.13 节。
 
-没有 micad 时两个应答器都不运行（[没有 micad](../../operate/without-micad.md) 第 8 节）。
+没有 micad 时两个应答器都不运行（[没有 micad](../operate/without-micad.md) 第 8 节）。
 
 > status: shipped — evidence: `mica-core:crates/micad/src/reconciler/mdns.rs`, `mica-core:crates/micad/src/reconciler/ssdp.rs`, `mica-core:crates/mica-apid/src/routes/mdns.rs`, `mica-core:crates/mica-apid/src/routes/ssdp.rs`
 

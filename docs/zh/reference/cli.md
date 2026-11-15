@@ -476,7 +476,7 @@ mica container: project web is refused
 在 Docker 产品上（`uefi-x64.docker`、`uefi-x64.gcp`、`cx3576.full`），`up`、`down` 和 `check` 以 1 退出并提示
 `this is a docker product: containers are made with docker and docker compose, not declared to micad; use
 docker compose`；`list`、`status`、`on`、`off`、`start`、`stop`、`restart` 和 `logs` 仍然可用。见
-[容器](../../integrate/containers.md)。
+[容器](../integrate/containers.md)。
 
 ### unit
 

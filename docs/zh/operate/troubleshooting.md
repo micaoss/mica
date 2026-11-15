@@ -90,7 +90,7 @@ Information、Diagnostics、Help 页上的复制与下载按钮。它包含板�
 
 - **容器：**`mica container list` 显示每个项目的容器及其阶段和健康状态，
   `mica container logs <project>/<service>` 显示日志；检查不通过的项目会在携带它的那次写入里
-  被拒绝，并列出每个问题；存储快满时看 `podman system df` 或 `docker system df`（[../../integrate/containers.md](../../integrate/containers.md)）。
+  被拒绝，并列出每个问题；存储快满时看 `podman system df` 或 `docker system df`（[../integrate/containers.md](../integrate/containers.md)）。
   `mica container list` 与 `logs` 在两种引擎上都可用。
 - **配置写入：**一次设置写入返回一个任务；其结果（已应用、无变化、失败
   及原因）通过 API 可观察，而不是从行为里猜。

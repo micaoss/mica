@@ -24,8 +24,11 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`mica.md`](operate/mica.md) — `mica` 命令：设备上 root 唯一的命令、动词、输出与退出码
   - [`troubleshooting.md`](operate/troubleshooting.md) — 诊断顺序：访问、识别、证据
   - [`api.md`](operate/api.md) — 管理 API：一份机器可读契约
+  - [`without-micad.md`](operate/without-micad.md) — 没有 micad 的设备：如何进入、用 `mica-units` 打开服务、手写每个服务的文件
 - `integrate/` — 集成：在它上面做产品
   - [`applications.md`](integrate/applications.md) — 原生软件包与容器两条交付路径
+  - [`containers.md`](integrate/containers.md) — 容器引擎、向 micad 声明 Compose 项目、引擎如何执行它们、持久化
+  - [`native-applications.md`](integrate/native-applications.md) — 原生 `.deb` 应用：unit、账户、可写状态、健康闸门、设备、上限与回滚的局限
   - [`provisioning.md`](integrate/provisioning.md) — 首次启动的自我配置、设备生成的秘密、没有网络时的四种配置方式、配置文档的规则
   - [`console.md`](integrate/console.md) — 内置管理控制台：导航与归属、状态与交互、自定义与开发验收
   - [`bus.md`](integrate/bus.md) — 设备总线与 MQTT 应用数据契约：管理与应用的边界、Item1 接口、发现与策略、MQTT 语法、注册表
@@ -105,14 +108,14 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../operate/mica.md` | current |
 | `../operate/troubleshooting.md` | current |
 | `../operate/updates.md` | current |
-| `../operate/without-micad.md` | not-translated |
+| `../operate/without-micad.md` | current |
 | `../integrate/applications.md` | current |
 | `../integrate/bus.md` | current |
 | `../integrate/console.md` | current |
-| `../integrate/containers.md` | not-translated |
+| `../integrate/containers.md` | current |
 | `../integrate/display.md` | not-translated |
 | `../integrate/manufacturing.md` | current |
-| `../integrate/native-applications.md` | not-translated |
+| `../integrate/native-applications.md` | current |
 | `../integrate/provisioning.md` | current |
 | `../hardware/README.md` | current |
 | `../hardware/assurance.md` | current |

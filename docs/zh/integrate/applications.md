@@ -39,8 +39,8 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 两条路径都不会回滚应用的**数据**。那是第 6 节。
 
 各自的集成商指南是
-[../../integrate/native-applications.md](../../integrate/native-applications.md) 与
-[../../integrate/containers.md](../../integrate/containers.md)（前者目前只有英文）。
+[../integrate/native-applications.md](../integrate/native-applications.md) 与
+[../integrate/containers.md](../integrate/containers.md)。
 
 > status: shipped — evidence: `docs/integrate/native-applications.md`, `docs/integrate/containers.md`
 
@@ -54,7 +54,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 
 > status: shipped — evidence: `mica-build:docs/design/packages.md`, `mica-core:scripts/deb/`, `mica-build:rootfs/packages/`
 
-集成商指南——[../../integrate/native-applications.md](../../integrate/native-applications.md)——
+集成商指南——[../integrate/native-applications.md](../integrate/native-applications.md)——
 覆盖 producer 约定、专用服务账户、可写状态归属、健康与日志、按名字的设备
 访问，以及 CPU、内存、PID 和 I/O 上限。它的样例就是本仓库真正构建的软件
 包，它指向源码树的引用由 `make docs-verify` 解析，所以它点名的文件不可能
@@ -68,7 +68,7 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 从固定版本的上游源码构建。Mica OS 不做容器编排：你在 micad 的 `container` 设置里
 逐个声明项目，每个项目是一份 Compose 文件；micad 把整组交给引擎，由它运行、重启
 并在开机时启动它们。集成商指南是
-[../../integrate/containers.md](../../integrate/containers.md)。
+[../integrate/containers.md](../integrate/containers.md)。
 
 操作员需要的运行事实：
 

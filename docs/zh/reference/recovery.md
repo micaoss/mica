@@ -70,7 +70,7 @@ API 和 `micad_settings::ResetTier` 恰好提供两个层级。执行者是 `mic
   `formatted`），并在文件系统和介质允许时丢弃 DATA 的空闲空间（UBIFS 上不做，不支持 TRIM 的卡上不做）。它
   不是经认证的擦除（第 7 节）。
 - **没有 micad 时。**root 运行 `mica-deploy factory-reset [--reboot]` 暂存同样的重置
-  （[没有 micad](../../operate/without-micad.md) 第 7 节）；`--cancel` 删除已暂存的重置。
+  （[没有 micad](../operate/without-micad.md) 第 7 节）；`--cancel` 删除已暂存的重置。
 
 > status: board-dependent — evidence: `mica-core:crates/micad/src/factory_reset.rs`, `mica-core:crates/mica-apid/src/routes/reset.rs`, `mica-core:crates/mica-deploy/src/factory_reset.rs`, `mica-core:docs/mica-core.md`
 

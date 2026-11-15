@@ -20,7 +20,7 @@ amd64 机器，按启动它的固件类命名，而不是按某台机器命名�
 | 功能 | 状态 | 说明 |
 |---|---|---|
 | 容器（Podman） | 随 `uefi-x64.full` 发布 | `BOARD_FEATURES="containers"`；`uefi-x64.basic` 不带引擎 |
-| 容器（Docker） | 随 `uefi-x64.docker` 发布 | 同一特性，`CONTAINER_ENGINE=docker`（[容器](../../integrate/containers.md)第 4 节） |
+| 容器（Docker） | 随 `uefi-x64.docker` 发布 | 同一特性，`CONTAINER_ENGINE=docker`（[容器](../integrate/containers.md)第 4 节） |
 | USB 存储 | 内核内建驱动，未在实机验证 | XHCI 与 EHCI 加内建的 `USB_STORAGE`，UAS 为模块；外部介质支持 vfat、exFAT 与 ext（[存储](../operate/storage.md)第 4 节） |
 | SATA | 内核内建驱动，未在实机验证 | AHCI 与 `ATA_PIIX` |
 | NVMe | 内核内建驱动，未在实机验证 | — |

@@ -209,7 +209,7 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
 从不读取设置树，移除 micad 后每个服务保持 micad 最后配置的样子。micad 打开的功能
 服务记录在 `/var/lib/mica/units/enabled`，开机时由 Base 的 `mica-units` 启动，因为
 在只读根上的启用只持续到下次启动。没有 micad 时，运维人员自己写同样的文件并使用
-`mica-units`（[没有 micad 时](../operate/without-micad.md)）。
+`mica-units`（[没有 micad 时](operate/without-micad.md)）。
 
 | 服务 | 它在 DATA 上的文件 | 开机时由谁启动 |
 |---|---|---|
@@ -285,7 +285,7 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
 - **容器**，在带 `containers` 功能的产品中。Podman 上，Compose 项目向 micad 声明，由
   `mica-containerd` 运行；Docker 上，在设备上用 `docker` 和 `docker compose` 创建容器，
   micad 只负责开关 dockerd。二者默认关闭，需手动打开
-  （[容器](../integrate/containers.md)）。
+  （[容器](integrate/containers.md)）。
 
 应用数据只能经 `mica-mqttd` 到达 MQTT，且只来自在总线上按确切名称登记的服务；配置、
 凭据和更新从不成为 MQTT 条目（[总线](integrate/bus.md)）。
@@ -369,11 +369,11 @@ runkit 的契约见 `mica-core:docs/mica-core.md` 6.4 与 6.5。
 | 问题 | 文档 |
 |---|---|
 | 有哪些产品，各带什么？ | [概览](start/overview.md)、[获取发布版](start/download.md) |
-| 没有 micad 时运行什么，读哪个文件？ | 第 7 节、[没有 micad 时](../operate/without-micad.md) |
+| 没有 micad 时运行什么，读哪个文件？ | 第 7 节、[没有 micad 时](operate/without-micad.md) |
 | 设置树里有什么？ | [配置](operate/configuration.md)、`mica-core:docs/mica-core.md` 3.3 |
 | API 提供什么？ | [API](operate/api.md)、[API 参考](reference/api.md) |
 | 写入去了哪里，我能把磁盘挂在哪里？ | [存储](operate/storage.md)、[只读根](reference/ro-root.md) |
 | 更新如何安装、确认或回滚？ | [更新](operate/updates.md)、[更新参考](reference/updates.md) |
 | 发布由谁、如何签名？ | [发布签名](security/signing.md) |
 | 设备如何获得最初的凭据？ | [首次启动](start/first-run.md)、[配网](integrate/provisioning.md) |
-| 如何运行我自己的软件？ | [应用](integrate/applications.md)、[容器](../integrate/containers.md) |
+| 如何运行我自己的软件？ | [应用](integrate/applications.md)、[容器](integrate/containers.md) |

@@ -100,7 +100,7 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
   由产品决定（云产品上关闭）；
 - **access.cloudAdmins**——在云产品上，来自实例元数据的登录账号是否经 `sudo` 获得 root；
 - **container**——控制容器引擎的开关与声明的 Compose 项目
-  （[../../integrate/containers.md](../../integrate/containers.md)）；
+  （[../integrate/containers.md](../integrate/containers.md)）；
 - **mqtt**——本地 MQTT broker 与应用数据桥
   （[../integrate/applications.md](../integrate/applications.md)）；
 - **time**——NTP 服务器与时区，时区从设备 tzdata 提供的列表中选择（第 5.1 节）；
@@ -109,7 +109,7 @@ SSH、MQTT、时间、容器开关和更新设置——按子系统各写成一�
   WireGuard 或 VPN 链路转发；
 - **services.units**——用户自己的 systemd 单元或 OpenRC 脚本，保存在 DATA 上并在
   这里声明，也可在设备上用 `mica unit` 管理
-  （[原生应用](../../integrate/native-applications.md)第 10 节）；
+  （[原生应用](../integrate/native-applications.md)第 10 节）；
 - **电源动作与更新动作**——不是设置，但通过同一认证面可达。
 
 板卡还可以声明它的物理端口（`/usr/share/mica/board/interfaces.json`）：标签、速率以及

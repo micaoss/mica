@@ -33,7 +33,8 @@
         { "name": "applications", "dir": "integrate" },
         { "name": "updates", "dir": "operate" },
         { "name": "storage", "dir": "operate" },
-        { "name": "mica", "dir": "operate" }
+        { "name": "mica", "dir": "operate" },
+        { "name": "without-micad", "dir": "operate" }
       ]
     },
     {
@@ -46,6 +47,8 @@
     {
       "id": "integrate",
       "docs": [
+        { "name": "containers", "dir": "integrate" },
+        { "name": "native-applications", "dir": "integrate" },
         { "name": "provisioning", "dir": "integrate" },
         { "name": "console", "dir": "integrate" },
         { "name": "bus", "dir": "integrate" },
