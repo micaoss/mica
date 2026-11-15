@@ -1,7 +1,7 @@
 # `mica` 命令
 
-> **适用于 core 0.0.8 及以后的设备**（2026-11-15 的产品发布）。更早的发布没有 `mica` 命令，使用 `micad`
-> 命令（`micad web`、`micad unit`、`micad factory-reset` 等）和控制台。
+> 2026-11-14 及更早发布的设备没有 `mica` 命令：先更新它（[更新](../operate/updates.md)），或使用该发布的
+> `micad` 命令（`micad web`、`micad unit`、`micad factory-reset` 等）。
 
 `mica` 是运维者在设备上唯一的命令。本页列出每个动词、选项、输出、退出码和 `--json` 形式，依据 `mica-core`
 发布 `20261115-0958`（core 0.0.8，`mica-core:crates/micad/src/cli.rs` 及其调用的模块）。
@@ -607,7 +607,8 @@ The factory reset is staged. The device reboots in a few seconds, erases everyth
 ```
 
 输入其他任何内容以 1 退出：`not confirmed; nothing was reset`。micad 的拒绝仍然适用，以 1 退出并带其代码：
-`factory_reset_unsupported`（runkit 不执行重置，例如 DATA 已加密）、`update_in_progress`、`trial_pending`、
+`data_encrypted`（DATA 已加密，启动程序不重置加密的 DATA）、`factory_reset_unsupported`（启动的 runkit
+不执行重置）、`update_in_progress`、`trial_pending`、
 `not_claimed`。清除和保留的内容见[恢复](recovery.md#23-出厂重置)。
 
 ### doctor

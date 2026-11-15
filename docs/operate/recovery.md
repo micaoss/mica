@@ -218,7 +218,7 @@ spends every setting to recover one. See
   or takes `--yes`. It is refused on an unclaimed
   device (`not_claimed`), while an update installs (`update_in_progress`),
   while a deployment or core set is on trial (`trial_pending`), and on an
-  encrypted DATA (`factory_reset_unsupported`). The device reboots after 3 s
+  encrypted DATA (`data_encrypted`). The device reboots after 3 s
   and the reset runs at that boot; an interruption anywhere runs it again at
   the next one. Without micad, `mica-deploy factory-reset --reboot` as root
   stages the same reset ([without micad](without-micad.md) section 7).

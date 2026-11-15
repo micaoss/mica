@@ -48,9 +48,12 @@ API 和 `micad_settings::ResetTier` 恰好提供两个层级。执行者是 `mic
 出厂重置清除所有配置过的东西，保留运行中的软件。
 
 - **谁来请求。**`POST /api/v1/system/factory-reset` `{password}`、控制台的系统页，以及设备上 root 运行的
-  `micad factory-reset`（会提示输入密码或读取 `--password-file`）。不论调用方的凭据如何，每种方式都要求
-  管理员密码，错误的密码计入登录退避（连错 3 次后，每次把等待时间从 5 秒加倍到 300 秒）。micad 以代码拒绝
-  （409）：启动的 runkit 不执行重置时（例如 DATA 已加密）为 `factory_reset_unsupported`；未认领的设备为
+  `mica factory-reset`。API 和控制台不论调用方的凭据如何都要求管理员密码，错误的密码计入登录退避（连错
+  3 次后，每次把等待时间从 5 秒加倍到 300 秒）。设备上的 root 不需要密码：`mica factory-reset` 先列出会清除
+  什么、保留什么，然后等待输入主机名或 `factory-reset`，或者带 `--yes`；两者都没有、或没有终端时，什么也不
+  重置。micad 以代码拒绝
+  （409）：DATA 已加密（启动程序不重置加密的 DATA）时为 `data_encrypted`；启动的 runkit 不执行重置时为
+  `factory_reset_unsupported`；未认领的设备为
   `not_claimed`；`update_in_progress`；部署或集合在试运行时为 `trial_pending`。
 - **暂存。**设备必须运行一个已确认的部署；待确认的候选会被拒绝。请求以及描述 SYSTEM 的 DATA `meta/` 文件
   快照（固件回执、目录检查点、部署状态）暂存在 SYSTEM 上，快照先写，设备在 3 秒后重启。

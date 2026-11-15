@@ -58,7 +58,7 @@
 - 安全相关的操作写入一个小型本地审计环。它是这些事件的记录，不是谁在设备上做过什么的完整历史，也不会被
   上传。
 - **API 在哪里监听**由 `access.web.mode` 决定：`network`（默认）、`local`（仅本地套接字：设备上 root 的命令，
-  没有控制台和 HTTP API）或 `off`（apid 停止）。设备上的 root 用 `micad web status|network|local|off` 设置它，
+  没有控制台和 HTTP API）或 `off`（apid 停止）。设备上的 root 用 `mica web status|network|local|off` 设置它，
   处于 `off` 的设备就是这样恢复的。
 - API 默认在明文 HTTP 8080 端口监听。开启 HTTPS 后在 8443 上使用自签名身份提供服务，管理员可以替换该身份，
   HTTP 端口只做重定向；恰在此时会话 cookie 带 `Secure`。
@@ -79,11 +79,11 @@ micad 用自己的两个应答器在本地网络上通告设备，作用于除�
   控制台位于网络上时运行。
 - **SSH 从不被通告**，两者都不会。
 - **开关**是 `access.mdns.enabled` 和 `access.ssdp.enabled`，都在控制台的概览页（局域网发现）上，也可用
-  `micad mdns on|off` 和 `micad ssdp on|off` 设置。未设置时由产品的 `MDNS=` 和 `SSDP=` 行决定，产品不说时
-  两者都开。关闭意味着根本没有套接字。`micad mdns status`、`micad ssdp status`、`GET /api/v1/mdns` 和
+  `mica mdns on|off` 和 `mica ssdp on|off` 设置。未设置时由产品的 `MDNS=` 和 `SSDP=` 行决定，产品不说时
+  两者都开。关闭意味着根本没有套接字。`mica mdns status`、`mica ssdp status`、`GET /api/v1/mdns` 和
   `GET /api/v1/ssdp` 显示正在运行和正在通告的内容。
 - **通过 mDNS 发布更多服务**：在 `/usr/share/mica/mdns.d/`（镜像自带）或 `/run/mica/mdns.d/`（重启后消失）
-  放 JSON 片段，或用 `micad mdns add` 和 `micad mdns remove`：
+  放 JSON 片段，或用 `mica mdns add` 和 `mica mdns remove`：
 
   ```json
   {"version": 1, "services": [
@@ -139,7 +139,8 @@ micad 用自己的两个应答器在本地网络上通告设备，作用于除�
 
 ## 7. 被锁在外面
 
-丢失管理员密码、全部 API 令牌和全部授权密钥的运维者**没有任何软件途径能回去**：API 需要凭据，SSH 需要不存在
+设备上的 root 用 `mica password set` 设置新的管理员密码，不需要旧密码，所以仍持有授权 SSH 密钥的运维者
+可以这样回来。丢失管理员密码、全部 API 令牌和全部授权密钥的运维者**没有任何软件途径能回去**：API 需要凭据，SSH 需要不存在
 的密钥，控制台没有接受密码的账户。
 
 凭据恢复在代码中存在——它在物理在场声明下生成新的管理员凭据，从不泄露旧凭据——但目前没有板卡声明物理恢复

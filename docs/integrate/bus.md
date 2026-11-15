@@ -4,7 +4,10 @@ This document describes the shipped boundary between the Mica OS management plan
 application services, and MQTT. The boundary is positive and package-enrolled:
 
 - `com.mica.micad1` is a local system-management API. APID is its network-facing
-  client; the boot-health gate is its other approved local caller.
+  client. Its approved local callers are the boot-health gate and root's
+  [`mica` command](../reference/cli.md#2-two-channels), which asks it for
+  what micad decides (updates, containers, services, the web mode, power, the
+  factory reset).
 - `com.mica.<class>[.<suffix>]` is the uniform service-name grammar. `micad` is
   therefore an application name too; the name alone grants no capability.
 - `mica-mqttd` mirrors only exact service names enrolled by their package. It

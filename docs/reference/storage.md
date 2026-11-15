@@ -149,6 +149,9 @@ Base's binds; `mica-mounts` repeats them on OpenRC):
 | `/dev` | devtmpfs | kernel | `nosuid` |
 | `/proc`, `/sys` | proc, sysfs | kernel | `nosuid,nodev,noexec` |
 
+DATA itself is mounted `nosuid,nodev` from core 0.0.8 (the releases of
+2026-11-15); earlier releases mount it `rw,noatime`.
+
 Everything else a program writes lands in one of these; the user's own disks
 add to it. A write anywhere else fails with a read-only file system error.
 

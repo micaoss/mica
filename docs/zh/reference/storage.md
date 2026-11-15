@@ -132,6 +132,8 @@ state/meta 是私有的物理目录。绑定出来的 Mica OS 状态根允许进
 | `/dev` | devtmpfs | 内核 | `nosuid` |
 | `/proc`、`/sys` | proc、sysfs | 内核 | `nosuid,nodev,noexec` |
 
+DATA 本身从 core 0.0.8（2026-11-15 的发布）起以 `nosuid,nodev` 挂载；更早的发布以 `rw,noatime` 挂载。
+
 程序写的其他任何东西都落在上面某处；用户自己的磁盘在此之外再添加。写到其他地方会以只读文件系统
 错误失败。
 

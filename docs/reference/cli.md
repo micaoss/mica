@@ -1,9 +1,8 @@
 # The `mica` command
 
-> **Applies to devices with core 0.0.8 or later** (the product releases of
-> 2026-11-15). Earlier releases have no `mica` command; they use the `micad`
-> commands (`micad web`, `micad unit`, `micad factory-reset`, ...) and the
-> console.
+> A device on a release of 2026-11-14 or earlier has no `mica` command:
+> update it first ([updates](../operate/updates.md)), or use that release's
+> `micad` commands (`micad web`, `micad unit`, `micad factory-reset`, ...).
 
 `mica` is the operator's one command on the device. Every verb, its options,
 its output, its exit code and its `--json` form are on this page, from
@@ -678,8 +677,9 @@ The factory reset is staged. The device reboots in a few seconds, erases everyth
 ```
 
 Anything else typed exits 1, `not confirmed; nothing was reset`. micad's
-refusals still apply and exit 1 with their code: `factory_reset_unsupported`
-(the runkit does not reset, for example on an encrypted DATA),
+refusals still apply and exit 1 with their code: `data_encrypted` (DATA is
+encrypted, and the boot does not reset an encrypted DATA),
+`factory_reset_unsupported` (the booted runkit does not carry a reset out),
 `update_in_progress`, `trial_pending`, `not_claimed`. What is erased and
 kept is in [recovery](recovery.md#23-factory-reset).
 

@@ -73,8 +73,9 @@ software.
   password: `mica factory-reset` prints what is erased and what is kept, then
   waits for the hostname or `factory-reset` to be typed, or takes `--yes`;
   with neither, or no terminal, nothing is reset.
-  micad refuses with a code (409): `factory_reset_unsupported` when the booted
-  runkit does not carry the reset out, as on an encrypted DATA; `not_claimed`
+  micad refuses with a code (409): `data_encrypted` when DATA is
+  encrypted, which the boot does not reset; `factory_reset_unsupported` when
+  the booted runkit does not carry the reset out; `not_claimed`
   on an unclaimed device; `update_in_progress`; `trial_pending` while a
   deployment or set is on trial.
 - **Staging.** The device must run a confirmed deployment; a pending candidate

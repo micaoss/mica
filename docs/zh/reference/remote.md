@@ -9,7 +9,7 @@
 `0.0.0.0:8080` 上提供普通 HTTP，不提供 HTTPS，因此不占用其他服务的 80 和 443。开启 `httpsEnabled` 后，它在
 `httpsPort`（默认 8443）上用每台设备自签名的身份提供 HTTPS，运维者可以上传证书链替换它，此时 HTTP 端口只做
 重定向；会话 cookie 恰在此时带 `Secure`。这是 `network` 模式；`local` 关闭监听器，只留下 root 拥有的套接字
-`/run/mica/apid.sock`，`off` 停止 apid。设备上 root 运行的 `micad web` 在每种模式下都能读取和设置模式。没有
+`/run/mica/apid.sock`，`off` 停止 apid。设备上 root 运行的 `mica web` 在每种模式下都能读取和设置模式。没有
 其他管理协议或端口（`mica-core:docs/mica-core.md` 第 4 节）。
 
 **API 就是闸门。**apid 在自定义界面包的兜底路由之前保留 `/api`、`/_ui`、`/healthz` 和 `/`

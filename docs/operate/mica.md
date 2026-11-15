@@ -8,6 +8,11 @@ services, the web mode, LAN discovery, power, the factory reset and the
 diagnostic snapshot. The contract is `mica-core:docs/mica-core.md`
 section 3.15.
 
+> A device on a release of 2026-11-14 or earlier has no `mica` command:
+> update it first ([updates](updates.md)), or use that release's `micad`
+> commands (`micad web`, `micad unit`, `micad factory-reset`, ...). The
+> operating guides use `mica` throughout.
+
 ## 1. How it works
 
 - `/usr/bin/mica` is a link to `micad`. `micad` itself runs only

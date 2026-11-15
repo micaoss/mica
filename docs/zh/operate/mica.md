@@ -5,6 +5,9 @@
 设置、网络、Wi-Fi、时间、更新、容器、用户服务、Web 模式、局域网发现、电源、出厂重置
 和诊断快照。契约见 `mica-core:docs/mica-core.md` 第 3.15 节。
 
+> 2026-11-14 及更早发布的设备没有 `mica` 命令：先更新它（[更新](updates.md)），或使用该发布的
+> `micad` 命令（`micad web`、`micad unit`、`micad factory-reset` 等）。运维指南全部使用 `mica`。
+
 ## 1. 它怎么工作
 
 - `/usr/bin/mica` 是指向 `micad` 的链接。`micad` 本身只运行 `micad daemon` 和

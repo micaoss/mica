@@ -170,7 +170,7 @@ Mica OS 的恢复是**数据优先保留**的：下面的步骤按代价递增�
   不要密码：它先列出会清除什么、保留什么，然后等你输入主机名或 `factory-reset`，
   或者直接带 `--yes`。设备未认领时（`not_claimed`）、正在安装
   更新时（`update_in_progress`）、有部署或 core 集处于试运行时（`trial_pending`），
-  以及 DATA 加密时（`factory_reset_unsupported`）会被拒绝。设备在 3 秒后重启，重置在
+  以及 DATA 加密时（`data_encrypted`）会被拒绝。设备在 3 秒后重启，重置在
   那次启动中进行；任何地方被打断都会在下一次启动时重新执行。没有 micad 时，以 root
   运行 `mica-deploy factory-reset --reboot` 暂存同样的重置。
 
