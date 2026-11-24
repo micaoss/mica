@@ -98,7 +98,7 @@ mica-build-env ─▶ mica-system-base ─▶ mica-podman ─┐
 | `uefi-arm64.full` | 与 `uefi-x64.full` 相同，跑在 arm64 上 | 否 |
 | `uefi-x64.openrc-full` | `uefi-x64.full` 的内容，跑在 OpenRC 上 | 否 |
 | `uefi-x64.base` | 只有 Base 加 Podman：没有 micad 和控制台，SSH 从首次启动起开启，更新走 `auto` 策略 | 否 |
-| `ssd202d.basic` | OpenRC、管理面与控制台、Dropbear，装在 SPI NAND 上；该板没有 Wi-Fi、蓝牙，也没有 USB 或 SD 主机 | 否：`ssd202d` 不是发布目标 |
+| `ssd202d.basic` | OpenRC、管理面与控制台、Dropbear，装在 SPI NAND 上 | 否：`ssd202d` 不是发布目标 |
 | `<board>.dev`、`s905x5m.emmc-dev` | 开发构建（`PROFILE=dev`） | 从不；只在本地构建 |
 
 没有 minimal 产品。目前除 `uefi-x64.gcp` 外，每个已发布的产品认领时都不要求
