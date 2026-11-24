@@ -114,7 +114,7 @@ products today, and which of them are released:
 | `uefi-arm64.full` | as `uefi-x64.full`, on arm64 | no |
 | `uefi-x64.openrc-full` | `uefi-x64.full`'s set on OpenRC | no |
 | `uefi-x64.base` | the Base alone with Podman: no micad and no console, SSH on from the first boot, updates on the `auto` policy | no |
-| `ssd202d.basic` | OpenRC, the management plane and the console, Dropbear, on SPI NAND | no: `ssd202d` is not a release target |
+| `ssd202d.basic` | OpenRC, the management plane and the console, Dropbear, on SPI NAND; the board has no Wi-Fi, no Bluetooth and no USB or SD host | no: `ssd202d` is not a release target |
 | `<board>.dev`, `s905x5m.emmc-dev` | a development build (`PROFILE=dev`) | never; built locally |
 
 There are no minimal products. Every released product but `uefi-x64.gcp`

@@ -169,8 +169,8 @@ mica reboot
 
 The unit is named after its path (`srv.mount` for `/srv`), names the disk by
 label rather than `/dev/sdb`, and is kept in the device's settings, so it
-survives updates; a configuration reset removes it with the other settings
-([recovery](recovery.md) step 3). Whatever DATA's own `/srv` held is hidden under the mount,
+survives updates and, from core 0.0.9, a configuration reset (0.0.8 and
+earlier removed it; [recovery](recovery.md) step 3). Whatever DATA's own `/srv` held is hidden under the mount,
 not lost: it is back when the unit is removed.
 
 **On OpenRC** (`mini-x64.basic`) the same disk is one fstab line instead of a

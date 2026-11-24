@@ -222,7 +222,7 @@ path in its own check on OpenRC.
 |---|---|---|---|
 | Reboot | kept, enabled ones started | kept | kept |
 | Update, rollback | kept, and **not** rolled back with the system | kept | kept |
-| Configuration reset | on a released device the declarations go with every other setting, so at the next apply micad stops and removes the services it installed; ones installed by hand stay | kept | kept |
+| Configuration reset | kept from core 0.0.9; on 0.0.8 and earlier the declarations went with every other setting, and micad stopped and removed the services it had installed | kept | kept |
 | Application-data reset | removed, and their directories cleared | removed | kept |
 | Factory reset | removed | removed | removed (DATA is made again), except a disk you mounted there |
 

@@ -74,8 +74,8 @@ Mica OS 支持两条应用交付路径，区别在于谁发布、何时发布：
 
 - **一个开关。**设置树中的 `container.enabled`，默认 `false`。它为 false 时
   引擎的守护进程停止，项目仍保持声明。通过 `mica container up`、认证 API 或控制台设置。
-- **声明放哪。**DATA 上的 `/mica/config/container/<project>.yaml`。声明在重启和
-  A/B 更新中保留，配置重置会删掉它。
+- **声明放哪。**DATA 上的 `/mica/config/container/<project>.yaml`。声明在重启、
+  A/B 更新以及（从 core 0.0.9 起）配置重置中保留，配置重置会把容器开关恢复为关闭（0.0.8 及更早的版本会删掉声明）。
 - **数据放哪。**项目的相对主机路径在它的项目目录里解析，命名卷落在
   `/mica/volumes/<project>/`；镜像在 DATA 上的 `/mica/containers`。绝不要用
   `/var`——它小、可丢弃、按设计会被清空（[../operate/storage.md](../operate/storage.md)）。

@@ -38,7 +38,7 @@ removal allowlist remains untouched. The machine ID and other preserved service
 files are not recreated as new identities.
 
 Configuration reset clears the whole public configuration directory, including
-documents not represented as modeled settings. On a released device it also drops the declared user services, container projects and paired Bluetooth devices: at the next apply micad stops and removes the units it installed and the declared containers, while units installed by hand, service accounts, volumes and the STATE stores stay. Application reset removes unit
+documents not represented as modeled settings. From core 0.0.9 it keeps the declared user services, container projects and paired Bluetooth devices; the container switch goes back to its default. Core 0.0.8 and earlier dropped those declarations too, and micad then stopped and removed the units it had installed and the declared containers. Application reset removes unit
 enrollments together with their payloads. Configuration reset marks
 provisioning pending so the normal initializer reestablishes defaults from
 the preserved device identity; there is no image profile to read

@@ -91,8 +91,9 @@ The operating facts an operator needs:
   stay declared. It is set through `mica container up`, the authenticated API or
   the console.
 - **Where declarations go.** `/mica/config/container/<project>.yaml` on DATA.
-  They survive reboots and A/B updates, and a configuration reset removes
-  them.
+  They survive reboots, A/B updates and, from core 0.0.9, a configuration
+  reset, which sets the container switch back to off (0.0.8 and earlier
+  removed the declarations).
 - **Where data goes.** A project's relative host paths resolve in its project
   directory, and its named volumes land under `/mica/volumes/<project>/`;
   images live under `/mica/containers` on DATA. Never `/var` — it is small,
