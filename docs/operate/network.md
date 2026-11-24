@@ -1,8 +1,9 @@
 # Network
 
 How to put a device on the network you have: wired DHCP or a static address,
-a port kept off the internet, extra routes, two uplinks, VLANs and bridges,
-Wi-Fi as a client or an access point, DNS, and a WireGuard tunnel to a peer.
+a port kept off the internet, extra routes, two uplinks with a reachability
+check and failover, VLANs and bridges, Wi-Fi as a client or an access point,
+DNS, and a WireGuard tunnel to a peer.
 Every change goes through micad's settings and is applied by its network
 reconciler; the reference for each field is
 [settings](../reference/settings.md), and for each route
@@ -163,33 +164,172 @@ the lease is bound and removed when it is lost.
 
 > status: shipped — evidence: `mica-core:crates/micad-settings/src/model/network.rs`, `mica-core:docs/mica-core.md`
 
-## 5. Two uplinks
+## 5. Two uplinks and failover
 
 When more than one interface can carry the default route, the route metrics
 choose; the lowest wins.
 
 | Default route from | Metric |
 |---|---|
-| a static gateway | 0 (the kernel's default for a route with none) |
+| a static gateway, first entry with one in name order | 20 |
+| each next static gateway | 21, 22, ... |
 | the first DHCP port, in name order | 100 |
 | each next DHCP port | 110, 120, ... |
 | the Wi-Fi station | 600 |
 
-So a cable is preferred to Wi-Fi, and a static gateway to any lease. Two
-default routes with one metric are refused (`metric_duplicate`).
+So a static gateway is preferred to any lease, and a cable to Wi-Fi. A
+declared default route below metric 20 is refused (`route_metric_reserved`):
+that range is micad's, for the failover route below. Two default routes with
+one metric are refused (`metric_duplicate`).
 
-**Failover today is on link and lease loss only.** When a port loses its
-carrier or its lease, its default route goes and the next one carries the
-traffic; when it comes back, it takes over again. A link that is up but cannot
-reach the internet (a modem with no signal behind a working cable) keeps its
-route: there is no reachability probing yet. Put the uplink you trust first,
-or keep the other one down until needed.
+**Without a check, failover is on link and lease loss only.** When a port
+loses its carrier or its lease, its default route goes and the next one
+carries the traffic; when it comes back, it takes over again. A link that is
+up but cannot reach the internet (a modem with no signal behind a working
+cable) keeps its route.
 
-**Check it worked:** `mica network show <port>` prints a `gateway:` line for
-each port carrying a default route; `ip route` on the device shows each with
-its `metric`.
+### The reachability check
 
-> status: shipped — evidence: `mica-core:crates/micad/src/reconciler/network/render.rs`, `mica-core:crates/micad/src/reconciler/wifi_client.rs`
+Each uplink can carry a **reachability check** (`probe`): every interval the
+device tries to reach a few targets out of that interface alone. When the
+check says an uplink is `down` and another one answers, micad adds one default
+route of its own via the one that answers, at metric 10, so it wins over the
+others; when the first answers again, micad removes it and the traffic goes
+back.
+
+**It is off by default.** Switching it on with no targets of your own stores
+two: `1.1.1.1` (Cloudflare) and `8.8.8.8` (Google), public DNS resolvers,
+reached by a TCP connect to port 53. From then on the device contacts them
+from that interface every interval, for as long as the check is on. Replace
+them with addresses you prefer, or add `gateway`, the uplink's own router.
+
+| Field | Default | Range |
+|---|---|---|
+| `targets` | `1.1.1.1` and `8.8.8.8`, `tcp` port 53 | 1 to 4; an IPv4 address or `gateway`; `icmp` (one echo) or `tcp` (a connect; `port` for `tcp` only, default 443) |
+| `intervalS` | 10 s | 2 to 300 |
+| `timeoutMs` | 2 s (2000) | 200 to 10 000, below the interval |
+| `failuresToDown` | 3 rounds | 1 to 20 |
+| `successesToUp` | 5 rounds | 1 to 50 |
+
+A round succeeds when any target answers. At the defaults a dead upstream is
+left after about 30 s (3 × 10 s), and taken back about 50 s (5 × 10 s) after
+it answers again. Port 53 and not 443, because a captive portal or a
+transparent proxy answers a connect to any port 443 and would make an uplink
+that reaches nothing look up.
+
+**Cost.** Each target costs about 1.5 MB a day at the defaults. That counts on
+a metered uplink, such as an LTE router billed by volume; a longer interval
+costs less and notices later.
+
+**In the console:** Network → Interfaces → the port → Reachability check
+("Check internet reachability"). It fills in the two targets, shows the time
+to switch over and back and the cost a day, and, once on, the verdict, whether
+the port carries the traffic and the last round's answers. For the Wi-Fi
+station, the same editor is on the Wi-Fi tab, beside the radio's state.
+
+### Worked example: a cable modem with an LTE router behind it
+
+`eth0` goes to the site's cable modem, `eth1` to an LTE router kept as a
+backup; both take DHCP, so `eth0` has metric 100 and `eth1` 110. Switch the
+check on for both: on `eth0` so a dead modem is noticed, and on `eth1` so the
+traffic is never moved to a backup that cannot reach the internet either.
+
+```sh
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/network/eth0 \
+  -H 'content-type: application/json' -d '{"dhcp": true, "probe": {"enabled": true}}'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/network/eth1 \
+  -H 'content-type: application/json' -d '{"dhcp": true, "probe": {"enabled": true}}'
+curl -s -H "$AUTH" $DEV/api/v1/network | jq .configured.eth0.probe
+# {"enabled":true,"targets":[{"address":"1.1.1.1","method":"tcp","port":53},
+#  {"address":"8.8.8.8","method":"tcp","port":53}], ...}
+```
+
+`PUT` replaces the whole entry, so name its addressing with the check. The
+stored entry names the targets the device now contacts.
+
+**Check it worked.** On the device, after a few rounds (the INTERNET column
+is `checking` until the first verdict):
+
+```sh
+mica network
+# NAME     STATE     INTERNET  ADDRESSES
+# eth0*    routable  up        192.168.1.40/24 ...
+# eth1     routable  up        192.168.8.100/24 ...
+mica network show eth0
+# internet: up (carries the traffic)
+# metric: 100
+# check: on, every 10 s, 2000 ms timeout, down after 3, up after 5: 1.1.1.1 tcp/53, 8.8.8.8 tcp/53
+# ...
+```
+
+`*` marks the uplink that carries the traffic. Now take the modem's line away
+and leave the cable in (unplug the modem's coaxial or DSL line). After about
+30 s:
+
+```sh
+mica network
+# eth0     routable  down      192.168.1.40/24 ...
+# eth1*    routable  up        192.168.8.100/24 ...
+ip route | grep default
+# default via 192.168.8.1 dev eth1 proto 109 metric 10
+# default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.40 metric 100
+# default via 192.168.8.1 dev eth1 proto dhcp src 192.168.8.100 metric 110
+journalctl -u micad -b | grep MICA_UPLINK      # OpenRC: logread | grep MICA_UPLINK
+# ... MICA_UPLINK active=eth1 previous=eth0 reason=probe
+```
+
+The metric-10 route is micad's (route protocol 109; BusyBox `ip route` on
+OpenRC does not print the protocol, so there it shows as the default route
+with `metric 10`). Each uplink keeps its own route. Put the line back: after
+about 50 s of answers `eth0` is `up` and `*` again, the metric-10 route is
+gone, and the log says `reason=recovered`. The same is in
+`GET /api/v1/network/status` under `uplinks`: `active`, `natural` (the uplink
+the metrics alone would pick), `override` (whether micad's route steers the traffic),
+`lastChange` and each uplink's state, counters and last round
+([diagnostics](../reference/diagnostics.md#3-the-observed-network-state)).
+
+**DNS follows the active uplink**, on both inits: an uplink that is `down`
+while another is active is not asked for names. On systemd micad tells
+resolved to stop using that link's servers for ordinary lookups; on OpenRC
+it writes `/run/mica/resolv.order` and `resolv.conf` is rebuilt with the
+active uplink's servers first and the down ones last. With global DNS servers
+on (section 8), every lookup goes to them whichever uplink is active.
+
+### Limits
+
+- **IPv4 only.** Targets are IPv4 addresses, and only IPv4 default routes are
+  switched.
+- **Addresses only**, no host names: a name would have to be resolved through
+  the very uplink being checked.
+- **Open connections do not move.** A switch moves new connections only; one
+  already open keeps the old uplink's source address and stalls until the
+  application reconnects. Containers and access-point clients get the new
+  uplink on new connections.
+- **Captive portals.** A portal that answers TCP on port 53 too makes an
+  uplink look up. Choose targets the portal cannot answer for, such as `icmp`
+  to an outside address.
+- **Every target down everywhere.** If the targets are unreachable from every
+  uplink, all are `down`, micad removes its route, and the device routes by
+  metric as it would with no check. Use two targets on different networks.
+- **Strict reverse-path filtering** (`rp_filter` 1) drops the answers on an
+  uplink that is not active; the uplink then reads `blocked` and is not used.
+  Mica images keep the kernel's 0.
+- Not for `internet: false`, WireGuard or CAN entries (`probe_not_allowed`).
+
+**What can go wrong:**
+
+| Code or state | Meaning | Fix |
+|---|---|---|
+| `probe_not_allowed` | the entry cannot carry the default route | drop `internet: false`, or check another port |
+| `probe_targets` | no target, more than 4, or one twice | 1 to 4 distinct targets |
+| `probe_address`, `probe_method`, `probe_port` | not an IPv4 address or `gateway`; not `icmp`/`tcp`; a port on `icmp` or out of 1-65535 | fix the target |
+| `probe_interval`, `probe_timeout`, `probe_threshold` | a number out of its range, or a timeout not below the interval | the table above |
+| `route_metric_reserved` | a declared default route below metric 20 | use 20 or more |
+| `no route` in INTERNET | no carrier, no lease or no default route on that port | the cable, or DHCP on that network |
+| `blocked` in INTERNET | strict reverse-path filtering (`rp_filter` 1 on the port or `all`) | set it back to 0 or 2 |
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:docs/plan/uplink-failover.md`, `mica-core:crates/micad/src/cli/network.rs`, `mica-core:crates/mica-apid/ui/src/i18n/resources.ts`
 
 ## 6. VLANs and bridges (systemd products)
 
@@ -379,7 +519,8 @@ before it connects again. A pre-shared key is read back as `<redacted>`.
 | `busy` | 409 | a network task is still applying |
 | `version_conflict` | 409 | the map or peer list changed since the version you named |
 | `name_invalid` | 422 | not an interface name |
-| `address_overlap`, `gateway_out_of_subnet`, `gateway_not_allowed`, `metric_duplicate` | 422 | addressing and routing rules (sections 2-5) |
+| `address_overlap`, `gateway_out_of_subnet`, `gateway_not_allowed`, `metric_duplicate`, `route_metric_reserved` | 422 | addressing and routing rules (sections 2-5) |
+| `probe_not_allowed`, `probe_*` | 422 | the reachability check (section 5) |
 | `vlan_*`, `bridge_port_*` | 422 | section 6 |
 | `port_in_use`, `peer_exists`, `wireguard_*` | 409 / 422 | section 9 |
 | `settings_rejected` | 422 | micad refused the write; the message quotes the rule |

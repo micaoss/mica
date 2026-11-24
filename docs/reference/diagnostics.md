@@ -141,6 +141,7 @@ carrier reads as exactly that.
 | `defaultRoutes` | `count` and `entries[]` of `family`, `gateway`, `interface`, `interfaceIndex`, `metric`, `protocol` + `protocolId`, `table` + `tableId`, `configSource`; a count of zero is evidence ("no default route"), not absence |
 | `dns` | `linkServers[]` (what networkd holds per link), `resolverServers[]` (what resolved holds), and `probe`: `name`, `reachable`, `result` (`resolved`, `failed`, `timeout`), `detail` |
 | `wifi` | `associations[]`: per wireless interface `state`, `associated`, `ssid`, `bssid`, `frequencyMhz`, `keyManagement`, `rssiDbm`, `linkSpeedMbps`; or absent with the reason (no wireless interface; wpa_supplicant's control directory absent; a socket nobody answered) |
+| `uplinks` | `active` (the uplink that carries the traffic), `natural` (the one the metrics alone pick), `override` (whether micad's failover route, protocol 109 at metric 10, steers the traffic), `lastChange` (`at`, `from`, `to`, `reason`: `probe`, `link`, `recovered` or `none-up`; `null` before the first switch) and `uplinks[]`: per uplink `name`, `state` (`off`, `unknown`, `up`, `down`, `noRoute`, `blocked`), `metric`, `probe`, `since`, `failures`, `successes` and `lastRound` (`at`, `ok`, `targets[]` of `address`, `method`, `port`, `ok`, `latencyMs`, `detail`) |
 | `capabilities` | `wifi` (`supported`, `interfaces[]`), `bluetooth` (`supported`, `adapters[]`, adapter presence only), `cellular` (`supported: false`, `interfaces[]`) |
 
 Every rtnetlink enum on this surface is reported as a **name plus the id it
@@ -167,7 +168,9 @@ network.** The probe is a single `ResolveHostname` through resolved for
 depends on, so the probe adds no new outbound dependency — bounded at 3 s.
 `reachable: false` with `result: failed` names resolved's error;
 `result: timeout` means no answer within the bound. Under a fixture root the
-observer runs no probe at all.
+observer runs no probe at all. `uplinks` only reports: the reachability
+checks behind it run in micad while an uplink's check is switched on, never
+because this route was read ([network](../operate/network.md)).
 
 **A route-shape cost, stated.** `/v1/network/status` is a static segment
 declared beside `/v1/network/{iface}`, and the router matches the static

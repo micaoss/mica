@@ -1,6 +1,6 @@
 # 网络
 
-如何让设备接入你现有的网络：有线 DHCP 或静态地址、不作为互联网出口的端口、额外路由、两条上行、VLAN 和网桥、
+如何让设备接入你现有的网络：有线 DHCP 或静态地址、不作为互联网出口的端口、额外路由、两条上行（连通性检查与故障切换）、VLAN 和网桥、
 作为客户端或接入点的 Wi-Fi、DNS，以及到对端的 WireGuard 隧道。每次修改都经过 micad 的设置，由它的网络协调器
 应用；每个字段的参考见[设置](../reference/settings.md)，每个路由见 [HTTP API](../reference/http-api.md)。
 
@@ -139,27 +139,137 @@ curl -s -H "$AUTH" -X PUT $DEV/api/v1/network/eth0 \
 
 > status: shipped — evidence: `mica-core:crates/micad-settings/src/model/network.rs`, `mica-core:docs/mica-core.md`
 
-## 5. 两条上行
+## 5. 两条上行与故障切换
 
 当多个接口都能承载默认路由时，由路由 metric 决定，最低者胜出。
 
 | 默认路由来自 | Metric |
 |---|---|
-| 静态网关 | 0（不带 metric 的路由的内核默认值） |
+| 静态网关，按名称顺序第一个带网关的条目 | 20 |
+| 之后的每个静态网关 | 21、22…… |
 | 按名称顺序的第一个 DHCP 端口 | 100 |
 | 之后的每个 DHCP 端口 | 110、120…… |
 | Wi-Fi 客户端 | 600 |
 
-所以有线优先于 Wi-Fi，静态网关优先于任何租约。两条 metric 相同的默认路由会被拒绝（`metric_duplicate`）。
+所以静态网关优先于任何租约，有线优先于 Wi-Fi。声明的默认路由 metric 低于 20 会被拒绝（`route_metric_reserved`）：
+这一段留给 micad 下文的故障切换路由。两条 metric 相同的默认路由会被拒绝（`metric_duplicate`）。
 
-**目前的故障切换只针对链路和租约丢失。**端口失去载波或租约时，它的默认路由消失，由下一条承载流量；它恢复时
-再次接管。链路正常却无法访问互联网（网线正常、后面的调制解调器没有信号）时，它的路由保留：还没有可达性探测。
-把你信任的上行放在前面，或在需要之前让另一条保持关闭。
+**不开检查时，故障切换只针对链路和租约丢失。**端口失去载波或租约时，它的默认路由消失，由下一条承载流量；
+它恢复时再次接管。链路正常却无法访问互联网（网线正常、后面的调制解调器没有信号）时，它的路由保留。
 
-**检查是否生效：**`mica network show <port>` 为每个承载默认路由的端口打印 `gateway:` 行；设备上的 `ip route`
-显示每条路由及其 `metric`。
+### 连通性检查
 
-> status: shipped — evidence: `mica-core:crates/micad/src/reconciler/network/render.rs`, `mica-core:crates/micad/src/reconciler/wifi_client.rs`
+每条上行都可以带一个**连通性检查**（`probe`）：设备每隔一个间隔，只从该接口去连接几个目标。检查判定某条上行
+`down` 而另一条有应答时，micad 经有应答的那条加一条自己的默认路由，metric 10，因此压过其他路由；前一条恢复
+应答后，micad 删除这条路由，流量切回。
+
+**默认关闭。**开启时如果没有填自己的目标，会存入两个：`1.1.1.1`（Cloudflare）和 `8.8.8.8`（Google），都是
+公共 DNS 解析服务器，以 TCP 连接 53 端口探测。此后只要检查开着，设备就会每个间隔从该接口联系它们。可以换成
+你想用的地址，或添加 `gateway`（该上行自己的路由器）。
+
+| 字段 | 默认值 | 范围 |
+|---|---|---|
+| `targets` | `1.1.1.1` 和 `8.8.8.8`，`tcp` 53 端口 | 1 到 4 个；IPv4 地址或 `gateway`；`icmp`（一次回显）或 `tcp`（一次连接；`port` 仅用于 `tcp`，默认 443） |
+| `intervalS` | 10 秒 | 2 到 300 |
+| `timeoutMs` | 2 秒（2000） | 200 到 10 000，且小于间隔 |
+| `failuresToDown` | 3 轮 | 1 到 20 |
+| `successesToUp` | 5 轮 | 1 到 50 |
+
+任一目标应答即算本轮成功。按默认值，上游停止应答约 30 秒（3 × 10 秒）后切走，恢复应答约 50 秒（5 × 10 秒）
+后切回。用 53 端口而不是 443，是因为强制门户或透明代理会应答任何 443 连接，让一条什么都连不上的上行看起来正常。
+
+**流量开销。**按默认值，每个目标每天约 1.5 MB。在按流量计费的上行（例如按流量计费的 LTE 路由器）上要算进去；
+间隔越长，开销越小，发现故障也越晚。
+
+**在控制台：**网络 → 接口 → 该端口 → 连通性检查（“检查能否访问互联网”）。它会填入两个目标，显示切走和切回所需
+时间以及每天的开销；开启后显示判定结果、该端口是否承载流量以及上一轮的应答。Wi-Fi 客户端的同一编辑器在 Wi-Fi
+标签页，位于无线状态旁边。
+
+### 完整示例：有线调制解调器，后备 LTE 路由器
+
+`eth0` 接现场的有线调制解调器，`eth1` 接作为后备的 LTE 路由器；两者都用 DHCP，所以 `eth0` 的 metric 是 100，
+`eth1` 是 110。两条都开启检查：`eth0` 上开，是为了发现调制解调器失效；`eth1` 上开，是为了不把流量切到同样
+连不上互联网的后备上。
+
+```sh
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/network/eth0 \
+  -H 'content-type: application/json' -d '{"dhcp": true, "probe": {"enabled": true}}'
+# {"taskId":"<id>"}
+curl -s -H "$AUTH" -X PUT $DEV/api/v1/network/eth1 \
+  -H 'content-type: application/json' -d '{"dhcp": true, "probe": {"enabled": true}}'
+curl -s -H "$AUTH" $DEV/api/v1/network | jq .configured.eth0.probe
+# {"enabled":true,"targets":[{"address":"1.1.1.1","method":"tcp","port":53},
+#  {"address":"8.8.8.8","method":"tcp","port":53}], ...}
+```
+
+`PUT` 替换整个条目，所以要连同地址配置一起写上检查。存下的条目写明了设备现在联系的目标。
+
+**检查是否生效。**在设备上，等几轮之后（第一次判定之前 INTERNET 列显示 `checking`）：
+
+```sh
+mica network
+# NAME     STATE     INTERNET  ADDRESSES
+# eth0*    routable  up        192.168.1.40/24 ...
+# eth1     routable  up        192.168.8.100/24 ...
+mica network show eth0
+# internet: up (carries the traffic)
+# metric: 100
+# check: on, every 10 s, 2000 ms timeout, down after 3, up after 5: 1.1.1.1 tcp/53, 8.8.8.8 tcp/53
+# ...
+```
+
+`*` 标出承载流量的上行。现在保留网线，断掉调制解调器的外线（拔掉同轴或 DSL 线）。约 30 秒后：
+
+```sh
+mica network
+# eth0     routable  down      192.168.1.40/24 ...
+# eth1*    routable  up        192.168.8.100/24 ...
+ip route | grep default
+# default via 192.168.8.1 dev eth1 proto 109 metric 10
+# default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.40 metric 100
+# default via 192.168.8.1 dev eth1 proto dhcp src 192.168.8.100 metric 110
+journalctl -u micad -b | grep MICA_UPLINK      # OpenRC：logread | grep MICA_UPLINK
+# ... MICA_UPLINK active=eth1 previous=eth0 reason=probe
+```
+
+metric 10 的路由是 micad 的（路由协议 109；OpenRC 上 BusyBox 的 `ip route` 不打印协议，所以那里显示为
+`metric 10` 的默认路由）。每条上行保留自己的路由。把外线接回：应答约 50 秒后 `eth0` 重新是 `up` 并带 `*`，
+metric 10 的路由消失，日志写 `reason=recovered`。`GET /api/v1/network/status` 的 `uplinks` 里也有同样内容：
+`active`、`natural`（只看 metric 会选的上行）、`override`（micad 的路由是否在引导流量）、`lastChange`，以及每条
+上行的状态、计数和上一轮结果（[诊断](../reference/diagnostics.md#3-观测到的网络状态)）。
+
+**DNS 跟随活动上行**，两种 init 都一样：另一条上行活动时，处于 `down` 的上行不再被用来解析名字。systemd 上
+micad 让 resolved 不再把该链路的服务器用于普通查询；OpenRC 上它写 `/run/mica/resolv.order`，重建
+`resolv.conf`，活动上行的服务器在前，down 的在后。开启全局 DNS 服务器时（第 8 节），无论哪条上行活动，
+所有查询都发给它们。
+
+### 限制
+
+- **只支持 IPv4。**目标是 IPv4 地址，也只切换 IPv4 默认路由。
+- **只能写地址**，不能写主机名：主机名得通过正被检查的那条上行去解析。
+- **已建立的连接不会迁移。**切换只影响新连接；已打开的连接保留旧上行的源地址，停住直到应用重连。容器和接入点
+  的客户端在新连接上使用新上行。
+- **强制门户。**如果门户连 53 端口的 TCP 也应答，上行会看起来正常。选门户无法代答的目标，例如对外部地址用
+  `icmp`。
+- **所有目标在每条上行上都不通。**如果从每条上行都连不上目标，所有上行都是 `down`，micad 删除自己的路由，设备
+  按 metric 路由，和没开检查一样。请用分属不同网络的两个目标。
+- **严格反向路径过滤**（`rp_filter` 为 1）会丢弃非活动上行上的应答；该上行显示 `blocked`，不会被使用。Mica 镜像
+  保持内核默认值 0。
+- 不适用于 `internet: false`、WireGuard 或 CAN 条目（`probe_not_allowed`）。
+
+**可能出现的问题：**
+
+| 代码或状态 | 含义 | 处理 |
+|---|---|---|
+| `probe_not_allowed` | 该条目不能承载默认路由 | 去掉 `internet: false`，或检查另一个端口 |
+| `probe_targets` | 没有目标、超过 4 个，或有重复 | 1 到 4 个互不相同的目标 |
+| `probe_address`、`probe_method`、`probe_port` | 不是 IPv4 地址或 `gateway`；不是 `icmp`/`tcp`；`icmp` 带了端口或端口不在 1-65535 | 修正该目标 |
+| `probe_interval`、`probe_timeout`、`probe_threshold` | 数值超出范围，或超时不小于间隔 | 见上表 |
+| `route_metric_reserved` | 声明的默认路由 metric 低于 20 | 用 20 或更大 |
+| INTERNET 为 `no route` | 该端口没有载波、租约或默认路由 | 检查网线，或该网络的 DHCP |
+| INTERNET 为 `blocked` | 严格反向路径过滤（端口或 `all` 的 `rp_filter` 为 1） | 改回 0 或 2 |
+
+> status: shipped — evidence: `mica-core:docs/mica-core.md`, `mica-core:docs/plan/uplink-failover.md`, `mica-core:crates/micad/src/cli/network.rs`, `mica-core:crates/mica-apid/ui/src/i18n/resources.ts`
 
 ## 6. VLAN 和网桥（systemd 产品）
 
@@ -322,7 +432,8 @@ mica wifi                          # enabled、interface、connected: <ssid>、�
 | `busy` | 409 | 有网络任务还在应用 |
 | `version_conflict` | 409 | 映射或对端列表在你指定的版本之后改变了 |
 | `name_invalid` | 422 | 不是接口名称 |
-| `address_overlap`、`gateway_out_of_subnet`、`gateway_not_allowed`、`metric_duplicate` | 422 | 地址和路由规则（第 2–5 节） |
+| `address_overlap`、`gateway_out_of_subnet`、`gateway_not_allowed`、`metric_duplicate`、`route_metric_reserved` | 422 | 地址和路由规则（第 2–5 节） |
+| `probe_not_allowed`、`probe_*` | 422 | 连通性检查（第 5 节） |
 | `vlan_*`、`bridge_port_*` | 422 | 第 6 节 |
 | `port_in_use`、`peer_exists`、`wireguard_*` | 409 / 422 | 第 9 节 |
 | `settings_rejected` | 422 | micad 拒绝了写入；消息引用了规则 |

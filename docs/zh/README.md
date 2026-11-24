@@ -20,7 +20,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
   - [`faq.md`](start/faq.md) — 最先被问到的问题：每条几行回答，并指向完整说明的页面
 - `operate/` — 运维：配置、更新、恢复、存储、API
   - [`configuration.md`](operate/configuration.md) — 配置模型与所有受支持的修改方式
-  - [`network.md`](operate/network.md) — 操作指南：有线 DHCP 与静态地址、不作为出口的端口、路由、两条上行、VLAN 与网桥、Wi-Fi、DNS、端到端的 WireGuard
+  - [`network.md`](operate/network.md) — 操作指南：有线 DHCP 与静态地址、不作为出口的端口、路由、两条上行与故障切换、VLAN 与网桥、Wi-Fi、DNS、端到端的 WireGuard
   - [`time.md`](operate/time.md) — 操作指南：自己的 NTP 服务器、时区、在各 init 上检查同步
   - [`ssh.md`](operate/ssh.md) — 操作指南：密钥、打开 SSH、本次启动有效的 root 密码、Compute Engine 登录与云管理员、收紧访问
   - [`logs.md`](operate/logs.md) — 操作指南：服务日志与上一次启动、保留与转发日志、`mica doctor`、支持摘要、错误报告

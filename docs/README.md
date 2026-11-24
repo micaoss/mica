@@ -80,7 +80,7 @@ current product only; history is in Git.
   - `faq.md` — the questions people ask first, each answered in a few lines with the page that holds the rest
 - `operate/` — running a device: configuration, updates, recovery, storage, the API
   - `configuration.md` — the configuration model and every supported way to change settings
-  - `network.md` — how-to: wired DHCP and static, a port off the internet, routes, two uplinks, VLANs and bridges, Wi-Fi, DNS, WireGuard end to end
+  - `network.md` — how-to: wired DHCP and static, a port off the internet, routes, two uplinks and failover, VLANs and bridges, Wi-Fi, DNS, WireGuard end to end
   - `time.md` — how-to: your own NTP servers, the time zone, checking synchronization on each init
   - `ssh.md` — how-to: keys, switching SSH on, the one-boot root password, Compute Engine logins and cloud administrators, locking down
   - `logs.md` — how-to: service logs and the previous boot, keeping and forwarding the log, `mica doctor`, the support summary, bug reports

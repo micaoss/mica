@@ -68,7 +68,7 @@ curl -s -H "$AUTH" -X PUT $DEV/api/v1/web -H 'content-type: application/json' \
 
 ```sh
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $DEV/_ui/
-# 一个重定向（3xx）到 https://...:8443
+# 308 https://mica-a4e2e69e.local:8443/_ui/
 curl -sk -H "$AUTH" https://mica-a4e2e69e.local:8443/api/v1/web/certificate \
   | jq '{serving, selfSigned: .certificate.selfSigned, sha256: .certificate.sha256}'
 # {"serving":true,"selfSigned":true,"sha256":"<摘要>"}

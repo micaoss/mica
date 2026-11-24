@@ -102,6 +102,7 @@
 | `defaultRoutes` | `count` 和 `entries[]`（`family`、`gateway`、`interface`、`interfaceIndex`、`metric`、`protocol` + `protocolId`、`table` + `tableId`、`configSource`）；计数为零是证据（"没有默认路由"），不是缺失 |
 | `dns` | `linkServers[]`（networkd 在每条链路上持有的）、`resolverServers[]`（resolved 持有的），以及 `probe`：`name`、`reachable`、`result`（`resolved`、`failed`、`timeout`）、`detail` |
 | `wifi` | `associations[]`：每个无线接口的 `state`、`associated`、`ssid`、`bssid`、`frequencyMhz`、`keyManagement`、`rssiDbm`、`linkSpeedMbps`；或缺失并说明原因（没有无线接口；wpa_supplicant 的控制目录不存在；套接字无人应答） |
+| `uplinks` | `active`（承载流量的上行）、`natural`（只看 metric 会选的上行）、`override`（micad 的故障切换路由，协议 109、metric 10，是否在引导流量）、`lastChange`（`at`、`from`、`to`、`reason`：`probe`、`link`、`recovered` 或 `none-up`；第一次切换之前为 `null`），以及 `uplinks[]`：每条上行的 `name`、`state`（`off`、`unknown`、`up`、`down`、`noRoute`、`blocked`）、`metric`、`probe`、`since`、`failures`、`successes` 和 `lastRound`（`at`、`ok`，以及 `targets[]`：`address`、`method`、`port`、`ok`、`latencyMs`、`detail`） |
 | `capabilities` | `wifi`（`supported`、`interfaces[]`）、`bluetooth`（`supported`、`adapters[]`，只报告适配器是否存在）、`cellular`（`supported: false`、`interfaces[]`） |
 
 这个状态面上的每个 rtnetlink 枚举都报告为**名称加上它所解析自的 id**（`protocol`/`protocolId`、
@@ -118,7 +119,8 @@ networkd 自己的 `ProtocolString`：它的 JSON 写入器对照一张只有三
 **DNS 可达性是本文中唯一会访问网络的东西。**探测是经 resolved 对 `0.debian.pool.ntp.org` 执行一次
 `ResolveHostname`（timesyncd 的后备服务器池，镜像本来就依赖这个名称，所以探测不新增向外依赖），上限 3 秒。
 `reachable: false` 加 `result: failed` 给出 resolved 的错误；`result: timeout` 表示在上限内没有应答。在测试夹具
-根下，观察器根本不运行探测。
+根下，观察器根本不运行探测。`uplinks` 只做报告：其背后的连通性检查只在某条上行开启检查时由 micad 运行，
+不会因读取这个路由而触发（[网络](../operate/network.md)）。
 
 **一个路由形状的代价，在此说明。**`/v1/network/status` 是与 `/v1/network/{iface}` 并列声明的静态段，路由器先
 匹配静态路由：名字恰好叫 `status` 的接口无法经每接口路由寻址。没有真实接口叫这个名字，而让三个状态面写法一致
