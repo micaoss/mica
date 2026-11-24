@@ -33,7 +33,8 @@ of the signed boot policy, `/etc/mica/boot.json` inside the initramfs and
 `/run/mica/boot-policy.json` once the system runs. It names the boot backend
 (`uefi` or `uboot-fit`), the kernel format (`uki` or `fit`), the GPT numbers
 of the boot partition, SYSTEM and DATA, the firmware target, the record
-geometry of a FIT board, and optionally the watchdog, the space `reserves`
+geometry of a FIT board, and optionally the watchdog (`identity`,
+`handoverS`, `confirmS`; section 8), the space `reserves`
 kept free (1 MiB to 1 GiB each on SYSTEM, the ESP and DATA), `dataQuotas`,
 `bootTrust`, `storage` (`gpt`, the default, or `ubi`) and, on a `gpt` board,
 `dataFormat`, the format a factory reset makes DATA with. The policy is
@@ -101,6 +102,17 @@ signed initramfs. There is no network and no shell at this stage. In order:
    stop!` (KERN_CRIT, in `dmesg` and `journalctl -b -p err`) is printed by
    design at every boot; the timer runs until the root feeds it (systemd's
    `RuntimeWatchdogSec`, or the `mica-watchdog` service on OpenRC).
+   The runkit arms the watchdog the policy names (`board.watchdog.identity`,
+   matched against `/sys/class/watchdog/watchdog<N>/identity`; absent, it is
+   `watchdog0`), and at the handover names it to the root's init, so the root
+   feeds that one and no other: `/run/systemd/system.conf.d/50-mica-watchdog.conf`
+   (`WatchdogDevice=/dev/watchdog<N>`) on systemd, `/run/mica/watchdog.env`
+   (`WATCHDOG_DEVICE=/dev/watchdog<N>`) for OpenRC's feeder. It then sets the
+   timeout to `board.watchdog.handoverS` (30 to 600 s, default 120, within
+   the driver's range), prints
+   `mica-init: watchdog<N> handed over with a <set>s timeout (policy <p>s, asked <a>s)`
+   on the console and feeds it once more: the root's init has that long to start feeding. A
+   driver that cannot set a timeout keeps its own, and the line says so.
 2. **Reads the signed boot policy and authenticates the selected
    deployment**: the descriptor's Ed25519 signature against the policy's keys,
    its board, architecture and product, and the kernel it was booted with.
@@ -217,6 +229,56 @@ A trial that never confirms runs out of attempts and the loader boots the
 fallback; a failure before the root runs, with a core set or extension change
 alone on trial, is charged to that change, and the deployment is kept.
 
+### The trial deadline
+
+A trial boot also has a deadline: `board.watchdog.confirmS` seconds of uptime
+to be confirmed in. A boot is on trial while it tries something a confirm has
+not settled: a new deployment, a pending core set, or a driver extension
+change. `mica-deploy trial-deadline` starts first in userspace
+(`mica-trial-deadline.service` on systemd; on OpenRC a sysinit script beside
+`mica-watchdog`, before the boot runlevel's DATA work, so a hang there meets
+the deadline too). On any other boot it prints `{"trial":false}` and exits.
+On a trial boot it waits until `confirmS`, then looks again: confirmed by
+then, it prints `{"trial":false,"confirmed":true}`. Otherwise it fails the
+boot as `mica-deploy fail-boot` does and reboots. That spends one of the
+trial's tries, so a trial that hangs before the health gate falls back like
+one that fails it. **A confirmed boot is never failed for being slow.**
+
+| Board or product | `confirmS` |
+|---|---|
+| `uefi-x64` (`full`, `docker`, `gcp`), `mini-x64` | 600 s |
+| `cx3576`, `s905x5m.emmc-full` | 900 s (core's default), provisional |
+| `s905x5m.sd-full` | 1200 s, provisional |
+| `qemu-armhf` | 1800 s, provisional |
+
+The x86-64 values rest on measured confirms: 9 to 17 s under KVM, 3 to 10 s on
+Compute Engine, up to 62 s under TCG emulation. The ARM and UBI values are
+provisional until a first boot and a trial boot are measured on the hardware.
+
+The reboot goes through the init (`systemctl reboot`, or
+`openrc-shutdown --reboot now`) and, if the init has not stopped within
+300 s, through the kernel after a sync. On OpenRC, `openrc-init` takes a
+request only between runlevels, so a boot hung inside one would never act on
+it: when `/run/openrc/softlevel` has not turned to `shutdown` within 15 s, the
+kernel reboots at once, 15 s after `confirmS`. A shutdown that has begun keeps
+the 300 s, however slow. On OpenRC the deadline's lines go to the kernel log,
+which exists before any syslogd, as `mica-trial-deadline: ...`; an error is
+logged at error level and so also reaches the console. A fallback the
+deadline cannot record powers the device off, as the health gate's failure
+path does.
+
+**Check it worked**, on the device:
+
+```sh
+jq .board.watchdog /run/mica/boot-policy.json   # confirmS and handoverS when named; absent = 900 s and 120 s
+journalctl -b -u mica-trial-deadline            # systemd
+dmesg | grep mica-trial-deadline                # OpenRC
+# {"trial":false}                                      an ordinary boot
+# mica-deploy: this boot is on trial; it is failed unless confirmed within 600s of boot
+# {"trial":false,"confirmed":true}                     the health gate confirmed in time
+# mica-deploy: the trial was not confirmed within 600s; failing the boot
+```
+
 ## 9. Shutdown
 
 - **systemd on x86-64 and aarch64**: systemd execs the runkit's `shutdown` as
@@ -237,6 +299,7 @@ alone on trial, is charged to that change, and the deployment is kept.
 | What you see | What it means | What to do |
 |---|---|---|
 | `watchdog: watchdog0: watchdog did not stop!` at every boot | expected: the runkit hands the armed watchdog to the root | nothing |
+| A trial boot reboots about `confirmS` after power-on | it was not confirmed by its deadline (section 8) | read that boot's `mica-trial-deadline` and `mica-health` lines; a slow board is not failed once confirmed |
 | The device boots the previous version after an update | the new deployment did not confirm in three attempts | [updates](../operate/updates.md): read the update state's `lastRollback` and the previous boot's log |
 | Boot stops before the root with a policy, signature or geometry error | the image or the disk does not match the signed policy | reflash the image ([recovery](../operate/recovery.md)) |
 | `DATA is locked` | an encrypted DATA no key provider unlocks | open it with the recovery passphrase, or reflash |

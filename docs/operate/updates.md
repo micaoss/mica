@@ -141,6 +141,13 @@ brought the same ways, and the import reports which of the two it took.
    boot settled, that the management daemon answers and that the API answers,
    then confirms the deployment. A failed gate reboots into the retained
    deployment.
+5. **The trial has a deadline.** A trial boot not confirmed within the
+   board's `confirmS` seconds of uptime (600 s on `uefi-x64` and `mini-x64`,
+   900 s on `cx3576` and `s905x5m.emmc-full`, 1200 s on `s905x5m.sd-full`,
+   1800 s on `qemu-armhf`; the ARM values are provisional until measured on
+   hardware) is failed and rebooted, spending one attempt, so an update that
+   hangs before the gate still falls back. A confirmed boot is never failed
+   for being slow ([the trial deadline](../reference/boot.md#the-trial-deadline)).
 
 On the device's command line, `mica update status`, `check`, `install` and
 `rollback` are the console's requests: `install` takes

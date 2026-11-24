@@ -77,7 +77,14 @@ Information、Diagnostics、Help 页上的复制与下载按钮。它包含板�
 - **服务状态：**systemd 上用 `systemctl status <unit>`、`systemctl is-system-running`
   与 `journalctl -u <unit>`；OpenRC 上用 `rc-status`。
 - **预期中的内核消息。**`watchdog: watchdog0: watchdog did not stop!` 每次启动都会出现，
-  这是设计如此：启动过程把正在运行的看门狗交给 init，而不停止它。这不是故障。
+  这是设计如此：启动过程把正在运行的看门狗交给 init，而不停止它。这不是故障。根喂的是哪个看门狗，写在
+  `/run/systemd/system.conf.d/50-mica-watchdog.conf`（systemd）或 `/run/mica/watchdog.env`（OpenRC）
+  里；控制台上有 runkit 的 `mica-init: watchdog<N> handed over with a <set>s timeout` 一行。
+- **试运行启动自己重启**，发生在开机约 `confirmS` 之后（按板卡为 600 到 1800 秒），说明它没有在期限内
+  得到确认。期限的输出在 systemd 上见 `journalctl -b -1 -u mica-trial-deadline`，OpenRC 上在内核日志里
+  （`mica-trial-deadline: ...`，`mica-klogd` 运行后也在 `logread` 中）；健康门的输出说明它在等什么。
+  OpenRC 上挂在某个运行级别里的启动会在期限之后 15 秒由内核重启
+  （[启动](../reference/boot.md#试运行期限)）。
 - **启动健康：**健康门记录它所需的集合、每个成员的裁决，以及它看到的每一个
   失败 unit（`journalctl -u mica-health`）。更新后持续回退的部署，失败在所需成员
   之一：启动事务稳定、micad 应答、apid 监听——日志会点名是哪一项。单个失败的

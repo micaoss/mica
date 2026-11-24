@@ -50,6 +50,18 @@
 - **使用 TPM 的 DATA 加密**在同时具备 `tpm2` 和 `dm-crypt` 的地方可行；没有已发布的产品开启它。
 - **容器**需要 `containers`、`netdev` 和 `firewall`；qemu-armhf 不支持容器。
 
+## 内核版本
+
+0.0.9 这一轮的产品（2026-11-24 发布）带以下内核；设备上 `uname -r` 打印的就是这个字符串。
+
+| 板卡 | 内核版本（`uname -r`） |
+|---|---|
+| `uefi-x64`、`mini-x64`、`qemu-armhf` | `6.12.119` |
+| `cx3576` | `6.1.192`（厂商内核树，本轮未变） |
+| `s905x5m` | `6.12.116-m100-arm64`（厂商内核树，本轮未变） |
+
+产品构建会拒绝内核版本与板卡声明（`KERNEL_EXPECT`，`mica-build:boards/README.md`）不符的内核。
+
 ## 读取内核的真实配置
 
 在 UEFI 板卡上，`mica-build` 中提交的 `kernel/config/<board>.config` 就是解析后的配置，构建时会核对。在

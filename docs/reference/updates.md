@@ -181,6 +181,9 @@ record policy described in [the boot contract](boot.md).
 
 Each candidate has three attempts. The boot health service confirms only the
 authenticated running deployment after required services and policy checks pass.
+A trial boot not confirmed within the board's `confirmS` seconds of uptime is
+failed and rebooted, which spends one attempt; a confirmed boot is never failed
+for being slow ([the trial deadline](boot.md#the-trial-deadline)).
 Known confirmed metadata/health failures retire that record when a usable
 fallback exists. Shared SYSTEM/DATA failures stop for explicit recovery. No path
 refills exhausted counters or falls back to unsigned content.

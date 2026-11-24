@@ -36,17 +36,20 @@ Every released product is `PROFILE=prod`. The features mean:
 
 ## Per-product settings
 
-| Product | Device code source | Claim asks for the code | mDNS / SSDP | Cloud admins | First-boot SSH | Watchdog | DATA encryption |
-|---|---|---|---|---|---|---|---|
-| `uefi-x64.full`, `uefi-x64.docker` | `dmi-serial` | off | on | off | off | `watchdog0` | off |
-| `uefi-x64.gcp` | `random` | required | off | on | on | `Software Watchdog` (softdog) | off |
-| `mini-x64.basic` | `dmi-serial` | off | on | off | off | `watchdog0` | off |
-| `cx3576.full` | `emmc-cid` | off | on | off | off | `watchdog0` | off |
-| `s905x5m.sd-full`, `s905x5m.emmc-full` | `emmc-cid` | off | on | off | off | `watchdog0` | off |
-| `qemu-armhf.basic` | `mac` | off | on | off | off | `watchdog0` | off |
+| Product | Device code source | Claim asks for the code | mDNS / SSDP | Cloud admins | First-boot SSH | Watchdog | Handover, trial deadline | DATA encryption |
+|---|---|---|---|---|---|---|---|---|
+| `uefi-x64.full`, `uefi-x64.docker` | `dmi-serial` | off | on | off | off | `watchdog0` | 120 s, 600 s | off |
+| `uefi-x64.gcp` | `random` | required | off | on | on | `Software Watchdog` (softdog) | 120 s, 600 s | off |
+| `mini-x64.basic` | `dmi-serial` | off | on | off | off | `watchdog0` | 120 s, 600 s | off |
+| `cx3576.full` | `emmc-cid` | off | on | off | off | `watchdog0` | 120 s, 900 s (provisional) | off |
+| `s905x5m.sd-full`, `s905x5m.emmc-full` | `emmc-cid` | off | on | off | off | `watchdog0` | 120 s, 1200 s on `sd-full`, 900 s on `emmc-full` (provisional) | off |
+| `qemu-armhf.basic` | `mac` | off | on | off | off | `watchdog0` | 120 s, 1800 s (provisional) | off |
 
 "off" in a column with no key in `product.env` is the default the key rules
-give. `CLAIM_DEVICE_CODE` is `off` on every product but the GCP one because
+give. The watchdog column is the one the runkit arms; the next is its timeout
+at the handover to the init (`handoverS`) and how long a trial boot has to be
+confirmed (`confirmS`); the ARM values are provisional until measured on
+hardware ([boot](boot.md#the-trial-deadline)). `CLAIM_DEVICE_CODE` is `off` on every product but the GCP one because
 their serials are placeholders no label carries, or the code is shown only on
 the serial console. Every released product bakes the update policy `check`
 every 1440 minutes against `https://res.micaos.dev/update/`

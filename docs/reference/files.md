@@ -27,6 +27,8 @@ the storage layout behind them is [storage](storage.md).
 | `/run/mica/apid.sock` | the API's local socket for root |
 | `/run/mica/media/<id>` | external media micad mounted read-only |
 | `/run/mica/hosts` | the hosts file (`/etc/hosts` links here) |
+| `/run/mica/watchdog.env` | OpenRC: `WATCHDOG_DEVICE=/dev/watchdog<N>`, the watchdog the runkit armed, which `mica-watchdog` feeds ([boot](boot.md#4-mica-runkit-init-stage-by-stage)); systemd gets `/run/systemd/system.conf.d/50-mica-watchdog.conf` instead |
+| `/run/mica/resolv.order` | OpenRC: the order `mica-resolv` builds `resolv.conf` in while an uplink is down, the active uplink's `resolv.d` files first ([network](../operate/network.md)); absent when nothing is steered |
 
 ## Configuration (DATA)
 

@@ -33,16 +33,16 @@
 
 ## 各产品的设置
 
-| 产品 | 设备码来源 | 认领是否要求设备码 | mDNS / SSDP | 云管理员 | 首次启动 SSH | 看门狗 | DATA 加密 |
-|---|---|---|---|---|---|---|---|
-| `uefi-x64.full`、`uefi-x64.docker` | `dmi-serial` | 关 | 开 | 关 | 关 | `watchdog0` | 关 |
-| `uefi-x64.gcp` | `random` | 要求 | 关 | 开 | 开 | `Software Watchdog`（softdog） | 关 |
-| `mini-x64.basic` | `dmi-serial` | 关 | 开 | 关 | 关 | `watchdog0` | 关 |
-| `cx3576.full` | `emmc-cid` | 关 | 开 | 关 | 关 | `watchdog0` | 关 |
-| `s905x5m.sd-full`、`s905x5m.emmc-full` | `emmc-cid` | 关 | 开 | 关 | 关 | `watchdog0` | 关 |
-| `qemu-armhf.basic` | `mac` | 关 | 开 | 关 | 关 | `watchdog0` | 关 |
+| 产品 | 设备码来源 | 认领是否要求设备码 | mDNS / SSDP | 云管理员 | 首次启动 SSH | 看门狗 | 交接超时、试运行期限 | DATA 加密 |
+|---|---|---|---|---|---|---|---|---|
+| `uefi-x64.full`、`uefi-x64.docker` | `dmi-serial` | 关 | 开 | 关 | 关 | `watchdog0` | 120 秒、600 秒 | 关 |
+| `uefi-x64.gcp` | `random` | 要求 | 关 | 开 | 开 | `Software Watchdog`（softdog） | 120 秒、600 秒 | 关 |
+| `mini-x64.basic` | `dmi-serial` | 关 | 开 | 关 | 关 | `watchdog0` | 120 秒、600 秒 | 关 |
+| `cx3576.full` | `emmc-cid` | 关 | 开 | 关 | 关 | `watchdog0` | 120 秒、900 秒（暂定） | 关 |
+| `s905x5m.sd-full`、`s905x5m.emmc-full` | `emmc-cid` | 关 | 开 | 关 | 关 | `watchdog0` | 120 秒；`sd-full` 1200 秒，`emmc-full` 900 秒（暂定） | 关 |
+| `qemu-armhf.basic` | `mac` | 关 | 开 | 关 | 关 | `watchdog0` | 120 秒、1800 秒（暂定） | 关 |
 
-`product.env` 中没有对应键的列，取键规则给出的默认值。除 GCP 产品外，所有产品的 `CLAIM_DEVICE_CODE`
+`product.env` 中没有对应键的列，取键规则给出的默认值。看门狗一列是 runkit 启用的看门狗；下一列是交接给 init 时的超时（`handoverS`）和试运行启动必须得到确认的时限（`confirmS`）；ARM 的取值在硬件实测之前是暂定的（[启动](boot.md#试运行期限)）。除 GCP 产品外，所有产品的 `CLAIM_DEVICE_CODE`
 都是 `off`，因为它们的序列号是标签上不会印的占位值，或者设备码只在串口控制台上显示。每个已发布的产品都
 内置更新策略：每 1440 分钟对 `https://res.micaos.dev/update/` 执行 `check`
 （[更新引擎](updates.md#策略文档)）。

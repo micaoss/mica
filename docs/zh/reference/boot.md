@@ -29,7 +29,7 @@ U-Boot 板卡： ROM ─▶ U-Boot micaboot（记录、试运行计数）─▶ 
 runkit 不按名字认识任何板卡：板卡就是签名启动策略里的 `board` 段，在 initramfs 中是
 `/etc/mica/boot.json`，系统运行后是 `/run/mica/boot-policy.json`。它写明启动后端
 （`uefi` 或 `uboot-fit`）、内核格式（`uki` 或 `fit`）、启动分区、SYSTEM 与 DATA 的 GPT 编号、
-固件目标、FIT 板卡的记录几何，以及可选的看门狗、保留空间 `reserves`（SYSTEM、ESP、DATA 各
+固件目标、FIT 板卡的记录几何，以及可选的看门狗（`identity`、`handoverS`、`confirmS`；第 8 节）、保留空间 `reserves`（SYSTEM、ESP、DATA 各
 1 MiB 至 1 GiB）、`dataQuotas`、`bootTrust`、`storage`（默认 `gpt`，或 `ubi`），以及 `gpt` 板卡上
 出厂重置重建 DATA 所用的格式 `dataFormat`。策略在使用前先校验，写入任何东西之前先核对磁盘符合其
 几何（`mica-core:docs/mica-core.md` 6.4）。
@@ -78,6 +78,14 @@ runkit 不按名字认识任何板卡：板卡就是签名启动策略里的 `bo
    init 时它保持未停止地关闭。内核的 `watchdog: watchdog0: watchdog did not stop!`（KERN_CRIT，
    见 `dmesg` 与 `journalctl -b -p err`）是设计使然，每次启动都会出现；计时器一直运行，直到根去
    喂它（systemd 的 `RuntimeWatchdogSec`，或 OpenRC 上的 `mica-watchdog` 服务）。
+   runkit 启用策略指定的看门狗（`board.watchdog.identity`，与
+   `/sys/class/watchdog/watchdog<N>/identity` 比对；缺省为 `watchdog0`），并在交接时把它告诉根的
+   init，让根只喂这一个：systemd 上是 `/run/systemd/system.conf.d/50-mica-watchdog.conf`
+   （`WatchdogDevice=/dev/watchdog<N>`），OpenRC 的喂狗服务用 `/run/mica/watchdog.env`
+   （`WATCHDOG_DEVICE=/dev/watchdog<N>`）。然后它把超时设为 `board.watchdog.handoverS`（30 到 600 秒，
+   默认 120，限制在驱动支持的范围内），在控制台上打印
+   `mica-init: watchdog<N> handed over with a <set>s timeout (policy <p>s, asked <a>s)`，
+   再喂一次：根的 init 有这么长时间开始喂狗。不能设置超时的驱动保留自己的超时，这一行会说明。
 2. **读取签名启动策略并认证所选部署**：用策略密钥校验描述符的 Ed25519 签名、其板卡、架构和产品，
    以及启动它的内核。
 3. **映射 support 镜像和根**为签名的 dm-verity 设备：磁盘板卡上是 loop 设备，UBI 板卡上是静态卷的
@@ -165,6 +173,46 @@ dm-verity 树的 `/usr` 与 `/etc` 的 squashfs，与产品分开、以签名的
 从不确认的试运行会用完尝试次数，加载器启动回退部署；在根运行之前的失败，如果当时只有 core 集合
 或扩展变更在单独试运行，就记在这个变更上，部署保留。
 
+### 试运行期限
+
+试运行启动还有一个期限：必须在开机后 `board.watchdog.confirmS` 秒内得到确认。一次启动只要在尝试
+尚未被确认的东西，就处于试运行：新的部署、待定的 core 集合，或驱动扩展变更。
+`mica-deploy trial-deadline` 在用户空间最先启动（systemd 上是 `mica-trial-deadline.service`；
+OpenRC 上是 sysinit 脚本，与 `mica-watchdog` 并列，在 boot 运行级别处理 DATA 之前，所以挂在那里的
+启动也会碰到期限）。其他启动时它打印 `{"trial":false}` 后退出。试运行启动时它等到 `confirmS`，
+再检查一次：此时已确认，就打印 `{"trial":false,"confirmed":true}`；否则像 `mica-deploy fail-boot`
+那样判这次启动失败并重启。这会用掉一次试运行尝试，所以在健康门之前挂住的试运行，和健康门失败的
+一样会回退。**已确认的启动不会因为慢而被判失败。**
+
+| 板卡或产品 | `confirmS` |
+|---|---|
+| `uefi-x64`（`full`、`docker`、`gcp`）、`mini-x64` | 600 秒 |
+| `cx3576`、`s905x5m.emmc-full` | 900 秒（core 的默认值），暂定 |
+| `s905x5m.sd-full` | 1200 秒，暂定 |
+| `qemu-armhf` | 1800 秒，暂定 |
+
+x86-64 的取值基于实测的确认时间：KVM 下 9 到 17 秒，Compute Engine 上 3 到 10 秒，TCG 模拟下最长
+62 秒。ARM 和 UBI 的取值是暂定的，要等在硬件上实测一次首次启动和一次试运行启动后再定。
+
+重启经由 init 进行（`systemctl reboot` 或 `openrc-shutdown --reboot now`）；init 在 300 秒内没有
+停下，就在 sync 之后由内核重启。OpenRC 上 `openrc-init` 只在运行级别之间接受请求，所以挂在某个
+运行级别里的启动永远不会执行它：`/run/openrc/softlevel` 在 15 秒内没有变成 `shutdown` 时，内核立即
+重启，即 `confirmS` 之后 15 秒。已经开始的关机保留 300 秒，无论多慢。OpenRC 上期限的输出写到内核
+日志（它在任何 syslogd 之前就存在），形如 `mica-trial-deadline: ...`；错误以 error 级别记录，所以
+也会显示在控制台上。期限无法记录的回退会让设备关机，与健康门的失败路径相同。
+
+**检查是否生效**，在设备上：
+
+```sh
+jq .board.watchdog /run/mica/boot-policy.json   # 写明时有 confirmS 和 handoverS；缺省为 900 秒和 120 秒
+journalctl -b -u mica-trial-deadline            # systemd
+dmesg | grep mica-trial-deadline                # OpenRC
+# {"trial":false}                                      普通启动
+# mica-deploy: this boot is on trial; it is failed unless confirmed within 600s of boot
+# {"trial":false,"confirmed":true}                     健康门按时确认
+# mica-deploy: the trial was not confirmed within 600s; failing the boot
+```
+
 ## 9. 关机
 
 - **x86-64 与 aarch64 上的 systemd**：systemd 把 runkit 的 `shutdown` 作为只在内存中的退出 ramdisk
@@ -181,6 +229,7 @@ dm-verity 树的 `/usr` 与 `/etc` 的 squashfs，与产品分开、以签名的
 | 你看到的 | 含义 | 怎么办 |
 |---|---|---|
 | 每次启动都有 `watchdog: watchdog0: watchdog did not stop!` | 预期行为：runkit 把已启用的看门狗交给根 | 无需处理 |
+| 试运行启动在开机约 `confirmS` 后重启 | 它没有在期限内得到确认（第 8 节） | 读那次启动的 `mica-trial-deadline` 和 `mica-health` 输出；已确认的启动再慢也不会被判失败 |
 | 更新后设备启动的是之前的版本 | 新部署在三次尝试内没有确认 | 见[更新](../operate/updates.md)：读更新状态的 `lastRollback` 和上一次启动的日志 |
 | 启动在进入根之前因策略、签名或几何错误停下 | 镜像或磁盘与签名策略不符 | 重刷镜像（[恢复](../operate/recovery.md)） |
 | `DATA is locked` | 没有密钥提供者能解锁的加密 DATA | 用恢复口令打开，或重刷 |

@@ -98,7 +98,17 @@ escalation carrying the board identity, never a green result.
   `rc-status`.
 - **An expected kernel message.** `watchdog: watchdog0: watchdog did not stop!`
   appears at every boot, by design: the boot hands the running watchdog to
-  the init without stopping it. It is not a fault.
+  the init without stopping it. It is not a fault. Which watchdog the root
+  feeds is named in `/run/systemd/system.conf.d/50-mica-watchdog.conf`
+  (systemd) or `/run/mica/watchdog.env` (OpenRC), and the console shows the
+  runkit's `mica-init: watchdog<N> handed over with a <set>s timeout` line.
+- **A trial boot that reboots on its own** about `confirmS` after power-on
+  (600 to 1800 s by board) was not confirmed by its deadline. The deadline's
+  lines are in `journalctl -b -1 -u mica-trial-deadline` on systemd and in the
+  kernel log on OpenRC (`mica-trial-deadline: ...`, in `logread` once
+  `mica-klogd` runs); the health gate's lines say what it was waiting for. On
+  OpenRC a boot hung inside a runlevel is rebooted by the kernel 15 s after
+  the deadline ([boot](../reference/boot.md#the-trial-deadline)).
 - **Boot health:** the health gate logs its required set, each member's
   verdict, and every failed unit it saw (`journalctl -u mica-health`). A deployment
   that keeps falling back after an update failed one of the required members —

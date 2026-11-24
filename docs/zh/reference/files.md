@@ -26,6 +26,8 @@
 | `/run/mica/apid.sock` | 供 root 使用的 API 本地套接字 |
 | `/run/mica/media/<id>` | micad 只读挂载的外接介质 |
 | `/run/mica/hosts` | hosts 文件（`/etc/hosts` 链接到这里） |
+| `/run/mica/watchdog.env` | OpenRC：`WATCHDOG_DEVICE=/dev/watchdog<N>`，runkit 启用、由 `mica-watchdog` 喂的看门狗（[启动](boot.md#4-mica-runkit-init-的各个阶段)）；systemd 上对应的是 `/run/systemd/system.conf.d/50-mica-watchdog.conf` |
+| `/run/mica/resolv.order` | OpenRC：有上行处于 down 时 `mica-resolv` 构建 `resolv.conf` 的顺序，活动上行的 `resolv.d` 文件在前（[网络](../operate/network.md)）；无需调整时不存在 |
 
 ## 配置（DATA）
 

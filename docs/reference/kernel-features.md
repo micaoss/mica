@@ -57,6 +57,20 @@ So:
 - **Containers** need `containers`, `netdev` and `firewall`; qemu-armhf has no
   container support.
 
+## Kernel releases
+
+The 0.0.9 round's products (released 2026-11-24) carry these kernels; `uname -r`
+on a device prints the same string.
+
+| Board | Kernel release (`uname -r`) |
+|---|---|
+| `uefi-x64`, `mini-x64`, `qemu-armhf` | `6.12.119` |
+| `cx3576` | `6.1.192` (the vendor tree, unchanged in this round) |
+| `s905x5m` | `6.12.116-m100-arm64` (the vendor tree, unchanged in this round) |
+
+A product build refuses a kernel whose release is not the one its board
+declares (`KERNEL_EXPECT`, `mica-build:boards/README.md`).
+
 ## Reading a kernel's real configuration
 
 On the UEFI boards the committed `kernel/config/<board>.config` in
