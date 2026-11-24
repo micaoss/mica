@@ -18,7 +18,7 @@
   read -rs ADMIN_PASSWORD                           # 管理员密码
   ```
 
-- **一台工作站**，装有 Docker、git 和 bun，以及检出到设备所运行发布标签（例如 `uefi-x64.full.20261115-1356`）的
+- **一台工作站**，装有 Docker、git 和 bun，以及检出到设备所运行发布标签（例如 `uefi-x64.full.20261124-1351`）的
   [mica-build](https://github.com/micaoss/mica-build)。它的 `driver-key` 和 `driver-ext` 工具不需要 Mica OS 的其他
   任何东西。
 

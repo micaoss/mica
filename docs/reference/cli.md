@@ -6,7 +6,7 @@
 
 `mica` is the operator's one command on the device. Every verb, its options,
 its output, its exit code and its `--json` form are on this page, from
-`mica-core` at release `20261115-0958` (core 0.0.8,
+`mica-core` at release `20261124-0755` (core 0.0.9,
 `mica-core:crates/micad/src/cli.rs` and the modules it calls).
 
 ## 1. Where it runs, and who may run it
@@ -26,7 +26,7 @@ as its units start it. Any other word exits 2 with `micad: use mica <word>
 (mica help)`.
 
 `mica --version` prints `mica <package version>`, for example
-`mica 0.0.8-1`.
+`mica 0.0.9-1`.
 
 ## 2. Two channels
 
@@ -183,7 +183,7 @@ print; only a failed `GetSystemInfo` fails the command.
 $ mica status
 board      <board model>
 system     <version> (<first 12 characters of the deployment id>)
-core       0.0.8 (channel general)
+core       0.0.9 (channel general)
 state      <lifecycle state>
 checked    <time of the last check>
 uptime     2h 14m
@@ -402,28 +402,42 @@ mica network show <interface> [--json]
 ```
 
 `mica network` reads the observed state (`GET /api/v1/network/status`) and
-prints one line per interface but `lo`: name, operational state, addresses.
-`show` prints one interface:
+prints a table of every interface but `lo`: its name, its operational state,
+whether it reaches the internet as its reachability check last said, and its
+addresses. `*` marks the uplink that carries the traffic. `show` prints one
+interface, with its check and the last round when it has one:
 
 ```text
 $ mica network
-enp0s2 routable 192.168.1.40/24 fe80::5054:ff:fe12:3456/64
-wlan0 no-carrier
-$ mica network show enp0s2
-name: enp0s2
+NAME     STATE     INTERNET  ADDRESSES
+eth0*    routable  up        192.168.1.40/24 fe80::5054:ff:fe12:3456/64
+wlan0    routable  up        10.0.0.23/24
+$ mica network show eth0
+name: eth0
 state: routable
 hardware address: 52:54:00:12:34:56
 address: 192.168.1.40/24
 address: fe80::5054:ff:fe12:3456/64
+gateway: 192.168.1.1
 dns: 192.168.1.1
+internet: up (carries the traffic)
+metric: 20
+check: on, every 10 s, 2000 ms timeout, down after 3, up after 5: 1.1.1.1 tcp/53, 8.8.8.8 tcp/53
+since: 2026-11-24T10:02:11Z (0 failed, 41 good in a row)
+last round: 2026-11-24T10:09:01Z ok
+  1.1.1.1 tcp/53 ok 12 ms
+  8.8.8.8 tcp/53 ok 15 ms
 ```
 
-`gateway:` lines appear for default routes and `wifi: <ssid>` for an
-associated wireless interface. An unknown name exits 1 with
-`no interface named <name>` (code `not_found`). `--json` prints the whole
-document, or the one interface's object with `show`
+INTERNET is `up`, `down`, `checking` (no verdict yet), `no route`, `blocked`
+(strict reverse-path filtering drops the answers), or `-` for an interface
+with no check. `wifi: <ssid>` appears for an associated wireless interface. An
+unknown name exits 1 with `no interface named <name>` (code `not_found`).
+`--json` prints the whole document, or the one interface's object with `show`
 ([diagnostics](diagnostics.md#3-the-observed-network-state)). Changing the
-network is the console's or `mica set`'s, not this verb's.
+network is the console's or `mica set`'s, not this verb's
+([network](../operate/network.md)). On core 0.0.8 `mica network` printed an
+empty list; that is fixed in 0.0.9.
 
 ### wifi
 
@@ -479,7 +493,7 @@ with `stopped at <state>; see mica update status`.
 ```text
 $ mica update
 system     <version> (<short deployment id>)
-core       0.0.8 (channel general)
+core       0.0.9 (channel general)
 state      <lifecycle state>
 available  system <version>
 checked    <time of the last check>

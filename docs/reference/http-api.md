@@ -2,7 +2,7 @@
 
 Every route the management API serves, by area: 103 paths and 134
 operations, generated from `mica-core:crates/mica-apid/openapi.json` at core
-0.0.8 (`20261115-0958`). The schema is the contract; this page is its index.
+0.0.9 (`20261124-0755`). The schema is the contract; this page is its index.
 How the API behaves (modes, listeners, authentication, the error envelope,
 tasks) is [the API page](api.md); the settings behind the settings routes
 are [the settings tree](settings.md).
@@ -10,7 +10,8 @@ are [the settings tree](settings.md).
 ## Using the API
 
 - **Base address.** `http://<device>:8080` by default, `https://<device>:8443`
-  once HTTPS is on, or the local socket `/run/mica/apid.sock` for root on the
+  once HTTPS is on (8080 then answers `308 Permanent Redirect` to the same
+  host, path and query on the HTTPS port, the SSDP description aside), or the local socket `/run/mica/apid.sock` for root on the
   device. A product without a feature has none of its routes (404).
 - **Credentials.** `POST /api/v1/setup` and `POST /api/v1/recovery/credential`
   take no credential, and `GET /api/v1/session` answers any caller; every other
@@ -68,7 +69,7 @@ are [the settings tree](settings.md).
 | POST | `/api/v1/dns/test` | Ask each server directly for one `A` record. | 200 |
 | GET | `/api/v1/network` | Read declared network configuration together with current link state. | 200 |
 | PUT | `/api/v1/network` | Replace the whole interface map, validated as one tree. | 200, 202 |
-| GET | `/api/v1/network/status` | Read the observed network state. | 200 |
+| GET | `/api/v1/network/status` | Read the observed network state, with `uplinks`: the uplink that carries the traffic and each uplink's reachability check. | 200 |
 | GET | `/api/v1/network/wireguard/defaults` | The values a new WireGuard tunnel starts from. | 200 |
 | PUT | `/api/v1/network/{iface}` | Declare or replace one interface, validated against the whole map. | 202 |
 | DELETE | `/api/v1/network/{iface}` | Remove one interface, re-validating the rest of the map without it. | 204 |

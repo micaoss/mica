@@ -28,7 +28,7 @@ it safe is [boot](../reference/boot.md) section 6.
 
 - **A workstation** with Docker, git and bun, and a checkout of
   [mica-build](https://github.com/micaoss/mica-build) at the tag of the
-  release the device runs (for example `uefi-x64.full.20261115-1356`). Its
+  release the device runs (for example `uefi-x64.full.20261124-1351`). Its
   `driver-key` and `driver-ext` tools need nothing else of Mica OS's.
 
 > status: board-dependent — evidence: `mica-core:docs/mica-core.md`, `docs/reference/kernel-features.md`, `mica-build:src/drivers/driver-ext.ts`

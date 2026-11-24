@@ -9,7 +9,7 @@
 `code` 是稳定的，程序应据此分支；`message` 是给人看的句子，可能变化；`source` 说明是谁拒绝的（`apid`
 是 API 服务器，`micad` 是其后的守护进程）；有相关设置或字段时 `path` 指明它；`params` 携带消息中提到的值。
 被拒绝的网络写入在 `details` 中列出每条违反的规则，被拒绝的 Compose 文件在 `problems` 中列出每个问题。本页
-列出这些代码，来源是 core 0.0.8（`20261115-0958`）的 `mica-core:crates/mica-apid/src` 和
+列出这些代码，来源是 core 0.0.9（`20261124-0755`）的 `mica-core:crates/mica-apid/src` 和
 `mica-core:docs/mica-core.md`。相关行为见 [API 页](api.md)。
 
 ## apid 返回的代码
@@ -88,11 +88,16 @@
 | `gateway_out_of_subnet` | 网关不在其子网内 |
 | `gateway_not_allowed` | 在 `internet: false` 的接口上设置静态网关或 `0.0.0.0/0` 路由 |
 | `metric_duplicate` | 两条默认路由度量相同 |
+| `route_metric_reserved` | 默认路由的度量小于 20，这一段留给设备自己的路由（0.0.9） |
+| `probe_not_allowed` | 在不承载默认路由的条目、隧道或 CAN 控制器上配置可达性检查（0.0.9） |
+| `probe_targets` | 目标超过四个，或有重复（0.0.9） |
+| `probe_address`、`probe_method`、`probe_port` | 目标不是 IPv4 单播地址或 `gateway`，方法不是 `icmp` 或 `tcp`，或端口不在 1 到 65535 内或用于 `icmp`（0.0.9） |
+| `probe_interval`、`probe_timeout`、`probe_threshold` | 间隔不在 2 到 300 秒内，超时不在 200 到 10 000 毫秒内或不小于间隔，阈值超出范围（0.0.9） |
 | `vlan_duplicate` | 同一父接口上同一 VLAN id 出现两次 |
 | `vlan_parent_invalid` | VLAN 父接口未声明或是 CAN |
 | `vlan_parent_unsupported` | 未声明的 VLAN 父接口，其镜像配置无法被采纳 |
 | `bridge_port_invalid`、`bridge_port_addressed`、`bridge_port_taken` | 网桥端口未声明或是 CAN、带有寻址、或被占用两次 |
-| `port_in_use` | 隧道的监听端口已被另一条隧道声明或被设备上的服务占用 |
+| `port_in_use` | 隧道的监听端口已被另一条隧道声明或被设备上的服务占用；从 0.0.9 起每次网络写入都会检查，不只是 WireGuard 路由 |
 | `in_use` | 另一个条目依赖这个条目 |
 | `validation_failed` | 字段本身的语法 |
 

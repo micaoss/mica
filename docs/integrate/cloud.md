@@ -37,10 +37,10 @@ then, with `gce-import.sh` from the same mica-build tag:
 ```sh
 GCE_LOCATION=europe-west4 \
   bash boards/uefi-x64/gce/gce-import.sh \
-  mica-uefi-x64.gcp-20261115-1652.gce.tar.gz \
-  mica-uefi-x64.gcp-20261115-1652.db.der \
+  mica-uefi-x64.gcp-20261124-1535.gce.tar.gz \
+  mica-uefi-x64.gcp-20261124-1535.db.der \
   my-bucket/mica
-# image mica-uefi-x64-gcp-20261115-1652 created from gs://my-bucket/mica/...
+# image mica-uefi-x64-gcp-20261124-1535 created from gs://my-bucket/mica/...
 ```
 
 It uploads the archive and creates the image with UEFI, gVNIC and multi-queue
@@ -61,7 +61,7 @@ them to try the product, not for anything you keep.
 ```sh
 gcloud compute instances create mica-1 \
   --zone europe-west4-a --machine-type e2-small \
-  --image mica-uefi-x64-gcp-20261115-1652 \
+  --image mica-uefi-x64-gcp-20261124-1535 \
   --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring
 ```
 

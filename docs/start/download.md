@@ -36,16 +36,16 @@ The current releases, and the core each image was built with:
 
 | Product | Stamp | Core in the image | What it carries |
 |---|---|---|---|
-| `cx3576.full` | `20261115-1337` | 0.0.8 | systemd, Docker, OpenSSH, WiFi and Bluetooth: factory access point, BLE provisioning |
-| `s905x5m.sd-full` | `20261115-1356` | 0.0.8 | systemd, Podman, Dropbear, WiFi and Bluetooth, on an SD card |
-| `s905x5m.emmc-full` | `20261115-1449` | 0.0.8 | the same, on the eMMC |
-| `uefi-x64.full` | `20261115-1356` | 0.0.8 | systemd, Podman, Dropbear, no radio |
-| `uefi-x64.docker` | `20261115-1449` | 0.0.8 | systemd, Docker, Dropbear, no radio |
-| `mini-x64.basic` | `20261115-1356` | 0.0.8 | OpenRC, the management plane and the console, Dropbear, no container engine |
-| `qemu-armhf.basic` | `20261115-1356` | 0.0.8 | OpenRC, the management plane and the console, Dropbear, no container engine |
-| `uefi-x64.gcp` | `20261115-1652` | 0.0.8 | for Google Compute Engine: systemd, Docker, OpenSSH, no radio; also a `.gce.tar.gz` to import and the boot certificate `.db.der` |
+| `cx3576.full` | `20261124-1332` | 0.0.9 | systemd, Docker, OpenSSH, WiFi and Bluetooth: factory access point, BLE provisioning |
+| `s905x5m.sd-full` | `20261124-1351` | 0.0.9 | systemd, Podman, Dropbear, WiFi and Bluetooth, on an SD card |
+| `s905x5m.emmc-full` | `20261124-1411` | 0.0.9 | the same, on the eMMC |
+| `uefi-x64.full` | `20261124-1351` | 0.0.9 | systemd, Podman, Dropbear, no radio |
+| `uefi-x64.docker` | `20261124-1505` | 0.0.9 | systemd, Docker, Dropbear, no radio |
+| `mini-x64.basic` | `20261124-1351` | 0.0.9 | OpenRC, the management plane and the console, Dropbear, no container engine |
+| `qemu-armhf.basic` | `20261124-1351` | 0.0.9 | OpenRC, the management plane and the console, Dropbear, no container engine |
+| `uefi-x64.gcp` | `20261124-1535` | 0.0.9 | for Google Compute Engine: systemd, Docker, OpenSSH, no radio; also a `.gce.tar.gz` to import and the boot certificate `.db.der` |
 
-The current core set is `core.general.20261115-1333`, core 0.0.8, and every
+The current core set is `core.general.20261124-1328`, core 0.0.9, and every
 image above was built with it. How to import `uefi-x64.gcp` into Compute
 Engine is on [uefi-x64](../hardware/uefi-x64.md).
 

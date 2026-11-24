@@ -262,7 +262,7 @@ AUTH="Authorization: Bearer mica_<id>_<secret>"   # 来自：mica tokens create 
 ssh root@mica-a4e2e69e.local
 mica update
 # system     <版本> (<id，12 位十六进制>)
-# core       0.0.8 (channel general)
+# core       0.0.9 (channel general)
 # state      succeeded: The boot health gate confirmed this deployment
 mica update check
 # available: system <更新的版本>          （或：up to date）

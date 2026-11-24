@@ -12,7 +12,7 @@ server, `micad` the daemon behind it); `path` names the setting or field when
 there is one; `params` carries the values the message names. A refused network
 write lists every broken rule in `details`, a refused Compose file every problem
 in `problems`. This page lists the codes, from `mica-core:crates/mica-apid/src`
-at core 0.0.8 (`20261115-0958`) and `mica-core:docs/mica-core.md`. Behaviour
+at core 0.0.9 (`20261124-0755`) and `mica-core:docs/mica-core.md`. Behaviour
 around them is [the API page](api.md).
 
 ## Codes apid answers
@@ -92,11 +92,16 @@ written into a route, so the table above does not list them.
 | `gateway_out_of_subnet` | a gateway outside its subnet |
 | `gateway_not_allowed` | a static gateway or `0.0.0.0/0` route on an interface with `internet: false` |
 | `metric_duplicate` | two default routes with one metric |
+| `route_metric_reserved` | a default route with a metric below 20, which is kept for the device's own routes (0.0.9) |
+| `probe_not_allowed` | a reachability check on an entry that carries no default route, a tunnel or a CAN controller (0.0.9) |
+| `probe_targets` | more than four targets, or one twice (0.0.9) |
+| `probe_address`, `probe_method`, `probe_port` | a target that is not an IPv4 unicast address or `gateway`, not `icmp` or `tcp`, or a port outside 1 to 65535 or on `icmp` (0.0.9) |
+| `probe_interval`, `probe_timeout`, `probe_threshold` | an interval outside 2 to 300 s, a timeout outside 200 to 10 000 ms or not below the interval, a threshold out of range (0.0.9) |
 | `vlan_duplicate` | one VLAN id twice on a parent |
 | `vlan_parent_invalid` | a VLAN parent that is not declared or is CAN |
 | `vlan_parent_unsupported` | an undeclared VLAN parent whose image configuration cannot be adopted |
 | `bridge_port_invalid`, `bridge_port_addressed`, `bridge_port_taken` | a bridge port that is not declared or is CAN, carries addressing, or is claimed twice |
-| `port_in_use` | a tunnel's listen port another tunnel declares or a service on the device holds |
+| `port_in_use` | a tunnel's listen port another tunnel declares or a service on the device holds; from 0.0.9 every network write checks it, not only the WireGuard routes |
 | `in_use` | an entry another entry depends on |
 | `validation_failed` | a field's own syntax |
 

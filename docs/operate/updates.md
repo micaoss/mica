@@ -329,7 +329,7 @@ AUTH="Authorization: Bearer mica_<id>_<secret>"   # from: mica tokens create lap
 ssh root@mica-a4e2e69e.local
 mica update
 # system     <version> (<id, 12 hex>)
-# core       0.0.8 (channel general)
+# core       0.0.9 (channel general)
 # state      succeeded: The boot health gate confirmed this deployment
 mica update check
 # available: system <newer version>          (or: up to date)

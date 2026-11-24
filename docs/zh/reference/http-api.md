@@ -1,13 +1,13 @@
 # HTTP API 路由
 
-管理 API 提供的每个路由，按领域分组：103 个路径、134 个操作，由 core 0.0.8（`20261115-0958`）的
+管理 API 提供的每个路由，按领域分组：103 个路径、134 个操作，由 core 0.0.9（`20261124-0755`）的
 `mica-core:crates/mica-apid/openapi.json` 生成。模式是契约，本页是它的索引；表中"内容"一列保留 OpenAPI
 摘要的英文原文，以免与契约产生偏差。API 的行为（模式、监听器、认证、错误封套、任务）见
 [API 页](api.md)；设置类路由背后的设置见[设置树](settings.md)。
 
 ## 使用 API
 
-- **基础地址。** 默认为 `http://<设备>:8080`，开启 HTTPS 后为 `https://<设备>:8443`，设备上的 root 也可使用
+- **基础地址。** 默认为 `http://<设备>:8080`，开启 HTTPS 后为 `https://<设备>:8443`（此时 8080 对除 SSDP 描述外的所有请求回答 `308 Permanent Redirect`，转到 HTTPS 端口上同一主机、路径和查询），设备上的 root 也可使用
   本地套接字 `/run/mica/apid.sock`。产品不具备的特性没有相应路由（404）。
 - **凭据。** `POST /api/v1/setup` 和 `POST /api/v1/recovery/credential` 不需要凭据，`GET /api/v1/session`
   回答任何调用方；其余路由都需要浏览器会话（写操作带 `X-CSRF-Token`）或 bearer 令牌
@@ -61,7 +61,7 @@
 | POST | `/api/v1/dns/test` | Ask each server directly for one `A` record. | 200 |
 | GET | `/api/v1/network` | Read declared network configuration together with current link state. | 200 |
 | PUT | `/api/v1/network` | Replace the whole interface map, validated as one tree. | 200, 202 |
-| GET | `/api/v1/network/status` | Read the observed network state. | 200 |
+| GET | `/api/v1/network/status` | Read the observed network state, with `uplinks`: the uplink that carries the traffic and each uplink's reachability check. | 200 |
 | GET | `/api/v1/network/wireguard/defaults` | The values a new WireGuard tunnel starts from. | 200 |
 | PUT | `/api/v1/network/{iface}` | Declare or replace one interface, validated against the whole map. | 202 |
 | DELETE | `/api/v1/network/{iface}` | Remove one interface, re-validating the rest of the map without it. | 204 |

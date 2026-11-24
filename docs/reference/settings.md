@@ -92,8 +92,14 @@ have) to its entry.
 | `static.gateway` | IPv4 | none | must be in the address's subnet |
 | `static.dns` | list of addresses | `[]` | |
 | `dns` | list of addresses | `[]` | with `dhcp` only: servers used instead of the lease's |
-| `routes` | list of `{destination, gateway?, metric?}` | `[]` | `destination` in CIDR; `0.0.0.0/0` beside a `static.gateway` is refused |
+| `routes` | list of `{destination, gateway?, metric?}` | `[]` | `destination` in CIDR; `0.0.0.0/0` beside a `static.gateway` is refused; a default route's `metric` is 20 or more (`route_metric_reserved`), and absent it takes the entry's |
 | `internet` | boolean | `true` (`false` on a port the board declares internal) | `false` takes the lease's address and subnet route but never a default route; a static gateway is then refused (`gateway_not_allowed`) |
+| `probe.enabled` | boolean | — (no `probe`: off) | the uplink's reachability check; `false` keeps the targets. Physical, bridge and VLAN entries that may carry the default route only (`probe_not_allowed`) |
+| `probe.targets` | list of `{address, method, port?}` | `1.1.1.1` and `8.8.8.8`, `tcp` to 53, stored when the check is enabled with none | 1 to 4, no duplicates (`probe_targets`); `address` an IPv4 unicast address or `gateway` (`probe_address`); `method` `icmp` or `tcp` (`probe_method`); `port` for `tcp` only, 1 to 65535, absent 443 (`probe_port`) |
+| `probe.intervalS` | integer, 2 to 300 | 10 | seconds between rounds (`probe_interval`) |
+| `probe.timeoutMs` | integer, 200 to 10 000 | 2000 | less than the interval (`probe_timeout`) |
+| `probe.failuresToDown` | integer, 1 to 20 | 3 | failed rounds in a row that take the uplink down (`probe_threshold`) |
+| `probe.successesToUp` | integer, 1 to 50 | 5 | good rounds in a row that bring it back (`probe_threshold`) |
 | `vlan.parent`, `vlan.id` | string, integer | — | the parent must be a declared, non-CAN entry; systemd only |
 | `bridge.ports` | list of entry names | `[]` | each declared and not CAN; systemd only |
 | `wireguard.listenPort` | integer | kernel picks | |
@@ -102,6 +108,11 @@ have) to its entry.
 | `can.restartMs` | integer, 0 to 60 000 | never restart | delay after bus-off |
 | `can.fd` | boolean | `false` | |
 | `can.dataBitrate` | integer, 1 to 8 000 000 | — | required with `fd: true`, refused otherwise |
+
+Static default routes take the metrics 20, 21, ... in entry-name order;
+below 20 is the device's own (micad's failover route is metric 10). Enabling
+a check makes the device contact its targets every interval out of that
+interface ([network](../operate/network.md)).
 
 A WireGuard peer is `{publicKey, allowedIps, endpoint?, persistentKeepalive?,
 name?, presharedKey?}`: keys are 32 bytes in base64, `allowedIps` are

@@ -92,7 +92,7 @@ ssh root@mica-a4e2e69e.local
 mica status
 # board      <board model>
 # system     <version> (<id, 12 hex>)
-# core       0.0.8 (channel general)
+# core       0.0.9 (channel general)
 # state      succeeded: The boot health gate confirmed this deployment
 # uptime     2h 14m
 # network    eth0 routable 192.168.1.40/24

@@ -4,7 +4,7 @@
 > `micad` 命令（`micad web`、`micad unit`、`micad factory-reset` 等）。
 
 `mica` 是运维者在设备上唯一的命令。本页列出每个动词、选项、输出、退出码和 `--json` 形式，依据 `mica-core`
-发布 `20261115-0958`（core 0.0.8，`mica-core:crates/micad/src/cli.rs` 及其调用的模块）。
+发布 `20261124-0755`（core 0.0.9，`mica-core:crates/micad/src/cli.rs` 及其调用的模块）。
 
 ## 1. 在哪里运行，谁能运行
 
@@ -19,7 +19,7 @@
 `micad` 本身只接受 `micad daemon`、`micad apid` 和 `micad --version`，即其 unit 启动它的方式。其他任何词都以
 退出码 2 退出，并提示 `micad: use mica <word> (mica help)`。
 
-`mica --version` 打印 `mica <软件包版本>`，例如 `mica 0.0.8-1`。
+`mica --version` 打印 `mica <软件包版本>`，例如 `mica 0.0.9-1`。
 
 ## 2. 两个通道
 
@@ -156,7 +156,7 @@ mica status [--json]
 $ mica status
 board      <板卡型号>
 system     <版本> (<部署 id 的前 12 个字符>)
-core       0.0.8 (channel general)
+core       0.0.9 (channel general)
 state      <生命周期状态>
 checked    <最近一次检查的时间>
 uptime     2h 14m
@@ -353,25 +353,37 @@ mica network [--json]
 mica network show <interface> [--json]
 ```
 
-`mica network` 读取观测到的状态（`GET /api/v1/network/status`），除 `lo` 外每个接口打印一行：名称、运行状态、
-地址。`show` 打印一个接口：
+`mica network` 读取观测到的状态（`GET /api/v1/network/status`），把除 `lo` 外的每个接口列成一张表：
+名称、运行状态、按最近一次可达性检查判断是否能上互联网，以及地址。`*` 标出承载流量的上行。`show`
+打印一个接口，有检查时连同检查和最近一轮的结果：
 
 ```text
 $ mica network
-enp0s2 routable 192.168.1.40/24 fe80::5054:ff:fe12:3456/64
-wlan0 no-carrier
-$ mica network show enp0s2
-name: enp0s2
+NAME     STATE     INTERNET  ADDRESSES
+eth0*    routable  up        192.168.1.40/24 fe80::5054:ff:fe12:3456/64
+wlan0    routable  up        10.0.0.23/24
+$ mica network show eth0
+name: eth0
 state: routable
 hardware address: 52:54:00:12:34:56
 address: 192.168.1.40/24
 address: fe80::5054:ff:fe12:3456/64
+gateway: 192.168.1.1
 dns: 192.168.1.1
+internet: up (carries the traffic)
+metric: 20
+check: on, every 10 s, 2000 ms timeout, down after 3, up after 5: 1.1.1.1 tcp/53, 8.8.8.8 tcp/53
+since: 2026-11-24T10:02:11Z (0 failed, 41 good in a row)
+last round: 2026-11-24T10:09:01Z ok
+  1.1.1.1 tcp/53 ok 12 ms
+  8.8.8.8 tcp/53 ok 15 ms
 ```
 
-默认路由会显示为 `gateway:` 行，已关联的无线接口显示 `wifi: <ssid>`。未知名称以 1 退出并提示
+INTERNET 取值为 `up`、`down`、`checking`（尚无结论）、`no route`、`blocked`（严格反向路径过滤丢弃了
+应答），没有检查的接口为 `-`。已关联的无线接口显示 `wifi: <ssid>`。未知名称以 1 退出并提示
 `no interface named <name>`（代码 `not_found`）。`--json` 打印整个文档，`show` 时打印该接口的对象
-（[诊断](diagnostics.md#3-观测到的网络状态)）。修改网络由控制台或 `mica set` 负责，不由本动词负责。
+（[诊断](diagnostics.md#3-观测到的网络状态)）。修改网络由控制台或 `mica set` 负责，不由本动词负责
+（[网络](../operate/network.md)）。core 0.0.8 上 `mica network` 打印的是空列表，0.0.9 已修复。
 
 ### wifi
 
@@ -426,7 +438,7 @@ mica update rollback [--reboot]
 ```text
 $ mica update
 system     <版本> (<部署 id 简写>)
-core       0.0.8 (channel general)
+core       0.0.9 (channel general)
 state      <生命周期状态>
 available  system <版本>
 checked    <最近一次检查的时间>

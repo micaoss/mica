@@ -31,16 +31,16 @@ Mica OS 通过 `micaoss/mica-build` 的 GitHub Release 发布。全部可匿名�
 
 | 产品 | 时间戳 | 镜像中的 core | 内容 |
 |---|---|---|---|
-| `cx3576.full` | `20261115-1337` | 0.0.8 | systemd、Docker、OpenSSH、WiFi 与蓝牙：出厂接入点、BLE 配网 |
-| `s905x5m.sd-full` | `20261115-1356` | 0.0.8 | systemd、Podman、Dropbear、WiFi 与蓝牙，用于 SD 卡 |
-| `s905x5m.emmc-full` | `20261115-1449` | 0.0.8 | 同上，用于 eMMC |
-| `uefi-x64.full` | `20261115-1356` | 0.0.8 | systemd、Podman、Dropbear，无无线电 |
-| `uefi-x64.docker` | `20261115-1449` | 0.0.8 | systemd、Docker、Dropbear，无无线电 |
-| `mini-x64.basic` | `20261115-1356` | 0.0.8 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
-| `qemu-armhf.basic` | `20261115-1356` | 0.0.8 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
-| `uefi-x64.gcp` | `20261115-1652` | 0.0.8 | 用于 Google Compute Engine：systemd、Docker、OpenSSH，无无线电；另有供导入的 `.gce.tar.gz` 与启动证书 `.db.der` |
+| `cx3576.full` | `20261124-1332` | 0.0.9 | systemd、Docker、OpenSSH、WiFi 与蓝牙：出厂接入点、BLE 配网 |
+| `s905x5m.sd-full` | `20261124-1351` | 0.0.9 | systemd、Podman、Dropbear、WiFi 与蓝牙，用于 SD 卡 |
+| `s905x5m.emmc-full` | `20261124-1411` | 0.0.9 | 同上，用于 eMMC |
+| `uefi-x64.full` | `20261124-1351` | 0.0.9 | systemd、Podman、Dropbear，无无线电 |
+| `uefi-x64.docker` | `20261124-1505` | 0.0.9 | systemd、Docker、Dropbear，无无线电 |
+| `mini-x64.basic` | `20261124-1351` | 0.0.9 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
+| `qemu-armhf.basic` | `20261124-1351` | 0.0.9 | OpenRC、管理平面与控制台、Dropbear，无容器引擎 |
+| `uefi-x64.gcp` | `20261124-1535` | 0.0.9 | 用于 Google Compute Engine：systemd、Docker、OpenSSH，无无线电；另有供导入的 `.gce.tar.gz` 与启动证书 `.db.der` |
 
-当前的 core 集是 `core.general.20261115-1333`，即 core 0.0.8，上面每个镜像都用它
+当前的 core 集是 `core.general.20261124-1328`，即 core 0.0.9，上面每个镜像都用它
 构建。如何把 `uefi-x64.gcp` 导入 Compute Engine 见 [uefi-x64](../hardware/uefi-x64.md)。
 
 > status: shipped — evidence: `mica-build:boards/products.md`, `mica-core:docs/mica-core.md`

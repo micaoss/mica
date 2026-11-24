@@ -71,8 +71,14 @@
 | `static.gateway` | IPv4 | 无 | 必须在地址的子网内 |
 | `static.dns` | 地址列表 | `[]` | |
 | `dns` | 地址列表 | `[]` | 仅与 `dhcp` 一起：代替租约给出的服务器 |
-| `routes` | `{destination, gateway?, metric?}` 列表 | `[]` | `destination` 为 CIDR；与 `static.gateway` 并存的 `0.0.0.0/0` 会被拒绝 |
+| `routes` | `{destination, gateway?, metric?}` 列表 | `[]` | `destination` 为 CIDR；与 `static.gateway` 并存的 `0.0.0.0/0` 会被拒绝；默认路由的 `metric` 须不小于 20（`route_metric_reserved`），缺省时取该条目的值 |
 | `internet` | 布尔 | `true`（板卡声明为内部的端口上为 `false`） | `false` 采用租约的地址和子网路由，但从不采用默认路由；此时静态网关会被拒绝（`gateway_not_allowed`） |
+| `probe.enabled` | 布尔 | —（没有 `probe`：关闭） | 上行可达性检查；`false` 保留目标。只用于可能承载默认路由的物理、网桥和 VLAN 条目（`probe_not_allowed`） |
+| `probe.targets` | `{address, method, port?}` 列表 | `1.1.1.1` 和 `8.8.8.8`，`tcp` 到 53 端口，在不带目标启用检查时写入 | 1 到 4 个，不得重复（`probe_targets`）；`address` 为 IPv4 单播地址或 `gateway`（`probe_address`）；`method` 为 `icmp` 或 `tcp`（`probe_method`）；`port` 仅用于 `tcp`，1 到 65535，缺省 443（`probe_port`） |
+| `probe.intervalS` | 整数，2 到 300 | 10 | 两轮之间的秒数（`probe_interval`） |
+| `probe.timeoutMs` | 整数，200 到 10 000 | 2000 | 必须小于间隔（`probe_timeout`） |
+| `probe.failuresToDown` | 整数，1 到 20 | 3 | 连续失败多少轮判定上行断开（`probe_threshold`） |
+| `probe.successesToUp` | 整数，1 到 50 | 5 | 连续成功多少轮判定恢复（`probe_threshold`） |
 | `vlan.parent`、`vlan.id` | 字符串、整数 | — | 父接口必须是已声明的非 CAN 条目；仅 systemd |
 | `bridge.ports` | 条目名列表 | `[]` | 每个都必须已声明且不是 CAN；仅 systemd |
 | `wireguard.listenPort` | 整数 | 由内核选 | |
@@ -81,6 +87,9 @@
 | `can.restartMs` | 整数，0 到 60 000 | 不重启 | bus-off 后的延迟 |
 | `can.fd` | 布尔 | `false` | |
 | `can.dataBitrate` | 整数，1 到 8 000 000 | — | `fd: true` 时必填，否则拒绝 |
+
+静态默认路由按条目名称顺序取 metric 20、21……；20 以下留给设备自己（micad 的故障切换路由
+是 metric 10）。启用检查后，设备会每个间隔从该接口联系一次它的目标（[网络](../operate/network.md)）。
 
 WireGuard 对端是 `{publicKey, allowedIps, endpoint?, persistentKeepalive?, name?, presharedKey?}`：密钥为
 base64 的 32 字节，`allowedIps` 是地址或 CIDR，`endpoint` 是 `host:port`，`name` 是最多 64 个字符的标签。
