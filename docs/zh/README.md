@@ -62,6 +62,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 - `releases/` — 发布：如何标识、制作、分发与支持
   - [`release-notes.md`](releases/release-notes.md) — 发布版标识与发布说明政策
   - [`how-releases-work.md`](releases/how-releases-work.md) — release 如何切、携带什么、什么决定重建
+  - [`notes-0-0-9.md`](releases/notes-0-0-9.md) — core 0.0.9 这一轮（2026-11-24）的发布说明：发布了什么、新内容、修复
   - [`support.md`](releases/support.md) — 支持层级与生命周期归属
 - [`contributing.md`](contributing.md) — 文档契约（读者、真实状态分类法、中英规则）
 - `reference/` — 设备行为的契约（工作原理），以及应要求以中文维护的设计简报
@@ -154,6 +155,7 @@ Mica OS（云母）是面向工业设备的嵌入式 Linux 操作系统。本目
 | `../security/overview.md` | current |
 | `../security/signing.md` | current |
 | `../releases/how-releases-work.md` | current |
+| `../releases/notes-0-0-9.md` | current |
 | `../releases/release-notes.md` | current |
 | `../releases/support.md` | current |
 | `../website/contract.md` | not-translated |

@@ -20,7 +20,7 @@ board status is in [support tiers](hardware/README.md#current-boards).
 | Develop against the API or the console | [API contract](reference/api.md), [console](integrate/console.md), OpenAPI (`mica-core:crates/mica-apid/openapi.json`) |
 | Integrate an application | [Native applications](integrate/native-applications.md), [containers](integrate/containers.md), [bus](integrate/bus.md) |
 | See what a board does today, and how to flash it | [Supported hardware](hardware/README.md), [support tiers](hardware/README.md) |
-| Understand how releases are identified | [Release notes](releases/release-notes.md), [releasing](releases/how-releases-work.md), [release lock](reference/release-lock.md) |
+| Understand how releases are identified | [Release notes](releases/release-notes.md), [0.0.9 round](releases/notes-0-0-9.md), [releasing](releases/how-releases-work.md), [release lock](reference/release-lock.md) |
 
 ## Naming
 
@@ -146,6 +146,7 @@ current product only; history is in Git.
   - `wifi.md` — Wi-Fi station and access point as two micad reconcilers driving wpa_supplicant and hostapd
 - `releases/` — how releases are identified, made, distributed and supported
   - `how-releases-work.md` — how a release is cut in each repository, what it carries, and what decides a rebuild
+  - `notes-0-0-9.md` — release notes of the core 0.0.9 round (2026-11-24): what was released, what is new, what is fixed
   - `release-notes.md` — how releases are identified and where release facts come from
   - `support.md` — support tiers, lifecycle ownership, and what a support case needs
 - `website/` — micaos.dev content briefs, one per page

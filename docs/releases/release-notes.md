@@ -39,7 +39,8 @@ what it publishes, not in prose written afterwards:
   ([updates](../operate/updates.md)).
 
 A change to a trust anchor, the boot policy, an access default or what
-persists is stated in the release's notes by name. A fallback deployment
+persists is stated in the release's notes by name. The latest product round's
+summary is [the core 0.0.9 round](notes-0-0-9.md). A fallback deployment
 shares DATA with the one it replaces: no release reverts application data, and
 there is no data migration path.
 

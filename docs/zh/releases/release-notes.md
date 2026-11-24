@@ -30,7 +30,7 @@
 - 有哪些更新归档说明了变了什么：有 `root` 归档表示内核是上一次发布的，有 `kernel` 归档
   表示根是上一次的（[更新](../operate/updates.md)）。
 
-信任锚、启动策略、访问默认值或持久化内容的变化，会在发布说明里点名写出。回退部署与它
+信任锚、启动策略、访问默认值或持久化内容的变化，会在发布说明里点名写出。最近一轮产品的摘要见 [core 0.0.9 这一轮](notes-0-0-9.md)。回退部署与它
 替换的部署共享 DATA：任何发布都不会回退应用数据，也没有数据迁移路径。
 
 > status: shipped — evidence: `mica-build:README.md`, `mica-build:src/release/scoped.ts`, `docs/reference/updates.md`

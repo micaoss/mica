@@ -111,6 +111,7 @@
         { "name": "glossary", "dir": "reference" },
         { "name": "how-releases-work", "dir": "releases" },
         { "name": "release-notes", "dir": "releases" },
+        { "name": "notes-0-0-9", "dir": "releases" },
         { "name": "support", "dir": "releases" }
       ]
     }
